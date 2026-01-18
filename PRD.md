@@ -41,12 +41,9 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 | ⏹️ **BLOCKED** | US-005 (Auth - Convex/Better Auth API integration failing) |
 | 🔄 **Stories Remaining** | US-020 (Phase 2-5), US-018, US-019 + 6 verification |
 
-**🚨 BUG: TWO HEADERS/NAVBARS ARE SHOWING - FIX THIS FIRST!**
+**✅ BUG FIXED: Duplicate header removed from song.$songId.tsx**
 
-The song page has TWO headers - one from `__root.tsx` and one from `song.$songId.tsx`.
-Remove the duplicate header from `song.$songId.tsx` - use only the root layout header.
-
-**THEN continue to: US-020 Phase 3 (Audio Preloader Hook)**
+**Continue to: US-020 Phase 5 (Browser Testing)**
 
 ---
 
@@ -836,14 +833,14 @@ const handleLineClick = useCallback((startTime: number, lineIndex: number) => {
 ```
 
 **Acceptance Criteria (Phase 4):**
-- [ ] Song page uses `useAudioPreloader` hook
-- [ ] Show "Loading audio... X/31" while preloading
-- [ ] Clicking a lyric line plays local audio snippet instantly
-- [ ] Previous audio stops when new line is clicked
-- [ ] Loop mode works with local audio (replay snippet when it ends)
-- [ ] Playback speed control works (use `audio.playbackRate`)
-- [ ] YouTube video is OPTIONAL - can be hidden or shown for reference
-- [ ] Typecheck passes
+- [x] Song page uses `useAudioPreloader` hook
+- [x] Show "Loading audio... X/31" while preloading
+- [x] Clicking a lyric line plays local audio snippet instantly
+- [x] Previous audio stops when new line is clicked
+- [x] Loop mode works with local audio (replay snippet when it ends)
+- [x] Playback speed control works (use `audio.playbackRate`)
+- [x] YouTube video is OPTIONAL - can be hidden or shown for reference
+- [x] Typecheck passes
 
 ---
 

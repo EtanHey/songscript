@@ -15,6 +15,7 @@ interface UseAudioPreloaderReturn extends PreloadState {
   play: (lineNumber: number) => void
   stop: () => void
   setPlaybackRate: (rate: number) => void
+  setLoop: (loop: boolean) => void
 }
 
 export function useAudioPreloader(snippets: AudioSnippet[]): UseAudioPreloaderReturn {
@@ -26,6 +27,7 @@ export function useAudioPreloader(snippets: AudioSnippet[]): UseAudioPreloaderRe
   const audioMapRef = useRef<Map<number, HTMLAudioElement>>(new Map())
   const currentlyPlayingRef = useRef<HTMLAudioElement | null>(null)
   const playbackRateRef = useRef<number>(1)
+  const loopRef = useRef<boolean>(false)
 
   useEffect(() => {
     if (snippets.length === 0) {
@@ -94,6 +96,7 @@ export function useAudioPreloader(snippets: AudioSnippet[]): UseAudioPreloaderRe
     if (audio) {
       audio.currentTime = 0
       audio.playbackRate = playbackRateRef.current
+      audio.loop = loopRef.current
       audio.play().catch((err) => {
         console.warn(`Failed to play audio for line ${lineNumber}:`, err)
       })
@@ -117,5 +120,13 @@ export function useAudioPreloader(snippets: AudioSnippet[]): UseAudioPreloaderRe
     }
   }, [])
 
-  return { ...state, play, stop, setPlaybackRate }
+  const setLoop = useCallback((loop: boolean) => {
+    loopRef.current = loop
+    // Update loop on currently playing audio immediately
+    if (currentlyPlayingRef.current) {
+      currentlyPlayingRef.current.loop = loop
+    }
+  }, [])
+
+  return { ...state, play, stop, setPlaybackRate, setLoop }
 }

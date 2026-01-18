@@ -18,6 +18,29 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-020 Phase 4: Integrate Audio Playback into Song Page
+- Fixed duplicate header bug: removed inline header from song.$songId.tsx, now using root layout header only
+- Integrated `useAudioPreloader` hook in song page:
+  - Prepared audio snippets from sortedLyrics with audioSnippetUrl
+  - Use `playAudioSnippet(lineNumber)` on line click for instant playback
+  - YouTube video syncs seekTo for visual reference but doesn't call play (to avoid audio overlap)
+- Added audio loading status indicator in controls section:
+  - Shows "Loading audio... X/31" while preloading
+  - Shows "Audio ready" with green checkmark when all snippets loaded
+  - Uses Volume2 icon from lucide-react
+- Updated loop mode to use HTML5 Audio `loop` property via hook's `setLoop` function
+- Connected speed control to audio playback rate via hook's `setPlaybackRate` function
+- Enhanced `useAudioPreloader` hook with `setLoop` function for native audio looping
+- Typecheck passes
+- Browser test NOT possible - extension not connected
+
+**Learnings:**
+- HTML5 Audio element has native `loop` property that handles looping automatically
+- Height calc `h-[calc(100vh-65px)]` accounts for root layout header height
+- Audio preloader hook works well for instant playback - no buffering delay expected
+
+---
+
 ## Iteration - US-020 Phase 3: Audio Preloader Hook
 - Created `src/hooks/useAudioPreloader.ts` with full implementation
 - Hook features:

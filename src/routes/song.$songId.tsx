@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Suspense, useRef, useState, useCallback, useEffect } from "react";
+import { Suspense, useRef, useState, useCallback, useEffect, useMemo } from "react";
 import { convexQuery } from "@convex-dev/react-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
@@ -7,6 +7,7 @@ import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import YouTubePlayer, { YouTubePlayerHandle } from "../components/YouTubePlayer";
 import LyricsDisplay, { LanguageFilter } from "../components/LyricsDisplay";
+import { useAudioPreloader } from "../hooks/useAudioPreloader";
 import { Switch } from "../components/ui/switch";
 import {
   Select,
@@ -15,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Repeat, Languages } from "lucide-react";
+import { Repeat, Languages, Volume2 } from "lucide-react";
 
 export const Route = createFileRoute("/song/$songId")({
   component: SongPage,
@@ -76,6 +77,28 @@ function SongPageContent({ songId }: SongPageContentProps) {
     (a, b) => a.lineNumber - b.lineNumber
   );
 
+  // Prepare audio snippets for the preloader hook
+  const audioSnippets = useMemo(
+    () =>
+      sortedLyrics
+        .filter((line) => line.audioSnippetUrl)
+        .map((line) => ({
+          lineNumber: line.lineNumber,
+          audioUrl: line.audioSnippetUrl!,
+        })),
+    [sortedLyrics]
+  );
+
+  // Audio preloader hook for instant playback
+  const {
+    ready: audioReady,
+    loaded: audioLoaded,
+    total: audioTotal,
+    play: playAudioSnippet,
+    setPlaybackRate: setAudioPlaybackRate,
+    setLoop: setAudioLoop,
+  } = useAudioPreloader(audioSnippets);
+
   const playerRef = useRef<YouTubePlayerHandle>(null);
   const [activeLineIndex, setActiveLineIndex] = useState<number | undefined>(
     undefined
@@ -98,8 +121,10 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
   const handleSpeedChange = useCallback((speed: string) => {
     setPlaybackSpeed(speed);
+    // Update both YouTube and audio playback rate
     playerRef.current?.setPlaybackRate(parseFloat(speed));
-  }, []);
+    setAudioPlaybackRate(parseFloat(speed));
+  }, [setAudioPlaybackRate]);
 
   // Clear click animation after 300ms
   const triggerClickAnimation = useCallback((lineIndex: number) => {
@@ -111,10 +136,18 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
   const handleLineClick = useCallback(
     (startTime: number, lineIndex: number) => {
-      // Seek to the timestamp
+      const lineNumber = sortedLyrics[lineIndex]?.lineNumber;
+
+      // Play local audio snippet if available (instant playback)
+      if (lineNumber !== undefined && audioReady) {
+        playAudioSnippet(lineNumber);
+      }
+
+      // Also sync YouTube video for visual reference
       playerRef.current?.seekTo(startTime);
-      // Start playing after seek
-      playerRef.current?.play();
+      // Mute YouTube so audio doesn't overlap
+      // (YouTube player doesn't have a mute method, so we just don't call play)
+
       // Trigger visual feedback
       triggerClickAnimation(lineIndex);
       // Set as active line
@@ -122,7 +155,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
       // Set as current line for looping
       setCurrentLineIndex(lineIndex);
     },
-    [triggerClickAnimation]
+    [triggerClickAnimation, sortedLyrics, audioReady, playAudioSnippet]
   );
 
   const handleTimeUpdate = useCallback(
@@ -138,41 +171,17 @@ function SongPageContent({ songId }: SongPageContentProps) {
     [sortedLyrics, activeLineIndex]
   );
 
-  // Loop mode effect - check time every 100ms and seek back if needed
+  // Sync loop mode to audio preloader
   useEffect(() => {
-    if (!isLooping || currentLineIndex === undefined) {
-      return;
-    }
-
-    const currentLine = sortedLyrics[currentLineIndex];
-    if (!currentLine) {
-      return;
-    }
-
-    const intervalId = setInterval(() => {
-      const currentTime = playerRef.current?.getCurrentTime();
-      if (currentTime !== undefined && currentTime >= currentLine.endTime) {
-        // Seek back to start of current line
-        playerRef.current?.seekTo(currentLine.startTime);
-      }
-    }, 100);
-
-    return () => clearInterval(intervalId);
-  }, [isLooping, currentLineIndex, sortedLyrics]);
+    setAudioLoop(isLooping);
+  }, [isLooping, setAudioLoop]);
 
   if (!song) {
     throw notFound();
   }
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-gray-900 text-white">
-      {/* Sticky header */}
-      <header className="flex-shrink-0 border-b border-gray-800 p-4">
-        <Link to="/" className="text-2xl font-bold iran-gradient hover:opacity-80 transition-opacity">
-          SongScript
-        </Link>
-      </header>
-
+    <div className="flex h-[calc(100vh-65px)] flex-col overflow-hidden bg-gray-900 text-white">
       {/* Main content - side by side on desktop (lg+) */}
       <div className="flex flex-1 flex-col lg:flex-row overflow-hidden">
         {/* LEFT: Player section (50% on desktop, sticky on mobile) */}
@@ -254,6 +263,18 @@ function SongPageContent({ songId }: SongPageContentProps) {
                       <SelectItem value="english">English Only</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                {/* Audio Loading Status */}
+                <div className="flex items-center gap-2">
+                  <Volume2 className={`h-4 w-4 ${audioReady ? "text-green-500" : "text-gray-400"}`} />
+                  {audioReady ? (
+                    <span className="text-xs text-green-500">Audio ready</span>
+                  ) : (
+                    <span className="text-xs text-gray-400">
+                      Loading audio... {audioLoaded}/{audioTotal}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
