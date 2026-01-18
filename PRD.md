@@ -31,6 +31,18 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
    - If TRULY blocked (missing API keys, user input required), mark as `**⏸️ BLOCKED**: [reason]` and move to next story.
 10. **ACTUALLY TEST**: Don't just write code - run it, test it in browser, verify it works end-to-end.
 
+11. **🔴 MANDATORY BROWSER VERIFICATION AFTER EACH STORY 🔴**:
+    After completing each story, you MUST do browser verification:
+    - Use `mcp__claude-in-chrome__tabs_context_mcp` to get browser context
+    - Navigate to `http://localhost:3001` or the relevant page
+    - Take a screenshot with `mcp__claude-in-chrome__computer` (action: screenshot)
+    - Click on the UI elements you just implemented
+    - Test toggles, buttons, modals - interact with everything you changed
+    - Verify nothing is broken visually
+    - If you changed playback: click lines, test loop mode, test speed control
+    - If you added a modal: open it, close it, test all buttons inside
+    - **DO NOT mark story complete without browser screenshots proving it works**
+
 ---
 
 ## 📊 PROGRESS SUMMARY
@@ -38,14 +50,15 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 | Metric | Count |
 |--------|-------|
 | ✅ **Stories Complete** | 31 (US-001-020A, US-022-027, V-001-007) |
-| ⏹️ **BLOCKED** | US-005 (Auth), US-020 Phase 5 |
-| 🔄 **Stories Remaining** | 8 (US-028-033, V-008-009) |
+| ⏹️ **BLOCKED** | US-005 (Auth - see US-005-FIX), US-020 Phase 5 |
+| 🔄 **Stories Remaining** | 9 (US-005-FIX, US-028-033, V-008-009) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** US-028 (Three-Way Playback Toggle)
+**Next Story:** US-005-FIX (Auth Investigation)
 
 **Story Order (optimized - API-dependent story LAST):**
+0. US-005-FIX: Investigate & Fix Auth HTTP 500 ← HIGH PRIORITY
 1. US-028: Three-Way Playback Toggle ← No API
 2. US-029: Pause/Play Controls ← No API
 3. US-030: Word-by-Word Info Modal ← No API
@@ -116,6 +129,45 @@ SongScript is a song transliteration learning app that helps users learn to pron
 ---
 
 ## User Stories
+
+### US-005-FIX: Investigate & Fix Auth HTTP 500 Error (HIGH PRIORITY)
+
+**Description:** The auth system returns HTTP 500 on `/api/auth/get-session`. This needs investigation and fixing. The login page takes forever to load because the session check fails.
+
+**🔍 CURRENT ERROR:**
+```
+GET http://localhost:3001/api/auth/get-session → 500
+Response: {"status":500,"unhandled":true,"message":"HTTPError"}
+```
+
+**📁 RELEVANT FILES:**
+- `src/lib/auth-server.ts` - Handler from `convexBetterAuthReactStart`
+- `src/lib/auth-client.ts` - Client auth hooks
+- `src/routes/api/auth/$.tsx` - API route handler
+- `convex/auth.config.ts` - Convex auth config
+- `.env.local` - Environment variables (BETTER_AUTH_SECRET, VITE_CONVEX_URL, etc.)
+
+**🔧 INVESTIGATION STEPS:**
+1. Check if Convex deployment is running: `npx convex dev`
+2. Verify environment variables are correct
+3. Use Context7 to look up latest Better Auth + Convex setup
+4. Check browser network tab for more error details
+5. Try simplifying the auth handler to isolate the issue
+6. Check Convex dashboard for any errors
+
+**Acceptance Criteria:**
+- [ ] Investigate the HTTP 500 error using browser tools and logs
+- [ ] Use `mcp__Context7__query-docs` to check latest Better Auth + Convex integration docs
+- [ ] Identify root cause of the error
+- [ ] Fix the auth handler so `/api/auth/get-session` returns 200 (or proper auth response)
+- [ ] **BROWSER TEST**: Navigate to `/login`, verify page loads quickly (< 2 seconds)
+- [ ] **BROWSER TEST**: Enter admin email `etan@heyman.net`, submit magic link form
+- [ ] If fix requires env vars or external setup, document what's needed
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-005-FIX. Do not continue to US-028.**
+
+---
 
 ### US-001: Project Scaffolding with TanStack Start + Bun
 
