@@ -18,6 +18,42 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-030: Word-by-Word Info Modal ✅
+- Added ShadCN Sheet and Dialog components: `bunx shadcn@latest add sheet dialog`
+- Created `src/components/WordInfoModal.tsx`:
+  - Displays word-by-word breakdown of a lyric line
+  - Desktop: centered Dialog modal with backdrop
+  - Mobile: Sheet drawer that slides up from bottom
+  - Full line display at top (Persian, transliteration, Hebrew, English)
+  - Word table with columns: Persian, Sound (transliteration), Hebrew, English, Type, Audio
+  - Audio buttons disabled until US-031 (ElevenLabs integration)
+  - Temporary word parsing that splits line into words (will use Convex data after US-033)
+- Updated `src/components/LyricsDisplay.tsx`:
+  - Added Info button (ⓘ icon) to each lyric line
+  - Added `onLineInfoClick` callback prop
+  - Exported `LyricLine` interface
+- Updated `src/routes/song.$songId.tsx`:
+  - Added modal state (wordModalOpen, selectedLine)
+  - Added mobile detection via resize listener
+  - Added `handleLineInfoClick` callback
+  - Integrated WordInfoModal component
+- Browser verification:
+  - ✅ Desktop: Click info button → centered modal opens with word breakdown
+  - ✅ Desktop: X button and click-outside-to-close work
+  - ✅ Mobile (375px): Click info button → bottom drawer slides up
+  - ✅ Word table shows Persian, transliteration, Hebrew for each word
+  - ✅ Audio buttons are disabled with tooltip "Audio not available (coming soon)"
+- Typecheck passes ✅
+
+**Learnings:**
+- ShadCN Sheet with `side="bottom"` creates mobile drawer pattern
+- Use `isMobile` state with resize listener to choose Dialog vs Sheet
+- Word parsing is temporary - will be replaced with Convex word data in US-033
+
+**Next:** US-033 (Pre-generate Word Data)
+
+---
+
 ## Iteration - US-029-FIX: Fluid Mode UX Improvements ✅
 - Removed "Play Full Video" button - Fluid mode now replaces this functionality
 - Hidden Pause/Play button when in Fluid mode (video has native controls)

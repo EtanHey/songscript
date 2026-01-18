@@ -49,13 +49,13 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 36 (US-001-020A, US-022-029, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, V-001-007) |
+| ✅ **Stories Complete** | 37 (US-001-020A, US-022-030, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, V-001-007) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), US-020 Phase 5 |
-| 🔄 **Stories Remaining** | 6 (US-030-033, V-008-009) |
+| 🔄 **Stories Remaining** | 5 (US-031-033, V-008-009) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** US-030 (Word-by-Word Info Modal)
+**Next Story:** US-033 (Pre-generate Word Data)
 
 **Story Order (optimized - API-dependent story LAST):**
 0. ~~US-TIMESTAMPS-V2~~ ✅ (end buffer increased to +0.70s)
@@ -63,8 +63,8 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 2. ~~US-TIMESTAMPS~~ ✅ (needs V2 - end still cuts)
 3. ~~US-005-FIX~~ ⏹️ BLOCKED (auth API still 500)
 4. ~~US-029~~ ✅ (needs FIX - Fluid mode behavior)
-5. **US-030: Word-by-Word Info Modal** ← NEXT
-6. US-033: Pre-generate Word Data (manual JSON) ← No API
+5. ~~US-030~~ ✅ (Word-by-Word Info Modal)
+6. **US-033: Pre-generate Word Data (manual JSON)** ← NEXT
 7. US-032: Word Learning Tracking ← No API (uses localStorage)
 8. V-008: Verify Playback Modes ← No API
 9. V-009: Verify Word Info Modal ← No API
@@ -1395,14 +1395,16 @@ Replace YouTube embed with local video player using downloaded MP4:
   - Audio button (plays word pronunciation - see US-031)
 
 **Acceptance Criteria:**
-- [ ] Click/tap lyric line opens modal (in addition to playing audio)
-- [ ] Modal shows line's full text at top
-- [ ] Below: word-by-word table with all columns
-- [ ] Each word row has audio button (speaker icon) - disabled until US-031 complete
-- [ ] Close button (X) and click-outside-to-close
-- [ ] Mobile: modal is full-screen drawer from bottom
-- [ ] Desktop: centered modal with backdrop
-- [ ] Typecheck passes
+- [x] Click/tap lyric line opens modal (in addition to playing audio)
+- [x] Modal shows line's full text at top
+- [x] Below: word-by-word table with all columns
+- [x] Each word row has audio button (speaker icon) - disabled until US-031 complete
+- [x] Close button (X) and click-outside-to-close
+- [x] Mobile: modal is full-screen drawer from bottom
+- [x] Desktop: centered modal with backdrop
+- [x] Typecheck passes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-030**
 

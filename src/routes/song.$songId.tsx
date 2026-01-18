@@ -6,7 +6,8 @@ import { ErrorBoundary } from "react-error-boundary";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import LocalVideoPlayer, { LocalVideoPlayerHandle } from "../components/LocalVideoPlayer";
-import LyricsDisplay, { LanguageFilter } from "../components/LyricsDisplay";
+import LyricsDisplay, { LanguageFilter, LyricLine } from "../components/LyricsDisplay";
+import WordInfoModal, { ModalLyricLine } from "../components/WordInfoModal";
 import { useAudioPreloader } from "../hooks/useAudioPreloader";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import {
@@ -135,6 +136,19 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
   // Video playing state - for pause/play control
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+
+  // Word info modal state
+  const [wordModalOpen, setWordModalOpen] = useState(false);
+  const [selectedLine, setSelectedLine] = useState<ModalLyricLine | null>(null);
+
+  // Detect if mobile (viewport width < 768px)
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleSpeedChange = useCallback((speed: string) => {
     setPlaybackSpeed(speed);
@@ -266,6 +280,18 @@ function SongPageContent({ songId }: SongPageContentProps) {
     },
     [sortedLyrics, activeLineIndex]
   );
+
+  // Handle opening word info modal
+  const handleLineInfoClick = useCallback((line: LyricLine) => {
+    setSelectedLine({
+      lineNumber: line.lineNumber,
+      original: line.original,
+      transliteration: line.transliteration,
+      hebrew: line.hebrew,
+      english: line.english,
+    });
+    setWordModalOpen(true);
+  }, []);
 
   // Sync loop mode to audio preloader (for Single/Loop snippet modes)
   useEffect(() => {
@@ -514,12 +540,21 @@ function SongPageContent({ songId }: SongPageContentProps) {
           <LyricsDisplay
             songId={songId}
             onLineClick={handleLineClick}
+            onLineInfoClick={handleLineInfoClick}
             activeLineIndex={activeLineIndex}
             clickedLineIndex={clickedLineIndex}
             languageFilter={languageFilter}
           />
         </div>
       </div>
+
+      {/* Word Info Modal */}
+      <WordInfoModal
+        isOpen={wordModalOpen}
+        onClose={() => setWordModalOpen(false)}
+        line={selectedLine}
+        isMobile={isMobile}
+      />
     </div>
   );
 }
