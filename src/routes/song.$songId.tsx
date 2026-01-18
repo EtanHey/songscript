@@ -1,11 +1,13 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { Suspense, useRef, useState, useCallback } from "react";
+import { Suspense, useRef, useState, useCallback, useEffect } from "react";
 import { convexQuery } from "@convex-dev/react-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import YouTubePlayer, { YouTubePlayerHandle } from "../components/YouTubePlayer";
 import LyricsDisplay from "../components/LyricsDisplay";
+import { Switch } from "../components/ui/switch";
+import { Repeat } from "lucide-react";
 
 export const Route = createFileRoute("/song/$songId")({
   component: SongPage,
@@ -40,12 +42,26 @@ function SongPageContent({ songId }: SongPageContentProps) {
   const { data: song } = useSuspenseQuery(
     convexQuery(api.songs.getById, { id: songId })
   );
+  const { data: lyrics } = useSuspenseQuery(
+    convexQuery(api.lyrics.getBySong, { songId })
+  );
+
+  // Sort lyrics by lineNumber for consistent access
+  const sortedLyrics = [...(lyrics || [])].sort(
+    (a, b) => a.lineNumber - b.lineNumber
+  );
 
   const playerRef = useRef<YouTubePlayerHandle>(null);
   const [activeLineIndex, setActiveLineIndex] = useState<number | undefined>(
     undefined
   );
   const [clickedLineIndex, setClickedLineIndex] = useState<number | undefined>(
+    undefined
+  );
+
+  // Loop mode state
+  const [isLooping, setIsLooping] = useState(false);
+  const [currentLineIndex, setCurrentLineIndex] = useState<number | undefined>(
     undefined
   );
 
@@ -67,6 +83,8 @@ function SongPageContent({ songId }: SongPageContentProps) {
       triggerClickAnimation(lineIndex);
       // Set as active line
       setActiveLineIndex(lineIndex);
+      // Set as current line for looping
+      setCurrentLineIndex(lineIndex);
     },
     [triggerClickAnimation]
   );
@@ -75,6 +93,28 @@ function SongPageContent({ songId }: SongPageContentProps) {
     // Time update tracking (will be used in US-013 for active line highlighting)
     // For now, this is a placeholder for future use
   }, []);
+
+  // Loop mode effect - check time every 100ms and seek back if needed
+  useEffect(() => {
+    if (!isLooping || currentLineIndex === undefined) {
+      return;
+    }
+
+    const currentLine = sortedLyrics[currentLineIndex];
+    if (!currentLine) {
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      const currentTime = playerRef.current?.getCurrentTime();
+      if (currentTime !== undefined && currentTime >= currentLine.endTime) {
+        // Seek back to start of current line
+        playerRef.current?.seekTo(currentLine.startTime);
+      }
+    }, 100);
+
+    return () => clearInterval(intervalId);
+  }, [isLooping, currentLineIndex, sortedLyrics]);
 
   if (!song) {
     throw notFound();
@@ -98,6 +138,33 @@ function SongPageContent({ songId }: SongPageContentProps) {
               videoId={song.youtubeId}
               onTimeUpdate={handleTimeUpdate}
             />
+            {/* Controls */}
+            <div className="mt-4 flex items-center gap-4 rounded-lg bg-gray-800 p-3">
+              {/* Loop Toggle */}
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="loop-mode"
+                  checked={isLooping}
+                  onCheckedChange={setIsLooping}
+                />
+                <label
+                  htmlFor="loop-mode"
+                  className={`flex cursor-pointer items-center gap-1.5 text-sm ${
+                    isLooping ? "text-primary" : "text-gray-400"
+                  }`}
+                >
+                  <Repeat
+                    className={`h-4 w-4 ${isLooping ? "text-primary" : "text-gray-400"}`}
+                  />
+                  <span>Loop</span>
+                  {isLooping && currentLineIndex !== undefined && (
+                    <span className="rounded bg-primary/20 px-1.5 py-0.5 text-xs text-primary">
+                      Line {currentLineIndex + 1}
+                    </span>
+                  )}
+                </label>
+              </div>
+            </div>
           </div>
         </div>
 

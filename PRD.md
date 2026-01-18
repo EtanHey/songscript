@@ -37,12 +37,12 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 8 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009) |
+| ✅ **Stories Complete** | 9 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010) |
 | ⚠️ **BROKEN** | US-005 (Auth - HTTP 500 errors, needs passwordless rework) |
-| 🔄 **Stories Remaining** | 11 + 6 verification |
-| ☑️ **Criteria Checked** | 56 / 97 (~58%) |
+| 🔄 **Stories Remaining** | 10 + 6 verification |
+| ☑️ **Criteria Checked** | 63 / 97 (~65%) |
 
-**Next Story:** US-010 (Loop Mode Toggle)
+**Next Story:** US-011 (Playback Speed Control)
 
 ---
 
@@ -305,13 +305,15 @@ SongScript is a song transliteration learning app that helps users learn to pron
 **Description:** Add loop toggle that repeats the current line.
 
 **Acceptance Criteria:**
-- [ ] Add ShadCN Switch component for loop toggle
-- [ ] Store `isLooping` and `currentLineIndex` in state
-- [ ] When loop ON and time reaches `endTime`, seek back to `startTime`
-- [ ] Use `setInterval` (100ms) to check currentTime
-- [ ] Clear interval on unmount
-- [ ] Visual indicator when loop is active (icon or badge)
-- [ ] Typecheck passes
+- [x] Add ShadCN Switch component for loop toggle
+- [x] Store `isLooping` and `currentLineIndex` in state
+- [x] When loop ON and time reaches `endTime`, seek back to `startTime`
+- [x] Use `setInterval` (100ms) to check currentTime
+- [x] Clear interval on unmount
+- [x] Visual indicator when loop is active (icon or badge)
+- [x] Typecheck passes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-010. Do not continue to US-011.**
 

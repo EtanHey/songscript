@@ -18,6 +18,23 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-010: Loop Mode Toggle
+- Added ShadCN Switch component via `bunx shadcn@latest add switch`
+- Added `isLooping` and `currentLineIndex` state to song page
+- Fetched lyrics in song page to access `startTime` and `endTime` for loop logic
+- Implemented `useEffect` with `setInterval` (100ms) to check currentTime and seek back when reaching endTime
+- Added controls section below YouTube player with Switch toggle
+- Added Repeat icon from lucide-react and "Line X" badge visual indicator when loop is active
+- Updated `handleLineClick` to set `currentLineIndex` when a line is clicked
+- Verified in browser: toggle works, badge shows "Line 4" when looping line 4
+- Typecheck passes
+
+**Learnings:**
+- Loop logic needs access to lyrics data (startTime, endTime) - must fetch in parent component
+- Visual indicator with badge showing line number helps users understand which line is looping
+
+---
+
 ## Iteration - US-009: Line Click to Seek Functionality
 - Created `src/routes/song.$songId.tsx` - song practice page route
 - Integrated YouTubePlayer and LyricsDisplay components
