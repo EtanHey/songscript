@@ -37,12 +37,14 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 14 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015) |
+| ✅ **Stories Complete** | 16 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017) |
 | ⏹️ **BLOCKED** | US-005 (Auth - Convex/Better Auth API integration failing) |
-| 🔄 **Stories Remaining** | 4 + 6 verification |
-| ☑️ **Criteria Checked** | 109 / 114 (~96%) |
+| 🔄 **Stories Remaining** | US-020 (Local Audio Snippets - HIGH PRIORITY), US-018, US-019 + 6 verification |
+| ☑️ **Criteria Checked** | ~96% |
 
-**Next Story:** US-016 (Song Practice Page Route) - skipping blocked US-005
+**🚨 NEXT STORY: US-020A (Sticky Layout Fix) → then US-020 (Local Audio Snippets)**
+
+US-020A is a quick layout fix, then proceed to US-020 for audio snippets.
 
 ---
 
@@ -52,7 +54,12 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 - Test URL: `http://localhost:3001`
 - **Port:** 3001 (not 3000)
 
-Run `bun dev` to start the development server on port 3001.
+**🚨 DEV SERVER IS ALREADY RUNNING 🚨**
+- The dev server is ALREADY running on `http://localhost:3001`
+- **DO NOT** run `bun dev` or start a new server
+- **DO NOT** kill the dev server
+- Just use `mcp__claude-in-chrome__*` tools to test at `http://localhost:3001`
+- If you see port conflicts, the server is already running - just use it
 
 ---
 
@@ -420,14 +427,16 @@ SongScript is a song transliteration learning app that helps users learn to pron
 **Description:** Create the main practice page that combines all components.
 
 **Acceptance Criteria:**
-- [ ] Create route `/song/$songId` using TanStack Router file-based routing
-- [ ] Page fetches song by ID from Convex
-- [ ] Renders YouTubePlayer with song's youtubeId
-- [ ] Renders LyricsDisplay with song's lyrics
-- [ ] Includes all controls (loop, speed, language filter)
-- [ ] Shows song title and artist
-- [ ] 404 handling if song not found
-- [ ] Typecheck passes
+- [x] Create route `/song/$songId` using TanStack Router file-based routing
+- [x] Page fetches song by ID from Convex
+- [x] Renders YouTubePlayer with song's youtubeId
+- [x] Renders LyricsDisplay with song's lyrics
+- [x] Includes all controls (loop, speed, language filter)
+- [x] Shows song title and artist
+- [x] 404 handling if song not found
+- [x] Typecheck passes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-016. Do not continue to US-017.**
 
@@ -555,6 +564,255 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 - [ ] Take screenshot showing RTL text
 
 **⏹️ STOP - END OF V-006**
+
+---
+
+### US-020: Local Audio Snippets for Instant Playback
+
+**Description:** Replace YouTube seekTo with local audio snippets for instant, zero-latency playback when clicking lyric lines.
+
+**🎯 WHY THIS MATTERS:**
+- YouTube seekTo has noticeable latency (500ms-2s) - frustrating for learners
+- Local audio snippets play instantly (<10ms latency)
+- No buffering delays, works offline once cached
+- Better UX for rapid line-by-line practice
+
+**📊 FILE SIZE ESTIMATE:**
+- 31 snippets × 3-5 seconds each
+- At 192 kbps MP3: ~2-3 MB total
+- Acceptable to preload all snippets on page load
+
+---
+
+**PHASE 1: Offline Audio Extraction (Manual/Script)**
+
+This is a ONE-TIME process per song, NOT runtime code.
+
+**Steps:**
+1. Download full audio from YouTube:
+   ```bash
+   yt-dlp -x --audio-format mp3 --audio-quality 192 "https://youtube.com/watch?v=xLvUEF2zpj8" -o baraye_full.mp3
+   ```
+
+2. Extract each snippet using ffmpeg (fast copy, no re-encode):
+   ```bash
+   # Example for line 1 (14.81s to 17.46s)
+   ffmpeg -i baraye_full.mp3 -ss 14.81 -t 2.65 -c copy snippets/baraye_001.mp3
+
+   # Example for line 28 (113.43s to 123.56s)
+   ffmpeg -i baraye_full.mp3 -ss 113.43 -t 10.13 -c copy snippets/baraye_028.mp3
+   ```
+
+3. Create a shell script `scripts/extract-snippets.sh` that:
+   - Reads timestamps from a JSON/CSV file
+   - Batch-extracts all 31 snippets
+   - Names them consistently: `{songSlug}_{lineNumber:03d}.mp3`
+
+**Acceptance Criteria (Phase 1):**
+- [ ] Create `scripts/extract-snippets.sh` that extracts snippets from a full audio file
+- [ ] Script reads timestamps from `scripts/baraye-timestamps.json`
+- [ ] Script outputs to `public/audio/{songSlug}/` directory
+- [ ] All 31 Baraye snippets extracted at 192 kbps MP3
+- [ ] Total size < 4 MB
+- [ ] Document the manual yt-dlp step in script comments
+
+---
+
+**PHASE 2: Convex Schema Update**
+
+**Update `convex/schema.ts`:**
+```typescript
+lyrics: defineTable({
+  songId: v.id("songs"),
+  lineNumber: v.number(),
+  startTime: v.number(),
+  endTime: v.number(),
+  original: v.string(),
+  transliteration: v.string(),
+  hebrew: v.optional(v.string()),
+  english: v.string(),
+  // NEW: Local audio snippet URL (relative path)
+  audioSnippetUrl: v.optional(v.string()), // e.g., "/audio/baraye/baraye_001.mp3"
+}).index("by_song", ["songId", "lineNumber"])
+```
+
+**Acceptance Criteria (Phase 2):**
+- [ ] Add `audioSnippetUrl` field to lyrics schema (optional for backward compat)
+- [ ] Push schema update: `bunx convex dev`
+- [ ] Update seed script to include audioSnippetUrl for each line
+- [ ] Re-seed Baraye with audio URLs: `npx convex run seed:seedBaraye`
+- [ ] Verify in Convex dashboard: lyrics have audioSnippetUrl populated
+- [ ] Typecheck passes
+
+---
+
+**PHASE 3: Audio Preloader Hook**
+
+**Create `src/hooks/useAudioPreloader.ts`:**
+```typescript
+import { useEffect, useState, useRef } from 'react'
+
+interface AudioSnippet {
+  lineNumber: number
+  audioUrl: string
+}
+
+interface PreloadState {
+  loaded: number
+  total: number
+  ready: boolean
+  audioElements: Map<number, HTMLAudioElement>
+}
+
+export function useAudioPreloader(snippets: AudioSnippet[]) {
+  const [state, setState] = useState<PreloadState>({
+    loaded: 0,
+    total: snippets.length,
+    ready: false,
+    audioElements: new Map(),
+  })
+  const audioMapRef = useRef<Map<number, HTMLAudioElement>>(new Map())
+
+  useEffect(() => {
+    if (snippets.length === 0) return
+
+    let loadedCount = 0
+    const total = snippets.length
+
+    snippets.forEach(({ lineNumber, audioUrl }) => {
+      const audio = new Audio()
+      audio.preload = 'auto'
+      audio.src = audioUrl
+
+      audio.addEventListener('canplay', () => {
+        loadedCount++
+        audioMapRef.current.set(lineNumber, audio)
+        setState({
+          loaded: loadedCount,
+          total,
+          ready: loadedCount === total,
+          audioElements: audioMapRef.current,
+        })
+      }, { once: true })
+    })
+
+    return () => {
+      audioMapRef.current.forEach(audio => {
+        audio.pause()
+        audio.src = ''
+      })
+      audioMapRef.current.clear()
+    }
+  }, [snippets])
+
+  const play = (lineNumber: number) => {
+    // Stop any currently playing audio
+    audioMapRef.current.forEach(audio => {
+      audio.pause()
+      audio.currentTime = 0
+    })
+
+    const audio = audioMapRef.current.get(lineNumber)
+    if (audio) {
+      audio.currentTime = 0
+      audio.play()
+    }
+  }
+
+  const stop = () => {
+    audioMapRef.current.forEach(audio => {
+      audio.pause()
+      audio.currentTime = 0
+    })
+  }
+
+  return { ...state, play, stop }
+}
+```
+
+**Acceptance Criteria (Phase 3):**
+- [ ] Create `src/hooks/useAudioPreloader.ts` with above implementation
+- [ ] Hook preloads all audio files on mount using `preload="auto"`
+- [ ] Hook tracks loading progress (loaded/total)
+- [ ] Hook exposes `ready` boolean when all snippets loaded
+- [ ] Hook exposes `play(lineNumber)` function for instant playback
+- [ ] Hook exposes `stop()` function to stop all audio
+- [ ] Hook cleans up audio elements on unmount
+- [ ] Typecheck passes
+
+---
+
+**PHASE 4: Integrate Audio Playback into Song Page**
+
+**Update `src/routes/song.$songId.tsx`:**
+1. Import and use `useAudioPreloader` hook
+2. Pass lyrics with audioSnippetUrl to hook
+3. Replace YouTube seekTo with `audioPreloader.play(lineIndex)`
+4. Keep YouTube video for visual reference (muted or optional)
+5. Show loading progress while snippets preload
+
+**Key Changes:**
+```typescript
+// In SongPageContent component:
+const { ready, loaded, total, play: playSnippet } = useAudioPreloader(
+  sortedLyrics.map(line => ({
+    lineNumber: line.lineNumber,
+    audioUrl: line.audioSnippetUrl || '',
+  })).filter(l => l.audioUrl)
+)
+
+const handleLineClick = useCallback((startTime: number, lineIndex: number) => {
+  // Play local audio snippet (instant)
+  playSnippet(sortedLyrics[lineIndex].lineNumber)
+
+  // Optionally sync YouTube video (for visual)
+  // playerRef.current?.seekTo(startTime)
+
+  triggerClickAnimation(lineIndex)
+  setActiveLineIndex(lineIndex)
+  setCurrentLineIndex(lineIndex)
+}, [playSnippet, sortedLyrics, triggerClickAnimation])
+```
+
+**Acceptance Criteria (Phase 4):**
+- [ ] Song page uses `useAudioPreloader` hook
+- [ ] Show "Loading audio... X/31" while preloading
+- [ ] Clicking a lyric line plays local audio snippet instantly
+- [ ] Previous audio stops when new line is clicked
+- [ ] Loop mode works with local audio (replay snippet when it ends)
+- [ ] Playback speed control works (use `audio.playbackRate`)
+- [ ] YouTube video is OPTIONAL - can be hidden or shown for reference
+- [ ] Typecheck passes
+
+---
+
+**PHASE 5: Browser Testing**
+
+**Acceptance Criteria (Phase 5):**
+- [ ] **BROWSER TEST**: Navigate to `/song/{baraye-id}`
+- [ ] **BROWSER TEST**: Wait for "Loading audio..." to complete
+- [ ] **BROWSER TEST**: Click line 1 → audio plays INSTANTLY (no buffering)
+- [ ] **BROWSER TEST**: Click line 15 → audio plays INSTANTLY
+- [ ] **BROWSER TEST**: Click line 28 → audio plays INSTANTLY
+- [ ] **BROWSER TEST**: Rapid clicking between lines → each plays correctly
+- [ ] **BROWSER TEST**: Enable loop → line replays automatically
+- [ ] **BROWSER TEST**: Change speed to 0.5x → audio slows down
+- [ ] **BROWSER TEST**: Measure latency: click-to-sound < 100ms
+- [ ] Take screenshot showing song page with audio controls
+
+---
+
+**OPTIONAL ENHANCEMENTS (Future):**
+
+1. **Howler.js Integration**: Replace raw HTML5 audio with Howler.js for better cross-browser support
+2. **Audio Sprites**: Combine all snippets into one file with time markers
+3. **Convex File Storage**: Store snippets in Convex instead of public/ folder
+4. **Waveform Visualization**: Show audio waveform while playing
+5. **Offline Support**: Cache snippets in Service Worker for offline use
+
+---
+
+**⏹️ STOP - END OF US-020. Do not continue to next story.**
 
 ---
 

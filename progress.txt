@@ -18,6 +18,22 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-016: Song Practice Page Route
+- Route `/song/$songId` already existed from previous iterations with full implementation
+- Added proper 404 error handling with react-error-boundary package
+- Created `SongErrorFallback` component showing "404 - Song not found" with "Go Home" link
+- Wrapped `SongPageContent` with `ErrorBoundary` to catch Convex validation errors for invalid IDs
+- Also added `notFoundComponent` to root route in `__root.tsx` for generic 404s
+- Verified in browser: navigating to invalid song ID shows styled 404 page
+- Typecheck passes
+
+**Learnings:**
+- TanStack Start SSR throws errors before React renders, so ErrorBoundary catches client-side hydration errors
+- Convex throws `ArgumentValidationError` for invalid IDs before reaching the `notFound()` check
+- `react-error-boundary` provides simple ErrorBoundary component with FallbackComponent pattern
+
+---
+
 ## Iteration - US-015: Mobile Responsive Design
 - Updated song page layout to be mobile-first responsive
 - Main content: `flex flex-col lg:flex-row` - vertical on mobile, side-by-side on desktop (lg+)
