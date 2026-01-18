@@ -41,9 +41,12 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 | ⏹️ **BLOCKED** | US-005 (Auth - Convex/Better Auth API integration failing) |
 | 🔄 **Stories Remaining** | US-020 (Phase 2-5), US-018, US-019 + 6 verification |
 
-**🚨 NEXT STORY: US-020 Phase 3 (Audio Preloader Hook)**
+**🚨 BUG: TWO HEADERS/NAVBARS ARE SHOWING - FIX THIS FIRST!**
 
-US-020A layout is now FIXED. Desktop shows video LEFT 50%, lyrics RIGHT 50%. Mobile shows video TOP, lyrics BELOW.
+The song page has TWO headers - one from `__root.tsx` and one from `song.$songId.tsx`.
+Remove the duplicate header from `song.$songId.tsx` - use only the root layout header.
+
+**THEN continue to: US-020 Phase 3 (Audio Preloader Hook)**
 
 ---
 
@@ -789,14 +792,14 @@ export function useAudioPreloader(snippets: AudioSnippet[]) {
 ```
 
 **Acceptance Criteria (Phase 3):**
-- [ ] Create `src/hooks/useAudioPreloader.ts` with above implementation
-- [ ] Hook preloads all audio files on mount using `preload="auto"`
-- [ ] Hook tracks loading progress (loaded/total)
-- [ ] Hook exposes `ready` boolean when all snippets loaded
-- [ ] Hook exposes `play(lineNumber)` function for instant playback
-- [ ] Hook exposes `stop()` function to stop all audio
-- [ ] Hook cleans up audio elements on unmount
-- [ ] Typecheck passes
+- [x] Create `src/hooks/useAudioPreloader.ts` with above implementation
+- [x] Hook preloads all audio files on mount using `preload="auto"`
+- [x] Hook tracks loading progress (loaded/total)
+- [x] Hook exposes `ready` boolean when all snippets loaded
+- [x] Hook exposes `play(lineNumber)` function for instant playback
+- [x] Hook exposes `stop()` function to stop all audio
+- [x] Hook cleans up audio elements on unmount
+- [x] Typecheck passes
 
 ---
 

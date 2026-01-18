@@ -18,6 +18,30 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-020 Phase 3: Audio Preloader Hook
+- Created `src/hooks/useAudioPreloader.ts` with full implementation
+- Hook features:
+  - Preloads all audio files on mount using `preload="auto"` on Audio elements
+  - Tracks loading progress with `loaded` and `total` counts
+  - Exposes `ready` boolean that becomes true when all snippets are loaded
+  - Exposes `play(lineNumber)` function for instant playback
+  - Exposes `stop()` function to stop all currently playing audio
+  - Exposes `setPlaybackRate(rate)` function for speed control
+  - Cleans up all audio elements on unmount (pauses, clears src, clears map)
+- Enhanced implementation beyond PRD spec:
+  - Added `setPlaybackRate` function to support playback speed control
+  - Added error handling for failed audio loads (warns but doesn't block ready state)
+  - Used `canplaythrough` event instead of `canplay` for better preloading
+  - Tracks currently playing audio to stop it before playing new line
+- Typecheck passes
+
+**Learnings:**
+- `canplaythrough` event fires when enough data is buffered to play through without stopping
+- Audio elements should use `playbackRate` property for speed control, same as YouTube API
+- Error handling in preloader should not block the `ready` state - log warnings but continue
+
+---
+
 ## Iteration - US-020 Phase 2: Schema Update for Audio Snippets
 - Added `audioSnippetUrl` optional field to lyrics table in `convex/schema.ts`
 - Field is optional (`v.optional(v.string())`) for backward compatibility with existing data
