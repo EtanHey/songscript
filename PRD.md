@@ -31,11 +31,11 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 7 (US-001, US-002, US-003, US-004, US-005, US-006, US-007) |
-| 🔄 **Stories Remaining** | 12 + 6 verification |
-| ☑️ **Criteria Checked** | 49 / 97 (~51%) |
+| ✅ **Stories Complete** | 8 (US-001, US-002, US-003, US-004, US-005, US-006, US-007, US-008) |
+| 🔄 **Stories Remaining** | 11 + 6 verification |
+| ☑️ **Criteria Checked** | 58 / 97 (~60%) |
 
-**Next Story:** US-008 (Lyrics Display Component)
+**Next Story:** US-009 (Line Click to Seek Functionality)
 
 ---
 
@@ -247,15 +247,17 @@ SongScript is a song transliteration learning app that helps users learn to pron
 **Description:** Create component to display lyrics from Convex.
 
 **Acceptance Criteria:**
-- [ ] Create `app/components/LyricsDisplay.tsx`
-- [ ] Fetch lyrics from Convex using `useSuspenseQuery`
-- [ ] Display each line with all language versions stacked
-- [ ] Persian text: RTL, larger font (text-xl), `dir="rtl"`
-- [ ] Transliteration: italic, green color (text-emerald-500)
-- [ ] Hebrew: RTL, blue color (text-blue-500), `dir="rtl"`
-- [ ] English: smaller, gray (text-gray-400)
-- [ ] Each line is a clickable button/div
-- [ ] Typecheck passes
+- [x] Create `app/components/LyricsDisplay.tsx`
+- [x] Fetch lyrics from Convex using `useSuspenseQuery`
+- [x] Display each line with all language versions stacked
+- [x] Persian text: RTL, larger font (text-xl), `dir="rtl"`
+- [x] Transliteration: italic, green color (text-emerald-500)
+- [x] Hebrew: RTL, blue color (text-blue-500), `dir="rtl"`
+- [x] English: smaller, gray (text-gray-400)
+- [x] Each line is a clickable button/div
+- [x] Typecheck passes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-008. Do not continue to US-009.**
 

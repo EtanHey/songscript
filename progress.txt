@@ -18,6 +18,27 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-008: Lyrics Display Component
+- Created `src/components/LyricsDisplay.tsx`
+- Installed `@convex-dev/react-query` and `@tanstack/react-query` for Convex + TanStack Query integration
+- Used `useSuspenseQuery` with `convexQuery` wrapper to fetch lyrics from Convex
+- Sorted lyrics by lineNumber to ensure correct display order
+- Styled Persian text with `dir="rtl"`, `text-right`, and `text-xl` for larger RTL display
+- Styled transliteration with `italic` and `text-emerald-500` (green)
+- Styled Hebrew with `dir="rtl"`, `text-right`, and `text-blue-500` (blue)
+- Styled English with `text-sm` and `text-gray-400` (smaller, gray)
+- Each line is a clickable button with hover state and active line highlighting
+- Added `onLineClick` callback prop for line click handling
+- Added `activeLineIndex` prop for highlighting the currently playing line
+- Typecheck passes
+
+**Learnings:**
+- TanStack Start + Convex requires `@convex-dev/react-query` package for `useSuspenseQuery` integration
+- `convexQuery` wrapper enables SSR + live updates with TanStack Query
+- Lyrics from Convex may not be ordered, so sort by lineNumber before rendering
+
+---
+
 ## Iteration - US-007: YouTube Player Component
 - Created `src/components/YouTubePlayer.tsx` with full YouTube IFrame API integration
 - Implemented dynamic API loading with promise caching to avoid duplicate loads
