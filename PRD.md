@@ -51,7 +51,7 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 |--------|-------|
 | ✅ **Stories Complete** | 34 (US-001-020A, US-022-029, US-TIMESTAMPS, V-001-007) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), US-020 Phase 5 |
-| 🔄 **Stories Remaining** | 6 (US-030-033, V-008-009) |
+| 🔄 **Stories Remaining** | 8 (US-TIMESTAMPS-V2, US-029-FIX, US-030-033, V-008-009) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
@@ -163,7 +163,76 @@ Push timestamps even LATER (forward in time):
 
 **✅ COMPLETE**
 
-**⏹️ STOP - END OF US-TIMESTAMPS. Do not continue to US-005-FIX.**
+**⏹️ STOP - END OF US-TIMESTAMPS. Do not continue to US-TIMESTAMPS-V2.**
+
+---
+
+### US-TIMESTAMPS-V2: Increase END Buffer (HIGHEST PRIORITY - User Still Hearing Cutoff)
+
+**Description:** User reports audio snippet ENDINGS are still getting cut off. The start is fine, but endings are cut.
+
+**🔍 USER FEEDBACK (direct quote):**
+> "The start is almost never or never cut, but the end is almost always cut or very close to being cut. Need to add more buffer at the end of each sentence."
+
+**Current offsets:** Start +0.35s (FINE), End +0.45s (NOT ENOUGH)
+
+**🔧 FIX:**
+- Keep start at +0.35s
+- Increase END from +0.45s to **+0.70s** (add 0.25s more)
+
+**Acceptance Criteria:**
+- [ ] Update `scripts/baraye-new-timestamps.json`:
+  - Keep start offset at +0.35s
+  - Change end offset from +0.45s to +0.70s
+  - Update the "note" field
+- [ ] Re-extract all 31 snippets: `./scripts/extract-snippets.sh scripts/baraye-new-timestamps.json public/audio/baraye/baraye_full.mp3`
+- [ ] **BROWSER TEST in Single mode**: Click line 28 - hear FULL "zan, zendegi, āzādi" with NO cutoff
+- [ ] **BROWSER TEST in Loop mode**: Click line 5, 15, 20 - endings are complete, no rush
+- [ ] If STILL cutting, increase end to +0.85s and re-test
+- [ ] Commit changes
+
+**⏹️ STOP - END OF US-TIMESTAMPS-V2. Do not continue to US-029-FIX.**
+
+---
+
+### US-029-FIX: Fluid Mode UX Improvements (HIGH PRIORITY - User Feedback)
+
+**Description:** User feedback on Fluid mode behavior and removing redundant controls.
+
+**🔍 USER FEEDBACK:**
+1. "We don't need pause/play and Play Full Video if we have Fluid mode"
+2. "Once user clicks Fluid, it should continue where it left off in Loop or Single mode"
+3. Maybe just have a button to watch on YouTube instead of Play Full Video
+
+**🔧 CHANGES NEEDED:**
+
+1. **Remove redundant controls when in Fluid mode:**
+   - Hide or disable Pause/Play button in Fluid mode (video has its own controls)
+   - Remove "Play Full Video" button entirely - Fluid mode IS full video playback
+   - Optionally: Add "Watch on YouTube" link/button instead
+
+2. **Fluid mode continues from current position:**
+   - When user switches from Single/Loop to Fluid, video should:
+     - Continue from the CURRENT line's position (where Loop/Single was playing)
+     - Unmute and continue playing
+   - NOT start from the beginning
+
+3. **Mode transition behavior:**
+   - Single → Fluid: Continue from current line, unmute, play continuously
+   - Loop → Fluid: Stop looping, unmute, continue from current position
+   - Fluid → Single/Loop: Mute video, use snippets from current line
+
+**Acceptance Criteria:**
+- [ ] Remove "Play Full Video" button - Fluid mode replaces this functionality
+- [ ] In Fluid mode: hide or disable Pause/Play button (video has native controls)
+- [ ] When switching TO Fluid: continue from current playback position, don't restart
+- [ ] When switching FROM Fluid to Single/Loop: stay at current line position
+- [ ] Optional: Add "Watch on YouTube" link that opens video in new tab
+- [ ] **BROWSER TEST**: In Single mode, click line 15, then switch to Fluid → video continues from ~65s
+- [ ] **BROWSER TEST**: In Loop mode on line 5, switch to Fluid → video continues from ~29s
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-029-FIX. Do not continue to US-005-FIX.**
 
 ---
 
