@@ -38,12 +38,25 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 | Metric | Count |
 |--------|-------|
 | ✅ **Stories Complete** | 31 (US-001-020A, US-022-027, V-001-007) |
-| ⏹️ **BLOCKED** | US-005 (Auth), US-020 Phase 5, US-021 (superseded) |
-| 🔄 **Stories Remaining** | 0 |
+| ⏹️ **BLOCKED** | US-005 (Auth), US-020 Phase 5 |
+| 🔄 **Stories Remaining** | 8 (US-028-033, V-008-009) |
 
-**Archive:** Completed stories (US-001-020A, V-001-006) moved to `docs.local/prd-completed-archive.md`
+**Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Status:** ✅ ALL ACTIONABLE STORIES COMPLETE! Only US-005 (Auth) remains blocked.
+**Next Story:** US-028 (Three-Way Playback Toggle)
+
+**Story Order (optimized - API-dependent story LAST):**
+1. US-028: Three-Way Playback Toggle ← No API
+2. US-029: Pause/Play Controls ← No API
+3. US-030: Word-by-Word Info Modal ← No API
+4. US-033: Pre-generate Word Data (manual JSON) ← No API
+5. US-032: Word Learning Tracking ← No API (uses localStorage)
+6. V-008: Verify Playback Modes ← No API
+7. V-009: Verify Word Info Modal ← No API
+8. **US-031: ElevenLabs Word Audio ← LAST (needs API key)**
+
+**API Key Needed (US-031 only):**
+- ElevenLabs: https://elevenlabs.io/ (free tier: ~10 min audio/month, supports Persian via v3)
 
 ---
 
@@ -1145,6 +1158,214 @@ Replace YouTube embed with local video player using downloaded MP4:
 **✅ COMPLETE**
 
 **⏹️ STOP - END OF V-007**
+
+---
+
+### US-028: Three-Way Playback Toggle (Single/Loop/Fluid)
+
+**Description:** Replace current loop toggle with a three-way toggle that controls playback behavior.
+
+**🎯 THE THREE MODES:**
+
+| Mode | Audio Source | Video Behavior | On Click | On Segment End |
+|------|--------------|----------------|----------|----------------|
+| **Single** | Snippet | Plays segment (muted) | Play segment once | Stop |
+| **Loop** | Snippet | Loops segment (muted) | Loop segment | Repeat |
+| **Fluid** | Video audio | Plays continuously | Seek + continue | Continue to next |
+
+**Key Principle:** Video and audio are ALWAYS in sync. In Single/Loop, video plays the segment (muted) alongside the snippet.
+
+**Acceptance Criteria:**
+- [ ] Replace loop toggle with three-way toggle (Single/Loop/Fluid)
+- [ ] Use ShadCN ToggleGroup or custom segmented control
+- [ ] Default mode: Single
+- [ ] **Single mode**: Click line → play snippet + play video segment (muted), both stop at endTime
+- [ ] **Loop mode**: Click line → loop snippet + loop video segment (muted), in sync
+- [ ] **Fluid mode**: Click line → seek video (unmuted), continue playing with video audio
+- [ ] Visual indicator shows current mode
+- [ ] Mode persists in component state
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-028**
+
+---
+
+### US-029: Pause/Play Controls
+
+**Description:** Add pause/play button that works across all modes.
+
+**Acceptance Criteria:**
+- [ ] Add pause/play button to controls section
+- [ ] Button shows play icon when paused, pause icon when playing
+- [ ] In Single/Loop: pauses both snippet audio AND video
+- [ ] In Fluid: pauses video (which includes audio)
+- [ ] Clicking paused line resumes from that line
+- [ ] Spacebar keyboard shortcut for pause/play
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-029**
+
+---
+
+### US-030: Word-by-Word Info Modal
+
+**Description:** Clicking a lyric line opens a modal showing word-by-word breakdown.
+
+**🎯 MODAL CONTENT:**
+- Each word displayed with:
+  - Persian (original)
+  - Transliteration
+  - Hebrew transliteration
+  - English meaning
+  - Grammar notes (word type: noun/verb/adjective, conjugation if applicable)
+  - Audio button (plays word pronunciation - see US-031)
+
+**Acceptance Criteria:**
+- [ ] Click/tap lyric line opens modal (in addition to playing audio)
+- [ ] Modal shows line's full text at top
+- [ ] Below: word-by-word table with all columns
+- [ ] Each word row has audio button (speaker icon) - disabled until US-031 complete
+- [ ] Close button (X) and click-outside-to-close
+- [ ] Mobile: modal is full-screen drawer from bottom
+- [ ] Desktop: centered modal with backdrop
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-030**
+
+---
+
+### US-031: ElevenLabs Word Audio Generation (LAST - needs API key)
+
+**Description:** Generate word pronunciations using ElevenLabs v3 API and save as local MP3 files.
+
+**⚠️ REQUIRES API KEY** - User will provide ELEVENLABS_API_KEY before this story runs.
+
+**🔧 API DETAILS:**
+- API: https://elevenlabs.io/docs/api-reference/text-to-speech/convert
+- Model: `eleven_v3` (supports Persian/Farsi)
+- Free tier: ~10 min audio/month (~100+ words)
+- Output: MP3 files saved to `public/audio/baraye/words/`
+
+**Strategy:** Pre-generate and SAVE locally
+- Generate audio for all unique words in Baraye (~100 words)
+- Save as MP3 files: `public/audio/baraye/words/{word}.mp3`
+- One-time API cost, then replay forever from local files
+- Update `words` table with `audioUrl` paths
+
+**Acceptance Criteria:**
+- [ ] Create `scripts/generate-word-audio.ts` script
+- [ ] Script reads unique words from `scripts/baraye-words.json`
+- [ ] Script calls ElevenLabs API for each word
+- [ ] Script saves MP3 to `public/audio/baraye/words/{word}.mp3`
+- [ ] Script updates `scripts/baraye-words.json` with audioUrl paths
+- [ ] Run script: `ELEVENLABS_API_KEY=xxx bun run scripts/generate-word-audio.ts`
+- [ ] Verify audio files exist (~100 files)
+- [ ] Update Convex seed to include audioUrl for each word
+- [ ] Re-seed: `npx convex run seed:seedBarayeWords`
+- [ ] Word audio buttons in modal play local MP3s
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-031**
+
+---
+
+### US-032: Word Learning Tracking
+
+**Description:** Track user's progress learning individual words. Mark words as "learned" per user.
+
+**Note:** Auth (US-005) is blocked, but this can still work for the single admin user. Use localStorage fallback if no auth session available.
+
+**Features:**
+- View count: how many times user looked at word meaning
+- Play count: how many times user played word audio
+- "Learned" checkmark: user marks word as learned
+- Store in Convex per-user (or localStorage as fallback)
+
+**Acceptance Criteria:**
+- [ ] Add Convex table `wordProgress`:
+  ```typescript
+  wordProgress: defineTable({
+    visitorId: v.string(), // localStorage-generated ID if no auth
+    wordId: v.id("words"),
+    viewCount: v.number(),
+    playCount: v.number(),
+    learned: v.boolean(),
+    lastSeen: v.number(),
+  }).index("by_visitor", ["visitorId"])
+    .index("by_visitor_word", ["visitorId", "wordId"])
+  ```
+- [ ] Generate visitor ID in localStorage if no auth session
+- [ ] Track view count when word modal opens
+- [ ] Track play count when word audio plays
+- [ ] Add "learned" checkbox in word info modal
+- [ ] Show learned status with visual indicator (checkmark badge)
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-032**
+
+---
+
+### US-033: Pre-generate Word Data for Baraye
+
+**Description:** Create word-by-word breakdown for all 31 Baraye lines and store in Convex.
+
+**Acceptance Criteria:**
+- [ ] Create `scripts/baraye-words.json` with word-by-word breakdown for all 31 lines
+- [ ] Each line contains array of words with: persian, transliteration, hebrew, english, grammarType
+- [ ] Create Convex mutation to seed word data
+- [ ] Add `words` table to schema:
+  ```typescript
+  words: defineTable({
+    songId: v.id("songs"),
+    lineNumber: v.number(),
+    wordIndex: v.number(),
+    persian: v.string(),
+    transliteration: v.string(),
+    hebrew: v.string(),
+    english: v.string(),
+    grammarType: v.optional(v.string()), // noun, verb, preposition, etc.
+    forvoAudioUrl: v.optional(v.string()),
+  }).index("by_song_line", ["songId", "lineNumber"])
+  ```
+- [ ] Seed Baraye word data: `npx convex run seed:seedBarayeWords`
+- [ ] Verify in Convex dashboard
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-033**
+
+---
+
+### V-008: Verify Playback Modes
+
+**Description:** Verify the three-way playback toggle works correctly.
+
+- [ ] **BROWSER TEST**: Default mode is "Single"
+- [ ] **BROWSER TEST**: Single mode - click line → plays once, stops
+- [ ] **BROWSER TEST**: Single mode - video plays segment (muted) in sync with snippet
+- [ ] **BROWSER TEST**: Loop mode - click line → loops indefinitely
+- [ ] **BROWSER TEST**: Loop mode - video loops segment (muted) in sync
+- [ ] **BROWSER TEST**: Fluid mode - click line → seeks, video continues with audio
+- [ ] **BROWSER TEST**: Pause button stops playback in all modes
+- [ ] **BROWSER TEST**: Spacebar toggles pause/play
+- [ ] Take screenshot showing mode toggle
+
+**⏹️ STOP - END OF V-008**
+
+---
+
+### V-009: Verify Word Info Modal
+
+**Description:** Verify the word-by-word info modal works correctly.
+
+- [ ] **BROWSER TEST**: Click lyric line → modal opens
+- [ ] **BROWSER TEST**: Modal shows word-by-word breakdown
+- [ ] **BROWSER TEST**: Each word shows: Persian, transliteration, Hebrew, English
+- [ ] **BROWSER TEST**: Click word audio button → pronunciation plays
+- [ ] **BROWSER TEST**: Close modal (X or click outside)
+- [ ] **BROWSER TEST**: Mobile: modal slides up from bottom
+- [ ] Take screenshot showing modal content
+
+**⏹️ STOP - END OF V-009**
 
 ---
 
