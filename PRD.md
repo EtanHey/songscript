@@ -55,18 +55,19 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** V-008 (Verify Playback Modes)
+**Next Story:** US-SYNC-FIX (Video/Audio Out of Sync)
 
 **Story Order (optimized - API-dependent story LAST):**
-0. ~~US-TIMESTAMPS-V2~~ ✅ (end buffer increased to +0.70s)
-1. ~~US-029-FIX~~ ✅ (Fluid Mode UX Improvements)
-2. ~~US-TIMESTAMPS~~ ✅ (needs V2 - end still cuts)
-3. ~~US-005-FIX~~ ⏹️ BLOCKED (auth API still 500)
-4. ~~US-029~~ ✅ (needs FIX - Fluid mode behavior)
-5. ~~US-030~~ ✅ (Word-by-Word Info Modal)
-6. ~~US-033~~ ✅ (Pre-generate Word Data - 135 words seeded)
-7. ~~US-032~~ ✅ (Word Learning Tracking - localStorage + Convex)
-8. **V-008: Verify Playback Modes ← NEXT** (No API)
+0. **US-SYNC-FIX: Video and Audio Not Synced ← HIGHEST PRIORITY**
+1. ~~US-TIMESTAMPS-V2~~ ✅ (end buffer increased to +0.70s)
+2. ~~US-029-FIX~~ ✅ (Fluid Mode UX Improvements)
+3. ~~US-TIMESTAMPS~~ ✅
+4. ~~US-005-FIX~~ ⏹️ BLOCKED (auth API still 500)
+5. ~~US-029~~ ✅
+6. ~~US-030~~ ✅ (Word-by-Word Info Modal)
+7. ~~US-033~~ ✅ (Pre-generate Word Data - 135 words seeded)
+8. ~~US-032~~ ✅ (Word Learning Tracking - localStorage + Convex)
+9. V-008: Verify Playback Modes (after sync fix)
 9. V-009: Verify Word Info Modal ← No API
 10. **US-031: ElevenLabs Word Audio ← LAST (needs API key)**
 
@@ -163,11 +164,47 @@ Push timestamps even LATER (forward in time):
 
 **✅ COMPLETE**
 
-**⏹️ STOP - END OF US-TIMESTAMPS. Do not continue to US-TIMESTAMPS-V2.**
+**⏹️ STOP - END OF US-TIMESTAMPS. Do not continue to US-SYNC-FIX.**
 
 ---
 
-### US-TIMESTAMPS-V2: Increase END Buffer (HIGHEST PRIORITY - User Still Hearing Cutoff)
+### US-SYNC-FIX: Video and Audio Not Synced (HIGHEST PRIORITY)
+
+**Description:** User reports the video and audio (song) are not synced. When clicking a line, the audio snippet plays but the video is at a different position.
+
+**🔍 PROBLEM:**
+- In Single/Loop mode: audio snippet plays but video position doesn't match
+- The video and audio should be perfectly in sync at all times
+
+**🔧 INVESTIGATION:**
+1. Check if `video.seekTo(startTime)` is being called with the SAME timestamp as the audio snippet
+2. The audio snippets were extracted with +0.35s start offset - is the video seeking to the ORIGINAL timestamp or the OFFSET timestamp?
+3. Check if the video is seeking to the correct position when a line is clicked
+
+**LIKELY CAUSE:**
+- Audio snippets start at `originalStartTime + 0.35s` (the offset)
+- But video might be seeking to `originalStartTime` (no offset)
+- This creates a 0.35s desync
+
+**🔧 FIX OPTIONS:**
+1. **Option A:** Video seeks to `startTime + 0.35s` to match audio snippet start
+2. **Option B:** Store the ACTUAL snippet start time (with offset) in the timestamps JSON and use that for both
+3. **Option C:** Calculate offset dynamically: `video.seekTo(line.startTime + AUDIO_START_OFFSET)`
+
+**Acceptance Criteria:**
+- [ ] Investigate the sync issue - identify where the mismatch comes from
+- [ ] Fix video seek to match audio snippet timing
+- [ ] **BROWSER TEST in Single mode**: Click line 5 - video and audio start at SAME moment
+- [ ] **BROWSER TEST in Loop mode**: Click line 15 - video and audio loop together in sync
+- [ ] **BROWSER TEST in Fluid mode**: Video plays with its own audio (should already be synced)
+- [ ] Verify at least 3 different lines are properly synced
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-SYNC-FIX. Do not continue to US-TIMESTAMPS-V2.**
+
+---
+
+### US-TIMESTAMPS-V2: Increase END Buffer (User Still Hearing Cutoff)
 
 **Description:** User reports audio snippet ENDINGS are still getting cut off. The start is fine, but endings are cut.
 
