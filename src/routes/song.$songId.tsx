@@ -72,9 +72,10 @@ function SongPageContent({ songId }: SongPageContentProps) {
     convexQuery(api.lyrics.getBySong, { songId })
   );
 
-  // Sort lyrics by lineNumber for consistent access
-  const sortedLyrics = [...(lyrics || [])].sort(
-    (a, b) => a.lineNumber - b.lineNumber
+  // Sort lyrics by lineNumber for consistent access - memoized to prevent infinite re-renders
+  const sortedLyrics = useMemo(
+    () => [...(lyrics || [])].sort((a, b) => a.lineNumber - b.lineNumber),
+    [lyrics]
   );
 
   // Prepare audio snippets for the preloader hook

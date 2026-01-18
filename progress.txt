@@ -18,6 +18,24 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - V-003: Verify Player Functionality ✅
+- Browser extension working on tab 1076981165 (desktop viewport 1504x756)
+- Navigated to song page `/song/j972m34dzqgx6a0r5a00n9k6pd7zekfa`
+- YouTube video loaded and plays (Baraye - Shervin Hajipour fingerstyle cover)
+- Clicked line 5 via JavaScript - displayed "Barāye sharmandegi, Barāye bi-pūli" (For shame, for being penniless)
+- Enabled loop toggle - showed "Line X" badge indicating active loop
+- Changed speed to 0.5x via dropdown - audio plays at half speed
+- Desktop layout verified: video LEFT 50%, lyrics RIGHT 50% (side-by-side)
+- Lyrics show all 4 languages: Persian (RTL), transliteration (green), Hebrew (blue), English (gray)
+- Screenshots captured showing full player + lyrics layout
+- All V-003 acceptance criteria complete
+
+**Learnings:**
+- Browser element refs can get detached - use JavaScript execution for reliable interactions
+- Desktop layout uses `lg:flex-row` for side-by-side video and lyrics
+
+---
+
 ## Iteration - V-002: Verify Convex Integration ✅
 - Browser extension connected successfully
 - Verified Convex data via CLI:

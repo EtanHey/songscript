@@ -37,11 +37,11 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 21 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020A, V-001, V-002) |
-| ⏹️ **BLOCKED** | US-005 (Auth), US-020 Phase 5 (browser) |
-| 🔄 **Stories Remaining** | 4 (V-003, V-004, V-005, V-006) |
+| ✅ **Stories Complete** | 22 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020A, V-001, V-002, V-003) |
+| ⏹️ **BLOCKED** | US-005 (Auth) |
+| 🔄 **Stories Remaining** | 3 (V-004, V-005, V-006) |
 
-**Browser extension now connected.** Proceeding with verification stories.
+**Browser extension connected.** Proceeding with remaining verification stories.
 
 ---
 
@@ -527,14 +527,14 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 
 ### V-003: Verify Player Functionality
 
-- [ ] Navigate to `/song/{baraye-id}`
-- [ ] YouTube video loads and plays
-- [ ] Click line 5 - video jumps to ~28.61s
-- [ ] Enable loop - line repeats when reaching endTime
-- [ ] Change speed to 0.5x - video slows down
-- [ ] Take screenshot showing player + lyrics
+- [x] Navigate to `/song/{baraye-id}`
+- [x] YouTube video loads and plays
+- [x] Click line 5 - video jumps to ~28.61s
+- [x] Enable loop - line repeats when reaching endTime
+- [x] Change speed to 0.5x - video slows down
+- [x] Take screenshot showing player + lyrics
 
-**Status:** ⏹️ BLOCKED: Browser extension not connected. Cannot perform browser automation tests.
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF V-003**
 
@@ -887,6 +887,94 @@ const handleLineClick = useCallback((startTime: number, lineIndex: number) => {
 ---
 
 **⏹️ STOP - END OF US-020. Do not continue to next story.**
+
+---
+
+### US-021: Real Audio from YouTube + Practice Mode
+
+**Description:** Replace placeholder audio files with real audio extracted from YouTube. Implement practice mode where clicking a line plays that segment, with loop toggle. Download video too for seamless seeking.
+
+**🎯 THE GOAL:**
+- Use the ACTUAL song audio from YouTube, not TTS placeholders
+- Practice mode: click line → play that segment → stop (or loop if toggle on)
+- Highlighting follows playback and moves to next line when segment ends
+- Downloaded video allows seamless seeking without buffering
+
+---
+
+**PHASE 1: Download Real Audio & Video**
+
+1. Download audio from YouTube:
+   ```bash
+   cd /Users/etanheyman/Desktop/Gits/songscript
+   yt-dlp -x --audio-format mp3 --audio-quality 192 "https://youtube.com/watch?v=xLvUEF2zpj8" -o "public/audio/baraye/baraye_full.mp3"
+   ```
+
+2. Download video from YouTube:
+   ```bash
+   yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]" "https://youtube.com/watch?v=xLvUEF2zpj8" -o "public/video/baraye/baraye_full.mp4"
+   ```
+
+3. Delete placeholder audio files:
+   ```bash
+   rm public/audio/baraye/baraye_*.mp3
+   ```
+
+4. Extract real snippets using ffmpeg:
+   ```bash
+   # Run the existing extract-snippets.sh script with the real audio
+   ./scripts/extract-snippets.sh public/audio/baraye/baraye_full.mp3
+   ```
+
+**Acceptance Criteria (Phase 1):**
+- [ ] yt-dlp installed (or install with `brew install yt-dlp`)
+- [ ] Real audio downloaded to `public/audio/baraye/baraye_full.mp3`
+- [ ] Real video downloaded to `public/video/baraye/baraye_full.mp4`
+- [ ] Placeholder MP3 files deleted
+- [ ] Real snippets extracted using timestamps from lyrics data
+- [ ] Verify snippets play actual song audio (not TTS)
+
+---
+
+**PHASE 2: Practice Mode UI**
+
+1. **Mute YouTube embed** - video is visual reference only, audio comes from snippets
+2. **Click line behavior:**
+   - Play that line's audio snippet
+   - When snippet ends: stop (unless loop is on)
+   - Highlighting stays on current line while playing
+3. **Loop toggle** (already exists):
+   - ON: replay snippet when it ends
+   - OFF: stop when snippet ends
+4. **Auto-advance highlighting:**
+   - Track when snippet ends based on duration
+   - Move highlight to next line when current segment completes (if not looping)
+
+**Acceptance Criteria (Phase 2):**
+- [ ] YouTube video is MUTED (audio from snippets only)
+- [ ] Clicking line plays real audio snippet
+- [ ] Snippet stops at end (not looping by default)
+- [ ] Loop toggle makes snippet repeat
+- [ ] Highlighting follows playback
+- [ ] When snippet ends (no loop), highlight moves to next line OR stays (user choice)
+- [ ] Typecheck passes
+
+---
+
+**PHASE 3: Local Video Player (Optional Enhancement)**
+
+Replace YouTube embed with local video player using downloaded MP4:
+- Use HTML5 `<video>` element with downloaded video
+- Seamless seeking without buffering
+- Can sync video position with audio snippets
+
+**Acceptance Criteria (Phase 3):**
+- [ ] Local video plays from `public/video/baraye/baraye_full.mp4`
+- [ ] Video seeks instantly when clicking lines
+- [ ] Video is muted, audio from snippets
+- [ ] Fallback to YouTube embed if local video not found
+
+**⏹️ STOP - END OF US-021. Do not continue to next story.**
 
 ---
 
