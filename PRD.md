@@ -19,11 +19,17 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 1. **ONE STORY PER ITERATION**: Complete exactly ONE user story, then STOP.
 2. **🧠 USE ULTRATHINK**: Think through implementation before coding.
 3. **TYPECHECK IS MANDATORY**: Run before marking complete.
-4. **VERIFY VISUALLY**: Check in browser before marking complete.
+4. **VERIFY VISUALLY**: Check in browser using `mcp__claude-in-chrome__*` tools before marking complete.
 5. **DO NOT BATCH**: Each story is a SEPARATE iteration.
 6. **V-* STORIES ARE MANDATORY**: Must execute ALL verification stories.
 7. **NO INLINE COLORS**: Use Tailwind preset tokens, never arbitrary hex.
 8. **NO ARBITRARY PIXELS**: Use Tailwind scale or CSS variables.
+9. **🚫 NO SKIPPING**: Do NOT skip stories. Use all available tools to complete them:
+   - `mcp__Context7__*` for documentation lookup
+   - `mcp__claude-in-chrome__*` for browser testing
+   - `mcp__browser-tools__*` for debugging
+   - If TRULY blocked (missing API keys, user input required), mark as `**⏸️ BLOCKED**: [reason]` and move to next story.
+10. **ACTUALLY TEST**: Don't just write code - run it, test it in browser, verify it works end-to-end.
 
 ---
 
@@ -31,11 +37,12 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 8 (US-001, US-002, US-003, US-004, US-005, US-006, US-007, US-008) |
+| ✅ **Stories Complete** | 8 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009) |
+| ⚠️ **BROKEN** | US-005 (Auth - HTTP 500 errors, needs passwordless rework) |
 | 🔄 **Stories Remaining** | 11 + 6 verification |
-| ☑️ **Criteria Checked** | 58 / 97 (~60%) |
+| ☑️ **Criteria Checked** | 56 / 97 (~58%) |
 
-**Next Story:** US-009 (Line Click to Seek Functionality)
+**Next Story:** US-010 (Loop Mode Toggle)
 
 ---
 
@@ -185,23 +192,35 @@ SongScript is a song transliteration learning app that helps users learn to pron
 
 ---
 
-### US-005: Admin-Only Authentication Setup
+### US-005: Admin-Only Passwordless Authentication
 
-**Description:** Set up Convex + Better Auth for admin-only access.
+**Description:** Set up Convex + Better Auth with PASSWORDLESS auth (magic link OR passkey). No passwords, no signup page.
 
 **Admin Email:** `etan@heyman.net`
 
-**Acceptance Criteria:**
-- [x] Install Better Auth: `bun add @convex-dev/better-auth better-auth@1.4.9`
-- [x] Create `convex/betterAuth.ts` with Better Auth configuration (renamed to avoid conflict)
-- [x] Add users table to schema with role field (admin/user)
-- [x] Create login page at `/login` route
-- [x] Hardcode admin email check: only `etan@heyman.net` can sign up/in
-- [x] Middleware checks auth on protected routes (admin check in login page)
-- [x] Unauthenticated users see "Admin Only" message on protected pages (login page shows admin restriction)
-- [x] Typecheck passes
+**⚠️ PREVIOUS ATTEMPT FAILED:**
+- Password-based auth returned HTTP 500 errors on `/api/auth/get-session` and `/api/auth/sign-in/email`
+- Server logs showed `TypeError: fetch failed` with `EAGAIN` errors
+- The auth flow was never actually tested in the browser
 
-**✅ COMPLETE**
+**🔧 REQUIREMENTS:**
+1. **Passwordless only** - Use magic link (email) OR passkey, NOT password
+2. **No signup page** - Only login page, admin is pre-seeded or auto-created on first login
+3. **Only admin can log in** - Hardcode `etan@heyman.net` check server-side
+4. **Must test in browser** - Use `mcp__claude-in-chrome__*` tools to verify the flow works end-to-end
+
+**Acceptance Criteria:**
+- [ ] Remove password-based auth, implement magic link OR passkey
+- [ ] Login page at `/login` - email input only, no password field, no signup toggle
+- [ ] Server-side check: reject any email that isn't `etan@heyman.net`
+- [ ] Auth API endpoints return 200 (not 500)
+- [ ] Use Context7 (`mcp__Context7__query-docs`) to look up Better Auth magic link/passkey setup
+- [ ] **BROWSER TEST**: Navigate to `/login`, enter admin email, complete auth flow
+- [ ] **BROWSER TEST**: Verify session persists after login (check `/api/auth/get-session` returns user)
+- [ ] **BROWSER TEST**: Verify non-admin email is rejected with clear error message
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-005. Do not continue to US-006.**
 
 ---
 
@@ -268,12 +287,14 @@ SongScript is a song transliteration learning app that helps users learn to pron
 **Description:** Clicking a lyric line seeks YouTube player to that timestamp.
 
 **Acceptance Criteria:**
-- [ ] Pass `onLineClick(startTime)` callback to LyricsDisplay
-- [ ] When line clicked, call `player.seekTo(startTime)`
-- [ ] Player starts playing after seek
-- [ ] Visual feedback on click (brief highlight)
-- [ ] Typecheck passes
-- [ ] Verify in browser: clicking line 5 jumps to ~28.61s
+- [x] Pass `onLineClick(startTime)` callback to LyricsDisplay
+- [x] When line clicked, call `player.seekTo(startTime)`
+- [x] Player starts playing after seek
+- [x] Visual feedback on click (brief highlight)
+- [x] Typecheck passes
+- [x] Verify in browser: clicking line 5 jumps to ~28.61s
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-009. Do not continue to US-010.**
 

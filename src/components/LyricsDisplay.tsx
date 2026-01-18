@@ -19,12 +19,14 @@ interface LyricsDisplayProps {
   songId: Id<"songs">;
   onLineClick?: (startTime: number, lineIndex: number) => void;
   activeLineIndex?: number;
+  clickedLineIndex?: number;
 }
 
 export default function LyricsDisplay({
   songId,
   onLineClick,
   activeLineIndex,
+  clickedLineIndex,
 }: LyricsDisplayProps) {
   const { data: lyrics } = useSuspenseQuery(
     convexQuery(api.lyrics.getBySong, { songId })
@@ -42,9 +44,13 @@ export default function LyricsDisplay({
           key={line._id}
           type="button"
           onClick={() => onLineClick?.(line.startTime, index)}
-          className={`flex flex-col gap-1 rounded-lg p-3 text-left transition-colors hover:bg-primary/5 ${
+          className={`flex flex-col gap-1 rounded-lg p-3 text-left transition-all duration-150 hover:bg-primary/5 ${
             activeLineIndex === index
               ? "bg-primary/10 ring-1 ring-primary/20"
+              : ""
+          } ${
+            clickedLineIndex === index
+              ? "scale-[0.98] bg-primary/20"
               : ""
           }`}
         >

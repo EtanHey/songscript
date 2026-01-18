@@ -18,6 +18,22 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-009: Line Click to Seek Functionality
+- Created `src/routes/song.$songId.tsx` - song practice page route
+- Integrated YouTubePlayer and LyricsDisplay components
+- Added `onLineClick` handler that calls `player.seekTo(startTime)` and `player.play()`
+- Added `clickedLineIndex` prop to LyricsDisplay for brief click animation (scale + bg change for 300ms)
+- Added `activeLineIndex` tracking for current playing line highlight
+- Fixed ConvexClientProvider to include QueryClientProvider with ConvexQueryClient setup
+- Verified in browser: clicking lyrics line seeks video and starts playback
+- Typecheck passes
+
+**Learnings:**
+- `@convex-dev/react-query` requires QueryClientProvider with ConvexQueryClient setup
+- Must configure `queryKeyHashFn` and `queryFn` from ConvexQueryClient on QueryClient
+
+---
+
 ## Iteration - US-008: Lyrics Display Component
 - Created `src/components/LyricsDisplay.tsx`
 - Installed `@convex-dev/react-query` and `@tanstack/react-query` for Convex + TanStack Query integration
