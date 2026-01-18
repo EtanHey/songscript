@@ -1152,23 +1152,66 @@ const handleLineClick = useCallback((startTime: number, lineIndex: number) => {
 
 ---
 
-### US-TEST-SETUP: Set Up Vitest + Playwright Testing Infrastructure
+### US-TEST-SETUP: Set Up Vitest + Playwright + Husky Pre-Commit
 
-**Description:** Set up proper testing infrastructure with Vitest for unit tests and Playwright for e2e tests.
+**Description:** Set up testing infrastructure with Vitest for unit tests, Playwright for e2e tests, and Husky pre-commit hook to run tests before every commit.
+
+**Reference:** See DOMICA repo (`~/Desktop/Gits/domica/.husky/pre-commit`) for working example.
 
 **Acceptance Criteria:**
+
+**1. Install Dependencies:**
 - [ ] Install Vitest: `bun add -d vitest @testing-library/react @testing-library/dom jsdom`
 - [ ] Install Playwright: `bun add -d @playwright/test`
+- [ ] Install Husky: `bun add -d husky`
+
+**2. Configure Test Runners:**
 - [ ] Create `vitest.config.ts` with jsdom environment
 - [ ] Create `playwright.config.ts` with localhost:3001 base URL
-- [ ] Add test scripts to `package.json`: `"test": "vitest"`, `"test:e2e": "playwright test"`
+- [ ] Add scripts to `package.json`:
+  ```json
+  "test": "vitest run",
+  "test:watch": "vitest",
+  "test:e2e": "playwright test",
+  "prepare": "husky"
+  ```
+
+**3. Create Test Folders:**
 - [ ] Create `app/__tests__/` folder for unit tests
 - [ ] Create `e2e/` folder for Playwright tests
-- [ ] Create sample unit test that passes
-- [ ] Create sample e2e test that navigates to `/` and passes
+- [ ] Add `e2e/` and `playwright-report/` and `test-results/` to `.gitignore`
+
+**4. Set Up Husky Pre-Commit Hook:**
+- [ ] Run `bunx husky init` to create `.husky/` folder
+- [ ] Create `.husky/pre-commit` with this content:
+  ```bash
+  #!/usr/bin/env sh
+
+  # Clean Playwright artifacts
+  rm -rf playwright-report test-results
+  git reset HEAD -- playwright-report test-results 2>/dev/null
+
+  # Run unit tests and typecheck
+  echo "🧪 Running tests..."
+  bun run test || { echo "❌ Unit tests failed"; exit 1; }
+
+  echo "📝 Running typecheck..."
+  bun run typecheck || { echo "❌ Typecheck failed"; exit 1; }
+
+  echo "✅ All checks passed"
+  ```
+- [ ] Make executable: `chmod +x .husky/pre-commit`
+
+**5. Create Sample Tests:**
+- [ ] Create sample unit test in `app/__tests__/sample.test.ts`
+- [ ] Create sample e2e test in `e2e/sample.spec.ts`
+
+**6. Verify Everything Works:**
 - [ ] `bun run test` passes
 - [ ] `bun run test:e2e` passes
-- [ ] Typecheck passes
+- [ ] `bun run typecheck` passes
+- [ ] Make a test commit - pre-commit hook runs tests automatically
+- [ ] Verify commit is blocked if tests fail
 
 **⏹️ STOP - END OF US-TEST-SETUP. Do not continue to next story.**
 
