@@ -37,9 +37,9 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 23 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020A, V-001, V-002, V-003, V-004) |
+| ✅ **Stories Complete** | 25 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020A, V-001, V-002, V-003, V-004, V-005, V-006) |
 | ⏹️ **BLOCKED** | US-005 (Auth) |
-| 🔄 **Stories Remaining** | 2 (V-005, V-006) |
+| 🔄 **Stories Remaining** | 0 |
 
 **Browser extension connected.** Proceeding with remaining verification stories.
 
@@ -555,12 +555,14 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 
 ### V-005: Verify Mobile Responsiveness
 
-- [ ] Resize browser to 375px width
-- [ ] Video is full width
-- [ ] Lyrics are below video
-- [ ] Controls are accessible
-- [ ] No horizontal scroll
-- [ ] Take screenshot of mobile view
+- [x] Resize browser to 375px width
+- [x] Video is full width
+- [x] Lyrics are below video
+- [x] Controls are accessible
+- [x] No horizontal scroll
+- [x] Take screenshot of mobile view
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF V-005**
 
@@ -568,11 +570,13 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 
 ### V-006: Verify RTL Support
 
-- [ ] Persian text displays right-to-left
-- [ ] Hebrew text displays right-to-left
-- [ ] Text alignment is correct (text-right)
-- [ ] No visual glitches with mixed RTL/LTR
-- [ ] Take screenshot showing RTL text
+- [x] Persian text displays right-to-left
+- [x] Hebrew text displays right-to-left
+- [x] Text alignment is correct (text-right)
+- [x] No visual glitches with mixed RTL/LTR
+- [x] Take screenshot showing RTL text
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF V-006**
 
