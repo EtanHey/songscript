@@ -147,7 +147,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen overflow-x-hidden bg-gray-900 text-white">
       {/* Header */}
       <header className="border-b border-gray-800 p-4">
         <h1 className="text-2xl font-bold iran-gradient">{song.title}</h1>
@@ -164,8 +164,8 @@ function SongPageContent({ songId }: SongPageContentProps) {
               videoId={song.youtubeId}
               onTimeUpdate={handleTimeUpdate}
             />
-            {/* Controls */}
-            <div className="mt-4 flex items-center gap-4 rounded-lg bg-gray-800 p-3">
+            {/* Controls - stack vertically on mobile, horizontal on md+ */}
+            <div className="mt-4 flex flex-col gap-3 rounded-lg bg-gray-800 p-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
               {/* Loop Toggle */}
               <div className="flex items-center gap-2">
                 <Switch

@@ -65,7 +65,7 @@ export default function LyricsDisplay({
           }}
           type="button"
           onClick={() => onLineClick?.(line.startTime, index)}
-          className={`flex flex-col gap-1 rounded-lg p-3 text-left transition-all duration-150 hover:bg-primary/5 ${
+          className={`flex min-h-11 flex-col gap-1 rounded-lg p-3 text-left transition-all duration-150 hover:bg-primary/5 ${
             activeLineIndex === index
               ? "bg-primary/10 ring-1 ring-primary/20"
               : ""

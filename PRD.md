@@ -37,12 +37,12 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 13 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014) |
+| ✅ **Stories Complete** | 14 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015) |
 | ⏹️ **BLOCKED** | US-005 (Auth - Convex/Better Auth API integration failing) |
-| 🔄 **Stories Remaining** | 5 + 6 verification |
-| ☑️ **Criteria Checked** | 102 / 107 (~95%) |
+| 🔄 **Stories Remaining** | 4 + 6 verification |
+| ☑️ **Criteria Checked** | 109 / 114 (~96%) |
 
-**Next Story:** US-015 (Mobile Responsive Design) - skipping blocked US-005
+**Next Story:** US-016 (Song Practice Page Route) - skipping blocked US-005
 
 ---
 
@@ -401,13 +401,15 @@ SongScript is a song transliteration learning app that helps users learn to pron
 - Touch targets for line clicks (44px minimum)
 
 **Acceptance Criteria:**
-- [ ] YouTube player: 100% width on mobile, fixed width on desktop
-- [ ] Lyrics below video on mobile, beside on desktop (md: breakpoint)
-- [ ] Line buttons have min-height 44px for touch
-- [ ] Controls (loop, speed, filter) stack vertically on mobile
-- [ ] No horizontal scroll on mobile
-- [ ] Typecheck passes
-- [ ] Verify in browser at 375px width
+- [x] YouTube player: 100% width on mobile, fixed width on desktop
+- [x] Lyrics below video on mobile, beside on desktop (md: breakpoint)
+- [x] Line buttons have min-height 44px for touch
+- [x] Controls (loop, speed, filter) stack vertically on mobile
+- [x] No horizontal scroll on mobile
+- [x] Typecheck passes
+- [x] Verify in browser at 375px width
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-015. Do not continue to US-016.**
 

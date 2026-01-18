@@ -18,6 +18,23 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-015: Mobile Responsive Design
+- Updated song page layout to be mobile-first responsive
+- Main content: `flex flex-col lg:flex-row` - vertical on mobile, side-by-side on desktop (lg+)
+- YouTube player wrapper: `w-full lg:w-1/2` - full width on mobile, half width on desktop
+- Controls section: `flex flex-col md:flex-row md:flex-wrap` - stacked on mobile, horizontal on md+
+- Added `min-h-11` (44px) to LyricsDisplay line buttons for proper touch targets
+- Added `overflow-x-hidden` to main container to prevent horizontal scroll on mobile
+- Verified in browser: desktop layout shows side-by-side video/lyrics correctly
+- Typecheck passes
+
+**Learnings:**
+- Tailwind's mobile-first approach: base classes are mobile, add `md:` and `lg:` prefixes for larger screens
+- `min-h-11` = 2.75rem = 44px - the recommended minimum touch target size
+- Using `flex-wrap` with `md:flex-row` allows controls to wrap naturally if needed
+
+---
+
 ## Iteration - US-005: Passwordless Auth (BLOCKED)
 - Removed password-based auth, implemented magic link authentication
 - Updated `convex/betterAuth.ts` to use `magicLink` plugin from `better-auth/plugins`
