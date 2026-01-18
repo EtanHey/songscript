@@ -19,6 +19,10 @@ out/
 .wrangler/
 .vinxi/
 
+# Convex build artifacts (stray .js files that get generated)
+convex/*.js
+!convex/_generated/**
+
 # IDE
 .vscode/
 .idea/

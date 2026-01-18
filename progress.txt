@@ -1,0 +1,40 @@
+# Progress Log
+
+## Learnings
+(Mark with [DONE] when promoted to CLAUDE.md)
+
+- NO INLINE COLORS: Use Tailwind preset tokens (primary-50, etc.), never arbitrary hex like bg-[#E9EFFD]
+- NO ARBITRARY PIXELS: Use Tailwind scale (gap-4, py-12) or @theme CSS variables
+- RTL: Persian and Hebrew text must have dir="rtl" and text-right
+- TanStack Start + Bun: Use `bun --bun` prefix for scripts, `nitro({ preset: "bun" })` in vite config
+- Convex + TanStack Start: Use @convex-dev/react-query for SSR + live updates
+
+- Convex Better Auth: Use `@convex-dev/better-auth` with `better-auth@1.4.9` pinned
+- Convex Components: File naming matters - avoid naming files `auth.ts` in convex/ folder when using betterAuth component (causes bundler conflicts)
+- Convex dev won't work with stray .js files in convex/ folder - remove them if build fails with "Two output files share the same path"
+
+---
+
+## Current Iteration
+(Continue from here)
+
+## Iteration - US-005: Admin-Only Authentication Setup
+- Installed Better Auth packages: `@convex-dev/better-auth` and `better-auth@1.4.9`
+- Created convex.config.ts to register Better Auth component
+- Created convex/auth.config.ts for auth provider configuration
+- Created convex/betterAuth.ts with Better Auth configuration (renamed from auth.ts to avoid bundler conflict)
+- Added users table to schema with email, authId, and role fields
+- Created src/lib/auth-client.ts for frontend auth client
+- Created src/lib/auth-server.ts for TanStack Start server-side auth
+- Created API route handler at src/routes/api/auth/$.tsx
+- Updated ConvexClientProvider to use ConvexBetterAuthProvider
+- Created login page at /login with admin email restriction
+- Added SITE_URL and VITE_SITE_URL to .env.local
+- Typecheck passes
+
+**Learnings:**
+- When using Convex components like Better Auth, avoid naming your files the same as component files (e.g., don't name your file auth.ts when the component has an auth.ts)
+- Vite dev server running in background can regenerate .js files in convex/ folder, causing bundler conflicts
+- Kill vite processes and remove .js files before running `npx convex dev` if you encounter "Two output files share the same path" errors
+
+---

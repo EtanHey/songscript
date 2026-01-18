@@ -2,6 +2,15 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  // App-specific users table (linked to Better Auth via authId)
+  users: defineTable({
+    email: v.string(),
+    authId: v.optional(v.string()), // Links to Better Auth user
+    role: v.optional(v.string()), // "admin" or "user"
+  })
+    .index("email", ["email"])
+    .index("authId", ["authId"]),
+
   songs: defineTable({
     title: v.string(),
     artist: v.string(),
