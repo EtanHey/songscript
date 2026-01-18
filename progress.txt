@@ -18,6 +18,96 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-MOBILE-DRAWER: Redesign Mobile Word Info Experience ✅
+- **Issue investigated**: Current mobile drawer uses a 7-column table squeezed into 375px
+- **Problems found**:
+  1. Table layout unreadable on narrow screens - columns truncated
+  2. Poor use of vertical space (mobile screens are tall, not wide)
+  3. Tiny touch targets for checkboxes and audio buttons
+  4. No visual hierarchy - all info competing for attention
+- **Solution implemented**: Vertical card layout
+  - Each word gets its own full-width card with stacked content
+  - Large 44px circular buttons for audio and learned toggle
+  - Persian word prominent at top of each card
+  - Supporting info (transliteration, Hebrew, English, grammar) below
+  - Green styling for learned words (green border, green background, green checkmark)
+  - Drag handle at top for visual affordance
+  - 85vh height for better screen coverage
+- **Files modified**: `src/components/WordInfoModal.tsx`
+  - Added `MobileWordCards` component with vertical card layout
+  - Desktop keeps the existing table layout via `WordTable`
+- **Browser verification**:
+  - ✅ Mobile drawer opens with new card layout
+  - ✅ Words display with Persian, transliteration, Hebrew, English
+  - ✅ Marking word as learned turns card green, updates progress
+  - ✅ Drawer dismissable via Escape key
+  - ✅ Progress indicator shows "X/Y words"
+- Typecheck passes ✅
+
+**Learnings:**
+- Tables are terrible on mobile - always use vertical card layouts for narrow screens
+- 44px touch targets are essential for mobile usability
+- Use clear visual hierarchy: primary info (Persian word) large, supporting info smaller below
+- Drag handle provides visual affordance that bottom sheet is draggable
+
+**Next:** US-MOBILE-LAYOUT (Mobile Controls Layout Fix)
+
+---
+
+## Iteration - US-SYNC-FIX: Video and Audio Not Synced ✅
+- **Issue investigated**: Video and audio snippets were out of sync by ~0.35s
+- **Root cause found**: Database had OLD timestamps while audio snippets used NEW offset timestamps
+  - Audio snippets extracted at offset times (e.g., Line 1 starts at 15.16s)
+  - Convex database still had original times (e.g., Line 1 at 14.81s)
+  - Convex `seedBaraye` mutation was never re-deployed after timestamp update
+- **Secondary issue found**: Convex bundling error ("Two output files share the same path")
+  - Cause: Stray `.js` files in `convex/` directory alongside `.ts` files
+  - Fix: Removed all `.js` files from convex directory
+- **Fix implemented**:
+  1. Deleted stray `convex/*.js` files
+  2. Re-deployed Convex functions with `npx convex dev --once`
+  3. Re-ran `npx convex run seed:seedBaraye` to update database timestamps
+- **Browser verification**:
+  - ✅ Single mode: Line 28 video=113.78s, expected=113.78s, diff=0.00s
+  - ✅ Loop mode: Line 21 video=87.74s, expected=87.74s, diff=0.00s
+  - ✅ Fluid mode: Video plays with native audio (same source, always synced)
+  - ✅ Video frame content matches lyric line being played
+- Typecheck passes ✅
+
+**Learnings:**
+- Convex dev bundler fails if both .ts and .js files exist for same module name
+- Always verify database has latest timestamp data after updating seed scripts
+- Add learning to CLAUDE.md about stray .js files in convex/ directory
+
+**Next:** US-MOBILE-DRAWER (Improve Mobile Info Drawer UX)
+
+---
+
+## Iteration - US-VIDEO-LOAD: Fix Video Behavior on Page Load ✅
+- **Issue investigated**: Video stuck on "Loading video..." spinner indefinitely on fresh page load
+- **Root cause found**: Video file (8.3 MB) loads very slowly on Vite dev server
+  - Network request returns 503 initially, then slow streaming (206 Partial Content works but slow)
+  - The `canplay` event never fires in time, causing infinite loading state
+- **Fix implemented**: Added 5-second timeout in `LocalVideoPlayer.tsx`
+  - After 5 seconds, video element is shown even if `canplay` hasn't fired
+  - Browsers can display partial video content while buffering
+- **Browser verification**:
+  - ✅ Video is visible within 5 seconds (no more infinite spinner)
+  - ✅ Video is muted by default (VolumeX icon shown)
+  - ✅ Video is paused until user clicks a line or play button
+  - ✅ No console errors on page load
+  - ✅ Clicking line 2 correctly seeked video and played audio snippet
+- Typecheck passes ✅
+
+**Learnings:**
+- Large video files (8+ MB) load slowly on Vite/Nitro dev server
+- Don't wait indefinitely for `canplay` event - add timeout for better UX
+- The video element can display partial content even before fully buffered
+
+**Next:** US-MOBILE-DRAWER (Improve Mobile Info Drawer UX)
+
+---
+
 ## Iteration - V-009: Verify Word Info Modal ✅
 - Browser verification completed on desktop tab (1076981165)
 - **Click lyric line → modal opens**: Verified - clicking "View word breakdown" button opens centered Dialog modal

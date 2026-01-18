@@ -49,9 +49,9 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 41 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, V-001-009) |
+| ✅ **Stories Complete** | 44 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, US-SYNC-FIX, V-001-009, US-VIDEO-LOAD, US-MOBILE-DRAWER) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), US-020 Phase 5 |
-| 🔄 **Stories Remaining** | 3 (US-MOBILE-LAYOUT, US-WORD-SYNC, US-031) |
+| 🔄 **Stories Remaining** | 4 (US-MOBILE-LAYOUT, US-VIDEO-MOBILE, US-WORD-SYNC, US-031) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
@@ -68,9 +68,12 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 7. ~~US-032~~ ✅ (Word Learning Tracking - localStorage + Convex)
 8. ~~V-008~~ ✅ (Verify Playback Modes)
 9. ~~V-009~~ ✅ (Verify Word Info Modal)
-10. **US-MOBILE-LAYOUT: Mobile Controls Layout ← NEXT**
-11. **US-WORD-SYNC: Sync Repeated Words Learning State**
-12. **US-031: ElevenLabs Word Audio ← LAST (needs API key)**
+10. ~~US-VIDEO-LOAD~~ ✅ (Fix Video Load Issue - 5s timeout)
+11. ~~US-MOBILE-DRAWER~~ ✅ (Vertical card layout for mobile)
+12. **US-MOBILE-LAYOUT: Mobile Controls Layout ← NEXT**
+13. **US-VIDEO-MOBILE: Collapsible Video on Mobile**
+14. **US-WORD-SYNC: Sync Repeated Words Learning State**
+15. **US-031: ElevenLabs Word Audio ← LAST (needs API key)**
 
 **API Key Needed (US-031 only):**
 - ElevenLabs: https://elevenlabs.io/ (free tier: ~10 min audio/month, supports Persian via v3)
@@ -89,6 +92,22 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 - **DO NOT** kill the dev server
 - Just use `mcp__claude-in-chrome__*` tools to test at `http://localhost:3001`
 - If you see port conflicts, the server is already running - just use it
+
+**🖥️ TWO TABS ARE ALREADY OPEN 🖥️**
+- **Tab 1:** Desktop viewport (1440px or larger)
+- **Tab 2:** Mobile viewport (375px)
+- **NEVER resize the browser window** - use the appropriate tab for each test
+- For desktop tests → use the desktop tab
+- For mobile tests → use the mobile tab
+
+**🚨 CHECK TABS BEFORE ANY BROWSER WORK 🚨**
+1. Call `mcp__claude-in-chrome__tabs_context_mcp` FIRST before any browser verification
+2. **If tabs exist:** Report "✓ Browser tabs available" and proceed
+3. **If NO tabs / error:**
+   - Report: "⚠️ Browser tabs not available. Need user to open Chrome with extension."
+   - Mark browser verification as BLOCKED
+   - Continue with non-browser parts of the story
+   - Do NOT keep retrying - user will open tabs and run Ralph again
 
 ---
 
@@ -193,13 +212,15 @@ Push timestamps even LATER (forward in time):
 3. **Option C:** Calculate offset dynamically: `video.seekTo(line.startTime + AUDIO_START_OFFSET)`
 
 **Acceptance Criteria:**
-- [ ] Investigate the sync issue - identify where the mismatch comes from
-- [ ] Fix video seek to match audio snippet timing
-- [ ] **BROWSER TEST in Single mode**: Click line 5 - video and audio start at SAME moment
-- [ ] **BROWSER TEST in Loop mode**: Click line 15 - video and audio loop together in sync
-- [ ] **BROWSER TEST in Fluid mode**: Video plays with its own audio (should already be synced)
-- [ ] Verify at least 3 different lines are properly synced
-- [ ] Typecheck passes
+- [x] Investigate the sync issue - identify where the mismatch comes from
+- [x] Fix video seek to match audio snippet timing
+- [x] **BROWSER TEST in Single mode**: Click line 5 - video and audio start at SAME moment
+- [x] **BROWSER TEST in Loop mode**: Click line 15 - video and audio loop together in sync
+- [x] **BROWSER TEST in Fluid mode**: Video plays with its own audio (should already be synced)
+- [x] Verify at least 3 different lines are properly synced
+- [x] Typecheck passes
+
+**✅ COMPLETE - Root cause: Convex database had OLD timestamps while audio snippets used NEW offset timestamps. Fixed by re-running seedBaraye to update DB with offset timestamps. Also fixed Convex bundling issue (duplicate .js files in convex/ directory).**
 
 **⏹️ STOP - END OF US-SYNC-FIX. Do not continue to US-TIMESTAMPS-V2.**
 
@@ -1573,6 +1594,88 @@ Replace YouTube embed with local video player using downloaded MP4:
 
 ---
 
+### US-VIDEO-LOAD: Fix Video Behavior on Page Load
+
+**Description:** There's an issue with the video when the page first loads, without any user interaction.
+
+**Investigation Required:**
+- [x] **BROWSER TEST**: Navigate to song page fresh (hard refresh)
+- [x] Document what happens: Does video autoplay? Error? Wrong state?
+- [x] Check console for errors with `mcp__claude-in-chrome__read_console_messages`
+- [x] Identify root cause
+
+**Root Cause Found:**
+- Video file (8.3 MB) loads very slowly on Vite dev server (returns 503 initially, then slow streaming)
+- The `canplay` event never fires in time, causing infinite "Loading video..." state
+- **Fix:** Added 5-second timeout in LocalVideoPlayer that shows the video element even if `canplay` hasn't fired yet
+
+**Requirements:**
+- [x] Video should NOT autoplay on page load (verified - paused by default)
+- [x] Video should be paused and muted by default (verified - VolumeX icon shown)
+- [x] No console errors on load (verified - only Vite connection logs)
+- [x] User must click a line or play button to start playback (verified)
+- [x] Typecheck passes
+- [x] **BROWSER TEST**: Verify video is visible within 5 seconds of page load (no more infinite spinner)
+
+**✅ COMPLETE**
+
+**⏹️ STOP - END OF US-VIDEO-LOAD**
+
+---
+
+### US-MOBILE-DRAWER: Redesign Mobile Word Info Experience
+
+**Description:** The word info modal/drawer is terrible on mobile. **You have full creative freedom to redesign the layout and UX for mobile.**
+
+**🎨 CREATIVE FREEDOM:**
+You are NOT limited to the current drawer/modal approach. Feel free to:
+- Completely redesign the layout
+- Try different UI patterns (bottom sheet, inline expansion, card stack, etc.)
+- Rethink how words are displayed and interacted with
+- Make it feel native and delightful on mobile
+- Look up modern mobile UI patterns for inspiration
+
+**Investigation First:**
+- [x] **BROWSER TEST**: Open current drawer on mobile (375px viewport)
+- [x] Document what's wrong with current approach
+- [x] Take screenshot of current state
+- [x] Research mobile UI patterns (use WebSearch if helpful)
+
+**Issues Found:**
+1. Table layout with 7 columns squeezed into 375px = unreadable
+2. Text cut off and truncated
+3. Poor use of vertical space (mobile screens are tall, not wide)
+4. Tiny touch targets for checkboxes and buttons
+5. No visual hierarchy - all columns compete equally
+
+**Solution Implemented:**
+- **Vertical card layout** instead of horizontal table
+- Each word gets its own full-width card with stacked content
+- Large 44px circular buttons for audio and learned toggle
+- Persian word prominent at top of each card
+- Supporting info (transliteration, Hebrew, English, grammar) below
+- Green styling for learned words
+- Drag handle at top for visual affordance
+- 85vh height for better screen coverage
+
+**Requirements:**
+- [x] Redesign mobile word info experience (be creative!)
+- [x] Must show: word, transliteration, Hebrew, English, learned state
+- [x] Must allow toggling learned/not learned
+- [x] Must be dismissable (Escape key, X button)
+- [x] Typecheck passes
+- [x] **BROWSER TEST**: Verify new design looks good and is usable on mobile
+- [x] Take screenshot of new design
+
+**Files modified:**
+- `src/components/WordInfoModal.tsx` - Added MobileWordCards component with vertical card layout
+
+**✅ COMPLETE**
+
+**⏹️ STOP - END OF US-MOBILE-DRAWER**
+
+---
+
 ### US-MOBILE-LAYOUT: Mobile Controls Layout Fix
 
 **Description:** On mobile, the line number and current line indicator should appear below or in the same row as the word mode toggle, not awkwardly placed.
@@ -1590,6 +1693,45 @@ Replace YouTube embed with local video player using downloaded MP4:
 - [ ] **BROWSER TEST**: Verify layout on mobile viewport (375px)
 
 **⏹️ STOP - END OF US-MOBILE-LAYOUT**
+
+---
+
+### US-VIDEO-MOBILE: Collapsible Video on Mobile
+
+**Description:** The video player with its controller takes too much vertical space on mobile, making it hard to scroll and focus on lyrics. The video should be collapsible OR the entire mobile layout should be rethought.
+
+**🎨 CREATIVE FREEDOM:**
+You have full freedom to redesign the mobile layout. Consider:
+- Collapsible/expandable video player (tap to show/hide)
+- Minimized video mode (small picture-in-picture style corner)
+- Video hidden by default, revealed with button
+- Split view with resizable sections
+- Tab-based layout (video tab / lyrics tab)
+- Floating minimized player while scrolling
+- Whatever else makes sense for mobile UX!
+
+**Current Problem:**
+- [ ] **BROWSER TEST (mobile tab)**: Navigate to song page on 375px viewport
+- [ ] Document how much screen space video + controls take
+- [ ] Measure: Can user see at least 3-4 lyrics lines without scrolling?
+- [ ] Take screenshot showing the problem
+
+**Requirements:**
+- [ ] Redesign mobile layout so lyrics get more screen space
+- [ ] User should be able to collapse/minimize/hide video when focusing on lyrics
+- [ ] When video is minimized, audio should still work (Single/Loop modes with snippets)
+- [ ] Easy way to bring video back when needed
+- [ ] Fluid mode should expand video automatically
+- [ ] Typecheck passes
+- [ ] **BROWSER TEST**: Verify new design on mobile - lyrics should dominate the view
+- [ ] Take screenshot of new design
+
+**Files to consider:**
+- `src/routes/song.$songId.tsx` - main layout
+- `src/components/LocalVideoPlayer.tsx` - video component
+- May need new components for collapse/minimize logic
+
+**⏹️ STOP - END OF US-VIDEO-MOBILE**
 
 ---
 

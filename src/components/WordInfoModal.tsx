@@ -43,7 +43,7 @@ interface WordInfoModalProps {
   isMobile: boolean;
 }
 
-// Word table component - shared between Dialog and Sheet
+// Word table component - for desktop Dialog
 function WordTable({
   words,
   wordProgress,
@@ -158,6 +158,108 @@ function WordTable({
           })}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+// Mobile-optimized word cards - vertical layout for narrow screens
+function MobileWordCards({
+  words,
+  wordProgress,
+  onPlayWord,
+  onToggleLearned,
+}: {
+  words: WordData[];
+  wordProgress: Map<string, WordProgressData>;
+  onPlayWord: (word: WordData) => void;
+  onToggleLearned: (wordId: Id<"words">) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-3">
+      {words.map((word) => {
+        const progress = wordProgress.get(word._id);
+        const isLearned = progress?.learned ?? false;
+
+        return (
+          <div
+            key={word._id}
+            className={`rounded-lg border p-4 transition-colors ${
+              isLearned
+                ? "border-green-600/30 bg-green-900/20"
+                : "border-gray-700 bg-gray-800/50"
+            }`}
+          >
+            {/* Top row: Persian word + checkbox + audio */}
+            <div className="flex items-center justify-between gap-3">
+              {/* Persian word - prominent */}
+              <div className="flex-1" dir="rtl">
+                <span
+                  className={`text-2xl font-medium ${
+                    isLearned ? "text-green-400" : "text-white"
+                  }`}
+                >
+                  {word.persian}
+                </span>
+              </div>
+
+              {/* Actions: Audio + Checkbox */}
+              <div className="flex items-center gap-3">
+                {/* Audio button - large touch target */}
+                <button
+                  onClick={() => onPlayWord(word)}
+                  disabled={!word.forvoAudioUrl}
+                  className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors ${
+                    word.forvoAudioUrl
+                      ? "bg-gray-700 text-white active:bg-gray-600"
+                      : "bg-gray-800 text-gray-600"
+                  }`}
+                  title={
+                    word.forvoAudioUrl
+                      ? "Play pronunciation"
+                      : "Audio coming soon"
+                  }
+                >
+                  <Volume2 className="h-5 w-5" />
+                </button>
+
+                {/* Learned checkbox - large touch target */}
+                <button
+                  onClick={() => onToggleLearned(word._id)}
+                  className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors ${
+                    isLearned
+                      ? "bg-green-600 text-white"
+                      : "border-2 border-gray-600 bg-transparent text-gray-400"
+                  }`}
+                >
+                  <Check className={`h-5 w-5 ${isLearned ? "" : "opacity-40"}`} />
+                </button>
+              </div>
+            </div>
+
+            {/* Transliteration - how to pronounce */}
+            <p className="mt-2 text-lg italic text-emerald-500">
+              {word.transliteration}
+            </p>
+
+            {/* Hebrew transliteration */}
+            {word.hebrew && (
+              <p className="mt-1 text-base text-blue-400" dir="rtl">
+                {word.hebrew}
+              </p>
+            )}
+
+            {/* English meaning + grammar type */}
+            <div className="mt-2 flex items-center justify-between">
+              <p className="text-base text-gray-300">{word.english}</p>
+              {word.grammarType && (
+                <span className="rounded-full bg-gray-700 px-2 py-0.5 text-xs text-gray-400">
+                  {word.grammarType}
+                </span>
+              )}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -336,21 +438,72 @@ export default function WordInfoModal({
     </>
   );
 
-  // Mobile: Use Sheet (drawer from bottom)
+  // Mobile: Use Sheet (drawer from bottom) with card-based layout
   if (isMobile) {
     return (
       <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
         <SheetContent
           side="bottom"
-          className="h-[80vh] border-gray-700 bg-gray-900 text-white"
+          className="flex h-[85vh] flex-col border-gray-700 bg-gray-900 text-white"
         >
-          <SheetHeader className="pb-2">
+          {/* Drag handle for visual affordance */}
+          <div className="mx-auto mt-2 h-1 w-12 rounded-full bg-gray-600" />
+
+          <SheetHeader className="flex-shrink-0 pb-2 pt-3">
             <SheetTitle className="text-white">Line {line.lineNumber}</SheetTitle>
             <SheetDescription className="text-gray-400">
-              Word-by-word breakdown
+              Tap a word to mark as learned
             </SheetDescription>
           </SheetHeader>
-          {content}
+
+          {/* Compact line display for mobile */}
+          <div className="flex-shrink-0 rounded-lg bg-gray-800 p-3">
+            <p dir="rtl" className="text-right text-lg font-medium leading-relaxed">
+              {line.original}
+            </p>
+            <p className="mt-1 text-sm italic text-emerald-500">
+              {line.transliteration}
+            </p>
+            <p className="mt-1 text-xs text-gray-400">{line.english}</p>
+          </div>
+
+          {/* Progress summary */}
+          {totalWords > 0 && (
+            <div className="flex flex-shrink-0 items-center gap-2 px-1 py-2 text-sm">
+              <span className="text-gray-400">Progress:</span>
+              <span
+                className={`font-medium ${
+                  learnedCount === totalWords ? "text-green-500" : "text-gray-300"
+                }`}
+              >
+                {learnedCount}/{totalWords} words
+              </span>
+              {learnedCount === totalWords && (
+                <Check className="h-4 w-4 text-green-500" />
+              )}
+            </div>
+          )}
+
+          {/* Scrollable word cards */}
+          <div className="flex-1 overflow-y-auto pb-4">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                <span className="ml-2 text-sm text-gray-400">Loading words...</span>
+              </div>
+            ) : words && words.length > 0 ? (
+              <MobileWordCards
+                words={words}
+                wordProgress={wordProgressMap}
+                onPlayWord={handlePlayWord}
+                onToggleLearned={handleToggleLearned}
+              />
+            ) : (
+              <p className="py-8 text-center text-sm text-gray-500">
+                No word data available for this line yet.
+              </p>
+            )}
+          </div>
         </SheetContent>
       </Sheet>
     );
