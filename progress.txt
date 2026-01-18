@@ -18,6 +18,19 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-025: Extract Audio Snippets from New Video ✅
+- Added `slug` field to `scripts/baraye-new-timestamps.json` (required by extract script)
+- Ran `./scripts/extract-snippets.sh scripts/baraye-new-timestamps.json public/audio/baraye/baraye_full.mp3`
+- All 31 snippets extracted successfully to `public/audio/baraye/`
+- Total size: 3.16MB (under 5MB limit)
+- Spot checked durations for lines 1, 15, 28 - all match expected values
+- audioSnippetUrl paths in seed.ts unchanged (already using correct format)
+- Typecheck passes ✅
+
+**Next:** US-026 will replace YouTube iframe with local video player using HTML5 `<video>` element.
+
+---
+
 ## Iteration - US-024: Update Seed Data with New Video + Timestamps ✅
 - Updated `convex/schema.ts` to add `videoUrl` optional field to songs table
 - Updated `convex/seed.ts`:

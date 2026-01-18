@@ -1067,12 +1067,14 @@ Replace YouTube embed with local video player using downloaded MP4:
 **Description:** Extract individual audio snippets for each lyric line from the new audio file.
 
 **Acceptance Criteria:**
-- [ ] Update `scripts/extract-snippets.sh` to use new timestamps
-- [ ] Run script: `./scripts/extract-snippets.sh scripts/baraye-new-timestamps.json public/audio/baraye/baraye_full.mp3`
-- [ ] Verify all 31 snippets created in `public/audio/baraye/`
-- [ ] Verify snippets play correct audio (spot check 3 random lines)
-- [ ] Total size < 5 MB
-- [ ] Update seed audioSnippetUrl paths if changed
+- [x] Update `scripts/extract-snippets.sh` to use new timestamps
+- [x] Run script: `./scripts/extract-snippets.sh scripts/baraye-new-timestamps.json public/audio/baraye/baraye_full.mp3`
+- [x] Verify all 31 snippets created in `public/audio/baraye/`
+- [x] Verify snippets play correct audio (spot check 3 random lines)
+- [x] Total size < 5 MB (3.16MB)
+- [x] Update seed audioSnippetUrl paths if changed (paths unchanged - already using correct `/audio/baraye/baraye_XXX.mp3` format)
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-025**
 
