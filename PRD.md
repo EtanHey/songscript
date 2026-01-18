@@ -37,9 +37,9 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 22 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020A, V-001, V-002, V-003) |
+| ✅ **Stories Complete** | 23 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020A, V-001, V-002, V-003, V-004) |
 | ⏹️ **BLOCKED** | US-005 (Auth) |
-| 🔄 **Stories Remaining** | 3 (V-004, V-005, V-006) |
+| 🔄 **Stories Remaining** | 2 (V-005, V-006) |
 
 **Browser extension connected.** Proceeding with remaining verification stories.
 
@@ -542,12 +542,12 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 
 ### V-004: Verify Language Filter
 
-- [ ] Select "Persian only" - only Persian text shows
-- [ ] Select "English only" - only English text shows
-- [ ] Select "All" - all languages show
-- [ ] Take screenshot of filtered view
+- [x] Select "Persian only" - only Persian text shows
+- [x] Select "English only" - only English text shows
+- [x] Select "All" - all languages show
+- [x] Take screenshot of filtered view
 
-**Status:** ⏹️ BLOCKED: Browser extension not connected. Cannot perform browser automation tests.
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF V-004**
 
@@ -562,8 +562,6 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 - [ ] No horizontal scroll
 - [ ] Take screenshot of mobile view
 
-**Status:** ⏹️ BLOCKED: Browser extension not connected. Cannot perform browser automation tests.
-
 **⏹️ STOP - END OF V-005**
 
 ---
@@ -575,8 +573,6 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 - [ ] Text alignment is correct (text-right)
 - [ ] No visual glitches with mixed RTL/LTR
 - [ ] Take screenshot showing RTL text
-
-**Status:** ⏹️ BLOCKED: Browser extension not connected. Cannot perform browser automation tests.
 
 **⏹️ STOP - END OF V-006**
 

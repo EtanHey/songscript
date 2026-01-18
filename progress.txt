@@ -18,6 +18,21 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - V-004: Verify Language Filter ✅
+- Browser extension connected on tab 1076981165
+- Opened language filter dropdown (shows: All Languages, Persian Only, Transliteration, Hebrew Only, English Only)
+- Selected "Persian Only" → VERIFIED: Only Persian text displayed (right-to-left script only)
+- Selected "English Only" → VERIFIED: Only English translations displayed
+- Selected "All Languages" → VERIFIED: All 4 languages displayed (Persian, Transliteration, Hebrew, English)
+- Multiple screenshots captured showing each filter state
+- All V-004 acceptance criteria complete
+
+**Learnings:**
+- ShadCN Select dropdown items get detached during interaction - use JavaScript or retry
+- Language filter correctly shows/hides each language layer based on selection
+
+---
+
 ## Iteration - V-003: Verify Player Functionality ✅
 - Browser extension working on tab 1076981165 (desktop viewport 1504x756)
 - Navigated to song page `/song/j972m34dzqgx6a0r5a00n9k6pd7zekfa`
