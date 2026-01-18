@@ -18,6 +18,36 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-WORD-SYNC: Sync Learning State for Repeated Words ✅
+- **Issue**: Words like "برای" (barāye) appear 31+ times in Baraye song, but learning state was tracked per word instance (`wordId`)
+- **Problem**: User had to mark the same word as learned multiple times in different lines
+- **Solution implemented**: Track learning state by word text (`persian` field) instead of word instance ID
+  - Added `persian` field (optional) to `wordProgress` schema
+  - Added `by_visitor_persian` index for efficient lookups
+  - Created `getByVisitorPersian` and `getByVisitorPersians` queries
+  - Updated `toggleLearned` mutation to update ALL matching records by persian text
+  - Updated `WordInfoModal` to lookup and display learned state by persian text
+- **Migration**: Created `migrateAddPersian` mutation, migrated 28 existing records
+- **Files modified**:
+  - `convex/schema.ts` - added persian field and index
+  - `convex/wordProgress.ts` - new queries/mutations for persian-based sync
+  - `src/components/WordInfoModal.tsx` - lookup by persian instead of wordId
+- **Browser verification**:
+  - ✅ Line 1: "برای" marked as learned → shows 1/4 words learned
+  - ✅ Line 2: "برای" automatically shows as learned (synced from Line 1!) → 1/5 words learned
+  - ✅ Unmark "برای" in Line 2 → Line 1 now shows 0/4 words learned (bidirectional sync!)
+- Typecheck passes ✅
+
+**Learnings:**
+- Convex schema migrations need `v.optional()` for backward compatibility with existing data
+- Word sync by text is more user-friendly than tracking individual word instances
+- The `by_visitor_persian` index enables efficient lookups across all word instances
+- Migration mutations can backfill existing records with new fields
+
+**Next:** US-031 (ElevenLabs Word Audio - needs API key) - currently the only remaining non-blocked story
+
+---
+
 ## Iteration - US-VIDEO-MOBILE: Collapsible Video on Mobile ✅
 - **Issue investigated**: Video player + controls took ~83% of mobile screen (only ~57px for lyrics)
 - **Problems found**:

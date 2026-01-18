@@ -48,14 +48,17 @@ export default defineSchema({
   }).index("by_song_line", ["songId", "lineNumber"]),
 
   // Track user's learning progress for individual words
+  // Learning state is keyed by persian text so repeated words (e.g., "برای") sync across all instances
   wordProgress: defineTable({
     visitorId: v.string(), // localStorage-generated ID if no auth
-    wordId: v.id("words"),
+    wordId: v.id("words"), // Reference to a specific word instance (for view/play counts)
+    persian: v.optional(v.string()), // The actual word text - used for syncing learned state across instances
     viewCount: v.number(),
     playCount: v.number(),
     learned: v.boolean(),
     lastSeen: v.number(),
   })
     .index("by_visitor", ["visitorId"])
-    .index("by_visitor_word", ["visitorId", "wordId"]),
+    .index("by_visitor_word", ["visitorId", "wordId"])
+    .index("by_visitor_persian", ["visitorId", "persian"]),
 });

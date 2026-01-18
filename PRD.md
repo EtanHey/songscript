@@ -5,7 +5,7 @@
 ---
 
 ## 🚨 ITERATION RULES (READ THIS FIRST) 🚨
-
+**YOU HAVE BEEN STRUGGLING WITH MOBILE, START WITH PERFECTING FUNCTIONALITY ON DESKTOP, THEN REDESGN FOR MOBILE**
 **CRITICAL: Each user story = ONE iteration. NO EXCEPTIONS.**
 
 **📊 CHECK PROGRESS FIRST:**
@@ -49,13 +49,13 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 46 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, US-SYNC-FIX, V-001-009, US-VIDEO-LOAD, US-MOBILE-DRAWER, US-MOBILE-LAYOUT, US-VIDEO-MOBILE) |
+| ✅ **Stories Complete** | 47 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, US-SYNC-FIX, V-001-009, US-VIDEO-LOAD, US-MOBILE-DRAWER, US-MOBILE-LAYOUT, US-VIDEO-MOBILE, US-WORD-SYNC) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), US-020 Phase 5 |
-| 🔄 **Stories Remaining** | 2 (US-WORD-SYNC, US-031) |
+| 🔄 **Stories Remaining** | 1 (US-031) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** US-WORD-SYNC (Sync Repeated Words Learning State)
+**Next Story:** US-031 (ElevenLabs Word Audio - needs API key)
 
 **Story Order (optimized - API-dependent story LAST):**
 0. ~~US-TIMESTAMPS-V2~~ ✅ (end buffer increased to +0.70s)
@@ -1761,17 +1761,28 @@ You have full freedom to redesign the mobile layout. Consider:
 - User has to mark the same word as learned multiple times
 
 **Requirements:**
-- [ ] Word learning state syncs by word text (original Persian), not by word ID
-- [ ] If "برای" is marked learned in line 1, all "برای" instances show as learned
-- [ ] Update `wordProgress` to key by `word.original` instead of `word._id`
-- [ ] On modal open, show correct learned state for that word
-- [ ] Typecheck passes
-- [ ] **BROWSER TEST**: Mark a repeated word as learned, verify it shows learned in other lines
+- [x] Word learning state syncs by word text (original Persian), not by word ID
+- [x] If "برای" is marked learned in line 1, all "برای" instances show as learned
+- [x] Update `wordProgress` to key by `word.persian` instead of `word._id`
+- [x] On modal open, show correct learned state for that word
+- [x] Typecheck passes
+- [x] **BROWSER TEST**: Mark a repeated word as learned, verify it shows learned in other lines
 
-**Files to check:**
-- `src/components/WordInfoModal.tsx` - learning state
-- `convex/wordProgress.ts` - may need to change lookup
-- `src/routes/song.$songId.tsx` - visitor ID logic
+**Implementation:**
+- Added `persian` field (optional) to `wordProgress` schema for backward compatibility
+- Added `by_visitor_persian` index for efficient lookups by word text
+- Created `getByVisitorPersian` and `getByVisitorPersians` queries
+- Updated `toggleLearned` mutation to update ALL matching records by persian text
+- Updated `WordInfoModal` to lookup and display learned state by persian text
+- Created `migrateAddPersian` mutation to backfill existing records
+- Migrated 28 existing records successfully
+
+**Files modified:**
+- `convex/schema.ts` - added persian field and by_visitor_persian index
+- `convex/wordProgress.ts` - new queries/mutations for persian-based sync
+- `src/components/WordInfoModal.tsx` - lookup by persian instead of wordId
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-WORD-SYNC**
 

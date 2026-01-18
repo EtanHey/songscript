@@ -51,9 +51,9 @@ function WordTable({
   onToggleLearned,
 }: {
   words: WordData[];
-  wordProgress: Map<string, WordProgressData>;
+  wordProgress: Map<string, WordProgressData>; // Keyed by persian text for sync
   onPlayWord: (word: WordData) => void;
-  onToggleLearned: (wordId: Id<"words">) => void;
+  onToggleLearned: (wordId: Id<"words">, persian: string) => void;
 }) {
   return (
     <div className="overflow-x-auto">
@@ -71,7 +71,8 @@ function WordTable({
         </thead>
         <tbody>
           {words.map((word) => {
-            const progress = wordProgress.get(word._id);
+            // Look up progress by persian text (syncs across all instances)
+            const progress = wordProgress.get(word.persian);
             const isLearned = progress?.learned ?? false;
 
             return (
@@ -85,7 +86,7 @@ function WordTable({
                 <td className="py-2 pr-2">
                   <Checkbox
                     checked={isLearned}
-                    onCheckedChange={() => onToggleLearned(word._id)}
+                    onCheckedChange={() => onToggleLearned(word._id, word.persian)}
                     className={`${
                       isLearned
                         ? "border-green-500 bg-green-500 text-white"
@@ -170,14 +171,15 @@ function MobileWordCards({
   onToggleLearned,
 }: {
   words: WordData[];
-  wordProgress: Map<string, WordProgressData>;
+  wordProgress: Map<string, WordProgressData>; // Keyed by persian text for sync
   onPlayWord: (word: WordData) => void;
-  onToggleLearned: (wordId: Id<"words">) => void;
+  onToggleLearned: (wordId: Id<"words">, persian: string) => void;
 }) {
   return (
     <div className="flex flex-col gap-3">
       {words.map((word) => {
-        const progress = wordProgress.get(word._id);
+        // Look up progress by persian text (syncs across all instances)
+        const progress = wordProgress.get(word.persian);
         const isLearned = progress?.learned ?? false;
 
         return (
@@ -224,7 +226,7 @@ function MobileWordCards({
 
                 {/* Learned checkbox - large touch target */}
                 <button
-                  onClick={() => onToggleLearned(word._id)}
+                  onClick={() => onToggleLearned(word._id, word.persian)}
                   className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors ${
                     isLearned
                       ? "bg-green-600 text-white"
@@ -279,16 +281,16 @@ export default function WordInfoModal({
     line ? { songId, lineNumber: line.lineNumber } : "skip"
   );
 
-  // Fetch word progress for all words in this line
-  const wordIds = words?.map((w) => w._id) ?? [];
+  // Fetch word progress by persian text (syncs across repeated words)
+  const persians = words?.map((w) => w.persian) ?? [];
   const progressData = useQuery(
-    api.wordProgress.getByVisitorWords,
-    visitorId && wordIds.length > 0
-      ? { visitorId, wordIds }
+    api.wordProgress.getByVisitorPersians,
+    visitorId && persians.length > 0
+      ? { visitorId, persians }
       : "skip"
   );
 
-  // Build a map of wordId -> progress for easy lookup
+  // Build a map of persian -> progress for easy lookup (synced across all instances)
   const [wordProgressMap, setWordProgressMap] = useState<
     Map<string, WordProgressData>
   >(new Map());
@@ -296,8 +298,8 @@ export default function WordInfoModal({
   useEffect(() => {
     if (progressData) {
       const map = new Map<string, WordProgressData>();
-      progressData.forEach(({ wordId, progress }) => {
-        map.set(wordId, progress);
+      progressData.forEach(({ persian, progress }) => {
+        map.set(persian, progress);
       });
       setWordProgressMap(map);
     }
@@ -313,7 +315,7 @@ export default function WordInfoModal({
     if (isOpen && words && visitorId) {
       // Increment view count for each word in the line
       words.forEach((word) => {
-        incrementViewCount({ visitorId, wordId: word._id });
+        incrementViewCount({ visitorId, wordId: word._id, persian: word.persian });
       });
     }
   }, [isOpen, words, visitorId, incrementViewCount]);
@@ -327,31 +329,32 @@ export default function WordInfoModal({
 
         // Track play count
         if (visitorId) {
-          incrementPlayCount({ visitorId, wordId: word._id });
+          incrementPlayCount({ visitorId, wordId: word._id, persian: word.persian });
         }
       }
     },
     [visitorId, incrementPlayCount]
   );
 
-  // Toggle learned status
+  // Toggle learned status - syncs across all instances of the same word
   const handleToggleLearned = useCallback(
-    async (wordId: Id<"words">) => {
+    async (wordId: Id<"words">, persian: string) => {
       if (visitorId) {
-        const newLearned = await toggleLearned({ visitorId, wordId });
-        // Update local state optimistically
+        const newLearned = await toggleLearned({ visitorId, wordId, persian });
+        // Update local state optimistically - keyed by persian for sync
         setWordProgressMap((prev) => {
           const newMap = new Map(prev);
-          const existing = newMap.get(wordId);
+          const existing = newMap.get(persian);
           if (existing) {
-            newMap.set(wordId, { ...existing, learned: newLearned });
+            newMap.set(persian, { ...existing, learned: newLearned });
           } else {
             // Create a placeholder progress entry
-            newMap.set(wordId, {
+            newMap.set(persian, {
               _id: "temp" as Id<"wordProgress">,
               _creationTime: Date.now(),
               visitorId,
               wordId,
+              persian,
               viewCount: 0,
               playCount: 0,
               learned: newLearned,
@@ -367,9 +370,9 @@ export default function WordInfoModal({
 
   if (!line) return null;
 
-  // Calculate learned count for summary
+  // Calculate learned count for summary (lookup by persian text for sync)
   const learnedCount =
-    words?.filter((w) => wordProgressMap.get(w._id)?.learned).length ?? 0;
+    words?.filter((w) => wordProgressMap.get(w.persian)?.learned).length ?? 0;
   const totalWords = words?.length ?? 0;
 
   // Show loading state while fetching words
