@@ -18,6 +18,27 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-009: Fix Seek + Auto-Play
+- Fixed YouTube player autoplay: changed `autoplay: 0` to `autoplay: 1` in playerVars
+- Added `playsinline: 1` for mobile autoplay support
+- Updated PlayerVars type to include playsinline
+- Verified seekTo already uses `allowSeekAhead: true` (second param)
+- Verified handleLineClick already calls `play()` after `seekTo()`
+- Browser tests passed:
+  - Click line 1 → video seeks to ~14.8s ✅
+  - Click line 10 → video seeks to ~46.9s ✅
+  - Click line 28 → video seeks to ~113.4s ✅
+  - Auto-plays after seek without manual click ✅
+  - Auto-plays on page load ✅
+- Typecheck passes
+
+**Learnings:**
+- YouTube autoplay requires `autoplay: 1` in playerVars
+- `playsinline: 1` helps with mobile autoplay
+- The seekTo was already working correctly, the main issue was autoplay being disabled
+
+---
+
 ## Iteration - US-014: Dark Theme with Iranian Flag Accent
 - Added `.iran-gradient` CSS class in styles.css using CSS linear-gradient
 - Gradient: green (#22c55e) → white (#ffffff) → red (#ef4444) - Iranian flag colors

@@ -38,6 +38,7 @@ declare namespace YT {
     enablejsapi?: 0 | 1
     modestbranding?: 0 | 1
     rel?: 0 | 1
+    playsinline?: 0 | 1
     origin?: string
   }
 
@@ -182,11 +183,12 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, YouTubePlayerProps>(
             width: '100%',
             height: '100%',
             playerVars: {
-              autoplay: 0,
+              autoplay: 1,
               controls: 1,
               enablejsapi: 1,
               modestbranding: 1,
               rel: 0,
+              playsinline: 1,
             },
             events: {
               onReady: () => {

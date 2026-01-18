@@ -38,11 +38,11 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 | Metric | Count |
 |--------|-------|
 | ✅ **Stories Complete** | 13 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014) |
-| ⚠️ **BROKEN** | US-005 (Auth - HTTP 500 errors, needs passwordless rework) |
-| 🔄 **Stories Remaining** | 6 + 6 verification |
-| ☑️ **Criteria Checked** | 87 / 97 (~90%) |
+| ⚠️ **BROKEN** | US-005 (Auth) |
+| 🔄 **Stories Remaining** | 5 + 6 verification |
+| ☑️ **Criteria Checked** | 97 / 107 (~91%) |
 
-**Next Story:** US-015 (Mobile Responsive Design)
+**Next Story:** US-005 (Auth), then US-015
 
 ---
 
@@ -286,22 +286,19 @@ SongScript is a song transliteration learning app that helps users learn to pron
 
 **Description:** Clicking a lyric line seeks YouTube player to that timestamp. Player should auto-play on load and after seeking.
 
-**⚠️ BROKEN - NEEDS FIX:**
-- `seekTo()` is NOT working - clicking different lines all start at same time
-- Currently requires clicking video to play after each seek
-- User wants: auto-play on page load, auto-play after seek (no manual clicks)
-
 **Acceptance Criteria:**
 - [x] Pass `onLineClick(startTime)` callback to LyricsDisplay
-- [ ] **FIX SEEK**: `player.seekTo(startTime, true)` - use second param `true` for allowSeekAhead
-- [ ] **AUTO-PLAY ON LOAD**: Player starts playing automatically when page loads (use `autoplay: 1` in playerVars)
-- [ ] **AUTO-PLAY AFTER SEEK**: After `seekTo()`, call `player.playVideo()` to resume without user click
+- [x] **FIX SEEK**: `player.seekTo(startTime, true)` - use second param `true` for allowSeekAhead
+- [x] **AUTO-PLAY ON LOAD**: Player starts playing automatically when page loads (use `autoplay: 1` in playerVars)
+- [x] **AUTO-PLAY AFTER SEEK**: After `seekTo()`, call `player.playVideo()` to resume without user click
 - [x] Visual feedback on click (brief highlight)
 - [x] Typecheck passes
-- [ ] **BROWSER TEST**: Click line 1 → video seeks to ~14.8s (not 0)
-- [ ] **BROWSER TEST**: Click line 10 → video seeks to ~46.9s
-- [ ] **BROWSER TEST**: Click line 28 → video seeks to ~113.4s
-- [ ] **BROWSER TEST**: Verify auto-plays after seek without manual click
+- [x] **BROWSER TEST**: Click line 1 → video seeks to ~14.8s (not 0)
+- [x] **BROWSER TEST**: Click line 10 → video seeks to ~46.9s
+- [x] **BROWSER TEST**: Click line 28 → video seeks to ~113.4s
+- [x] **BROWSER TEST**: Verify auto-plays after seek without manual click
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-009. Do not continue to US-010.**
 
