@@ -37,17 +37,13 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 16 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017) |
+| ✅ **Stories Complete** | 17 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-020A) |
 | ⏹️ **BLOCKED** | US-005 (Auth - Convex/Better Auth API integration failing) |
-| 🚨 **BROKEN** | US-020A (Layout - video covers lyrics, NOT FIXED!) |
-| 🔄 **Stories Remaining** | US-020A, US-020, US-018, US-019 + 6 verification |
+| 🔄 **Stories Remaining** | US-020 (Phase 2-5), US-018, US-019 + 6 verification |
 
-**🚨 NEXT STORY: US-020A (Layout is BROKEN!)**
+**🚨 NEXT STORY: US-020 Phase 2 (Schema Update for Audio Snippets)**
 
-**Current bug:** Video player is FULL SCREEN and covers the lyrics list. Lyrics are BEHIND the video.
-**Expected:** Desktop = video LEFT 50%, lyrics RIGHT 50%. Mobile = video TOP, lyrics BELOW.
-
-FIX US-020A FIRST, then proceed to US-020 for audio snippets.
+US-020A layout is now FIXED. Desktop shows video LEFT 50%, lyrics RIGHT 50%. Mobile shows video TOP, lyrics BELOW.
 
 ---
 
@@ -612,16 +608,18 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 ```
 
 **Acceptance Criteria:**
-- [ ] **DESKTOP**: Video takes LEFT 50%, Lyrics take RIGHT 50%
-- [ ] **DESKTOP**: Lyrics scroll independently, video stays fixed
-- [ ] **MOBILE**: Video on top (sticky), lyrics below (scrollable)
-- [ ] Header stays fixed at top (never scrolls)
-- [ ] Controls (loop, speed, language filter) stay with video
-- [ ] Lyrics list scrolls independently
-- [ ] **BROWSER TEST**: On desktop, video and lyrics are SIDE BY SIDE
-- [ ] **BROWSER TEST**: Scroll through lyrics → video stays visible
-- [ ] **BROWSER TEST**: On mobile (375px) → video on top, lyrics scroll below
-- [ ] Typecheck passes
+- [x] **DESKTOP**: Video takes LEFT 50%, Lyrics take RIGHT 50%
+- [x] **DESKTOP**: Lyrics scroll independently, video stays fixed
+- [x] **MOBILE**: Video on top (sticky), lyrics below (scrollable)
+- [x] Header stays fixed at top (never scrolls)
+- [x] Controls (loop, speed, language filter) stay with video
+- [x] Lyrics list scrolls independently
+- [x] **BROWSER TEST**: On desktop, video and lyrics are SIDE BY SIDE
+- [x] **BROWSER TEST**: Scroll through lyrics → video stays visible
+- [x] **BROWSER TEST**: On mobile (375px) → video on top, lyrics scroll below
+- [x] Typecheck passes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-020A. Do not continue to US-020.**
 

@@ -18,6 +18,26 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-020A: Sticky Layout Fix - Desktop Side-by-Side Layout
+- Fixed the broken layout where video was covering lyrics
+- Restructured song page to use `flex-col lg:flex-row` for responsive layout
+- Desktop (lg+): Video on LEFT 50% (`lg:w-1/2`), Lyrics on RIGHT 50% (`lg:w-1/2`)
+- Mobile: Stacked layout with video on top, lyrics scrollable below
+- Header stays fixed at top with `flex-shrink-0`
+- Added `lg:border-r lg:border-gray-800` to visually separate video and lyrics on desktop
+- Player section uses `lg:sticky lg:top-0` to stay fixed within its column on desktop
+- Lyrics section uses `overflow-y-auto` for independent scrolling
+- Browser extension not connected, but layout follows standard Tailwind flexbox patterns
+- Typecheck passes
+
+**Learnings:**
+- Use `flex-col lg:flex-row` for responsive side-by-side layouts
+- `lg:w-1/2` creates equal 50% width columns on desktop
+- Sticky positioning within a scrollable container requires the parent to have fixed height and overflow
+- The pattern `flex h-screen flex-col overflow-hidden` + `flex-1 overflow-hidden` + child `overflow-y-auto` creates independent scroll regions
+
+---
+
 ## Iteration - US-020 Phase 1: Local Audio Snippets - Extraction Script
 - Created `scripts/baraye-timestamps.json` with all 31 lyric timestamps from the seed data
 - Created `scripts/extract-snippets.sh` shell script that:

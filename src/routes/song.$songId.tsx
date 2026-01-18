@@ -173,95 +173,103 @@ function SongPageContent({ songId }: SongPageContentProps) {
         </Link>
       </header>
 
-      {/* Sticky song title */}
-      <div className="flex-shrink-0 border-b border-gray-800 px-4 py-3">
-        <h1 className="text-xl font-bold iran-gradient">{song.title}</h1>
-        <p className="text-sm text-gray-400">{song.artist}</p>
-      </div>
+      {/* Main content - side by side on desktop (lg+) */}
+      <div className="flex flex-1 flex-col lg:flex-row overflow-hidden">
+        {/* LEFT: Player section (50% on desktop, sticky on mobile) */}
+        <div className="flex-shrink-0 lg:w-1/2 lg:h-full lg:overflow-y-auto lg:border-r lg:border-gray-800">
+          <div className="lg:sticky lg:top-0">
+            {/* Song title */}
+            <div className="border-b border-gray-800 px-4 py-3">
+              <h1 className="text-xl font-bold iran-gradient">{song.title}</h1>
+              <p className="text-sm text-gray-400">{song.artist}</p>
+            </div>
 
-      {/* Sticky player section */}
-      <div className="flex-shrink-0 p-4 pb-2">
-        <YouTubePlayer
-          ref={playerRef}
-          videoId={song.youtubeId}
-          onTimeUpdate={handleTimeUpdate}
-        />
-      </div>
-
-      {/* Sticky controls */}
-      <div className="flex-shrink-0 px-4 pb-4">
-        <div className="flex flex-col gap-3 rounded-lg bg-gray-800 p-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
-          {/* Loop Toggle */}
-          <div className="flex items-center gap-2">
-            <Switch
-              id="loop-mode"
-              checked={isLooping}
-              onCheckedChange={setIsLooping}
-            />
-            <label
-              htmlFor="loop-mode"
-              className={`flex cursor-pointer items-center gap-1.5 text-sm ${
-                isLooping ? "text-primary" : "text-gray-400"
-              }`}
-            >
-              <Repeat
-                className={`h-4 w-4 ${isLooping ? "text-primary" : "text-gray-400"}`}
+            {/* Player */}
+            <div className="p-4 pb-2">
+              <YouTubePlayer
+                ref={playerRef}
+                videoId={song.youtubeId}
+                onTimeUpdate={handleTimeUpdate}
               />
-              <span>Loop</span>
-              {isLooping && currentLineIndex !== undefined && (
-                <span className="rounded bg-primary/20 px-1.5 py-0.5 text-xs text-primary">
-                  Line {currentLineIndex + 1}
-                </span>
-              )}
-            </label>
-          </div>
+            </div>
 
-          {/* Speed Control */}
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-400">Speed</label>
-            <Select value={playbackSpeed} onValueChange={handleSpeedChange}>
-              <SelectTrigger className="w-20 border-gray-700 bg-gray-900">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="border-gray-700 bg-gray-900">
-                <SelectItem value="0.5">0.5x</SelectItem>
-                <SelectItem value="0.75">0.75x</SelectItem>
-                <SelectItem value="1">1x</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            {/* Controls */}
+            <div className="px-4 pb-4">
+              <div className="flex flex-col gap-3 rounded-lg bg-gray-800 p-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
+                {/* Loop Toggle */}
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="loop-mode"
+                    checked={isLooping}
+                    onCheckedChange={setIsLooping}
+                  />
+                  <label
+                    htmlFor="loop-mode"
+                    className={`flex cursor-pointer items-center gap-1.5 text-sm ${
+                      isLooping ? "text-primary" : "text-gray-400"
+                    }`}
+                  >
+                    <Repeat
+                      className={`h-4 w-4 ${isLooping ? "text-primary" : "text-gray-400"}`}
+                    />
+                    <span>Loop</span>
+                    {isLooping && currentLineIndex !== undefined && (
+                      <span className="rounded bg-primary/20 px-1.5 py-0.5 text-xs text-primary">
+                        Line {currentLineIndex + 1}
+                      </span>
+                    )}
+                  </label>
+                </div>
 
-          {/* Language Filter */}
-          <div className="flex items-center gap-2">
-            <Languages className="h-4 w-4 text-gray-400" />
-            <Select
-              value={languageFilter}
-              onValueChange={(value) => setLanguageFilter(value as LanguageFilter)}
-            >
-              <SelectTrigger className="w-36 border-gray-700 bg-gray-900">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="border-gray-700 bg-gray-900">
-                <SelectItem value="all">All Languages</SelectItem>
-                <SelectItem value="persian">Persian Only</SelectItem>
-                <SelectItem value="transliteration">Transliteration</SelectItem>
-                <SelectItem value="hebrew">Hebrew Only</SelectItem>
-                <SelectItem value="english">English Only</SelectItem>
-              </SelectContent>
-            </Select>
+                {/* Speed Control */}
+                <div className="flex items-center gap-2">
+                  <label className="text-sm text-gray-400">Speed</label>
+                  <Select value={playbackSpeed} onValueChange={handleSpeedChange}>
+                    <SelectTrigger className="w-20 border-gray-700 bg-gray-900">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="border-gray-700 bg-gray-900">
+                      <SelectItem value="0.5">0.5x</SelectItem>
+                      <SelectItem value="0.75">0.75x</SelectItem>
+                      <SelectItem value="1">1x</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Language Filter */}
+                <div className="flex items-center gap-2">
+                  <Languages className="h-4 w-4 text-gray-400" />
+                  <Select
+                    value={languageFilter}
+                    onValueChange={(value) => setLanguageFilter(value as LanguageFilter)}
+                  >
+                    <SelectTrigger className="w-36 border-gray-700 bg-gray-900">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="border-gray-700 bg-gray-900">
+                      <SelectItem value="all">All Languages</SelectItem>
+                      <SelectItem value="persian">Persian Only</SelectItem>
+                      <SelectItem value="transliteration">Transliteration</SelectItem>
+                      <SelectItem value="hebrew">Hebrew Only</SelectItem>
+                      <SelectItem value="english">English Only</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Scrollable lyrics */}
-      <div className="flex-1 overflow-y-auto px-4 pb-4">
-        <LyricsDisplay
-          songId={songId}
-          onLineClick={handleLineClick}
-          activeLineIndex={activeLineIndex}
-          clickedLineIndex={clickedLineIndex}
-          languageFilter={languageFilter}
-        />
+        {/* RIGHT: Scrollable lyrics (50% on desktop) */}
+        <div className="flex-1 lg:w-1/2 overflow-y-auto px-4 py-4">
+          <LyricsDisplay
+            songId={songId}
+            onLineClick={handleLineClick}
+            activeLineIndex={activeLineIndex}
+            clickedLineIndex={clickedLineIndex}
+            languageFilter={languageFilter}
+          />
+        </div>
       </div>
     </div>
   );
