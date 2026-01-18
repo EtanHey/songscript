@@ -67,11 +67,11 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 |--------|-------|
 | ✅ **Stories Complete** | 50 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, US-SYNC-FIX, V-001-009, US-VIDEO-LOAD, US-MOBILE-DRAWER, US-MOBILE-LAYOUT, US-VIDEO-MOBILE, US-WORD-SYNC, US-WORD-TOKEN, US-WORD-TOKEN-FIX, V-WORD-TOKEN) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), **US-031 (missing API key)** |
-| 🔄 **Stories Remaining** | 1 (US-020 Phase 5 - browser testing) |
+| 🔄 **Stories Remaining** | 5 (US-LOAD-FIX, US-AUTOPLAY, US-LOOP-UX, V-AUTOPLAY, US-020 Phase 5) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** US-020 Phase 5 (Browser Testing - audio playback verification)
+**Next Story:** US-LOAD-FIX (Fix dynamic import errors)
 
 **Story Order (optimized - API-dependent story LAST):**
 0. ~~US-TIMESTAMPS-V2~~ ✅ (end buffer increased to +0.70s)
@@ -89,7 +89,12 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 12. ~~US-MOBILE-LAYOUT~~ ✅ (Mobile line indicator on own row)
 13. ~~US-VIDEO-MOBILE~~ ✅ (Collapsible Video on Mobile)
 14. ~~US-WORD-SYNC~~ ✅ (Sync Repeated Words Learning State)
-15. **US-031: ElevenLabs Word Audio ← ⏹️ BLOCKED (needs API key)**
+15. **US-LOAD-FIX: Fix Dynamic Import Errors ← NEXT**
+16. **US-AUTOPLAY: Auto-Play Video + Fluid Mode**
+17. **US-LOOP-UX: Fix Loop Mode Line Flashing**
+18. **V-AUTOPLAY: Verify Auto-Play and Loop Mode**
+19. **US-020 Phase 5: Browser Testing**
+20. **US-031: ElevenLabs Word Audio ← ⏹️ BLOCKED (needs API key)**
 
 **API Key Needed (US-031 only):**
 - ElevenLabs: https://elevenlabs.io/ (free tier: ~10 min audio/month, supports Persian via v3)
@@ -1140,6 +1145,106 @@ const handleLineClick = useCallback((startTime: number, lineIndex: number) => {
 ---
 
 **⏹️ STOP - END OF US-020. Do not continue to next story.**
+
+---
+
+### US-LOAD-FIX: Fix Dynamic Import and Initial Load Errors
+
+**Description:** Fix the login route dynamic import error and any other module loading issues preventing the app from working.
+
+**Current Error:**
+```
+Failed to fetch dynamically imported module: http://localhost:3001/src/routes/login.tsx?tsr-split=component
+```
+
+**Acceptance Criteria:**
+- [ ] Investigate the dynamic import error in TanStack Router
+- [ ] Fix the login.tsx route so it loads without errors
+- [ ] Check for any other broken dynamic imports
+- [ ] App loads without console errors related to module imports
+- [ ] Typecheck passes
+- [ ] Verify in browser: navigate to `/login` and `/song/{id}` without errors
+
+**⏹️ STOP - END OF US-LOAD-FIX. Do not continue to next story.**
+
+---
+
+### US-AUTOPLAY: Auto-Play Video + Fluid Mode on Page Load
+
+**Description:** When user navigates to a song page, the video should automatically start playing and fluid mode should be enabled so lines auto-advance as the song plays.
+
+**Current Bug:** Video shows blurred/paused state or "Loading audio..." hangs. No auto-play.
+
+**Expected Behavior:**
+1. Page loads → Video starts playing automatically
+2. Fluid mode is ON by default
+3. Lines highlight and auto-advance as video plays
+4. User can pause/control as normal after auto-start
+
+**Acceptance Criteria:**
+- [ ] On song page load, video auto-plays after audio files are loaded
+- [ ] Fluid mode is enabled by default (not just on toggle)
+- [ ] Lines highlight and advance automatically as video plays
+- [ ] Video player shows playing state (not blurred/paused)
+- [ ] Loading state clears properly when audio files are ready
+- [ ] Typecheck passes
+- [ ] Verify in browser: page load → video plays → lines advance
+
+**Technical Notes:**
+- Check `YouTubePlayer.tsx` for autoplay logic
+- Check `useSongPlayback.ts` or similar for fluid mode initialization
+- May need to handle YouTube autoplay policies (muted autoplay)
+
+**⏹️ STOP - END OF US-AUTOPLAY. Do not continue to next story.**
+
+---
+
+### US-LOOP-UX: Fix Loop Mode Line Flashing
+
+**Description:** When playing in loop mode, there's a visual bug where the line selection flashes incorrectly:
+- When loop ends: next line briefly flashes as selected before current line restarts
+- When loop starts: previous line briefly flashes before current line is selected
+
+This creates a jarring, unprofessional UX.
+
+**Expected Behavior:**
+- In loop mode, the current line stays highlighted continuously
+- No flashing to adjacent lines during loop restart
+- Smooth, seamless visual loop experience
+
+**Acceptance Criteria:**
+- [ ] Identify the source of the flash (likely in time update handler or seek logic)
+- [ ] Fix loop restart to not trigger line change events
+- [ ] Current line stays visually selected during entire loop cycle
+- [ ] No visual flicker or flash when loop restarts
+- [ ] Loop mode feels smooth and polished
+- [ ] Typecheck passes
+- [ ] Verify in browser: enable loop, watch 3+ loops, no flashing
+
+**Technical Notes:**
+- Check `useSongPlayback.ts` for loop logic
+- May need to debounce or guard against false line-change triggers during seek
+- Consider using a "looping" state to suppress line updates during restart
+
+**⏹️ STOP - END OF US-LOOP-UX. Do not continue to next story.**
+
+---
+
+### V-AUTOPLAY: Verify Auto-Play, Fluid Mode, and Loop UX
+
+**Description:** Verify that auto-play, fluid mode, and loop mode all work correctly.
+
+**Acceptance Criteria:**
+- [ ] Navigate to song page in browser
+- [ ] Take screenshot showing video is playing (not paused/blurred)
+- [ ] Verify lines are highlighting and advancing automatically (fluid mode)
+- [ ] Test pause button stops playback
+- [ ] Test clicking a line jumps to that position
+- [ ] Enable loop mode and watch 3+ loops - NO flashing between lines
+- [ ] Verify loop mode keeps current line highlighted smoothly
+- [ ] Verify no console errors during playback
+
+**⏹️ STOP - END OF V-AUTOPLAY. Do not continue to next story.**
 
 ---
 
