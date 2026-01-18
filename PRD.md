@@ -38,11 +38,11 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 | Metric | Count |
 |--------|-------|
 | ✅ **Stories Complete** | 13 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014) |
-| ⚠️ **BROKEN** | US-005 (Auth) |
+| ⏹️ **BLOCKED** | US-005 (Auth - Convex/Better Auth API integration failing) |
 | 🔄 **Stories Remaining** | 5 + 6 verification |
-| ☑️ **Criteria Checked** | 97 / 107 (~91%) |
+| ☑️ **Criteria Checked** | 102 / 107 (~95%) |
 
-**Next Story:** US-005 (Auth), then US-015
+**Next Story:** US-015 (Mobile Responsive Design) - skipping blocked US-005
 
 ---
 
@@ -210,15 +210,17 @@ SongScript is a song transliteration learning app that helps users learn to pron
 4. **Must test in browser** - Use `mcp__claude-in-chrome__*` tools to verify the flow works end-to-end
 
 **Acceptance Criteria:**
-- [ ] Remove password-based auth, implement magic link OR passkey
-- [ ] Login page at `/login` - email input only, no password field, no signup toggle
-- [ ] Server-side check: reject any email that isn't `etan@heyman.net`
+- [x] Remove password-based auth, implement magic link OR passkey
+- [x] Login page at `/login` - email input only, no password field, no signup toggle
+- [x] Server-side check: reject any email that isn't `etan@heyman.net`
 - [ ] Auth API endpoints return 200 (not 500)
-- [ ] Use Context7 (`mcp__Context7__query-docs`) to look up Better Auth magic link/passkey setup
+- [x] Use Context7 (`mcp__Context7__query-docs`) to look up Better Auth magic link/passkey setup
 - [ ] **BROWSER TEST**: Navigate to `/login`, enter admin email, complete auth flow
 - [ ] **BROWSER TEST**: Verify session persists after login (check `/api/auth/get-session` returns user)
-- [ ] **BROWSER TEST**: Verify non-admin email is rejected with clear error message
-- [ ] Typecheck passes
+- [x] **BROWSER TEST**: Verify non-admin email is rejected with clear error message
+- [x] Typecheck passes
+
+**Status:** ⏹️ BLOCKED: Auth API endpoints (`/api/auth/get-session`, `/api/auth/sign-in/magic-link`) return 500 or hang indefinitely. The Convex + Better Auth integration has a fundamental issue with request handling. Frontend magic link UI is complete and non-admin rejection works, but the actual auth flow cannot complete.
 
 **⏹️ STOP - END OF US-005. Do not continue to US-006.**
 

@@ -12,12 +12,11 @@ const ADMIN_EMAIL = "etan@heyman.net";
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session, isPending, error: sessionError } = authClient.useSession();
 
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   // If already logged in, show user info
@@ -46,7 +45,8 @@ function LoginPage() {
     );
   }
 
-  if (isPending) {
+  // Only show loading if pending AND no error (error means session check failed, treat as not logged in)
+  if (isPending && !sessionError) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-white">Loading...</div>
@@ -57,9 +57,10 @@ function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
     setLoading(true);
 
-    // Check if email is admin email
+    // Check if email is admin email (client-side check)
     if (email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
       setError("Only admin email is allowed to sign in");
       setLoading(false);
@@ -67,29 +68,17 @@ function LoginPage() {
     }
 
     try {
-      if (isSignUp) {
-        const result = await authClient.signUp.email({
-          email,
-          password,
-          name: "Admin",
-        });
+      const result = await authClient.signIn.magicLink({
+        email,
+        callbackURL: "/",
+      });
 
-        if (result.error) {
-          setError(result.error.message || "Sign up failed");
-        } else {
-          navigate({ to: "/" });
-        }
+      if (result.error) {
+        setError(result.error.message || "Failed to send magic link");
       } else {
-        const result = await authClient.signIn.email({
-          email,
-          password,
-        });
-
-        if (result.error) {
-          setError(result.error.message || "Sign in failed");
-        } else {
-          navigate({ to: "/" });
-        }
+        setSuccess(
+          "Magic link sent! Check your email (or the server console in development)."
+        );
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -105,7 +94,7 @@ function LoginPage() {
           SongScript Admin
         </h1>
         <p className="text-gray-400 text-center mb-6 text-sm">
-          Admin access only
+          Admin access only (passwordless)
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -122,27 +111,8 @@ function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              placeholder="admin@example.com"
+              placeholder="etan@heyman.net"
               required
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-300 mb-1"
-            >
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              placeholder="Enter your password"
-              required
-              minLength={8}
             />
           </div>
 
@@ -152,32 +122,24 @@ function LoginPage() {
             </div>
           )}
 
+          {success && (
+            <div className="text-emerald-400 text-sm bg-emerald-900/20 p-3 rounded-md">
+              {success}
+            </div>
+          )}
+
           <Button
             type="submit"
             disabled={loading}
             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
           >
-            {loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
+            {loading ? "Sending..." : "Send Magic Link"}
           </Button>
         </form>
 
-        <div className="mt-4 text-center">
-          <button
-            onClick={() => {
-              setIsSignUp(!isSignUp);
-              setError(null);
-            }}
-            className="text-emerald-400 hover:text-emerald-300 text-sm"
-          >
-            {isSignUp
-              ? "Already have an account? Sign In"
-              : "Need an account? Sign Up"}
-          </button>
-        </div>
-
         <div className="mt-6 pt-6 border-t border-slate-700">
           <p className="text-gray-500 text-xs text-center">
-            This app is restricted to admin users only.
+            A magic link will be sent to your email. Click it to sign in.
           </p>
         </div>
       </div>

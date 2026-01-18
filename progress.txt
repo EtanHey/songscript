@@ -18,6 +18,31 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-005: Passwordless Auth (BLOCKED)
+- Removed password-based auth, implemented magic link authentication
+- Updated `convex/betterAuth.ts` to use `magicLink` plugin from `better-auth/plugins`
+- Server-side admin email check in `sendMagicLink` callback
+- Updated `src/lib/auth-client.ts` to include `magicLinkClient` plugin
+- Updated `src/routes/login.tsx`:
+  - Removed password field and signup toggle
+  - Email-only input with "Send Magic Link" button
+  - Client-side admin email validation
+  - Added workaround for session error (show login form if session check fails)
+- Fixed Convex deployment errors by removing stray .js files in convex/ folder
+- Browser tests:
+  - ✅ Non-admin email rejected with "Only admin email is allowed to sign in"
+  - ⏹️ BLOCKED: Auth API endpoints (`/api/auth/get-session`, `/api/auth/sign-in/magic-link`) return 500 or hang
+- Typecheck passes
+
+**BLOCKED**: Convex + Better Auth integration has fundamental API request handling issues. The `handler` from `convexBetterAuthReactStart` does not properly proxy requests to Convex backend. Frontend is complete but actual auth flow cannot complete.
+
+**Learnings:**
+- Vite dev regenerates .js files in convex/ folder - must kill vite before running `npx convex dev`
+- `better-auth/minimal` should work with magic link plugin (per docs), but may need full `better-auth` import
+- Auth session errors should not block login page rendering - handle gracefully
+
+---
+
 ## Iteration - US-009: Fix Seek + Auto-Play
 - Fixed YouTube player autoplay: changed `autoplay: 0` to `autoplay: 1` in playerVars
 - Added `playsinline: 1` for mobile autoplay support

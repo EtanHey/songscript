@@ -9,5 +9,6 @@ export const {
   fetchAuthAction, // Execute authenticated actions
 } = convexBetterAuthReactStart({
   convexUrl: import.meta.env.VITE_CONVEX_URL!,
-  convexSiteUrl: import.meta.env.VITE_SITE_URL || "http://localhost:3001",
+  convexSiteUrl:
+    import.meta.env.VITE_CONVEX_SITE_URL || "http://localhost:3001",
 });
