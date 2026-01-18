@@ -5,7 +5,24 @@
 ---
 
 ## 🚨 ITERATION RULES (READ THIS FIRST) 🚨
-**YOU HAVE BEEN STRUGGLING WITH MOBILE, START WITH PERFECTING FUNCTIONALITY ON DESKTOP, THEN REDESGN FOR MOBILE**
+
+### 🖥️ DESKTOP FIRST - MOBILE LATER (CRITICAL)
+
+**This project is HARD on mobile. DO NOT optimize for mobile yet.**
+
+| Priority | Focus |
+|----------|-------|
+| **1. NOW** | Desktop functionality & accessibility - make it work perfectly |
+| **2. LATER** | Mobile layout - nice to have, will address after desktop is solid |
+
+**Rules:**
+- Test on desktop viewport (1200px+)
+- Don't worry about mobile breakpoints
+- If something looks bad on mobile, IGNORE IT for now
+- Focus on: audio sync, word tracking, playback modes, accessibility
+
+---
+
 **CRITICAL: Each user story = ONE iteration. NO EXCEPTIONS.**
 
 **📊 CHECK PROGRESS FIRST:**
@@ -50,12 +67,12 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 | Metric | Count |
 |--------|-------|
 | ✅ **Stories Complete** | 47 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, US-SYNC-FIX, V-001-009, US-VIDEO-LOAD, US-MOBILE-DRAWER, US-MOBILE-LAYOUT, US-VIDEO-MOBILE, US-WORD-SYNC) |
-| ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), US-020 Phase 5 |
-| 🔄 **Stories Remaining** | 1 (US-031) |
+| ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), US-020 Phase 5, **US-031 (missing API key)** |
+| 🔄 **Stories Remaining** | 3 (US-WORD-TOKEN, US-WORD-TOKEN-FIX, V-WORD-TOKEN) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** US-031 (ElevenLabs Word Audio - needs API key)
+**Next Story:** US-031 (ElevenLabs Word Audio - ⏹️ BLOCKED: needs API key)
 
 **Story Order (optimized - API-dependent story LAST):**
 0. ~~US-TIMESTAMPS-V2~~ ✅ (end buffer increased to +0.70s)
@@ -72,8 +89,8 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 11. ~~US-MOBILE-DRAWER~~ ✅ (Vertical card layout for mobile)
 12. ~~US-MOBILE-LAYOUT~~ ✅ (Mobile line indicator on own row)
 13. ~~US-VIDEO-MOBILE~~ ✅ (Collapsible Video on Mobile)
-14. **US-WORD-SYNC: Sync Repeated Words Learning State ← NEXT**
-15. **US-031: ElevenLabs Word Audio ← LAST (needs API key)**
+14. ~~US-WORD-SYNC~~ ✅ (Sync Repeated Words Learning State)
+15. **US-031: ElevenLabs Word Audio ← ⏹️ BLOCKED (needs API key)**
 
 **API Key Needed (US-031 only):**
 - ElevenLabs: https://elevenlabs.io/ (free tier: ~10 min audio/month, supports Persian via v3)
@@ -1500,6 +1517,8 @@ Replace YouTube embed with local video player using downloaded MP4:
 - [ ] Word audio buttons in modal play local MP3s
 - [ ] Typecheck passes
 
+**Status:** ⏹️ BLOCKED - ELEVENLABS_API_KEY not found in .env.local. User must provide API key from https://elevenlabs.io/ to proceed.
+
 **⏹️ STOP - END OF US-031**
 
 ---
@@ -1803,6 +1822,95 @@ You have full freedom to redesign the mobile layout. Consider:
 **✅ COMPLETE**
 
 **⏹️ STOP - END OF V-009**
+
+---
+
+### US-WORD-TOKEN: Words as Database Tokens (Schema Refactor)
+
+**Description:** Words should be treated as unique tokens/enums in the database, NOT as per-sentence instances. When "دل" appears in line 3 and line 7, they MUST share the same learning state.
+
+**🔧 REQUIRED: Use Context7 for Convex documentation:**
+```
+mcp__Context7__resolve-library-id libraryName="convex"
+mcp__Context7__query-docs query="convex schema indexes unique constraints"
+```
+
+**Current Problem:**
+- Words are stored per-line occurrence
+- Same word in different lines = different database entries
+- Learning state doesn't sync across occurrences
+
+**Solution Architecture:**
+1. Create a `words` table with unique Persian text as the key
+2. `wordProgress` references word by Persian text (already done in US-WORD-SYNC)
+3. When displaying any line, look up each word's learning state from the unified store
+
+**Acceptance Criteria:**
+- [ ] **CONTEXT7 FIRST**: Use `mcp__Context7__query-docs` to research Convex schema best practices for unique word tokens
+- [ ] Verify `convex/schema.ts` has proper indexes on `words` table by `persian` field
+- [ ] Verify `wordProgress` table uses `persian` field (not `wordId`) as the word identifier
+- [ ] Query `wordProgress.getByVisitorPersian` returns same state for same Persian word regardless of which line it came from
+- [ ] Test: Mark word "دل" as learned on line 3 → check line 7 shows same "learned" state
+- [ ] Typecheck passes
+- [ ] Verify in browser: same word across lines shows consistent state
+
+**⏹️ STOP - END OF US-WORD-TOKEN**
+
+---
+
+### US-WORD-TOKEN-FIX: Migrate and Sync Word States
+
+**Description:** Ensure all existing word progress data is properly synced by Persian text, and fix any duplicate/inconsistent entries.
+
+**🔧 REQUIRED: Use Context7 for Convex mutations:**
+```
+mcp__Context7__query-docs query="convex mutations batch operations"
+```
+
+**Acceptance Criteria:**
+- [ ] **CONTEXT7 FIRST**: Research Convex batch mutations for data migration
+- [ ] Create migration script `convex/migrations/syncWordProgress.ts` that:
+  - Finds all `wordProgress` entries
+  - Groups by `persian` field
+  - For duplicates: keeps the most recent `updatedAt`, deletes others
+- [ ] Run migration in Convex dashboard or via seed script
+- [ ] Verify no duplicate entries exist for same `(visitorId, persian)` pair
+- [ ] Add unique index constraint if Convex supports it (research via Context7)
+- [ ] Test: After migration, word states are consistent
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-WORD-TOKEN-FIX**
+
+---
+
+### V-WORD-TOKEN: Audit Word Sync Across All Lines
+
+**Description:** Comprehensive verification that word learning state syncs correctly across ALL occurrences in the song.
+
+**🔧 REQUIRED: Use Context7 for Convex queries:**
+```
+mcp__Context7__query-docs query="convex queries aggregations count"
+```
+
+**Audit Process:**
+1. Get list of all unique Persian words in the song
+2. For each word that appears multiple times, verify single progress entry
+3. Test UI shows consistent state across all occurrences
+
+**Acceptance Criteria:**
+- [ ] **CONTEXT7 FIRST**: Research Convex query patterns for data auditing
+- [ ] **BROWSER TEST**: Find a word that appears in multiple lines (e.g., "برای" or "دل")
+- [ ] **BROWSER TEST**: Click that word in FIRST occurrence → mark as "learning"
+- [ ] **BROWSER TEST**: Navigate to SECOND occurrence of same word → verify shows "learning" state
+- [ ] **BROWSER TEST**: Click second occurrence → mark as "learned"
+- [ ] **BROWSER TEST**: Go back to first occurrence → verify shows "learned" state
+- [ ] **DATABASE CHECK**: Query `wordProgress` table → verify only ONE entry per `(visitorId, persian)` pair
+- [ ] Take screenshots proving sync works across lines
+- [ ] Document any words that still have sync issues
+
+**Pass Criteria:** ALL repeated words must show identical learning state across ALL their occurrences in the song.
+
+**⏹️ STOP - END OF V-WORD-TOKEN**
 
 ---
 
