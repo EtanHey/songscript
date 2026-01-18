@@ -447,12 +447,14 @@ SongScript is a song transliteration learning app that helps users learn to pron
 **Description:** Create homepage showing available songs.
 
 **Acceptance Criteria:**
-- [ ] Homepage at `/` route
-- [ ] Fetch all songs from Convex
-- [ ] Display as cards with title, artist, thumbnail (YouTube)
-- [ ] Each card links to `/song/$songId`
-- [ ] Show "No songs yet" if empty
-- [ ] Typecheck passes
+- [x] Homepage at `/` route
+- [x] Fetch all songs from Convex
+- [x] Display as cards with title, artist, thumbnail (YouTube)
+- [x] Each card links to `/song/$songId`
+- [x] Show "No songs yet" if empty
+- [x] Typecheck passes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-017. Do not continue to US-018.**
 
@@ -564,6 +566,56 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 - [ ] Take screenshot showing RTL text
 
 **⏹️ STOP - END OF V-006**
+
+---
+
+### US-020A: Sticky Layout - Fixed Player, Scrollable Lyrics
+
+**Description:** Fix the song page layout so the header, song title, video player, and controls stay fixed/sticky while only the lyrics list scrolls.
+
+**Current Problem:**
+- The entire page scrolls, including the video
+- When scrolling through lyrics, you lose sight of the video/controls
+
+**Desired Behavior:**
+- Header (SongScript logo): sticky at top
+- Song title & artist: sticky below header
+- YouTube player + controls (loop, speed, language): sticky below title
+- Lyrics list: scrollable within remaining viewport height
+
+**Implementation Approach:**
+```tsx
+// In song.$songId.tsx
+<div className="h-screen flex flex-col overflow-hidden">
+  {/* Sticky header */}
+  <header className="flex-shrink-0 border-b ...">...</header>
+
+  {/* Sticky player section */}
+  <div className="flex-shrink-0 p-4">
+    <YouTubePlayer ... />
+    <div className="controls ...">...</div>
+  </div>
+
+  {/* Scrollable lyrics */}
+  <div className="flex-1 overflow-y-auto p-4">
+    <LyricsDisplay ... />
+  </div>
+</div>
+```
+
+**Acceptance Criteria:**
+- [ ] Page takes full viewport height (`h-screen`)
+- [ ] Header stays fixed at top (never scrolls)
+- [ ] Song title stays fixed below header
+- [ ] YouTube player stays fixed below title
+- [ ] Controls (loop, speed, language filter) stay fixed below player
+- [ ] Lyrics list scrolls independently within remaining space
+- [ ] On mobile: same behavior - player fixed, lyrics scroll
+- [ ] **BROWSER TEST**: Scroll through lyrics → video stays visible
+- [ ] **BROWSER TEST**: On mobile (375px) → same sticky behavior
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-020A. Do not continue to US-020.**
 
 ---
 

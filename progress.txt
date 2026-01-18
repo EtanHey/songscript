@@ -18,6 +18,19 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-017: Homepage with Song List
+- Homepage already implemented in previous iteration at `/` route
+- Added YouTube thumbnail to song cards using `https://img.youtube.com/vi/{youtubeId}/mqdefault.jpg`
+- Updated card layout with `aspect-video` container for thumbnail
+- Moved text content into a `p-4` padded container below thumbnail
+- Typecheck passes
+
+**Learnings:**
+- YouTube provides free thumbnail URLs at `img.youtube.com/vi/{videoId}/mqdefault.jpg` (320x180)
+- Other sizes: `default.jpg` (120x90), `hqdefault.jpg` (480x360), `maxresdefault.jpg` (1280x720)
+
+---
+
 ## Iteration - US-016: Song Practice Page Route
 - Route `/song/$songId` already existed from previous iterations with full implementation
 - Added proper 404 error handling with react-error-boundary package
