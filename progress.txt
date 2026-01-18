@@ -18,6 +18,36 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-026: Local Video Player with Muted Video + Audio Snippets ✅
+- Created `src/components/LocalVideoPlayer.tsx` - new HTML5 video player component
+  - Uses `<video>` element instead of YouTube iframe
+  - Supports muted by default, playsInline for mobile
+  - Exposes LocalVideoPlayerHandle interface: play, pause, seekTo, getCurrentTime, setPlaybackRate, mute, unmute, isMuted
+  - Includes built-in mute/unmute button overlay on video
+  - Handles video events: canplay, timeupdate, play, pause, ended, error
+  - Error state shows fallback UI
+- Updated `src/routes/song.$songId.tsx`:
+  - Replaced YouTubePlayer import with LocalVideoPlayer
+  - Added isVideoMuted state (defaults to true - snippets provide audio)
+  - Added videoError state for fallback handling
+  - Added toggleVideoMute function
+  - Modified handleLineClick to only play snippets when video is muted
+  - Video player shows local video from song.videoUrl if available
+  - Fallback UI shows when videoUrl missing or error occurs (with YouTube link)
+  - Added "Video Audio" toggle switch in controls section
+  - Audio snippets status shows only when video is muted
+- Typecheck passes ✅
+
+**Key Changes:**
+- Video muted by default - audio comes from instant-play snippets
+- When "Video Audio" toggle is ON: video audio plays, snippets disabled on click
+- When "Video Audio" toggle is OFF: video muted, snippets play on line click
+- Fallback shows "Video not available" with YouTube link if local video missing
+
+**Next:** US-027 will add "Play Full Video" mode for continuous playback.
+
+---
+
 ## Iteration - US-025: Extract Audio Snippets from New Video ✅
 - Added `slug` field to `scripts/baraye-new-timestamps.json` (required by extract script)
 - Ran `./scripts/extract-snippets.sh scripts/baraye-new-timestamps.json public/audio/baraye/baraye_full.mp3`

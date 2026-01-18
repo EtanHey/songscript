@@ -1092,15 +1092,17 @@ Replace YouTube embed with local video player using downloaded MP4:
 - User can toggle between: snippets-only, video-audio, or both
 
 **Acceptance Criteria:**
-- [ ] Replace YouTubePlayer component usage with HTML5 `<video>` element
-- [ ] Video src: `/video/baraye/baraye.mp4`
-- [ ] Video `muted={true}` by default
-- [ ] Video `playsInline` for mobile
-- [ ] Clicking line: plays audio snippet + seeks video to startTime
-- [ ] Add "Unmute video" toggle to controls
-- [ ] When unmuted: video audio plays, snippets are paused/disabled
-- [ ] Fallback: if local video missing, show error or use YouTube embed
-- [ ] Typecheck passes
+- [x] Replace YouTubePlayer component usage with HTML5 `<video>` element
+- [x] Video src: `/video/baraye/baraye.mp4`
+- [x] Video `muted={true}` by default
+- [x] Video `playsInline` for mobile
+- [x] Clicking line: plays audio snippet + seeks video to startTime
+- [x] Add "Unmute video" toggle to controls
+- [x] When unmuted: video audio plays, snippets are paused/disabled
+- [x] Fallback: if local video missing, show error or use YouTube embed
+- [x] Typecheck passes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-026**
 

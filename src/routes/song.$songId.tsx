@@ -5,7 +5,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
-import YouTubePlayer, { YouTubePlayerHandle } from "../components/YouTubePlayer";
+import LocalVideoPlayer, { LocalVideoPlayerHandle } from "../components/LocalVideoPlayer";
 import LyricsDisplay, { LanguageFilter } from "../components/LyricsDisplay";
 import { useAudioPreloader } from "../hooks/useAudioPreloader";
 import { Switch } from "../components/ui/switch";
@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Repeat, Languages, Volume2 } from "lucide-react";
+import { Repeat, Languages, Volume2, Video, VolumeX } from "lucide-react";
 
 export const Route = createFileRoute("/song/$songId")({
   component: SongPage,
@@ -100,7 +100,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
     setLoop: setAudioLoop,
   } = useAudioPreloader(audioSnippets);
 
-  const playerRef = useRef<YouTubePlayerHandle>(null);
+  const playerRef = useRef<LocalVideoPlayerHandle>(null);
   const [activeLineIndex, setActiveLineIndex] = useState<number | undefined>(
     undefined
   );
@@ -120,12 +120,37 @@ function SongPageContent({ songId }: SongPageContentProps) {
   // Language filter state
   const [languageFilter, setLanguageFilter] = useState<LanguageFilter>("all");
 
+  // Video mute state - muted by default, audio comes from snippets
+  const [isVideoMuted, setIsVideoMuted] = useState(true);
+
+  // Video error state - for fallback handling
+  const [videoError, setVideoError] = useState<string | null>(null);
+
   const handleSpeedChange = useCallback((speed: string) => {
     setPlaybackSpeed(speed);
-    // Update both YouTube and audio playback rate
+    // Update both video and audio playback rate
     playerRef.current?.setPlaybackRate(parseFloat(speed));
     setAudioPlaybackRate(parseFloat(speed));
   }, [setAudioPlaybackRate]);
+
+  // Toggle video mute - when unmuted, video audio plays, when muted, use snippets
+  const toggleVideoMute = useCallback(() => {
+    if (playerRef.current) {
+      if (playerRef.current.isMuted()) {
+        playerRef.current.unmute();
+        setIsVideoMuted(false);
+      } else {
+        playerRef.current.mute();
+        setIsVideoMuted(true);
+      }
+    }
+  }, []);
+
+  // Handle video error (for fallback)
+  const handleVideoError = useCallback((error: string) => {
+    setVideoError(error);
+    console.warn('Local video error:', error);
+  }, []);
 
   // Clear click animation after 300ms
   const triggerClickAnimation = useCallback((lineIndex: number) => {
@@ -139,15 +164,13 @@ function SongPageContent({ songId }: SongPageContentProps) {
     (startTime: number, lineIndex: number) => {
       const lineNumber = sortedLyrics[lineIndex]?.lineNumber;
 
-      // Play local audio snippet if available (instant playback)
-      if (lineNumber !== undefined && audioReady) {
+      // Play local audio snippet if available (instant playback) - only if video is muted
+      if (lineNumber !== undefined && audioReady && isVideoMuted) {
         playAudioSnippet(lineNumber);
       }
 
-      // Also sync YouTube video for visual reference
+      // Seek video to match the line (visual sync)
       playerRef.current?.seekTo(startTime);
-      // Mute YouTube so audio doesn't overlap
-      // (YouTube player doesn't have a mute method, so we just don't call play)
 
       // Trigger visual feedback
       triggerClickAnimation(lineIndex);
@@ -156,7 +179,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
       // Set as current line for looping
       setCurrentLineIndex(lineIndex);
     },
-    [triggerClickAnimation, sortedLyrics, audioReady, playAudioSnippet]
+    [triggerClickAnimation, sortedLyrics, audioReady, playAudioSnippet, isVideoMuted]
   );
 
   const handleTimeUpdate = useCallback(
@@ -196,11 +219,35 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
             {/* Player */}
             <div className="p-4 pb-2">
-              <YouTubePlayer
-                ref={playerRef}
-                videoId={song.youtubeId}
-                onTimeUpdate={handleTimeUpdate}
-              />
+              {song.videoUrl && !videoError ? (
+                <LocalVideoPlayer
+                  ref={playerRef}
+                  videoUrl={song.videoUrl}
+                  onTimeUpdate={handleTimeUpdate}
+                  onError={handleVideoError}
+                  muted={isVideoMuted}
+                />
+              ) : (
+                <div className="flex aspect-video w-full items-center justify-center rounded-lg bg-gray-800 text-gray-400">
+                  <div className="text-center p-4">
+                    <Video className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p className="font-semibold">Video not available</p>
+                    <p className="text-sm mt-1">
+                      {videoError || 'Local video file not found'}
+                    </p>
+                    {song.youtubeId && (
+                      <a
+                        href={`https://www.youtube.com/watch?v=${song.youtubeId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline mt-2 inline-block"
+                      >
+                        Watch on YouTube →
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Controls */}
@@ -266,17 +313,43 @@ function SongPageContent({ songId }: SongPageContentProps) {
                   </Select>
                 </div>
 
-                {/* Audio Loading Status */}
-                <div className="flex items-center gap-2">
-                  <Volume2 className={`h-4 w-4 ${audioReady ? "text-green-500" : "text-gray-400"}`} />
-                  {audioReady ? (
-                    <span className="text-xs text-green-500">Audio ready</span>
-                  ) : (
-                    <span className="text-xs text-gray-400">
-                      Loading audio... {audioLoaded}/{audioTotal}
-                    </span>
-                  )}
-                </div>
+                {/* Video Mute Toggle */}
+                {song.videoUrl && !videoError && (
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id="video-mute"
+                      checked={!isVideoMuted}
+                      onCheckedChange={() => toggleVideoMute()}
+                    />
+                    <label
+                      htmlFor="video-mute"
+                      className={`flex cursor-pointer items-center gap-1.5 text-sm ${
+                        !isVideoMuted ? "text-primary" : "text-gray-400"
+                      }`}
+                    >
+                      {isVideoMuted ? (
+                        <VolumeX className="h-4 w-4" />
+                      ) : (
+                        <Volume2 className="h-4 w-4" />
+                      )}
+                      <span>Video Audio</span>
+                    </label>
+                  </div>
+                )}
+
+                {/* Audio Loading Status - show only when video is muted (using snippets) */}
+                {isVideoMuted && (
+                  <div className="flex items-center gap-2">
+                    <Volume2 className={`h-4 w-4 ${audioReady ? "text-green-500" : "text-gray-400"}`} />
+                    {audioReady ? (
+                      <span className="text-xs text-green-500">Snippets ready</span>
+                    ) : (
+                      <span className="text-xs text-gray-400">
+                        Loading snippets... {audioLoaded}/{audioTotal}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
