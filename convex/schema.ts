@@ -17,6 +17,8 @@ export default defineSchema({
     youtubeId: v.string(),
     sourceLanguage: v.string(), // e.g., "persian"
     createdAt: v.number(),
+    // Optional local video URL (relative path) for instant seeking without YouTube buffering
+    videoUrl: v.optional(v.string()), // e.g., "/video/baraye/baraye.mp4"
   }),
 
   lyrics: defineTable({

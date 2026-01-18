@@ -18,6 +18,27 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-024: Update Seed Data with New Video + Timestamps ✅
+- Updated `convex/schema.ts` to add `videoUrl` optional field to songs table
+- Updated `convex/seed.ts`:
+  - Changed youtubeId from `xLvUEF2zpj8` to `0th9_v-BbUI` (correct Baraye video)
+  - Added videoUrl: `/video/baraye/baraye.mp4` for local video path
+  - Updated seed mutation to handle both old and new youtubeId lookup
+  - Seed now patches existing song with new youtubeId and videoUrl
+- Removed stray .js files from convex/ folder (Vite dev server artifacts)
+- Pushed schema to Convex successfully
+- Re-seeded Baraye: `npx convex run seed:seedBaraye` returned success
+  - Updated 31 lyrics with audioSnippetUrl
+  - Updated song with new youtubeId and videoUrl
+- Verified in Convex: youtubeId is now `0th9_v-BbUI`, videoUrl is `/video/baraye/baraye.mp4`
+- Typecheck passes ✅
+
+**Note:** Timestamps didn't need updating - US-023 verified the existing PRD timestamps match the new video perfectly.
+
+**Next:** US-025 will extract audio snippets from the new audio file using the verified timestamps.
+
+---
+
 ## Iteration - US-023: Get Timestamps for New Video ✅
 - Attempted Option A (Megalobiz LRC) - WebFetch couldn't extract full LRC content due to copyright
 - Used existing PRD timestamps (which originally came from Megalobiz) to verify against new video

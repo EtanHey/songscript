@@ -37,14 +37,28 @@ const barayeLyrics = [
 export const seedBaraye = mutation({
   args: {},
   handler: async (ctx) => {
-    // Check if Baraye already exists
-    const existingSong = await ctx.db
+    // Check if Baraye already exists (try new youtubeId first, then old)
+    let existingSong = await ctx.db
       .query("songs")
-      .filter((q) => q.eq(q.field("youtubeId"), "xLvUEF2zpj8"))
+      .filter((q) => q.eq(q.field("youtubeId"), "0th9_v-BbUI"))
       .first();
 
+    // Also check for the old youtubeId
+    if (!existingSong) {
+      existingSong = await ctx.db
+        .query("songs")
+        .filter((q) => q.eq(q.field("youtubeId"), "xLvUEF2zpj8"))
+        .first();
+    }
+
     if (existingSong) {
-      // Song exists - update existing lyrics with audio URLs
+      // Song exists - update song with new youtubeId and videoUrl
+      await ctx.db.patch(existingSong._id, {
+        youtubeId: "0th9_v-BbUI",
+        videoUrl: "/video/baraye/baraye.mp4",
+      });
+
+      // Update existing lyrics with audio URLs
       const existingLyrics = await ctx.db
         .query("lyrics")
         .withIndex("by_song", (q) => q.eq("songId", existingSong._id))
@@ -64,9 +78,10 @@ export const seedBaraye = mutation({
       }
 
       return {
-        message: "Baraye lyrics updated with audio URLs",
+        message: "Baraye song updated with new video and audio URLs",
         songId: existingSong._id,
         updatedCount,
+        updatedFields: ["youtubeId", "videoUrl"],
       };
     }
 
@@ -74,9 +89,10 @@ export const seedBaraye = mutation({
     const songId = await ctx.db.insert("songs", {
       title: "Baraye (برای)",
       artist: "Shervin Hajipour",
-      youtubeId: "xLvUEF2zpj8",
+      youtubeId: "0th9_v-BbUI",
       sourceLanguage: "persian",
       createdAt: Date.now(),
+      videoUrl: "/video/baraye/baraye.mp4",
     });
 
     // Create all lyrics

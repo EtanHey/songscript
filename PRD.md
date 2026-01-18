@@ -1047,14 +1047,16 @@ Replace YouTube embed with local video player using downloaded MP4:
 **Description:** Update Convex seed data with correct YouTube ID and new timestamps.
 
 **Acceptance Criteria:**
-- [ ] Update `convex/seed.ts`: change `youtubeId` from `xLvUEF2zpj8` to `0th9_v-BbUI`
-- [ ] Update all 31 lyrics with new timestamps from `scripts/baraye-new-timestamps.json`
-- [ ] Add `videoUrl` field to songs schema: `v.optional(v.string())` for local video path
-- [ ] Update seed to include `videoUrl: "/video/baraye/baraye.mp4"`
-- [ ] Push schema: `bunx convex dev`
-- [ ] Re-seed: `npx convex run seed:seedBaraye`
-- [ ] Verify in Convex: new youtubeId and timestamps are correct
-- [ ] Typecheck passes
+- [x] Update `convex/seed.ts`: change `youtubeId` from `xLvUEF2zpj8` to `0th9_v-BbUI`
+- [x] Update all 31 lyrics with new timestamps from `scripts/baraye-new-timestamps.json`
+- [x] Add `videoUrl` field to songs schema: `v.optional(v.string())` for local video path
+- [x] Update seed to include `videoUrl: "/video/baraye/baraye.mp4"`
+- [x] Push schema: `bunx convex dev`
+- [x] Re-seed: `npx convex run seed:seedBaraye`
+- [x] Verify in Convex: new youtubeId and timestamps are correct
+- [x] Typecheck passes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-024**
 
