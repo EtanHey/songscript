@@ -18,6 +18,21 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - V-002: Verify Convex Integration ✅
+- Browser extension connected successfully
+- Verified Convex data via CLI:
+  - `npx convex data songs` - shows Baraye song (ID: j972m34dzqgx6a0r5a00n9k6pd7zekfa)
+  - `npx convex data lyrics` - shows 31 lyrics rows with audioSnippetUrl populated
+- User denied navigation to Convex dashboard (reasonable for security) - used CLI verification instead
+- Screenshot of homepage shows Convex data loading correctly:
+  - Song card with title "Baraye (برای)"
+  - Artist "Shervin Hajipour"
+  - YouTube thumbnail
+  - Language "persian"
+- All V-002 acceptance criteria complete (verified via CLI + app screenshot)
+
+---
+
 ## Iteration - V-001: Verify Project Setup ✅
 - Browser extension now connected
 - Navigated to homepage at localhost:3001
