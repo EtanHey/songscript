@@ -15,11 +15,14 @@ interface LyricLine {
   english: string;
 }
 
+export type LanguageFilter = "all" | "persian" | "transliteration" | "hebrew" | "english";
+
 interface LyricsDisplayProps {
   songId: Id<"songs">;
   onLineClick?: (startTime: number, lineIndex: number) => void;
   activeLineIndex?: number;
   clickedLineIndex?: number;
+  languageFilter?: LanguageFilter;
 }
 
 export default function LyricsDisplay({
@@ -27,6 +30,7 @@ export default function LyricsDisplay({
   onLineClick,
   activeLineIndex,
   clickedLineIndex,
+  languageFilter = "all",
 }: LyricsDisplayProps) {
   const { data: lyrics } = useSuspenseQuery(
     convexQuery(api.lyrics.getBySong, { songId })
@@ -55,27 +59,33 @@ export default function LyricsDisplay({
           }`}
         >
           {/* Persian text - RTL, larger font */}
-          <p
-            dir="rtl"
-            className="text-right text-xl font-medium leading-relaxed"
-          >
-            {line.original}
-          </p>
+          {(languageFilter === "all" || languageFilter === "persian") && (
+            <p
+              dir="rtl"
+              className="text-right text-xl font-medium leading-relaxed"
+            >
+              {line.original}
+            </p>
+          )}
 
           {/* Transliteration - italic, green */}
-          <p className="text-base italic text-emerald-500">
-            {line.transliteration}
-          </p>
+          {(languageFilter === "all" || languageFilter === "transliteration") && (
+            <p className="text-base italic text-emerald-500">
+              {line.transliteration}
+            </p>
+          )}
 
           {/* Hebrew text - RTL, blue */}
-          {line.hebrew && (
+          {(languageFilter === "all" || languageFilter === "hebrew") && line.hebrew && (
             <p dir="rtl" className="text-right text-base text-blue-500">
               {line.hebrew}
             </p>
           )}
 
           {/* English translation - smaller, gray */}
-          <p className="text-sm text-gray-400">{line.english}</p>
+          {(languageFilter === "all" || languageFilter === "english") && (
+            <p className="text-sm text-gray-400">{line.english}</p>
+          )}
         </button>
       ))}
     </div>

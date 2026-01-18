@@ -18,6 +18,27 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-012: Language Filter Dropdown
+- Added `LanguageFilter` type to LyricsDisplay component (all | persian | transliteration | hebrew | english)
+- Added `languageFilter` prop to LyricsDisplay with "all" as default
+- Updated lyrics rendering to conditionally show/hide each language based on filter
+- Added `languageFilter` state to song page component
+- Added Languages icon from lucide-react for visual indicator
+- Added Select dropdown in controls section with 5 options:
+  - All Languages (default)
+  - Persian Only
+  - Transliteration
+  - Hebrew Only
+  - English Only
+- Connected filter state to LyricsDisplay component
+- Typecheck passes
+
+**Learnings:**
+- Language filter is simple conditional rendering - no need for complex state management
+- Exported LanguageFilter type from LyricsDisplay for use in parent components
+
+---
+
 ## Iteration - US-011: Playback Speed Control
 - Added ShadCN Select component via `bunx shadcn@latest add select`
 - Added `playbackSpeed` state (default "1") and `handleSpeedChange` callback

@@ -5,7 +5,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import YouTubePlayer, { YouTubePlayerHandle } from "../components/YouTubePlayer";
-import LyricsDisplay from "../components/LyricsDisplay";
+import LyricsDisplay, { LanguageFilter } from "../components/LyricsDisplay";
 import { Switch } from "../components/ui/switch";
 import {
   Select,
@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Repeat } from "lucide-react";
+import { Repeat, Languages } from "lucide-react";
 
 export const Route = createFileRoute("/song/$songId")({
   component: SongPage,
@@ -74,6 +74,9 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
   // Playback speed state
   const [playbackSpeed, setPlaybackSpeed] = useState<string>("1");
+
+  // Language filter state
+  const [languageFilter, setLanguageFilter] = useState<LanguageFilter>("all");
 
   const handleSpeedChange = useCallback((speed: string) => {
     setPlaybackSpeed(speed);
@@ -194,6 +197,26 @@ function SongPageContent({ songId }: SongPageContentProps) {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Language Filter */}
+              <div className="flex items-center gap-2">
+                <Languages className="h-4 w-4 text-gray-400" />
+                <Select
+                  value={languageFilter}
+                  onValueChange={(value) => setLanguageFilter(value as LanguageFilter)}
+                >
+                  <SelectTrigger className="w-36 border-gray-700 bg-gray-900">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="border-gray-700 bg-gray-900">
+                    <SelectItem value="all">All Languages</SelectItem>
+                    <SelectItem value="persian">Persian Only</SelectItem>
+                    <SelectItem value="transliteration">Transliteration</SelectItem>
+                    <SelectItem value="hebrew">Hebrew Only</SelectItem>
+                    <SelectItem value="english">English Only</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         </div>
@@ -205,6 +228,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
             onLineClick={handleLineClick}
             activeLineIndex={activeLineIndex}
             clickedLineIndex={clickedLineIndex}
+            languageFilter={languageFilter}
           />
         </div>
       </main>

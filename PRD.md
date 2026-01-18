@@ -37,12 +37,12 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 10 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011) |
+| ✅ **Stories Complete** | 11 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012) |
 | ⚠️ **BROKEN** | US-005 (Auth - HTTP 500 errors, needs passwordless rework) |
-| 🔄 **Stories Remaining** | 9 + 6 verification |
-| ☑️ **Criteria Checked** | 69 / 97 (~71%) |
+| 🔄 **Stories Remaining** | 8 + 6 verification |
+| ☑️ **Criteria Checked** | 75 / 97 (~77%) |
 
-**Next Story:** US-012 (Language Filter Dropdown)
+**Next Story:** US-013 (Active Line Highlighting)
 
 ---
 
@@ -340,12 +340,12 @@ SongScript is a song transliteration learning app that helps users learn to pron
 **Description:** Add dropdown to filter which language versions are shown.
 
 **Acceptance Criteria:**
-- [ ] Add ShadCN Select for language filter
-- [ ] Options: All, Persian only, Transliteration only, Hebrew only, English only
-- [ ] Filter affects which text rows are visible per line
-- [ ] Default: All
-- [ ] Filter state stored in component
-- [ ] Typecheck passes
+- [x] Add ShadCN Select for language filter
+- [x] Options: All, Persian only, Transliteration only, Hebrew only, English only
+- [x] Filter affects which text rows are visible per line
+- [x] Default: All
+- [x] Filter state stored in component
+- [x] Typecheck passes
 
 **⏹️ STOP - END OF US-012. Do not continue to US-013.**
 
