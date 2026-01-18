@@ -37,13 +37,13 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 25 (archived to `docs.local/prd-completed-archive.md`) |
-| ⏹️ **BLOCKED** | US-005 (Auth) |
-| 🔄 **Stories Remaining** | 7 (US-022 through US-027, V-007) |
+| ✅ **Stories Complete** | 31 (US-001-020A, US-022-027, V-001-007) |
+| ⏹️ **BLOCKED** | US-005 (Auth), US-020 Phase 5, US-021 (superseded) |
+| 🔄 **Stories Remaining** | 0 |
 
 **Archive:** Completed stories (US-001-020A, V-001-006) moved to `docs.local/prd-completed-archive.md`
 
-**Current Focus:** Download correct video, extract timestamps, re-implement audio system.
+**Status:** ✅ ALL ACTIONABLE STORIES COMPLETE! Only US-005 (Auth) remains blocked.
 
 ---
 
