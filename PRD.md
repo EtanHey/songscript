@@ -846,6 +846,8 @@ const handleLineClick = useCallback((startTime: number, lineIndex: number) => {
 
 **PHASE 5: Browser Testing**
 
+**Status:** ⏹️ BLOCKED: Browser extension not connected. Cannot perform browser automation tests.
+
 **Acceptance Criteria (Phase 5):**
 - [ ] **BROWSER TEST**: Navigate to `/song/{baraye-id}`
 - [ ] **BROWSER TEST**: Wait for "Loading audio..." to complete

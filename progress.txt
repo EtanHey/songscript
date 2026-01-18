@@ -32,7 +32,9 @@
 - Connected speed control to audio playback rate via hook's `setPlaybackRate` function
 - Enhanced `useAudioPreloader` hook with `setLoop` function for native audio looping
 - Typecheck passes
-- Browser test NOT possible - extension not connected
+- Committed changes
+
+[US-020 Phase 5] BLOCKED: Browser extension not connected. Moving to next story.
 
 **Learnings:**
 - HTML5 Audio element has native `loop` property that handles looping automatically
