@@ -12,6 +12,8 @@ import type * as betterAuth from "../betterAuth.js";
 import type * as lyrics from "../lyrics.js";
 import type * as seed from "../seed.js";
 import type * as songs from "../songs.js";
+import type * as wordProgress from "../wordProgress.js";
+import type * as words from "../words.js";
 
 import type {
   ApiFromModules,
@@ -24,6 +26,8 @@ declare const fullApi: ApiFromModules<{
   lyrics: typeof lyrics;
   seed: typeof seed;
   songs: typeof songs;
+  wordProgress: typeof wordProgress;
+  words: typeof words;
 }>;
 
 /**

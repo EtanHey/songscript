@@ -46,4 +46,16 @@ export default defineSchema({
     grammarType: v.optional(v.string()), // noun, verb, preposition, adjective, etc.
     forvoAudioUrl: v.optional(v.string()), // Future: audio from Forvo or ElevenLabs
   }).index("by_song_line", ["songId", "lineNumber"]),
+
+  // Track user's learning progress for individual words
+  wordProgress: defineTable({
+    visitorId: v.string(), // localStorage-generated ID if no auth
+    wordId: v.id("words"),
+    viewCount: v.number(),
+    playCount: v.number(),
+    learned: v.boolean(),
+    lastSeen: v.number(),
+  })
+    .index("by_visitor", ["visitorId"])
+    .index("by_visitor_word", ["visitorId", "wordId"]),
 });

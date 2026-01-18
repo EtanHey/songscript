@@ -18,6 +18,50 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-032: Word Learning Tracking ✅
+- Added `wordProgress` table to `convex/schema.ts`:
+  - Fields: visitorId, wordId, viewCount, playCount, learned, lastSeen
+  - Indexes: by_visitor (visitorId), by_visitor_word (visitorId, wordId)
+- Created `convex/wordProgress.ts` with mutations and queries:
+  - `getByVisitor`: Get all progress for a visitor
+  - `getByVisitorWord`: Get progress for a specific word
+  - `getByVisitorWords`: Get progress for multiple words at once
+  - `incrementViewCount`: Track when user views a word
+  - `incrementPlayCount`: Track when user plays word audio
+  - `toggleLearned` and `setLearned`: Toggle/set learned status
+- Created `convex/words.ts` with queries:
+  - `getByLine`: Fetch words for a specific line
+  - `getBySong`: Fetch all words for a song
+- Created `src/hooks/useVisitorId.ts`:
+  - Generates a random UUID for anonymous visitors
+  - Persists in localStorage as `songscript_visitor_id`
+  - Falls back to session-only ID if localStorage unavailable
+- Updated `src/components/WordInfoModal.tsx`:
+  - Now fetches real word data from Convex via `api.words.getByLine`
+  - Uses `useVisitorId` hook to identify visitors
+  - Tracks view count when modal opens (for each word in line)
+  - Tracks play count when word audio is played
+  - Added checkbox column with `Checkbox` component (ShadCN)
+  - Shows learned status with green background and checkmark
+  - Progress summary shows "X/Y words learned" with completion indicator
+  - Optimistic updates for learned checkbox toggle
+- Updated `src/routes/song.$songId.tsx`:
+  - Passes `songId` prop to WordInfoModal
+- Added ShadCN Checkbox component: `bunx shadcn@latest add checkbox`
+- Cleaned stray .js files from convex/ folder (Vite dev server artifacts)
+- Pushed schema to Convex: `npx convex dev --once`
+- Typecheck passes ✅
+
+**Learnings:**
+- Convex `useQuery` returns `undefined` while loading, handle with loading state
+- For batch operations, `getByVisitorWords` is more efficient than N separate queries
+- Optimistic updates improve UX - update local state immediately, let Convex sync
+- `useVisitorId` hook handles SSR gracefully (returns empty string on server)
+
+**Next:** V-008 (Verify Playback Modes)
+
+---
+
 ## Iteration - US-033: Pre-generate Word Data for Baraye ✅
 - Created `scripts/baraye-words.json` with word-by-word breakdown for all 31 Baraye lines
 - Each line contains array of words with: persian, transliteration, hebrew, english, grammarType

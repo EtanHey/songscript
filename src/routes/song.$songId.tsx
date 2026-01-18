@@ -553,6 +553,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
         isOpen={wordModalOpen}
         onClose={() => setWordModalOpen(false)}
         line={selectedLine}
+        songId={songId}
         isMobile={isMobile}
       />
     </div>

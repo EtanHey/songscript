@@ -49,13 +49,13 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 38 (US-001-020A, US-022-030, US-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, V-001-007) |
+| ✅ **Stories Complete** | 39 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, V-001-007) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), US-020 Phase 5 |
-| 🔄 **Stories Remaining** | 4 (US-031-032, V-008-009) |
+| 🔄 **Stories Remaining** | 3 (US-031, V-008-009) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** US-032 (Word Learning Tracking)
+**Next Story:** V-008 (Verify Playback Modes)
 
 **Story Order (optimized - API-dependent story LAST):**
 0. ~~US-TIMESTAMPS-V2~~ ✅ (end buffer increased to +0.70s)
@@ -65,8 +65,8 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 4. ~~US-029~~ ✅ (needs FIX - Fluid mode behavior)
 5. ~~US-030~~ ✅ (Word-by-Word Info Modal)
 6. ~~US-033~~ ✅ (Pre-generate Word Data - 135 words seeded)
-7. **US-032: Word Learning Tracking** ← NEXT (uses localStorage)
-8. V-008: Verify Playback Modes ← No API
+7. ~~US-032~~ ✅ (Word Learning Tracking - localStorage + Convex)
+8. **V-008: Verify Playback Modes ← NEXT** (No API)
 9. V-009: Verify Word Info Modal ← No API
 10. **US-031: ElevenLabs Word Audio ← LAST (needs API key)**
 
@@ -1458,7 +1458,7 @@ Replace YouTube embed with local video player using downloaded MP4:
 - Store in Convex per-user (or localStorage as fallback)
 
 **Acceptance Criteria:**
-- [ ] Add Convex table `wordProgress`:
+- [x] Add Convex table `wordProgress`:
   ```typescript
   wordProgress: defineTable({
     visitorId: v.string(), // localStorage-generated ID if no auth
@@ -1470,12 +1470,14 @@ Replace YouTube embed with local video player using downloaded MP4:
   }).index("by_visitor", ["visitorId"])
     .index("by_visitor_word", ["visitorId", "wordId"])
   ```
-- [ ] Generate visitor ID in localStorage if no auth session
-- [ ] Track view count when word modal opens
-- [ ] Track play count when word audio plays
-- [ ] Add "learned" checkbox in word info modal
-- [ ] Show learned status with visual indicator (checkmark badge)
-- [ ] Typecheck passes
+- [x] Generate visitor ID in localStorage if no auth session
+- [x] Track view count when word modal opens
+- [x] Track play count when word audio plays
+- [x] Add "learned" checkbox in word info modal
+- [x] Show learned status with visual indicator (checkmark badge)
+- [x] Typecheck passes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-032**
 
