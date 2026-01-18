@@ -2,14 +2,9 @@
 
 Song transliteration learning app - follow each line of a song and learn to read/pronounce it.
 
-## Project Status: 🌱 Greenfield
+## Project Status: 🚧 In Development
 
-This project is just starting. Work WITH the user to figure out:
-- Tech stack (Convex vs Supabase, TanStack, framework choice)
-- Architecture
-- Features
-
-**Don't assume anything. Ask questions. Explore together.**
+Tech stack decided. Ralph will execute PRD.md stories.
 
 ---
 
@@ -44,15 +39,32 @@ git status  # Check current branch FIRST
 
 ---
 
-## Project Structure (TBD)
+## Project Structure
 
 ```
 songscript/
 ├── CLAUDE.md          ← This file
 ├── README.md          ← Project description
-├── PRD.md             ← Ralph task list (gitignored)
-├── progress.txt       ← Ralph progress (gitignored)
-└── ...                ← TBD with user
+├── PRD.md             ← Ralph task list
+├── progress.txt       ← Ralph progress
+├── app/
+│   ├── components/    ← React components
+│   │   ├── YouTubePlayer.tsx
+│   │   └── LyricsDisplay.tsx
+│   ├── routes/        ← TanStack file-based routes
+│   │   ├── index.tsx
+│   │   ├── login.tsx
+│   │   └── song.$songId.tsx
+│   └── styles/
+│       └── globals.css
+├── convex/
+│   ├── schema.ts      ← Database schema
+│   ├── songs.ts       ← Queries/mutations
+│   ├── seed.ts        ← Seed data
+│   └── auth.ts        ← Auth config
+├── package.json
+├── vite.config.ts
+└── tailwind.config.ts
 ```
 
 ---
@@ -69,15 +81,19 @@ songscript/
 
 ---
 
-## Tech Stack (TBD - Discuss with user)
+## Tech Stack (DECIDED)
 
-Options to explore:
-- **Database:** Supabase vs Convex
-- **Frontend:** React, Next.js, or other
-- **State:** TanStack Query, Zustand, or Convex built-in
-- **Styling:** Tailwind, CSS-in-JS, etc.
+- **Framework:** TanStack Start (with Bun runtime)
+- **Database:** Convex (real-time sync)
+- **Auth:** Convex + Better Auth (admin-only for v1)
+- **Styling:** Tailwind CSS + ShadCN UI
+- **State:** @convex-dev/react-query + TanStack Query
+- **Testing:** Vitest + Playwright
 
-**Don't pick. Discuss first.**
+**References:**
+- [TanStack Start + Bun](https://bun.com/docs/guides/ecosystem/tanstack-start)
+- [Convex + TanStack Start](https://docs.convex.dev/quickstart/tanstack-start)
+- [Convex + Better Auth](https://labs.convex.dev/better-auth/framework-guides/tanstack-start)
 
 ---
 
