@@ -18,6 +18,24 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-014: Dark Theme with Iranian Flag Accent
+- Added `.iran-gradient` CSS class in styles.css using CSS linear-gradient
+- Gradient: green (#22c55e) → white (#ffffff) → red (#ef4444) - Iranian flag colors
+- Applied gradient to Header component "SongScript" title
+- Applied gradient to song page title (song.title)
+- Dark mode already enabled via `class="dark"` on `<html>` element in __root.tsx
+- Background uses bg-gray-900 throughout (already in place from previous work)
+- Text colors contrast well: white text, gray-400 subtitles, emerald-500/blue-500/gray-400 for languages
+- Typecheck passes
+- Verified in browser: dark theme with Iranian flag gradient on titles
+
+**Learnings:**
+- Tailwind v4 uses CSS-based config, custom classes go in `@layer base` or after it in styles.css
+- `background-clip: text` with `color: transparent` creates text gradient effect
+- The `dark` class on `<html>` element activates dark CSS variables defined in `.dark` block
+
+---
+
 ## Iteration - US-013: Active Line Highlighting
 - Implemented time-based active line tracking in `handleTimeUpdate` callback
 - Finds which line's `startTime <= currentTime < endTime` using `findIndex`

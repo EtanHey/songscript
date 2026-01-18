@@ -128,3 +128,11 @@ code {
     @apply bg-background text-foreground;
   }
 }
+
+/* Iranian flag gradient for titles */
+.iran-gradient {
+  background: linear-gradient(to right, #22c55e, #ffffff, #ef4444);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

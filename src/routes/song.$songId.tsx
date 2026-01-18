@@ -150,7 +150,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
     <div className="min-h-screen bg-gray-900 text-white">
       {/* Header */}
       <header className="border-b border-gray-800 p-4">
-        <h1 className="text-2xl font-bold">{song.title}</h1>
+        <h1 className="text-2xl font-bold iran-gradient">{song.title}</h1>
         <p className="text-gray-400">{song.artist}</p>
       </header>
 

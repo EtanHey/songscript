@@ -37,12 +37,12 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 12 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013) |
+| ✅ **Stories Complete** | 13 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014) |
 | ⚠️ **BROKEN** | US-005 (Auth - HTTP 500 errors, needs passwordless rework) |
-| 🔄 **Stories Remaining** | 7 + 6 verification |
-| ☑️ **Criteria Checked** | 80 / 97 (~82%) |
+| 🔄 **Stories Remaining** | 6 + 6 verification |
+| ☑️ **Criteria Checked** | 87 / 97 (~90%) |
 
-**Next Story:** US-014 (Dark Theme with Iranian Flag Accent)
+**Next Story:** US-015 (Mobile Responsive Design)
 
 ---
 
@@ -282,19 +282,26 @@ SongScript is a song transliteration learning app that helps users learn to pron
 
 ---
 
-### US-009: Line Click to Seek Functionality
+### US-009: Line Click to Seek + Auto-Play
 
-**Description:** Clicking a lyric line seeks YouTube player to that timestamp.
+**Description:** Clicking a lyric line seeks YouTube player to that timestamp. Player should auto-play on load and after seeking.
+
+**⚠️ BROKEN - NEEDS FIX:**
+- `seekTo()` is NOT working - clicking different lines all start at same time
+- Currently requires clicking video to play after each seek
+- User wants: auto-play on page load, auto-play after seek (no manual clicks)
 
 **Acceptance Criteria:**
 - [x] Pass `onLineClick(startTime)` callback to LyricsDisplay
-- [x] When line clicked, call `player.seekTo(startTime)`
-- [x] Player starts playing after seek
+- [ ] **FIX SEEK**: `player.seekTo(startTime, true)` - use second param `true` for allowSeekAhead
+- [ ] **AUTO-PLAY ON LOAD**: Player starts playing automatically when page loads (use `autoplay: 1` in playerVars)
+- [ ] **AUTO-PLAY AFTER SEEK**: After `seekTo()`, call `player.playVideo()` to resume without user click
 - [x] Visual feedback on click (brief highlight)
 - [x] Typecheck passes
-- [x] Verify in browser: clicking line 5 jumps to ~28.61s
-
-**✅ COMPLETE**
+- [ ] **BROWSER TEST**: Click line 1 → video seeks to ~14.8s (not 0)
+- [ ] **BROWSER TEST**: Click line 10 → video seeks to ~46.9s
+- [ ] **BROWSER TEST**: Click line 28 → video seeks to ~113.4s
+- [ ] **BROWSER TEST**: Verify auto-plays after seek without manual click
 
 **⏹️ STOP - END OF US-009. Do not continue to US-010.**
 
@@ -371,13 +378,15 @@ SongScript is a song transliteration learning app that helps users learn to pron
 **Description:** Style the app with dark theme and Iranian flag colors.
 
 **Acceptance Criteria:**
-- [ ] Set dark mode as default in Tailwind config
-- [ ] Background: dark (bg-gray-900 or bg-slate-950)
-- [ ] Title gradient: green → white → red (Iranian flag)
-- [ ] Add CSS gradient class for title: `bg-gradient-to-r from-green-500 via-white to-red-500`
-- [ ] Text colors contrast well on dark background
-- [ ] Typecheck passes
-- [ ] Verify in browser: app has dark theme with accent colors
+- [x] Set dark mode as default in Tailwind config
+- [x] Background: dark (bg-gray-900 or bg-slate-950)
+- [x] Title gradient: green → white → red (Iranian flag)
+- [x] Add CSS gradient class for title: `bg-gradient-to-r from-green-500 via-white to-red-500`
+- [x] Text colors contrast well on dark background
+- [x] Typecheck passes
+- [x] Verify in browser: app has dark theme with accent colors
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-014. Do not continue to US-015.**
 
