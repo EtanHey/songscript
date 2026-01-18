@@ -18,6 +18,33 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-WORD-TOKEN: Verify Schema Indexes and Word Sync ✅
+- **Task**: Verify that word sync by persian text is working correctly after US-WORD-SYNC implementation
+- **Schema verification**:
+  - ✅ `convex/schema.ts` has `by_visitor_persian` index on `wordProgress` table (line 63)
+  - ✅ `wordProgress` uses `persian: v.optional(v.string())` field (line 55)
+  - ✅ `words` table has `persian: v.string()` field for word text (line 42)
+- **Code verification**:
+  - ✅ `getByVisitorPersian` query returns state for same Persian word across lines
+  - ✅ `getByVisitorPersians` query does batch lookups by persian text
+  - ✅ `toggleLearned` mutation syncs across ALL instances with same persian text
+- **Browser verification** (desktop tab 1076981165):
+  - ✅ Marked "برای" as learned on Line 1 → Progress: 1/4 words learned
+  - ✅ Opened Line 2 → "برای" already shown as learned (Progress: 1/5 words learned)
+  - ✅ Unmarked "برای" on Line 2 → Progress: 0/5 words learned
+  - ✅ Opened Line 1 again → "برای" now shows as unmarked (Progress: 0/4 words learned)
+  - ✅ Bidirectional sync verified!
+- Typecheck passes ✅
+
+**Learnings:**
+- US-WORD-SYNC already implemented the full solution - this story was just verification
+- Bidirectional sync works: marking/unmarking a word in ANY line updates ALL occurrences
+- The `by_visitor_persian` index enables efficient lookups for consistent state display
+
+**Next:** US-WORD-TOKEN-FIX (Migration and duplicate cleanup) or V-WORD-TOKEN (Comprehensive audit)
+
+---
+
 ## Iteration - US-WORD-SYNC: Sync Learning State for Repeated Words ✅
 - **Issue**: Words like "برای" (barāye) appear 31+ times in Baraye song, but learning state was tracked per word instance (`wordId`)
 - **Problem**: User had to mark the same word as learned multiple times in different lines
