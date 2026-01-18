@@ -66,12 +66,12 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 | Metric | Count |
 |--------|-------|
 | ✅ **Stories Complete** | 50 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, US-SYNC-FIX, V-001-009, US-VIDEO-LOAD, US-MOBILE-DRAWER, US-MOBILE-LAYOUT, US-VIDEO-MOBILE, US-WORD-SYNC, US-WORD-TOKEN, US-WORD-TOKEN-FIX, V-WORD-TOKEN) |
-| ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), US-020 Phase 5, **US-031 (missing API key)** |
-| 🔄 **Stories Remaining** | 0 (All non-blocked stories complete!) |
+| ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), **US-031 (missing API key)** |
+| 🔄 **Stories Remaining** | 1 (US-020 Phase 5 - browser testing) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** US-031 (ElevenLabs Word Audio - ⏹️ BLOCKED: needs API key)
+**Next Story:** US-020 Phase 5 (Browser Testing - audio playback verification)
 
 **Story Order (optimized - API-dependent story LAST):**
 0. ~~US-TIMESTAMPS-V2~~ ✅ (end buffer increased to +0.70s)
@@ -1114,8 +1114,6 @@ const handleLineClick = useCallback((startTime: number, lineIndex: number) => {
 ---
 
 **PHASE 5: Browser Testing**
-
-**Status:** ⏹️ BLOCKED: Browser extension not connected. Cannot perform browser automation tests.
 
 **Acceptance Criteria (Phase 5):**
 - [ ] **BROWSER TEST**: Navigate to `/song/{baraye-id}`
