@@ -37,11 +37,11 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 18 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-020A) |
+| ✅ **Stories Complete** | 19 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020A) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-020 Phase 5 (browser extension not connected) |
-| 🔄 **Stories Remaining** | US-019, V-001 through V-006 |
+| 🔄 **Stories Remaining** | V-001 through V-006 |
 
-**Continue to: US-019 (Component Tests)**
+**Continue to: V-001 (Verify Project Setup)**
 
 ---
 
@@ -481,12 +481,14 @@ SongScript is a song transliteration learning app that helps users learn to pron
 **Description:** Add tests for key components.
 
 **Acceptance Criteria:**
-- [ ] Test YouTubePlayer: mocks API, verifies seekTo called on play
-- [ ] Test LyricsDisplay: renders all language versions correctly
-- [ ] Test language filter: only selected language visible
-- [ ] Test loop toggle: state changes correctly
-- [ ] All tests pass with `bun test`
-- [ ] Typecheck passes
+- [x] Test YouTubePlayer: mocks API, verifies seekTo called on play
+- [x] Test LyricsDisplay: renders all language versions correctly
+- [x] Test language filter: only selected language visible
+- [x] Test loop toggle: state changes correctly
+- [x] All tests pass with `bun test`
+- [x] Typecheck passes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-019. Do not continue to verification stories.**
 

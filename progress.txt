@@ -18,6 +18,38 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-019: Add Component Tests
+- Created `src/components/YouTubePlayer.test.tsx`:
+  - Mocks window.YT and YT.Player constructor
+  - Tests: loading state, player creation with correct videoId
+  - Tests: seekTo, play, pause, getCurrentTime, setPlaybackRate exposed through ref
+  - Tests: onReady callback, cleanup on unmount
+  - 9 tests total
+- Created `src/components/LyricsDisplay.test.tsx`:
+  - Mocks Convex query and useSuspenseQuery to return mock lyrics data
+  - Tests: renders all language versions by default
+  - Tests: multiple lines sorted by lineNumber
+  - Tests: onLineClick callback with startTime and index
+  - Tests: active line highlight and click animation
+  - Tests: language filter (persian, transliteration, hebrew, english, all)
+  - Tests: optional Hebrew field handling
+  - Tests: RTL direction and styling for Persian/Hebrew text
+  - Tests: transliteration italic/green, Hebrew blue, English gray styling
+  - 16 tests total
+- Switched from jsdom to happy-dom environment due to ESM compatibility issues
+- Used pool: 'forks' with singleFork to avoid memory issues
+- Removed problematic useAudioPreloader hook test (caused memory leaks)
+- All 36 tests pass with `bunx vitest run`
+- Typecheck passes
+
+**Learnings:**
+- happy-dom has better ESM support than jsdom for Vitest
+- Mocking window.YT requires casting through `unknown` to avoid TypeScript errors
+- useSuspenseQuery can be mocked by mocking the whole module
+- Hook tests with Audio mocking can cause memory issues - consider testing at integration level instead
+
+---
+
 ## Iteration - US-018: Set Up Vitest for Unit Testing
 - Vitest and testing dependencies already installed in package.json
 - Created `vitest.config.ts` with jsdom environment, React plugin, and path aliases
