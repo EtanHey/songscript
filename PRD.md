@@ -67,11 +67,11 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 |--------|-------|
 | ✅ **Stories Complete** | 50 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, US-SYNC-FIX, V-001-009, US-VIDEO-LOAD, US-MOBILE-DRAWER, US-MOBILE-LAYOUT, US-VIDEO-MOBILE, US-WORD-SYNC, US-WORD-TOKEN, US-WORD-TOKEN-FIX, V-WORD-TOKEN) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), **US-031 (missing API key)** |
-| 🔄 **Stories Remaining** | 5 (US-LOAD-FIX, US-AUTOPLAY, US-LOOP-UX, V-AUTOPLAY, US-020 Phase 5) |
+| 🔄 **Stories Remaining** | 9 (US-TEST-SETUP, US-LOAD-FIX, US-LOAD-FIX-TESTS, US-AUTOPLAY, US-AUTOPLAY-TESTS, US-LOOP-UX, US-LOOP-UX-TESTS, V-AUTOPLAY, US-020 Phase 5) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** US-LOAD-FIX (Fix dynamic import errors)
+**Next Story:** US-TEST-SETUP (Set up Vitest + Playwright)
 
 **Story Order (optimized - API-dependent story LAST):**
 0. ~~US-TIMESTAMPS-V2~~ ✅ (end buffer increased to +0.70s)
@@ -89,12 +89,16 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 12. ~~US-MOBILE-LAYOUT~~ ✅ (Mobile line indicator on own row)
 13. ~~US-VIDEO-MOBILE~~ ✅ (Collapsible Video on Mobile)
 14. ~~US-WORD-SYNC~~ ✅ (Sync Repeated Words Learning State)
-15. **US-LOAD-FIX: Fix Dynamic Import Errors ← NEXT**
-16. **US-AUTOPLAY: Auto-Play Video + Fluid Mode**
-17. **US-LOOP-UX: Fix Loop Mode Line Flashing**
-18. **V-AUTOPLAY: Verify Auto-Play and Loop Mode**
-19. **US-020 Phase 5: Browser Testing**
-20. **US-031: ElevenLabs Word Audio ← ⏹️ BLOCKED (needs API key)**
+15. **US-TEST-SETUP: Set Up Vitest + Playwright ← NEXT**
+16. **US-LOAD-FIX: Fix Dynamic Import Errors**
+17. **US-LOAD-FIX-TESTS: Tests for Route Loading**
+18. **US-AUTOPLAY: Auto-Play Video + Fluid Mode**
+19. **US-AUTOPLAY-TESTS: Tests for Auto-Play**
+20. **US-LOOP-UX: Fix Loop Mode Line Flashing**
+21. **US-LOOP-UX-TESTS: Tests for Loop Mode**
+22. **V-AUTOPLAY: Verify Auto-Play and Loop Mode**
+23. **US-020 Phase 5: Browser Testing**
+24. **US-031: ElevenLabs Word Audio ← ⏹️ BLOCKED (needs API key)**
 
 **API Key Needed (US-031 only):**
 - ElevenLabs: https://elevenlabs.io/ (free tier: ~10 min audio/month, supports Persian via v3)
@@ -1148,6 +1152,28 @@ const handleLineClick = useCallback((startTime: number, lineIndex: number) => {
 
 ---
 
+### US-TEST-SETUP: Set Up Vitest + Playwright Testing Infrastructure
+
+**Description:** Set up proper testing infrastructure with Vitest for unit tests and Playwright for e2e tests.
+
+**Acceptance Criteria:**
+- [ ] Install Vitest: `bun add -d vitest @testing-library/react @testing-library/dom jsdom`
+- [ ] Install Playwright: `bun add -d @playwright/test`
+- [ ] Create `vitest.config.ts` with jsdom environment
+- [ ] Create `playwright.config.ts` with localhost:3001 base URL
+- [ ] Add test scripts to `package.json`: `"test": "vitest"`, `"test:e2e": "playwright test"`
+- [ ] Create `app/__tests__/` folder for unit tests
+- [ ] Create `e2e/` folder for Playwright tests
+- [ ] Create sample unit test that passes
+- [ ] Create sample e2e test that navigates to `/` and passes
+- [ ] `bun run test` passes
+- [ ] `bun run test:e2e` passes
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-TEST-SETUP. Do not continue to next story.**
+
+---
+
 ### US-LOAD-FIX: Fix Dynamic Import and Initial Load Errors
 
 **Description:** Fix the login route dynamic import error and any other module loading issues preventing the app from working.
@@ -1161,11 +1187,48 @@ Failed to fetch dynamically imported module: http://localhost:3001/src/routes/lo
 - [ ] Investigate the dynamic import error in TanStack Router
 - [ ] Fix the login.tsx route so it loads without errors
 - [ ] Check for any other broken dynamic imports
-- [ ] App loads without console errors related to module imports
 - [ ] Typecheck passes
-- [ ] Verify in browser: navigate to `/login` and `/song/{id}` without errors
+
+**🧪 E2E TESTS (Playwright):**
+- [ ] Create `e2e/routes.spec.ts` if not exists
+- [ ] Test: navigate to `/` - page loads without errors
+- [ ] Test: navigate to `/login` - page loads without errors
+- [ ] Test: navigate to `/song/{testSongId}` - page loads without errors
+- [ ] All e2e tests pass: `bun run test:e2e`
 
 **⏹️ STOP - END OF US-LOAD-FIX. Do not continue to next story.**
+
+---
+
+### US-LOAD-FIX-TESTS: Tests for Route Loading
+
+**Description:** Write unit and e2e tests to verify all routes load correctly. Include manual checklist for magic link auth.
+
+**Acceptance Criteria:**
+- [ ] Create `e2e/routes.spec.ts`
+- [ ] E2E: Test `/` loads without console errors
+- [ ] E2E: Test `/login` loads, form is visible
+- [ ] E2E: Test `/song/{testSongId}` loads without console errors
+- [ ] E2E: Test navigation between routes works
+- [ ] All tests pass: `bun run test:e2e`
+- [ ] Typecheck passes
+
+**📋 MANUAL CHECKLIST: Magic Link Login (for user to verify):**
+Output this checklist for the user after tests pass:
+```
+## Magic Link Login Checklist
+
+- [ ] Navigate to /login
+- [ ] Enter your email address
+- [ ] Click "Send Magic Link"
+- [ ] Check email inbox for magic link
+- [ ] Click magic link in email
+- [ ] Verify redirected to app and logged in
+- [ ] Verify session persists after refresh
+- [ ] Test logout button works
+```
+
+**⏹️ STOP - END OF US-LOAD-FIX-TESTS. Do not continue to next story.**
 
 ---
 
@@ -1199,6 +1262,25 @@ Failed to fetch dynamically imported module: http://localhost:3001/src/routes/lo
 
 ---
 
+### US-AUTOPLAY-TESTS: Tests for Auto-Play and Fluid Mode
+
+**Description:** Write unit and e2e tests to verify auto-play and fluid mode work correctly.
+
+**Acceptance Criteria:**
+- [ ] Create `e2e/autoplay.spec.ts`
+- [ ] E2E: Test song page auto-plays video on load
+- [ ] E2E: Test fluid mode is enabled by default
+- [ ] E2E: Test lines highlight and advance during playback
+- [ ] E2E: Test pause button stops playback
+- [ ] E2E: Test clicking a line seeks to that position
+- [ ] Unit test: `useSongPlayback` hook initializes with fluid mode ON
+- [ ] All tests pass: `bun run test && bun run test:e2e`
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-AUTOPLAY-TESTS. Do not continue to next story.**
+
+---
+
 ### US-LOOP-UX: Fix Loop Mode Line Flashing
 
 **Description:** When playing in loop mode, there's a visual bug where the line selection flashes incorrectly:
@@ -1227,6 +1309,23 @@ This creates a jarring, unprofessional UX.
 - Consider using a "looping" state to suppress line updates during restart
 
 **⏹️ STOP - END OF US-LOOP-UX. Do not continue to next story.**
+
+---
+
+### US-LOOP-UX-TESTS: Tests for Loop Mode
+
+**Description:** Write unit and e2e tests to verify loop mode has no visual flashing.
+
+**Acceptance Criteria:**
+- [ ] Create `e2e/loop-mode.spec.ts`
+- [ ] E2E: Test enabling loop mode
+- [ ] E2E: Test loop replays same line (wait for 2-3 loops)
+- [ ] E2E: Verify no line change during loop restart (check DOM stability)
+- [ ] Unit test: Loop seek logic doesn't emit line change events
+- [ ] All tests pass: `bun run test && bun run test:e2e`
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-LOOP-UX-TESTS. Do not continue to next story.**
 
 ---
 
