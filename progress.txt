@@ -18,6 +18,47 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-VIDEO-MOBILE: Collapsible Video on Mobile ✅
+- **Issue investigated**: Video player + controls took ~83% of mobile screen (only ~57px for lyrics)
+- **Problems found**:
+  1. Song title: ~45px
+  2. Video player: ~91px (aspect-video on 162px width)
+  3. Mobile line indicator: ~30px
+  4. Controls: ~60px
+  5. Status row: ~20px
+  6. Total fixed: ~276px out of 333px = 83% of screen, leaving barely 1 line of lyrics visible
+- **Solution implemented**: Collapsible video player header for mobile
+  - New collapsible header bar with: Video icon, song title, artist, compact mode toggle, expand chevron
+  - Video + full controls hidden when collapsed (maximum lyrics space)
+  - User taps header to expand/collapse
+  - Starts collapsed by default
+  - Fluid mode auto-expands video (video is needed for watching)
+  - Desktop layout unchanged (side-by-side video and lyrics)
+- **Files modified**: `src/routes/song.$songId.tsx`
+  - Added `isVideoCollapsed` state (default: true)
+  - Added `ChevronDown`, `ChevronUp` icons from lucide-react
+  - Mobile: conditional rendering based on `isMobile && isVideoCollapsed`
+  - Compact mode toggle (icon-only) in collapsed header
+  - Full controls only when expanded
+- **Browser verification**:
+  - ✅ Mobile (375px): Collapsed state shows 5+ lyrics lines (huge improvement from 1)
+  - ✅ Tap header to expand: Video and full controls appear
+  - ✅ Tap header again to collapse: Back to lyrics-focused view
+  - ✅ Fluid mode: Auto-expands video when selected
+  - ✅ Single/Loop modes work while collapsed (audio snippets still play)
+  - ✅ Desktop: No change, side-by-side layout intact
+- Typecheck passes ✅
+
+**Learnings:**
+- Mobile screen real estate is precious - default to showing primary content (lyrics)
+- Collapsible headers with compact controls provide quick access without wasting space
+- Auto-expand on Fluid mode makes sense since user wants to watch the video
+- `onClick={(e) => e.stopPropagation()}` prevents mode toggle clicks from also toggling the header
+
+**Next:** US-WORD-SYNC (Sync Learning State for Repeated Words)
+
+---
+
 ## Iteration - US-MOBILE-LAYOUT: Mobile Controls Layout Fix ✅
 - **Issue investigated**: Line indicator only showed when a line was clicked, and was mixed with other controls on mobile
 - **Problems found**:

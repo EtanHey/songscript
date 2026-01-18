@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Repeat, Languages, Volume2, Video, Play, Square, Waves, Pause } from "lucide-react";
+import { Repeat, Languages, Volume2, Video, Play, Square, Waves, Pause, ChevronDown, ChevronUp } from "lucide-react";
 
 // Playback modes
 type PlaybackMode = "single" | "loop" | "fluid";
@@ -141,6 +141,9 @@ function SongPageContent({ songId }: SongPageContentProps) {
   const [wordModalOpen, setWordModalOpen] = useState(false);
   const [selectedLine, setSelectedLine] = useState<ModalLyricLine | null>(null);
 
+  // Mobile video collapsed state - starts collapsed for more lyrics space
+  const [isVideoCollapsed, setIsVideoCollapsed] = useState(true);
+
   // Detect if mobile (viewport width < 768px)
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
@@ -169,6 +172,10 @@ function SongPageContent({ songId }: SongPageContentProps) {
       setIsVideoMuted(false);
       // Continue playing from current position (don't restart)
       playerRef.current?.play();
+      // Auto-expand video on mobile when switching to Fluid mode
+      if (isMobile) {
+        setIsVideoCollapsed(false);
+      }
     } else {
       // Switching TO Single/Loop mode: mute video, audio from snippets
       playerRef.current?.mute();
@@ -190,7 +197,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
     // Update audio loop based on mode
     setAudioLoop(mode === "loop");
-  }, [playbackMode, setAudioLoop, activeLineIndex, sortedLyrics, audioReady, playAudioSnippet]);
+  }, [playbackMode, setAudioLoop, activeLineIndex, sortedLyrics, audioReady, playAudioSnippet, isMobile]);
 
   // REMOVED: playFullVideo function - Fluid mode now replaces "Play Full Video" functionality
   // When user switches to Fluid mode, video continues from current position instead of restarting
@@ -360,200 +367,262 @@ function SongPageContent({ songId }: SongPageContentProps) {
     <div className="flex h-[calc(100vh-65px)] flex-col overflow-hidden bg-gray-900 text-white">
       {/* Main content - side by side on desktop (lg+) */}
       <div className="flex flex-1 flex-col lg:flex-row overflow-hidden">
-        {/* LEFT: Player section (50% on desktop, sticky on mobile) */}
-        <div className="flex-shrink-0 lg:w-1/2 lg:h-full lg:overflow-y-auto lg:border-r lg:border-gray-800">
+        {/* LEFT: Player section (50% on desktop, collapsible on mobile) */}
+        <div className={`flex-shrink-0 lg:w-1/2 lg:h-full lg:overflow-y-auto lg:border-r lg:border-gray-800 ${isMobile && isVideoCollapsed ? '' : ''}`}>
           <div className="lg:sticky lg:top-0">
-            {/* Song title */}
-            <div className="border-b border-gray-800 px-4 py-3">
-              <h1 className="text-xl font-bold iran-gradient">{song.title}</h1>
-              <p className="text-sm text-gray-400">{song.artist}</p>
-            </div>
-
-            {/* Player */}
-            <div className="p-4 pb-2">
-              {song.videoUrl && !videoError ? (
-                <LocalVideoPlayer
-                  ref={playerRef}
-                  videoUrl={song.videoUrl}
-                  onTimeUpdate={handleTimeUpdate}
-                  onStateChange={handleVideoStateChange}
-                  onError={handleVideoError}
-                  muted={isVideoMuted}
-                />
-              ) : (
-                <div className="flex aspect-video w-full items-center justify-center rounded-lg bg-gray-800 text-gray-400">
-                  <div className="text-center p-4">
-                    <Video className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                    <p className="font-semibold">Video not available</p>
-                    <p className="text-sm mt-1">
-                      {videoError || 'Local video file not found'}
-                    </p>
-                    {song.youtubeId && (
-                      <a
-                        href={`https://www.youtube.com/watch?v=${song.youtubeId}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-primary hover:underline mt-2 inline-block"
+            {/* Mobile: Collapsible Header Bar */}
+            {isMobile && (
+              <button
+                onClick={() => setIsVideoCollapsed(!isVideoCollapsed)}
+                className="w-full flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700 hover:bg-gray-700/50 transition-colors"
+              >
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <Video className="h-4 w-4 text-primary flex-shrink-0" />
+                  <div className="text-left min-w-0 flex-1">
+                    <h1 className="text-sm font-bold truncate iran-gradient">{song.title}</h1>
+                    <p className="text-xs text-gray-400 truncate">{song.artist}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {/* Compact mode toggle when collapsed */}
+                  {isVideoCollapsed && (
+                    <div className="flex items-center gap-1 mr-2" onClick={(e) => e.stopPropagation()}>
+                      <ToggleGroup
+                        type="single"
+                        value={playbackMode}
+                        onValueChange={(value) => value && handlePlaybackModeChange(value as PlaybackMode)}
+                        className="bg-gray-900 rounded p-0.5"
                       >
-                        Watch on YouTube →
-                      </a>
-                    )}
-                  </div>
+                        <ToggleGroupItem
+                          value="single"
+                          aria-label="Single"
+                          className="px-2 py-1 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                        >
+                          <Square className="h-3 w-3" />
+                        </ToggleGroupItem>
+                        <ToggleGroupItem
+                          value="loop"
+                          aria-label="Loop"
+                          className="px-2 py-1 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                        >
+                          <Repeat className="h-3 w-3" />
+                        </ToggleGroupItem>
+                        <ToggleGroupItem
+                          value="fluid"
+                          aria-label="Fluid"
+                          className="px-2 py-1 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                        >
+                          <Waves className="h-3 w-3" />
+                        </ToggleGroupItem>
+                      </ToggleGroup>
+                    </div>
+                  )}
+                  {isVideoCollapsed ? (
+                    <ChevronDown className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <ChevronUp className="h-5 w-5 text-gray-400" />
+                  )}
                 </div>
-              )}
-            </div>
+              </button>
+            )}
 
-            {/* Controls */}
-            <div className="px-4 pb-4">
-              {/* Mobile: Current Line Indicator - always visible on its own row */}
-              <div className="md:hidden mb-2">
-                <div className="flex items-center gap-2 rounded-lg bg-gray-800/50 px-3 py-2 border border-gray-700">
-                  <span className="rounded bg-primary/20 px-2 py-1 text-xs font-medium text-primary whitespace-nowrap">
-                    {currentLineIndex !== undefined ? `Line ${currentLineIndex + 1}` : 'Select a line'}
-                  </span>
-                  {currentLineIndex !== undefined && sortedLyrics[currentLineIndex] && (
-                    <span className="text-xs text-gray-400 truncate flex-1" dir="rtl">
-                      {sortedLyrics[currentLineIndex].original}
-                    </span>
-                  )}
-                  {currentLineIndex === undefined && (
-                    <span className="text-xs text-gray-500 italic">
-                      Tap a lyric line below to start
-                    </span>
-                  )}
-                </div>
+            {/* Desktop: Song title (always visible) */}
+            {!isMobile && (
+              <div className="border-b border-gray-800 px-4 py-3">
+                <h1 className="text-xl font-bold iran-gradient">{song.title}</h1>
+                <p className="text-sm text-gray-400">{song.artist}</p>
               </div>
+            )}
 
-              <div className="flex flex-col gap-3 rounded-lg bg-gray-800 p-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
-                {/* Pause/Play Button - hidden in Fluid mode (video has native controls) */}
-                {playbackMode !== "fluid" && (
-                  <button
-                    onClick={togglePlayPause}
-                    className="flex items-center gap-2 rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-600 transition-colors"
-                    title={isVideoPlaying || isAudioPlaying ? "Pause (Space)" : "Play (Space)"}
-                  >
-                    {isVideoPlaying || isAudioPlaying ? (
-                      <>
-                        <Pause className="h-4 w-4" />
-                        <span>Pause</span>
-                      </>
-                    ) : (
-                      <>
-                        <Play className="h-4 w-4" />
-                        <span>Play</span>
-                      </>
-                    )}
-                  </button>
-                )}
-
-                {/* Watch on YouTube link - shown in Fluid mode as alternative to native controls */}
-                {playbackMode === "fluid" && song.youtubeId && (
-                  <a
-                    href={`https://www.youtube.com/watch?v=${song.youtubeId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-600 transition-colors"
-                  >
-                    <Video className="h-4 w-4" />
-                    <span>Watch on YouTube</span>
-                  </a>
-                )}
-
-                {/* Desktop: Current Line Indicator - inline with other controls */}
-                {currentLineIndex !== undefined && (
-                  <div className="hidden md:flex items-center gap-2">
-                    <span className="rounded bg-primary/20 px-2 py-1 text-xs font-medium text-primary">
-                      Line {currentLineIndex + 1}
-                    </span>
+            {/* Player - hidden on mobile when collapsed */}
+            {(!isMobile || !isVideoCollapsed) && (
+              <div className={`p-4 pb-2 ${isMobile ? 'pt-2' : ''}`}>
+                {song.videoUrl && !videoError ? (
+                  <LocalVideoPlayer
+                    ref={playerRef}
+                    videoUrl={song.videoUrl}
+                    onTimeUpdate={handleTimeUpdate}
+                    onStateChange={handleVideoStateChange}
+                    onError={handleVideoError}
+                    muted={isVideoMuted}
+                  />
+                ) : (
+                  <div className="flex aspect-video w-full items-center justify-center rounded-lg bg-gray-800 text-gray-400">
+                    <div className="text-center p-4">
+                      <Video className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                      <p className="font-semibold">Video not available</p>
+                      <p className="text-sm mt-1">
+                        {videoError || 'Local video file not found'}
+                      </p>
+                      {song.youtubeId && (
+                        <a
+                          href={`https://www.youtube.com/watch?v=${song.youtubeId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-primary hover:underline mt-2 inline-block"
+                        >
+                          Watch on YouTube →
+                        </a>
+                      )}
+                    </div>
                   </div>
                 )}
+              </div>
+            )}
 
-                {/* Playback Mode Toggle */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-400">Mode</span>
-                  <ToggleGroup
-                    type="single"
-                    value={playbackMode}
-                    onValueChange={(value) => value && handlePlaybackModeChange(value as PlaybackMode)}
-                    className="bg-gray-900 rounded-lg p-1"
-                  >
-                    <ToggleGroupItem
-                      value="single"
-                      aria-label="Single play mode"
-                      className="px-3 py-1.5 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-                    >
-                      <Square className="h-3 w-3 mr-1" />
-                      Single
-                    </ToggleGroupItem>
-                    <ToggleGroupItem
-                      value="loop"
-                      aria-label="Loop mode"
-                      className="px-3 py-1.5 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-                    >
-                      <Repeat className="h-3 w-3 mr-1" />
-                      Loop
-                    </ToggleGroupItem>
-                    <ToggleGroupItem
-                      value="fluid"
-                      aria-label="Fluid play mode"
-                      className="px-3 py-1.5 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-                    >
-                      <Waves className="h-3 w-3 mr-1" />
-                      Fluid
-                    </ToggleGroupItem>
-                  </ToggleGroup>
-                </div>
-
-                {/* Speed Control */}
-                <div className="flex items-center gap-2">
-                  <label className="text-sm text-gray-400">Speed</label>
-                  <Select value={playbackSpeed} onValueChange={handleSpeedChange}>
-                    <SelectTrigger className="w-20 border-gray-700 bg-gray-900">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="border-gray-700 bg-gray-900">
-                      <SelectItem value="0.5">0.5x</SelectItem>
-                      <SelectItem value="0.75">0.75x</SelectItem>
-                      <SelectItem value="1">1x</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Language Filter */}
-                <div className="flex items-center gap-2">
-                  <Languages className="h-4 w-4 text-gray-400" />
-                  <Select
-                    value={languageFilter}
-                    onValueChange={(value) => setLanguageFilter(value as LanguageFilter)}
-                  >
-                    <SelectTrigger className="w-36 border-gray-700 bg-gray-900">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="border-gray-700 bg-gray-900">
-                      <SelectItem value="all">All Languages</SelectItem>
-                      <SelectItem value="persian">Persian Only</SelectItem>
-                      <SelectItem value="transliteration">Transliteration</SelectItem>
-                      <SelectItem value="hebrew">Hebrew Only</SelectItem>
-                      <SelectItem value="english">English Only</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Audio Loading Status - show only when not in Fluid mode (using snippets) */}
-                {playbackMode !== "fluid" && (
-                  <div className="flex items-center gap-2">
-                    <Volume2 className={`h-4 w-4 ${audioReady ? "text-green-500" : "text-gray-400"}`} />
-                    {audioReady ? (
-                      <span className="text-xs text-green-500">Snippets ready</span>
-                    ) : (
-                      <span className="text-xs text-gray-400">
-                        Loading snippets... {audioLoaded}/{audioTotal}
+            {/* Controls - shown on desktop always, on mobile only when expanded */}
+            {(!isMobile || !isVideoCollapsed) && (
+              <div className="px-4 pb-4">
+                {/* Mobile: Current Line Indicator - always visible on its own row */}
+                <div className="md:hidden mb-2">
+                  <div className="flex items-center gap-2 rounded-lg bg-gray-800/50 px-3 py-2 border border-gray-700">
+                    <span className="rounded bg-primary/20 px-2 py-1 text-xs font-medium text-primary whitespace-nowrap">
+                      {currentLineIndex !== undefined ? `Line ${currentLineIndex + 1}` : 'Select a line'}
+                    </span>
+                    {currentLineIndex !== undefined && sortedLyrics[currentLineIndex] && (
+                      <span className="text-xs text-gray-400 truncate flex-1" dir="rtl">
+                        {sortedLyrics[currentLineIndex].original}
+                      </span>
+                    )}
+                    {currentLineIndex === undefined && (
+                      <span className="text-xs text-gray-500 italic">
+                        Tap a lyric line below to start
                       </span>
                     )}
                   </div>
-                )}
+                </div>
+
+                <div className="flex flex-col gap-3 rounded-lg bg-gray-800 p-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
+                  {/* Pause/Play Button - hidden in Fluid mode (video has native controls) */}
+                  {playbackMode !== "fluid" && (
+                    <button
+                      onClick={togglePlayPause}
+                      className="flex items-center gap-2 rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-600 transition-colors"
+                      title={isVideoPlaying || isAudioPlaying ? "Pause (Space)" : "Play (Space)"}
+                    >
+                      {isVideoPlaying || isAudioPlaying ? (
+                        <>
+                          <Pause className="h-4 w-4" />
+                          <span>Pause</span>
+                        </>
+                      ) : (
+                        <>
+                          <Play className="h-4 w-4" />
+                          <span>Play</span>
+                        </>
+                      )}
+                    </button>
+                  )}
+
+                  {/* Watch on YouTube link - shown in Fluid mode as alternative to native controls */}
+                  {playbackMode === "fluid" && song.youtubeId && (
+                    <a
+                      href={`https://www.youtube.com/watch?v=${song.youtubeId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-600 transition-colors"
+                    >
+                      <Video className="h-4 w-4" />
+                      <span>Watch on YouTube</span>
+                    </a>
+                  )}
+
+                  {/* Desktop: Current Line Indicator - inline with other controls */}
+                  {currentLineIndex !== undefined && (
+                    <div className="hidden md:flex items-center gap-2">
+                      <span className="rounded bg-primary/20 px-2 py-1 text-xs font-medium text-primary">
+                        Line {currentLineIndex + 1}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Playback Mode Toggle */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-400">Mode</span>
+                    <ToggleGroup
+                      type="single"
+                      value={playbackMode}
+                      onValueChange={(value) => value && handlePlaybackModeChange(value as PlaybackMode)}
+                      className="bg-gray-900 rounded-lg p-1"
+                    >
+                      <ToggleGroupItem
+                        value="single"
+                        aria-label="Single play mode"
+                        className="px-3 py-1.5 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                      >
+                        <Square className="h-3 w-3 mr-1" />
+                        Single
+                      </ToggleGroupItem>
+                      <ToggleGroupItem
+                        value="loop"
+                        aria-label="Loop mode"
+                        className="px-3 py-1.5 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                      >
+                        <Repeat className="h-3 w-3 mr-1" />
+                        Loop
+                      </ToggleGroupItem>
+                      <ToggleGroupItem
+                        value="fluid"
+                        aria-label="Fluid play mode"
+                        className="px-3 py-1.5 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                      >
+                        <Waves className="h-3 w-3 mr-1" />
+                        Fluid
+                      </ToggleGroupItem>
+                    </ToggleGroup>
+                  </div>
+
+                  {/* Speed Control */}
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-gray-400">Speed</label>
+                    <Select value={playbackSpeed} onValueChange={handleSpeedChange}>
+                      <SelectTrigger className="w-20 border-gray-700 bg-gray-900">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="border-gray-700 bg-gray-900">
+                        <SelectItem value="0.5">0.5x</SelectItem>
+                        <SelectItem value="0.75">0.75x</SelectItem>
+                        <SelectItem value="1">1x</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Language Filter */}
+                  <div className="flex items-center gap-2">
+                    <Languages className="h-4 w-4 text-gray-400" />
+                    <Select
+                      value={languageFilter}
+                      onValueChange={(value) => setLanguageFilter(value as LanguageFilter)}
+                    >
+                      <SelectTrigger className="w-36 border-gray-700 bg-gray-900">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="border-gray-700 bg-gray-900">
+                        <SelectItem value="all">All Languages</SelectItem>
+                        <SelectItem value="persian">Persian Only</SelectItem>
+                        <SelectItem value="transliteration">Transliteration</SelectItem>
+                        <SelectItem value="hebrew">Hebrew Only</SelectItem>
+                        <SelectItem value="english">English Only</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Audio Loading Status - show only when not in Fluid mode (using snippets) */}
+                  {playbackMode !== "fluid" && (
+                    <div className="flex items-center gap-2">
+                      <Volume2 className={`h-4 w-4 ${audioReady ? "text-green-500" : "text-gray-400"}`} />
+                      {audioReady ? (
+                        <span className="text-xs text-green-500">Snippets ready</span>
+                      ) : (
+                        <span className="text-xs text-gray-400">
+                          Loading snippets... {audioLoaded}/{audioTotal}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 

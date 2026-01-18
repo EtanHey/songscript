@@ -49,13 +49,13 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 45 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, US-SYNC-FIX, V-001-009, US-VIDEO-LOAD, US-MOBILE-DRAWER, US-MOBILE-LAYOUT) |
+| ✅ **Stories Complete** | 46 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, US-SYNC-FIX, V-001-009, US-VIDEO-LOAD, US-MOBILE-DRAWER, US-MOBILE-LAYOUT, US-VIDEO-MOBILE) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), US-020 Phase 5 |
-| 🔄 **Stories Remaining** | 3 (US-VIDEO-MOBILE, US-WORD-SYNC, US-031) |
+| 🔄 **Stories Remaining** | 2 (US-WORD-SYNC, US-031) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** US-VIDEO-MOBILE (Collapsible Video on Mobile)
+**Next Story:** US-WORD-SYNC (Sync Repeated Words Learning State)
 
 **Story Order (optimized - API-dependent story LAST):**
 0. ~~US-TIMESTAMPS-V2~~ ✅ (end buffer increased to +0.70s)
@@ -71,8 +71,8 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 10. ~~US-VIDEO-LOAD~~ ✅ (Fix Video Load Issue - 5s timeout)
 11. ~~US-MOBILE-DRAWER~~ ✅ (Vertical card layout for mobile)
 12. ~~US-MOBILE-LAYOUT~~ ✅ (Mobile line indicator on own row)
-13. **US-VIDEO-MOBILE: Collapsible Video on Mobile ← NEXT**
-14. **US-WORD-SYNC: Sync Repeated Words Learning State**
+13. ~~US-VIDEO-MOBILE~~ ✅ (Collapsible Video on Mobile)
+14. **US-WORD-SYNC: Sync Repeated Words Learning State ← NEXT**
 15. **US-031: ElevenLabs Word Audio ← LAST (needs API key)**
 
 **API Key Needed (US-031 only):**
@@ -1720,25 +1720,33 @@ You have full freedom to redesign the mobile layout. Consider:
 - Whatever else makes sense for mobile UX!
 
 **Current Problem:**
-- [ ] **BROWSER TEST (mobile tab)**: Navigate to song page on 375px viewport
-- [ ] Document how much screen space video + controls take
-- [ ] Measure: Can user see at least 3-4 lyrics lines without scrolling?
-- [ ] Take screenshot showing the problem
+- [x] **BROWSER TEST (mobile tab)**: Navigate to song page on 375px viewport
+- [x] Document how much screen space video + controls take
+- [x] Measure: Can user see at least 3-4 lyrics lines without scrolling?
+- [x] Take screenshot showing the problem
+
+**Solution Implemented:** Collapsible video player header for mobile
+- When collapsed: thin header bar with song title, artist, compact mode toggle, and expand chevron
+- When expanded: full video player with all controls
+- Starts collapsed by default for maximum lyrics space
+- User can tap header to expand/collapse
+- Fluid mode auto-expands video (since video is needed for watching)
+- Audio snippets still work when collapsed (Single/Loop modes)
 
 **Requirements:**
-- [ ] Redesign mobile layout so lyrics get more screen space
-- [ ] User should be able to collapse/minimize/hide video when focusing on lyrics
-- [ ] When video is minimized, audio should still work (Single/Loop modes with snippets)
-- [ ] Easy way to bring video back when needed
-- [ ] Fluid mode should expand video automatically
-- [ ] Typecheck passes
-- [ ] **BROWSER TEST**: Verify new design on mobile - lyrics should dominate the view
-- [ ] Take screenshot of new design
+- [x] Redesign mobile layout so lyrics get more screen space
+- [x] User should be able to collapse/minimize/hide video when focusing on lyrics
+- [x] When video is minimized, audio should still work (Single/Loop modes with snippets)
+- [x] Easy way to bring video back when needed
+- [x] Fluid mode should expand video automatically
+- [x] Typecheck passes
+- [x] **BROWSER TEST**: Verify new design on mobile - lyrics should dominate the view
+- [x] Take screenshot of new design
 
-**Files to consider:**
-- `src/routes/song.$songId.tsx` - main layout
-- `src/components/LocalVideoPlayer.tsx` - video component
-- May need new components for collapse/minimize logic
+**Files modified:**
+- `src/routes/song.$songId.tsx` - added isVideoCollapsed state, collapsible header for mobile
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-VIDEO-MOBILE**
 
