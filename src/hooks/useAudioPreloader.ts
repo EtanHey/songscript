@@ -14,6 +14,9 @@ interface PreloadState {
 interface UseAudioPreloaderReturn extends PreloadState {
   play: (lineNumber: number) => void
   stop: () => void
+  pause: () => void
+  resume: () => void
+  isPlaying: boolean
   setPlaybackRate: (rate: number) => void
   setLoop: (loop: boolean) => void
 }
@@ -24,6 +27,7 @@ export function useAudioPreloader(snippets: AudioSnippet[]): UseAudioPreloaderRe
     total: snippets.length,
     ready: false,
   })
+  const [isPlaying, setIsPlaying] = useState(false)
   const audioMapRef = useRef<Map<number, HTMLAudioElement>>(new Map())
   const currentlyPlayingRef = useRef<HTMLAudioElement | null>(null)
   const playbackRateRef = useRef<number>(1)
@@ -99,8 +103,10 @@ export function useAudioPreloader(snippets: AudioSnippet[]): UseAudioPreloaderRe
       audio.loop = loopRef.current
       audio.play().catch((err) => {
         console.warn(`Failed to play audio for line ${lineNumber}:`, err)
+        setIsPlaying(false)
       })
       currentlyPlayingRef.current = audio
+      setIsPlaying(true)
     }
   }, [])
 
@@ -110,6 +116,24 @@ export function useAudioPreloader(snippets: AudioSnippet[]): UseAudioPreloaderRe
       audio.currentTime = 0
     })
     currentlyPlayingRef.current = null
+    setIsPlaying(false)
+  }, [])
+
+  const pause = useCallback(() => {
+    if (currentlyPlayingRef.current) {
+      currentlyPlayingRef.current.pause()
+      setIsPlaying(false)
+    }
+  }, [])
+
+  const resume = useCallback(() => {
+    if (currentlyPlayingRef.current) {
+      currentlyPlayingRef.current.play().catch((err) => {
+        console.warn('Failed to resume audio:', err)
+        setIsPlaying(false)
+      })
+      setIsPlaying(true)
+    }
   }, [])
 
   const setPlaybackRate = useCallback((rate: number) => {
@@ -128,5 +152,5 @@ export function useAudioPreloader(snippets: AudioSnippet[]): UseAudioPreloaderRe
     }
   }, [])
 
-  return { ...state, play, stop, setPlaybackRate, setLoop }
+  return { ...state, play, stop, pause, resume, isPlaying, setPlaybackRate, setLoop }
 }

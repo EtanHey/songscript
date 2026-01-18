@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Repeat, Languages, Volume2, Video, Play, Square, Waves } from "lucide-react";
+import { Repeat, Languages, Volume2, Video, Play, Square, Waves, Pause } from "lucide-react";
 
 // Playback modes
 type PlaybackMode = "single" | "loop" | "fluid";
@@ -99,6 +99,9 @@ function SongPageContent({ songId }: SongPageContentProps) {
     loaded: audioLoaded,
     total: audioTotal,
     play: playAudioSnippet,
+    pause: pauseAudioSnippet,
+    resume: resumeAudioSnippet,
+    isPlaying: isAudioPlaying,
     setPlaybackRate: setAudioPlaybackRate,
     setLoop: setAudioLoop,
   } = useAudioPreloader(audioSnippets);
@@ -129,6 +132,9 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
   // Video error state - for fallback handling
   const [videoError, setVideoError] = useState<string | null>(null);
+
+  // Video playing state - for pause/play control
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
   const handleSpeedChange = useCallback((speed: string) => {
     setPlaybackSpeed(speed);
@@ -179,6 +185,34 @@ function SongPageContent({ songId }: SongPageContentProps) {
     setVideoError(error);
     console.warn('Local video error:', error);
   }, []);
+
+  // Handle video state change (playing/paused/ended)
+  const handleVideoStateChange = useCallback((state: 'playing' | 'paused' | 'ended') => {
+    setIsVideoPlaying(state === 'playing');
+  }, []);
+
+  // Toggle pause/play across all modes
+  const togglePlayPause = useCallback(() => {
+    if (playbackMode === "fluid") {
+      // Fluid mode: only video matters (video audio is playing)
+      if (isVideoPlaying) {
+        playerRef.current?.pause();
+      } else {
+        playerRef.current?.play();
+      }
+    } else {
+      // Single/Loop mode: pause/resume both video (muted) and audio snippet
+      if (isVideoPlaying || isAudioPlaying) {
+        // Pause both
+        playerRef.current?.pause();
+        pauseAudioSnippet();
+      } else {
+        // Resume both
+        playerRef.current?.play();
+        resumeAudioSnippet();
+      }
+    }
+  }, [playbackMode, isVideoPlaying, isAudioPlaying, pauseAudioSnippet, resumeAudioSnippet]);
 
   // Clear click animation after 300ms
   const triggerClickAnimation = useCallback((lineIndex: number) => {
@@ -277,6 +311,20 @@ function SongPageContent({ songId }: SongPageContentProps) {
     // No special handling needed - video plays through all segments
   }, [playbackMode, currentLineIndex]);
 
+  // Spacebar keyboard shortcut for pause/play
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Only handle spacebar, and not when typing in an input
+      if (event.code === 'Space' && event.target === document.body) {
+        event.preventDefault(); // Prevent page scroll
+        togglePlayPause();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [togglePlayPause]);
+
   if (!song) {
     throw notFound();
   }
@@ -301,6 +349,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
                   ref={playerRef}
                   videoUrl={song.videoUrl}
                   onTimeUpdate={handleTimeUpdate}
+                  onStateChange={handleVideoStateChange}
                   onError={handleVideoError}
                   muted={isVideoMuted}
                 />
@@ -340,6 +389,25 @@ function SongPageContent({ songId }: SongPageContentProps) {
                     <span>Play Full Video</span>
                   </button>
                 )}
+
+                {/* Pause/Play Button */}
+                <button
+                  onClick={togglePlayPause}
+                  className="flex items-center gap-2 rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-600 transition-colors"
+                  title={isVideoPlaying || isAudioPlaying ? "Pause (Space)" : "Play (Space)"}
+                >
+                  {isVideoPlaying || isAudioPlaying ? (
+                    <>
+                      <Pause className="h-4 w-4" />
+                      <span>Pause</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4" />
+                      <span>Play</span>
+                    </>
+                  )}
+                </button>
 
                 {/* Playback Mode Toggle */}
                 <div className="flex items-center gap-2">

@@ -18,6 +18,29 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-029: Pause/Play Controls ✅
+- Added `pause` and `resume` functions to `useAudioPreloader` hook
+- Added `isPlaying` state tracking to the hook
+- Added `isVideoPlaying` state to song page that tracks video state via `onStateChange` callback
+- Created `togglePlayPause` function that handles all modes:
+  - In Fluid mode: toggles video play/pause
+  - In Single/Loop mode: toggles both video (muted) and audio snippet
+- Added Pause/Play button to controls section:
+  - Shows Play icon when paused, Pause icon when playing
+  - Tooltip shows "(Space)" keyboard shortcut hint
+- Added spacebar keyboard shortcut via `useEffect` with `keydown` listener
+  - Only triggers when focus is on document.body (not input elements)
+- Browser verification:
+  - ✅ Button shows "Play" when paused
+  - ✅ Button shows "Pause" when playing
+  - ✅ Click toggles play/pause correctly
+  - ✅ Video and audio pause together in Loop mode
+- Typecheck passes ✅
+
+**Next:** US-030 (Word-by-Word Info Modal)
+
+---
+
 ## Iteration - US-005-FIX: Investigate & Fix Auth HTTP 500 ⏹️ BLOCKED
 - Investigated the HTTP 500 error on `/api/auth/get-session` and `/api/auth/sign-in/magic-link`
 - Used Context7 to check latest Better Auth + Convex integration docs

@@ -49,24 +49,26 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 33 (US-001-020A, US-022-028, US-TIMESTAMPS, V-001-007) |
+| ✅ **Stories Complete** | 34 (US-001-020A, US-022-029, US-TIMESTAMPS, V-001-007) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), US-020 Phase 5 |
-| 🔄 **Stories Remaining** | 7 (US-029-033, V-008-009) |
+| 🔄 **Stories Remaining** | 6 (US-030-033, V-008-009) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** US-029 (Pause/Play Controls) - skipping blocked auth stories
+**Next Story:** US-TIMESTAMPS-V2 (Audio END buffer still cutting off)
 
 **Story Order (optimized - API-dependent story LAST):**
-0. ~~US-TIMESTAMPS: Fix Audio Snippet Timing~~ ✅ COMPLETE
-1. ~~US-005-FIX: Investigate & Fix Auth HTTP 500~~ ⏹️ BLOCKED (partial fix - login page loads, auth API still 500)
-2. US-029: Pause/Play Controls ← NEXT
-2. US-030: Word-by-Word Info Modal ← No API
-3. US-033: Pre-generate Word Data (manual JSON) ← No API
-4. US-032: Word Learning Tracking ← No API (uses localStorage)
-5. V-008: Verify Playback Modes ← No API
-6. V-009: Verify Word Info Modal ← No API
-7. **US-031: ElevenLabs Word Audio ← LAST (needs API key)**
+0. **US-TIMESTAMPS-V2: More END buffer for snippets** ← HIGHEST PRIORITY
+1. **US-029-FIX: Fluid Mode UX Improvements** ← HIGH PRIORITY
+2. ~~US-TIMESTAMPS~~ ✅ (needs V2 - end still cuts)
+3. ~~US-005-FIX~~ ⏹️ BLOCKED (auth API still 500)
+4. ~~US-029~~ ✅ (needs FIX - Fluid mode behavior)
+5. US-030: Word-by-Word Info Modal ← After fixes
+4. US-033: Pre-generate Word Data (manual JSON) ← No API
+5. US-032: Word Learning Tracking ← No API (uses localStorage)
+6. V-008: Verify Playback Modes ← No API
+7. V-009: Verify Word Info Modal ← No API
+8. **US-031: ElevenLabs Word Audio ← LAST (needs API key)**
 
 **API Key Needed (US-031 only):**
 - ElevenLabs: https://elevenlabs.io/ (free tier: ~10 min audio/month, supports Persian via v3)
@@ -1292,13 +1294,15 @@ Replace YouTube embed with local video player using downloaded MP4:
 **Description:** Add pause/play button that works across all modes.
 
 **Acceptance Criteria:**
-- [ ] Add pause/play button to controls section
-- [ ] Button shows play icon when paused, pause icon when playing
-- [ ] In Single/Loop: pauses both snippet audio AND video
-- [ ] In Fluid: pauses video (which includes audio)
-- [ ] Clicking paused line resumes from that line
-- [ ] Spacebar keyboard shortcut for pause/play
-- [ ] Typecheck passes
+- [x] Add pause/play button to controls section
+- [x] Button shows play icon when paused, pause icon when playing
+- [x] In Single/Loop: pauses both snippet audio AND video
+- [x] In Fluid: pauses video (which includes audio)
+- [x] Clicking paused line resumes from that line
+- [x] Spacebar keyboard shortcut for pause/play
+- [x] Typecheck passes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-029**
 
