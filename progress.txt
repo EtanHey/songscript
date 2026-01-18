@@ -18,6 +18,28 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-028: Three-Way Playback Toggle ✅
+- Replaced loop toggle (Switch) with three-way mode toggle (ToggleGroup)
+- Added ShadCN ToggleGroup component: `bunx shadcn@latest add toggle-group`
+- Implemented three playback modes:
+  - **Single**: Click line → play snippet + video segment (muted), stop at endTime
+  - **Loop**: Click line → loop snippet + video segment (muted), repeat at endTime
+  - **Fluid**: Click line → seek video (unmuted), continue playing with video audio
+- Added `PlaybackMode` type: "single" | "loop" | "fluid"
+- Created `handlePlaybackModeChange` function that syncs video mute state with mode
+- Updated `handleLineClick` to handle all three modes
+- Updated effects to handle Single mode (pause at segment end) and Loop mode (re-seek at segment end)
+- Removed old Loop toggle, Video Audio toggle (now controlled by mode selection)
+- Added icons: Square (Single), Repeat (Loop), Waves (Fluid)
+- "Line X" badge shows in Loop mode to indicate current looping line
+- "Snippets ready" indicator only shows in Single/Loop modes (hidden in Fluid)
+- Browser verified: All three modes work correctly
+- Typecheck passes ✅
+
+**Next:** US-029 (Pause/Play Controls)
+
+---
+
 ## Iteration - V-007: Verify New Video + Audio System ✅
 - Browser extension connected, used desktop tab (1076981165) for testing
 - **Navigated to song page**: `/song/j972m34dzqgx6a0r5a00n9k6pd7zekfa` ✅

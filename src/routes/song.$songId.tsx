@@ -8,7 +8,7 @@ import { Id } from "../../convex/_generated/dataModel";
 import LocalVideoPlayer, { LocalVideoPlayerHandle } from "../components/LocalVideoPlayer";
 import LyricsDisplay, { LanguageFilter } from "../components/LyricsDisplay";
 import { useAudioPreloader } from "../hooks/useAudioPreloader";
-import { Switch } from "../components/ui/switch";
+import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import {
   Select,
   SelectContent,
@@ -16,7 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Repeat, Languages, Volume2, Video, VolumeX, Play } from "lucide-react";
+import { Repeat, Languages, Volume2, Video, Play, Square, Waves } from "lucide-react";
+
+// Playback modes
+type PlaybackMode = "single" | "loop" | "fluid";
 
 export const Route = createFileRoute("/song/$songId")({
   component: SongPage,
@@ -108,8 +111,8 @@ function SongPageContent({ songId }: SongPageContentProps) {
     undefined
   );
 
-  // Loop mode state
-  const [isLooping, setIsLooping] = useState(false);
+  // Playback mode state: single, loop, or fluid
+  const [playbackMode, setPlaybackMode] = useState<PlaybackMode>("single");
   const [currentLineIndex, setCurrentLineIndex] = useState<number | undefined>(
     undefined
   );
@@ -120,7 +123,8 @@ function SongPageContent({ songId }: SongPageContentProps) {
   // Language filter state
   const [languageFilter, setLanguageFilter] = useState<LanguageFilter>("all");
 
-  // Video mute state - muted by default, audio comes from snippets
+  // Video mute state - derived from playback mode (muted in single/loop, unmuted in fluid)
+  // But we also track it separately for edge cases
   const [isVideoMuted, setIsVideoMuted] = useState(true);
 
   // Video error state - for fallback handling
@@ -133,22 +137,31 @@ function SongPageContent({ songId }: SongPageContentProps) {
     setAudioPlaybackRate(parseFloat(speed));
   }, [setAudioPlaybackRate]);
 
-  // Toggle video mute - when unmuted, video audio plays, when muted, use snippets
-  const toggleVideoMute = useCallback(() => {
-    if (playerRef.current) {
-      if (playerRef.current.isMuted()) {
-        playerRef.current.unmute();
-        setIsVideoMuted(false);
-      } else {
-        playerRef.current.mute();
-        setIsVideoMuted(true);
-      }
-    }
-  }, []);
+  // Handle playback mode change
+  const handlePlaybackModeChange = useCallback((mode: PlaybackMode) => {
+    setPlaybackMode(mode);
 
-  // Play full video from beginning with audio
+    // Sync video mute state with mode
+    if (mode === "fluid") {
+      // Fluid mode: video audio plays
+      playerRef.current?.unmute();
+      setIsVideoMuted(false);
+    } else {
+      // Single/Loop mode: video muted, audio from snippets
+      playerRef.current?.mute();
+      setIsVideoMuted(true);
+    }
+
+    // Update audio loop based on mode
+    setAudioLoop(mode === "loop");
+  }, [setAudioLoop]);
+
+  // Play full video from beginning with audio (switch to Fluid mode)
   const playFullVideo = useCallback(() => {
     if (playerRef.current) {
+      // Switch to Fluid mode
+      setPlaybackMode("fluid");
+      setAudioLoop(false);
       // Unmute the video
       playerRef.current.unmute();
       setIsVideoMuted(false);
@@ -159,7 +172,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
       // Reset active line to start
       setActiveLineIndex(0);
     }
-  }, []);
+  }, [setAudioLoop]);
 
   // Handle video error (for fallback)
   const handleVideoError = useCallback((error: string) => {
@@ -179,27 +192,31 @@ function SongPageContent({ songId }: SongPageContentProps) {
     (startTime: number, lineIndex: number) => {
       const lineNumber = sortedLyrics[lineIndex]?.lineNumber;
 
-      // Play local audio snippet if available (instant playback) - only if video is muted
-      if (lineNumber !== undefined && audioReady && isVideoMuted) {
-        playAudioSnippet(lineNumber);
-      }
-
-      // Seek video to match the line
-      playerRef.current?.seekTo(startTime);
-
-      // If video is unmuted (full video mode), continue playing after seek
-      if (!isVideoMuted) {
-        playerRef.current?.play();
-      }
-
       // Trigger visual feedback
       triggerClickAnimation(lineIndex);
       // Set as active line
       setActiveLineIndex(lineIndex);
-      // Set as current line for looping
+      // Set as current line for looping/single mode
       setCurrentLineIndex(lineIndex);
+
+      // Seek video to match the line
+      playerRef.current?.seekTo(startTime);
+
+      // Handle differently based on playback mode
+      if (playbackMode === "fluid") {
+        // Fluid mode: video plays with audio, continue playing after seek
+        playerRef.current?.play();
+      } else {
+        // Single/Loop mode: video muted, audio from snippet
+        // Play local audio snippet if available (instant playback)
+        if (lineNumber !== undefined && audioReady) {
+          playAudioSnippet(lineNumber);
+        }
+        // Also play video (muted) to keep visual in sync
+        playerRef.current?.play();
+      }
     },
-    [triggerClickAnimation, sortedLyrics, audioReady, playAudioSnippet, isVideoMuted]
+    [triggerClickAnimation, sortedLyrics, audioReady, playAudioSnippet, playbackMode]
   );
 
   const handleTimeUpdate = useCallback(
@@ -215,15 +232,16 @@ function SongPageContent({ songId }: SongPageContentProps) {
     [sortedLyrics, activeLineIndex]
   );
 
-  // Sync loop mode to audio preloader (for snippet mode)
+  // Sync loop mode to audio preloader (for Single/Loop snippet modes)
   useEffect(() => {
-    setAudioLoop(isLooping);
-  }, [isLooping, setAudioLoop]);
+    setAudioLoop(playbackMode === "loop");
+  }, [playbackMode, setAudioLoop]);
 
-  // Loop mode for full video playback - re-seek to line start when line ends
+  // Handle video segment looping/stopping in Single/Loop modes
+  // In these modes, video plays muted alongside audio snippets
   useEffect(() => {
-    if (!isLooping || currentLineIndex === undefined || isVideoMuted) {
-      return; // Only handle looping when video audio is playing
+    if (currentLineIndex === undefined || playbackMode === "fluid") {
+      return; // Only handle in Single/Loop modes
     }
 
     const currentLine = sortedLyrics[currentLineIndex];
@@ -234,14 +252,30 @@ function SongPageContent({ songId }: SongPageContentProps) {
       if (!player) return;
 
       const currentTime = player.getCurrentTime();
-      // If we've reached the end of the current line, loop back to start
+      // If we've reached the end of the current line
       if (currentTime >= currentLine.endTime) {
-        player.seekTo(currentLine.startTime);
+        if (playbackMode === "loop") {
+          // Loop mode: seek back to start of line
+          player.seekTo(currentLine.startTime);
+        } else {
+          // Single mode: pause video at end of segment
+          player.pause();
+        }
       }
     }, 100);
 
     return () => clearInterval(checkTime);
-  }, [isLooping, currentLineIndex, sortedLyrics, isVideoMuted]);
+  }, [playbackMode, currentLineIndex, sortedLyrics]);
+
+  // Handle video segment looping in Fluid mode (when Loop mode was active before switching to Fluid)
+  useEffect(() => {
+    if (currentLineIndex === undefined || playbackMode !== "fluid") {
+      return; // Only handle in Fluid mode
+    }
+
+    // In Fluid mode, video just continues playing naturally
+    // No special handling needed - video plays through all segments
+  }, [playbackMode, currentLineIndex]);
 
   if (!song) {
     throw notFound();
@@ -307,29 +341,46 @@ function SongPageContent({ songId }: SongPageContentProps) {
                   </button>
                 )}
 
-                {/* Loop Toggle */}
+                {/* Playback Mode Toggle */}
                 <div className="flex items-center gap-2">
-                  <Switch
-                    id="loop-mode"
-                    checked={isLooping}
-                    onCheckedChange={setIsLooping}
-                  />
-                  <label
-                    htmlFor="loop-mode"
-                    className={`flex cursor-pointer items-center gap-1.5 text-sm ${
-                      isLooping ? "text-primary" : "text-gray-400"
-                    }`}
+                  <span className="text-sm text-gray-400">Mode</span>
+                  <ToggleGroup
+                    type="single"
+                    value={playbackMode}
+                    onValueChange={(value) => value && handlePlaybackModeChange(value as PlaybackMode)}
+                    className="bg-gray-900 rounded-lg p-1"
                   >
-                    <Repeat
-                      className={`h-4 w-4 ${isLooping ? "text-primary" : "text-gray-400"}`}
-                    />
-                    <span>Loop</span>
-                    {isLooping && currentLineIndex !== undefined && (
-                      <span className="rounded bg-primary/20 px-1.5 py-0.5 text-xs text-primary">
-                        Line {currentLineIndex + 1}
-                      </span>
-                    )}
-                  </label>
+                    <ToggleGroupItem
+                      value="single"
+                      aria-label="Single play mode"
+                      className="px-3 py-1.5 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                    >
+                      <Square className="h-3 w-3 mr-1" />
+                      Single
+                    </ToggleGroupItem>
+                    <ToggleGroupItem
+                      value="loop"
+                      aria-label="Loop mode"
+                      className="px-3 py-1.5 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                    >
+                      <Repeat className="h-3 w-3 mr-1" />
+                      Loop
+                    </ToggleGroupItem>
+                    <ToggleGroupItem
+                      value="fluid"
+                      aria-label="Fluid play mode"
+                      className="px-3 py-1.5 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                    >
+                      <Waves className="h-3 w-3 mr-1" />
+                      Fluid
+                    </ToggleGroupItem>
+                  </ToggleGroup>
+                  {/* Show current line indicator in Loop mode */}
+                  {playbackMode === "loop" && currentLineIndex !== undefined && (
+                    <span className="rounded bg-primary/20 px-1.5 py-0.5 text-xs text-primary">
+                      Line {currentLineIndex + 1}
+                    </span>
+                  )}
                 </div>
 
                 {/* Speed Control */}
@@ -367,32 +418,8 @@ function SongPageContent({ songId }: SongPageContentProps) {
                   </Select>
                 </div>
 
-                {/* Video Mute Toggle */}
-                {song.videoUrl && !videoError && (
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      id="video-mute"
-                      checked={!isVideoMuted}
-                      onCheckedChange={() => toggleVideoMute()}
-                    />
-                    <label
-                      htmlFor="video-mute"
-                      className={`flex cursor-pointer items-center gap-1.5 text-sm ${
-                        !isVideoMuted ? "text-primary" : "text-gray-400"
-                      }`}
-                    >
-                      {isVideoMuted ? (
-                        <VolumeX className="h-4 w-4" />
-                      ) : (
-                        <Volume2 className="h-4 w-4" />
-                      )}
-                      <span>Video Audio</span>
-                    </label>
-                  </div>
-                )}
-
-                {/* Audio Loading Status - show only when video is muted (using snippets) */}
-                {isVideoMuted && (
+                {/* Audio Loading Status - show only when not in Fluid mode (using snippets) */}
+                {playbackMode !== "fluid" && (
                   <div className="flex items-center gap-2">
                     <Volume2 className={`h-4 w-4 ${audioReady ? "text-green-500" : "text-gray-400"}`} />
                     {audioReady ? (

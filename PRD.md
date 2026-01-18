@@ -49,24 +49,24 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 31 (US-001-020A, US-022-027, V-001-007) |
-| ⏹️ **BLOCKED** | US-005 (Auth - see US-005-FIX), US-020 Phase 5 |
-| 🔄 **Stories Remaining** | 9 (US-005-FIX, US-028-033, V-008-009) |
+| ✅ **Stories Complete** | 32 (US-001-020A, US-022-028, V-001-007) |
+| ⏹️ **BLOCKED** | US-005 (Auth), US-020 Phase 5 |
+| 🔄 **Stories Remaining** | 7 (US-029-033, V-008-009) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** US-005-FIX (Auth Investigation)
+**Next Story:** US-TIMESTAMPS (Fix Audio Snippet Timing - HIGHEST PRIORITY)
 
 **Story Order (optimized - API-dependent story LAST):**
-0. US-005-FIX: Investigate & Fix Auth HTTP 500 ← HIGH PRIORITY
-1. US-028: Three-Way Playback Toggle ← No API
+0. **US-TIMESTAMPS: Fix Audio Snippet Timing ← HIGHEST PRIORITY**
+1. US-005-FIX: Investigate & Fix Auth HTTP 500 ← HIGH PRIORITY
 2. US-029: Pause/Play Controls ← No API
-3. US-030: Word-by-Word Info Modal ← No API
-4. US-033: Pre-generate Word Data (manual JSON) ← No API
-5. US-032: Word Learning Tracking ← No API (uses localStorage)
-6. V-008: Verify Playback Modes ← No API
-7. V-009: Verify Word Info Modal ← No API
-8. **US-031: ElevenLabs Word Audio ← LAST (needs API key)**
+2. US-030: Word-by-Word Info Modal ← No API
+3. US-033: Pre-generate Word Data (manual JSON) ← No API
+4. US-032: Word Learning Tracking ← No API (uses localStorage)
+5. V-008: Verify Playback Modes ← No API
+6. V-009: Verify Word Info Modal ← No API
+7. **US-031: ElevenLabs Word Audio ← LAST (needs API key)**
 
 **API Key Needed (US-031 only):**
 - ElevenLabs: https://elevenlabs.io/ (free tier: ~10 min audio/month, supports Persian via v3)
@@ -1228,15 +1228,17 @@ Replace YouTube embed with local video player using downloaded MP4:
 **Key Principle:** Video and audio are ALWAYS in sync. In Single/Loop, video plays the segment (muted) alongside the snippet.
 
 **Acceptance Criteria:**
-- [ ] Replace loop toggle with three-way toggle (Single/Loop/Fluid)
-- [ ] Use ShadCN ToggleGroup or custom segmented control
-- [ ] Default mode: Single
-- [ ] **Single mode**: Click line → play snippet + play video segment (muted), both stop at endTime
-- [ ] **Loop mode**: Click line → loop snippet + loop video segment (muted), in sync
-- [ ] **Fluid mode**: Click line → seek video (unmuted), continue playing with video audio
-- [ ] Visual indicator shows current mode
-- [ ] Mode persists in component state
-- [ ] Typecheck passes
+- [x] Replace loop toggle with three-way toggle (Single/Loop/Fluid)
+- [x] Use ShadCN ToggleGroup or custom segmented control
+- [x] Default mode: Single
+- [x] **Single mode**: Click line → play snippet + play video segment (muted), both stop at endTime
+- [x] **Loop mode**: Click line → loop snippet + loop video segment (muted), in sync
+- [x] **Fluid mode**: Click line → seek video (unmuted), continue playing with video audio
+- [x] Visual indicator shows current mode
+- [x] Mode persists in component state
+- [x] Typecheck passes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-028**
 
