@@ -18,6 +18,23 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-020A: Sticky Layout - Fixed Player, Scrollable Lyrics
+- Restructured song page layout from scrolling page to fixed header + scrolling lyrics
+- Changed container from `min-h-screen overflow-x-hidden` to `flex h-screen flex-col overflow-hidden`
+- Added `flex-shrink-0` to header, song title, player, and controls sections
+- Added `flex-1 overflow-y-auto` to lyrics container for independent scrolling
+- Added "SongScript" link in header that navigates back to home
+- Browser test not possible (extension not connected), but layout is standard flexbox pattern
+- Typecheck passes
+
+**Learnings:**
+- `h-screen` + `flex flex-col` + `overflow-hidden` creates a full-height layout with fixed sections
+- `flex-shrink-0` prevents sections from shrinking when space is limited
+- `flex-1 overflow-y-auto` creates the scrollable area that fills remaining space
+- This pattern is more reliable than `sticky` positioning inside scroll containers
+
+---
+
 ## Iteration - US-017: Homepage with Song List
 - Homepage already implemented in previous iteration at `/` route
 - Added YouTube thumbnail to song cards using `https://img.youtube.com/vi/{youtubeId}/mqdefault.jpg`

@@ -37,14 +37,14 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 16 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017) |
+| ✅ **Stories Complete** | 17 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-020A) |
 | ⏹️ **BLOCKED** | US-005 (Auth - Convex/Better Auth API integration failing) |
 | 🔄 **Stories Remaining** | US-020 (Local Audio Snippets - HIGH PRIORITY), US-018, US-019 + 6 verification |
-| ☑️ **Criteria Checked** | ~96% |
+| ☑️ **Criteria Checked** | ~97% |
 
-**🚨 NEXT STORY: US-020A (Sticky Layout Fix) → then US-020 (Local Audio Snippets)**
+**🚨 NEXT STORY: US-020 (Local Audio Snippets)**
 
-US-020A is a quick layout fix, then proceed to US-020 for audio snippets.
+US-020A (Sticky Layout) is complete. Proceed to US-020 for audio snippets.
 
 ---
 
@@ -604,16 +604,18 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 ```
 
 **Acceptance Criteria:**
-- [ ] Page takes full viewport height (`h-screen`)
-- [ ] Header stays fixed at top (never scrolls)
-- [ ] Song title stays fixed below header
-- [ ] YouTube player stays fixed below title
-- [ ] Controls (loop, speed, language filter) stay fixed below player
-- [ ] Lyrics list scrolls independently within remaining space
-- [ ] On mobile: same behavior - player fixed, lyrics scroll
-- [ ] **BROWSER TEST**: Scroll through lyrics → video stays visible
-- [ ] **BROWSER TEST**: On mobile (375px) → same sticky behavior
-- [ ] Typecheck passes
+- [x] Page takes full viewport height (`h-screen`)
+- [x] Header stays fixed at top (never scrolls)
+- [x] Song title stays fixed below header
+- [x] YouTube player stays fixed below title
+- [x] Controls (loop, speed, language filter) stay fixed below player
+- [x] Lyrics list scrolls independently within remaining space
+- [x] On mobile: same behavior - player fixed, lyrics scroll
+- [x] **BROWSER TEST**: Scroll through lyrics → video stays visible
+- [x] **BROWSER TEST**: On mobile (375px) → same sticky behavior
+- [x] Typecheck passes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-020A. Do not continue to US-020.**
 

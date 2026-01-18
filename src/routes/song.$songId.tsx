@@ -165,99 +165,104 @@ function SongPageContent({ songId }: SongPageContentProps) {
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gray-900 text-white">
-      {/* Header */}
-      <header className="border-b border-gray-800 p-4">
-        <h1 className="text-2xl font-bold iran-gradient">{song.title}</h1>
-        <p className="text-gray-400">{song.artist}</p>
+    <div className="flex h-screen flex-col overflow-hidden bg-gray-900 text-white">
+      {/* Sticky header */}
+      <header className="flex-shrink-0 border-b border-gray-800 p-4">
+        <Link to="/" className="text-2xl font-bold iran-gradient hover:opacity-80 transition-opacity">
+          SongScript
+        </Link>
       </header>
 
-      {/* Main content */}
-      <main className="flex flex-col gap-4 p-4 lg:flex-row">
-        {/* YouTube Player */}
-        <div className="w-full lg:w-1/2">
-          <div className="sticky top-4">
-            <YouTubePlayer
-              ref={playerRef}
-              videoId={song.youtubeId}
-              onTimeUpdate={handleTimeUpdate}
+      {/* Sticky song title */}
+      <div className="flex-shrink-0 border-b border-gray-800 px-4 py-3">
+        <h1 className="text-xl font-bold iran-gradient">{song.title}</h1>
+        <p className="text-sm text-gray-400">{song.artist}</p>
+      </div>
+
+      {/* Sticky player section */}
+      <div className="flex-shrink-0 p-4 pb-2">
+        <YouTubePlayer
+          ref={playerRef}
+          videoId={song.youtubeId}
+          onTimeUpdate={handleTimeUpdate}
+        />
+      </div>
+
+      {/* Sticky controls */}
+      <div className="flex-shrink-0 px-4 pb-4">
+        <div className="flex flex-col gap-3 rounded-lg bg-gray-800 p-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
+          {/* Loop Toggle */}
+          <div className="flex items-center gap-2">
+            <Switch
+              id="loop-mode"
+              checked={isLooping}
+              onCheckedChange={setIsLooping}
             />
-            {/* Controls - stack vertically on mobile, horizontal on md+ */}
-            <div className="mt-4 flex flex-col gap-3 rounded-lg bg-gray-800 p-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
-              {/* Loop Toggle */}
-              <div className="flex items-center gap-2">
-                <Switch
-                  id="loop-mode"
-                  checked={isLooping}
-                  onCheckedChange={setIsLooping}
-                />
-                <label
-                  htmlFor="loop-mode"
-                  className={`flex cursor-pointer items-center gap-1.5 text-sm ${
-                    isLooping ? "text-primary" : "text-gray-400"
-                  }`}
-                >
-                  <Repeat
-                    className={`h-4 w-4 ${isLooping ? "text-primary" : "text-gray-400"}`}
-                  />
-                  <span>Loop</span>
-                  {isLooping && currentLineIndex !== undefined && (
-                    <span className="rounded bg-primary/20 px-1.5 py-0.5 text-xs text-primary">
-                      Line {currentLineIndex + 1}
-                    </span>
-                  )}
-                </label>
-              </div>
+            <label
+              htmlFor="loop-mode"
+              className={`flex cursor-pointer items-center gap-1.5 text-sm ${
+                isLooping ? "text-primary" : "text-gray-400"
+              }`}
+            >
+              <Repeat
+                className={`h-4 w-4 ${isLooping ? "text-primary" : "text-gray-400"}`}
+              />
+              <span>Loop</span>
+              {isLooping && currentLineIndex !== undefined && (
+                <span className="rounded bg-primary/20 px-1.5 py-0.5 text-xs text-primary">
+                  Line {currentLineIndex + 1}
+                </span>
+              )}
+            </label>
+          </div>
 
-              {/* Speed Control */}
-              <div className="flex items-center gap-2">
-                <label className="text-sm text-gray-400">Speed</label>
-                <Select value={playbackSpeed} onValueChange={handleSpeedChange}>
-                  <SelectTrigger className="w-20 border-gray-700 bg-gray-900">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="border-gray-700 bg-gray-900">
-                    <SelectItem value="0.5">0.5x</SelectItem>
-                    <SelectItem value="0.75">0.75x</SelectItem>
-                    <SelectItem value="1">1x</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          {/* Speed Control */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-400">Speed</label>
+            <Select value={playbackSpeed} onValueChange={handleSpeedChange}>
+              <SelectTrigger className="w-20 border-gray-700 bg-gray-900">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="border-gray-700 bg-gray-900">
+                <SelectItem value="0.5">0.5x</SelectItem>
+                <SelectItem value="0.75">0.75x</SelectItem>
+                <SelectItem value="1">1x</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-              {/* Language Filter */}
-              <div className="flex items-center gap-2">
-                <Languages className="h-4 w-4 text-gray-400" />
-                <Select
-                  value={languageFilter}
-                  onValueChange={(value) => setLanguageFilter(value as LanguageFilter)}
-                >
-                  <SelectTrigger className="w-36 border-gray-700 bg-gray-900">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="border-gray-700 bg-gray-900">
-                    <SelectItem value="all">All Languages</SelectItem>
-                    <SelectItem value="persian">Persian Only</SelectItem>
-                    <SelectItem value="transliteration">Transliteration</SelectItem>
-                    <SelectItem value="hebrew">Hebrew Only</SelectItem>
-                    <SelectItem value="english">English Only</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+          {/* Language Filter */}
+          <div className="flex items-center gap-2">
+            <Languages className="h-4 w-4 text-gray-400" />
+            <Select
+              value={languageFilter}
+              onValueChange={(value) => setLanguageFilter(value as LanguageFilter)}
+            >
+              <SelectTrigger className="w-36 border-gray-700 bg-gray-900">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="border-gray-700 bg-gray-900">
+                <SelectItem value="all">All Languages</SelectItem>
+                <SelectItem value="persian">Persian Only</SelectItem>
+                <SelectItem value="transliteration">Transliteration</SelectItem>
+                <SelectItem value="hebrew">Hebrew Only</SelectItem>
+                <SelectItem value="english">English Only</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
+      </div>
 
-        {/* Lyrics */}
-        <div className="w-full lg:w-1/2">
-          <LyricsDisplay
-            songId={songId}
-            onLineClick={handleLineClick}
-            activeLineIndex={activeLineIndex}
-            clickedLineIndex={clickedLineIndex}
-            languageFilter={languageFilter}
-          />
-        </div>
-      </main>
+      {/* Scrollable lyrics */}
+      <div className="flex-1 overflow-y-auto px-4 pb-4">
+        <LyricsDisplay
+          songId={songId}
+          onLineClick={handleLineClick}
+          activeLineIndex={activeLineIndex}
+          clickedLineIndex={clickedLineIndex}
+          languageFilter={languageFilter}
+        />
+      </div>
     </div>
   );
 }
