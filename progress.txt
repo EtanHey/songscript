@@ -18,6 +18,26 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-018: Set Up Vitest for Unit Testing
+- Vitest and testing dependencies already installed in package.json
+- Created `vitest.config.ts` with jsdom environment, React plugin, and path aliases
+- Created `src/test/setup.ts` with @testing-library/jest-dom matchers and afterEach cleanup
+- Installed @testing-library/jest-dom for extended matchers
+- Created `src/lib/time.ts` with useful utility functions:
+  - `formatTime(seconds)` - formats seconds to MM:SS or H:MM:SS
+  - `parseTime(timeString)` - parses time string back to seconds
+  - `calculateDuration(start, end)` - calculates duration between timestamps
+- Created `src/lib/time.test.ts` with 11 test cases covering all functions
+- All tests pass: `bun test` shows 11 pass, 0 fail
+- Typecheck passes
+
+**Learnings:**
+- Vitest uses separate config file (`vitest.config.ts`) from Vite to avoid plugin conflicts
+- `@testing-library/jest-dom/vitest` provides matchers specifically for vitest
+- Path aliases must be configured in vitest.config.ts separately from vite.config.ts
+
+---
+
 ## Iteration - US-020 Phase 4: Integrate Audio Playback into Song Page
 - Fixed duplicate header bug: removed inline header from song.$songId.tsx, now using root layout header only
 - Integrated `useAudioPreloader` hook in song page:

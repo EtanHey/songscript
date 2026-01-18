@@ -37,13 +37,11 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 17 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-020A) |
-| ⏹️ **BLOCKED** | US-005 (Auth - Convex/Better Auth API integration failing) |
-| 🔄 **Stories Remaining** | US-020 (Phase 2-5), US-018, US-019 + 6 verification |
+| ✅ **Stories Complete** | 18 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-020A) |
+| ⏹️ **BLOCKED** | US-005 (Auth), US-020 Phase 5 (browser extension not connected) |
+| 🔄 **Stories Remaining** | US-019, V-001 through V-006 |
 
-**✅ BUG FIXED: Duplicate header removed from song.$songId.tsx**
-
-**Continue to: US-020 Phase 5 (Browser Testing)**
+**Continue to: US-019 (Component Tests)**
 
 ---
 
@@ -464,13 +462,15 @@ SongScript is a song transliteration learning app that helps users learn to pron
 **Description:** Configure Vitest for component and utility testing.
 
 **Acceptance Criteria:**
-- [ ] Install: `bun add -D vitest @testing-library/react @testing-library/dom jsdom @vitejs/plugin-react`
-- [ ] Create `vitest.config.ts` with jsdom environment
-- [ ] Add test script to `package.json`: `"test": "vitest"`
-- [ ] Create `src/test/setup.ts` for test utilities
-- [ ] Write sample test for a utility function (e.g., time formatting)
-- [ ] Run `bun test` - all tests pass
-- [ ] Typecheck passes
+- [x] Install: `bun add -D vitest @testing-library/react @testing-library/dom jsdom @vitejs/plugin-react`
+- [x] Create `vitest.config.ts` with jsdom environment
+- [x] Add test script to `package.json`: `"test": "vitest"`
+- [x] Create `src/test/setup.ts` for test utilities
+- [x] Write sample test for a utility function (e.g., time formatting)
+- [x] Run `bun test` - all tests pass
+- [x] Typecheck passes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-018. Do not continue to US-019.**
 
