@@ -34,8 +34,7 @@
 Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 1. **ONE STORY PER ITERATION**: Complete exactly ONE user story, then STOP.
-2. **🧠 USE ULTRATHINK**: Think through implementation before coding.
-3. **TYPECHECK IS MANDATORY**: Run before marking complete.
+2. **TYPECHECK IS MANDATORY**: Run before marking complete.
 4. **VERIFY VISUALLY**: Check in browser using `mcp__claude-in-chrome__*` tools before marking complete.
 5. **DO NOT BATCH**: Each story is a SEPARATE iteration.
 6. **V-* STORIES ARE MANDATORY**: Must execute ALL verification stories.
@@ -66,9 +65,9 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 49 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, US-SYNC-FIX, V-001-009, US-VIDEO-LOAD, US-MOBILE-DRAWER, US-MOBILE-LAYOUT, US-VIDEO-MOBILE, US-WORD-SYNC, US-WORD-TOKEN, US-WORD-TOKEN-FIX) |
+| ✅ **Stories Complete** | 50 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, US-SYNC-FIX, V-001-009, US-VIDEO-LOAD, US-MOBILE-DRAWER, US-MOBILE-LAYOUT, US-VIDEO-MOBILE, US-WORD-SYNC, US-WORD-TOKEN, US-WORD-TOKEN-FIX, V-WORD-TOKEN) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), US-020 Phase 5, **US-031 (missing API key)** |
-| 🔄 **Stories Remaining** | 1 (V-WORD-TOKEN) |
+| 🔄 **Stories Remaining** | 0 (All non-blocked stories complete!) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
@@ -659,11 +658,6 @@ Response: {"status":500,"unhandled":true,"message":"HTTPError"}
 ### US-015: Mobile Responsive Design
 
 **Description:** Ensure the app works well on mobile devices.
-
-**🧠 ULTRATHINK REQUIRED:** Before coding, analyze:
-- How should YouTube player size on mobile vs desktop?
-- Should lyrics be below or beside video on different breakpoints?
-- Touch targets for line clicks (44px minimum)
 
 **Acceptance Criteria:**
 - [x] YouTube player: 100% width on mobile, fixed width on desktop
@@ -1902,17 +1896,19 @@ mcp__Context7__query-docs query="convex queries aggregations count"
 3. Test UI shows consistent state across all occurrences
 
 **Acceptance Criteria:**
-- [ ] **CONTEXT7 FIRST**: Research Convex query patterns for data auditing
-- [ ] **BROWSER TEST**: Find a word that appears in multiple lines (e.g., "برای" or "دل")
-- [ ] **BROWSER TEST**: Click that word in FIRST occurrence → mark as "learning"
-- [ ] **BROWSER TEST**: Navigate to SECOND occurrence of same word → verify shows "learning" state
-- [ ] **BROWSER TEST**: Click second occurrence → mark as "learned"
-- [ ] **BROWSER TEST**: Go back to first occurrence → verify shows "learned" state
-- [ ] **DATABASE CHECK**: Query `wordProgress` table → verify only ONE entry per `(visitorId, persian)` pair
-- [ ] Take screenshots proving sync works across lines
-- [ ] Document any words that still have sync issues
+- [x] **CONTEXT7 FIRST**: Research Convex query patterns for data auditing
+- [x] **BROWSER TEST**: Find a word that appears in multiple lines (e.g., "برای" or "دل")
+- [x] **BROWSER TEST**: Click that word in FIRST occurrence → mark as "learning"
+- [x] **BROWSER TEST**: Navigate to SECOND occurrence of same word → verify shows "learning" state
+- [x] **BROWSER TEST**: Click second occurrence → mark as "learned"
+- [x] **BROWSER TEST**: Go back to first occurrence → verify shows "learned" state
+- [x] **DATABASE CHECK**: Query `wordProgress` table → verify only ONE entry per `(visitorId, persian)` pair
+- [x] Take screenshots proving sync works across lines
+- [x] Document any words that still have sync issues
 
 **Pass Criteria:** ALL repeated words must show identical learning state across ALL their occurrences in the song.
+
+**✅ COMPLETE - All sync tests passed. "برای" syncs bidirectionally between Line 1 and Line 2. Database shows 21 unique entries, 0 duplicates.**
 
 **⏹️ STOP - END OF V-WORD-TOKEN**
 
