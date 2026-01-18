@@ -49,16 +49,16 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 32 (US-001-020A, US-022-028, V-001-007) |
+| ✅ **Stories Complete** | 33 (US-001-020A, US-022-028, US-TIMESTAMPS, V-001-007) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-020 Phase 5 |
-| 🔄 **Stories Remaining** | 9 (US-TIMESTAMPS, US-005-FIX, US-029-033, V-008-009) |
+| 🔄 **Stories Remaining** | 8 (US-005-FIX, US-029-033, V-008-009) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** US-TIMESTAMPS (Fix Audio Snippet Timing - HIGHEST PRIORITY)
+**Next Story:** US-005-FIX (Investigate & Fix Auth HTTP 500)
 
 **Story Order (optimized - API-dependent story LAST):**
-0. **US-TIMESTAMPS: Fix Audio Snippet Timing ← HIGHEST PRIORITY**
+0. ~~US-TIMESTAMPS: Fix Audio Snippet Timing~~ ✅ COMPLETE
 1. US-005-FIX: Investigate & Fix Auth HTTP 500 ← HIGH PRIORITY
 2. US-029: Pause/Play Controls ← No API
 2. US-030: Word-by-Word Info Modal ← No API
@@ -149,15 +149,17 @@ Push timestamps even LATER (forward in time):
 2. Re-extract snippets: `./scripts/extract-snippets.sh scripts/baraye-new-timestamps.json public/audio/baraye/baraye_full.mp3`
 
 **Acceptance Criteria:**
-- [ ] Update `scripts/baraye-new-timestamps.json` with larger offsets (try +0.35s start, +0.45s end)
-- [ ] Update the "note" field in JSON to reflect new offsets
-- [ ] Re-extract all 31 audio snippets using the extract script
-- [ ] **BROWSER TEST**: Navigate to song page, click line 1 - should NOT hear end of intro
-- [ ] **BROWSER TEST**: Click line 5 - should hear complete line without cutoff
-- [ ] **BROWSER TEST**: Click line 15 - verify no bleed from line 14
-- [ ] **BROWSER TEST**: Click line 28 ("zan, zendegi, āzādi") - must hear COMPLETE phrase
-- [ ] If still cutting off, increase offsets more (+0.50s start, +0.60s end) and re-test
-- [ ] Commit updated timestamps and snippets
+- [x] Update `scripts/baraye-new-timestamps.json` with larger offsets (try +0.35s start, +0.45s end)
+- [x] Update the "note" field in JSON to reflect new offsets
+- [x] Re-extract all 31 audio snippets using the extract script
+- [x] **BROWSER TEST**: Navigate to song page, click line 1 - should NOT hear end of intro
+- [x] **BROWSER TEST**: Click line 5 - should hear complete line without cutoff
+- [x] **BROWSER TEST**: Click line 15 - verify no bleed from line 14
+- [x] **BROWSER TEST**: Click line 28 ("zan, zendegi, āzādi") - must hear COMPLETE phrase
+- [x] If still cutting off, increase offsets more (+0.50s start, +0.60s end) and re-test
+- [x] Commit updated timestamps and snippets
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-TIMESTAMPS. Do not continue to US-005-FIX.**
 

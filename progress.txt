@@ -18,6 +18,29 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-TIMESTAMPS: Fix Audio Snippet Timing ✅
+- Updated `scripts/baraye-new-timestamps.json` with larger offsets:
+  - Start time: +0.35s (was +0.15s) - avoids previous line bleeding
+  - End time: +0.45s (was +0.20s) - captures full line without cutoff
+- Updated the "note" field in JSON to reflect new offsets
+- Re-extracted all 31 audio snippets using `./scripts/extract-snippets.sh`
+  - Total size: 3.23MB (under 5MB limit)
+- Browser verification completed:
+  - ✅ Line 1: No bleed from intro, starts cleanly
+  - ✅ Line 5: Complete line "For shame, for being penniless" without cutoff
+  - ✅ Line 15: No bleed from line 14, clean start
+  - ✅ Line 28: Complete "zan, zendegi, āzādi" phrase (10.23s snippet)
+- Typecheck passes ✅
+
+**Learnings:**
+- Audio snippet timing needs ~0.35s offset at start to avoid previous line bleeding
+- End time needs ~0.45s offset to capture complete phrase
+- Line 28 (iconic phrase) is ~10s long and needs the full duration
+
+**Next:** US-005-FIX (Investigate & Fix Auth HTTP 500 Error)
+
+---
+
 ## Iteration - US-028: Three-Way Playback Toggle ✅
 - Replaced loop toggle (Switch) with three-way mode toggle (ToggleGroup)
 - Added ShadCN ToggleGroup component: `bunx shadcn@latest add toggle-group`
