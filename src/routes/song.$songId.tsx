@@ -7,6 +7,13 @@ import { Id } from "../../convex/_generated/dataModel";
 import YouTubePlayer, { YouTubePlayerHandle } from "../components/YouTubePlayer";
 import LyricsDisplay from "../components/LyricsDisplay";
 import { Switch } from "../components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 import { Repeat } from "lucide-react";
 
 export const Route = createFileRoute("/song/$songId")({
@@ -64,6 +71,14 @@ function SongPageContent({ songId }: SongPageContentProps) {
   const [currentLineIndex, setCurrentLineIndex] = useState<number | undefined>(
     undefined
   );
+
+  // Playback speed state
+  const [playbackSpeed, setPlaybackSpeed] = useState<string>("1");
+
+  const handleSpeedChange = useCallback((speed: string) => {
+    setPlaybackSpeed(speed);
+    playerRef.current?.setPlaybackRate(parseFloat(speed));
+  }, []);
 
   // Clear click animation after 300ms
   const triggerClickAnimation = useCallback((lineIndex: number) => {
@@ -163,6 +178,21 @@ function SongPageContent({ songId }: SongPageContentProps) {
                     </span>
                   )}
                 </label>
+              </div>
+
+              {/* Speed Control */}
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-gray-400">Speed</label>
+                <Select value={playbackSpeed} onValueChange={handleSpeedChange}>
+                  <SelectTrigger className="w-20 border-gray-700 bg-gray-900">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="border-gray-700 bg-gray-900">
+                    <SelectItem value="0.5">0.5x</SelectItem>
+                    <SelectItem value="0.75">0.75x</SelectItem>
+                    <SelectItem value="1">1x</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>

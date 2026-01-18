@@ -37,12 +37,12 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 9 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010) |
+| ✅ **Stories Complete** | 10 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011) |
 | ⚠️ **BROKEN** | US-005 (Auth - HTTP 500 errors, needs passwordless rework) |
-| 🔄 **Stories Remaining** | 10 + 6 verification |
-| ☑️ **Criteria Checked** | 63 / 97 (~65%) |
+| 🔄 **Stories Remaining** | 9 + 6 verification |
+| ☑️ **Criteria Checked** | 69 / 97 (~71%) |
 
-**Next Story:** US-011 (Playback Speed Control)
+**Next Story:** US-012 (Language Filter Dropdown)
 
 ---
 
@@ -324,12 +324,12 @@ SongScript is a song transliteration learning app that helps users learn to pron
 **Description:** Add dropdown to control playback speed (0.5x, 0.75x, 1x).
 
 **Acceptance Criteria:**
-- [ ] Add ShadCN Select component for speed
-- [ ] Options: 0.5x, 0.75x, 1x (default)
-- [ ] Call `player.setPlaybackRate(speed)` on change
-- [ ] Persist speed selection in component state
-- [ ] Show current speed in dropdown
-- [ ] Typecheck passes
+- [x] Add ShadCN Select component for speed
+- [x] Options: 0.5x, 0.75x, 1x (default)
+- [x] Call `player.setPlaybackRate(speed)` on change
+- [x] Persist speed selection in component state
+- [x] Show current speed in dropdown
+- [x] Typecheck passes
 
 **⏹️ STOP - END OF US-011. Do not continue to US-012.**
 

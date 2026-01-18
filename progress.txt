@@ -18,6 +18,21 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-011: Playback Speed Control
+- Added ShadCN Select component via `bunx shadcn@latest add select`
+- Added `playbackSpeed` state (default "1") and `handleSpeedChange` callback
+- Implemented Select dropdown with options: 0.5x, 0.75x, 1x
+- Select triggers `player.setPlaybackRate(parseFloat(speed))` on change
+- Added speed control next to loop toggle in controls section
+- Styled to match dark theme (bg-gray-900, border-gray-700)
+- Typecheck passes
+
+**Learnings:**
+- ShadCN Select is stateless by design - need to manage value with React state
+- Parse string value to float for setPlaybackRate API
+
+---
+
 ## Iteration - US-010: Loop Mode Toggle
 - Added ShadCN Switch component via `bunx shadcn@latest add switch`
 - Added `isLooping` and `currentLineIndex` state to song page
