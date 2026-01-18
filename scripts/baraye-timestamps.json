@@ -1,0 +1,41 @@
+{
+  "song": {
+    "title": "Baraye",
+    "artist": "Shervin Hajipour",
+    "youtubeId": "xLvUEF2zpj8",
+    "slug": "baraye"
+  },
+  "lyrics": [
+    { "lineNumber": 1, "startTime": 14.81, "endTime": 17.46 },
+    { "lineNumber": 2, "startTime": 17.46, "endTime": 20.91 },
+    { "lineNumber": 3, "startTime": 20.91, "endTime": 24.63 },
+    { "lineNumber": 4, "startTime": 24.63, "endTime": 28.61 },
+    { "lineNumber": 5, "startTime": 28.61, "endTime": 32.33 },
+    { "lineNumber": 6, "startTime": 32.33, "endTime": 35.78 },
+    { "lineNumber": 7, "startTime": 35.78, "endTime": 39.50 },
+    { "lineNumber": 8, "startTime": 39.50, "endTime": 43.22 },
+    { "lineNumber": 9, "startTime": 43.22, "endTime": 46.94 },
+    { "lineNumber": 10, "startTime": 46.94, "endTime": 50.66 },
+    { "lineNumber": 11, "startTime": 50.66, "endTime": 54.38 },
+    { "lineNumber": 12, "startTime": 54.38, "endTime": 58.10 },
+    { "lineNumber": 13, "startTime": 58.10, "endTime": 61.81 },
+    { "lineNumber": 14, "startTime": 61.81, "endTime": 65.30 },
+    { "lineNumber": 15, "startTime": 65.30, "endTime": 69.03 },
+    { "lineNumber": 16, "startTime": 69.03, "endTime": 72.75 },
+    { "lineNumber": 17, "startTime": 72.75, "endTime": 77.27 },
+    { "lineNumber": 18, "startTime": 77.27, "endTime": 83.94 },
+    { "lineNumber": 19, "startTime": 83.94, "endTime": 84.47 },
+    { "lineNumber": 20, "startTime": 84.47, "endTime": 87.39 },
+    { "lineNumber": 21, "startTime": 87.39, "endTime": 91.38 },
+    { "lineNumber": 22, "startTime": 91.38, "endTime": 94.83 },
+    { "lineNumber": 23, "startTime": 94.83, "endTime": 98.55 },
+    { "lineNumber": 24, "startTime": 98.55, "endTime": 102.27 },
+    { "lineNumber": 25, "startTime": 102.27, "endTime": 105.99 },
+    { "lineNumber": 26, "startTime": 105.99, "endTime": 109.71 },
+    { "lineNumber": 27, "startTime": 109.71, "endTime": 113.43 },
+    { "lineNumber": 28, "startTime": 113.43, "endTime": 123.56 },
+    { "lineNumber": 29, "startTime": 123.56, "endTime": 130.81 },
+    { "lineNumber": 30, "startTime": 130.81, "endTime": 138.15 },
+    { "lineNumber": 31, "startTime": 138.15, "endTime": 151.46 }
+  ]
+}

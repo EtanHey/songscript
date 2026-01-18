@@ -37,14 +37,17 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 17 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-020A) |
+| ✅ **Stories Complete** | 16 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017) |
 | ⏹️ **BLOCKED** | US-005 (Auth - Convex/Better Auth API integration failing) |
-| 🔄 **Stories Remaining** | US-020 (Local Audio Snippets - HIGH PRIORITY), US-018, US-019 + 6 verification |
-| ☑️ **Criteria Checked** | ~97% |
+| 🚨 **BROKEN** | US-020A (Layout - video covers lyrics, NOT FIXED!) |
+| 🔄 **Stories Remaining** | US-020A, US-020, US-018, US-019 + 6 verification |
 
-**🚨 NEXT STORY: US-020 (Local Audio Snippets)**
+**🚨 NEXT STORY: US-020A (Layout is BROKEN!)**
 
-US-020A (Sticky Layout) is complete. Proceed to US-020 for audio snippets.
+**Current bug:** Video player is FULL SCREEN and covers the lyrics list. Lyrics are BEHIND the video.
+**Expected:** Desktop = video LEFT 50%, lyrics RIGHT 50%. Mobile = video TOP, lyrics BELOW.
+
+FIX US-020A FIRST, then proceed to US-020 for audio snippets.
 
 ---
 
@@ -573,49 +576,52 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 
 **Description:** Fix the song page layout so the header, song title, video player, and controls stay fixed/sticky while only the lyrics list scrolls.
 
-**Current Problem:**
-- The entire page scrolls, including the video
-- When scrolling through lyrics, you lose sight of the video/controls
+**🚨 CURRENT BROKEN STATE (NOT FIXED!):**
+- Video player is FULL WIDTH / FULL SCREEN, covering everything
+- Lyrics list is BEHIND the video, not visible or accessible
+- This is COMPLETELY WRONG
 
-**Desired Behavior:**
-- Header (SongScript logo): sticky at top
-- Song title & artist: sticky below header
-- YouTube player + controls (loop, speed, language): sticky below title
-- Lyrics list: scrollable within remaining viewport height
+**✅ CORRECT LAYOUT:**
+- **Desktop (lg+):** Video on LEFT (50% width, sticky), Lyrics on RIGHT (50% width, scrollable)
+- **Mobile:** Video on TOP (sticky), Lyrics BELOW (scrollable)
+- Header always sticky at very top
 
 **Implementation Approach:**
 ```tsx
-// In song.$songId.tsx
+// In song.$songId.tsx - DESKTOP: side-by-side layout
 <div className="h-screen flex flex-col overflow-hidden">
   {/* Sticky header */}
   <header className="flex-shrink-0 border-b ...">...</header>
 
-  {/* Sticky player section */}
-  <div className="flex-shrink-0 p-4">
-    <YouTubePlayer ... />
-    <div className="controls ...">...</div>
-  </div>
+  {/* Main content - side by side on desktop */}
+  <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+    {/* LEFT: Sticky player section (50% on desktop) */}
+    <div className="flex-shrink-0 lg:w-1/2 lg:h-full lg:overflow-hidden p-4">
+      <div className="lg:sticky lg:top-0">
+        <YouTubePlayer ... />
+        <div className="controls ...">...</div>
+      </div>
+    </div>
 
-  {/* Scrollable lyrics */}
-  <div className="flex-1 overflow-y-auto p-4">
-    <LyricsDisplay ... />
+    {/* RIGHT: Scrollable lyrics (50% on desktop) */}
+    <div className="flex-1 lg:w-1/2 overflow-y-auto p-4">
+      <LyricsDisplay ... />
+    </div>
   </div>
 </div>
 ```
 
 **Acceptance Criteria:**
-- [x] Page takes full viewport height (`h-screen`)
-- [x] Header stays fixed at top (never scrolls)
-- [x] Song title stays fixed below header
-- [x] YouTube player stays fixed below title
-- [x] Controls (loop, speed, language filter) stay fixed below player
-- [x] Lyrics list scrolls independently within remaining space
-- [x] On mobile: same behavior - player fixed, lyrics scroll
-- [x] **BROWSER TEST**: Scroll through lyrics → video stays visible
-- [x] **BROWSER TEST**: On mobile (375px) → same sticky behavior
-- [x] Typecheck passes
-
-**✅ COMPLETE**
+- [ ] **DESKTOP**: Video takes LEFT 50%, Lyrics take RIGHT 50%
+- [ ] **DESKTOP**: Lyrics scroll independently, video stays fixed
+- [ ] **MOBILE**: Video on top (sticky), lyrics below (scrollable)
+- [ ] Header stays fixed at top (never scrolls)
+- [ ] Controls (loop, speed, language filter) stay with video
+- [ ] Lyrics list scrolls independently
+- [ ] **BROWSER TEST**: On desktop, video and lyrics are SIDE BY SIDE
+- [ ] **BROWSER TEST**: Scroll through lyrics → video stays visible
+- [ ] **BROWSER TEST**: On mobile (375px) → video on top, lyrics scroll below
+- [ ] Typecheck passes
 
 **⏹️ STOP - END OF US-020A. Do not continue to US-020.**
 
@@ -663,12 +669,12 @@ This is a ONE-TIME process per song, NOT runtime code.
    - Names them consistently: `{songSlug}_{lineNumber:03d}.mp3`
 
 **Acceptance Criteria (Phase 1):**
-- [ ] Create `scripts/extract-snippets.sh` that extracts snippets from a full audio file
-- [ ] Script reads timestamps from `scripts/baraye-timestamps.json`
-- [ ] Script outputs to `public/audio/{songSlug}/` directory
-- [ ] All 31 Baraye snippets extracted at 192 kbps MP3
-- [ ] Total size < 4 MB
-- [ ] Document the manual yt-dlp step in script comments
+- [x] Create `scripts/extract-snippets.sh` that extracts snippets from a full audio file
+- [x] Script reads timestamps from `scripts/baraye-timestamps.json`
+- [x] Script outputs to `public/audio/{songSlug}/` directory
+- [x] All 31 Baraye snippets extracted at 192 kbps MP3
+- [x] Total size < 4 MB (3.07MB)
+- [x] Document the manual yt-dlp step in script comments
 
 ---
 

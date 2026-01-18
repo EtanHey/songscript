@@ -37,6 +37,11 @@ progress.txt
 # Local docs
 docs.local/
 
+# Audio files (generated, not committed)
+public/audio/**/*.mp3
+*_full.mp3
+baraye_full.mp3
+
 # Misc
 count.txt
 todos.json

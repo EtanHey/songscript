@@ -18,6 +18,28 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-020 Phase 1: Local Audio Snippets - Extraction Script
+- Created `scripts/baraye-timestamps.json` with all 31 lyric timestamps from the seed data
+- Created `scripts/extract-snippets.sh` shell script that:
+  - Reads song metadata and timestamps from JSON file
+  - Uses ffmpeg to extract each snippet at 192kbps MP3
+  - Outputs to `public/audio/{songSlug}/` directory
+  - Names files as `{songSlug}_{lineNumber:03d}.mp3`
+  - Shows progress and total file size
+- Created `public/audio/baraye/` directory with .gitkeep
+- Updated `.gitignore` to exclude MP3 files (not committed to git)
+- Extracted all 31 Baraye snippets (total: 3.07MB, under 4MB target)
+- Fixed awk-based duration calculation to handle sub-second durations correctly
+- Typecheck passes
+
+**Learnings:**
+- Use `awk` instead of `bc` for floating point math in bash - bc outputs `.53` not `0.53` for values < 1
+- YouTube thumbnails: `img.youtube.com/vi/{videoId}/mqdefault.jpg` (320x180)
+- yt-dlp downloads audio with `-x --audio-format mp3 --audio-quality 192`
+- ffmpeg `-ss` before `-i` is faster (seeks input) but may be less precise
+
+---
+
 ## Iteration - US-020A: Sticky Layout - Fixed Player, Scrollable Lyrics
 - Restructured song page layout from scrolling page to fixed header + scrolling lyrics
 - Changed container from `min-h-screen overflow-x-hidden` to `flex h-screen flex-col overflow-hidden`

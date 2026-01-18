@@ -1,0 +1,11 @@
+# This directory contains audio snippets for the Baraye song
+#
+# To generate the snippets:
+# 1. Download the full audio:
+#    yt-dlp -x --audio-format mp3 --audio-quality 192 \
+#      "https://youtube.com/watch?v=xLvUEF2zpj8" -o baraye_full.mp3
+#
+# 2. Run the extraction script:
+#    ./scripts/extract-snippets.sh scripts/baraye-timestamps.json baraye_full.mp3
+#
+# The MP3 files are not committed to git (added to .gitignore)
