@@ -49,26 +49,26 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 35 (US-001-020A, US-022-029, US-TIMESTAMPS, US-TIMESTAMPS-V2, V-001-007) |
+| ✅ **Stories Complete** | 36 (US-001-020A, US-022-029, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, V-001-007) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), US-020 Phase 5 |
-| 🔄 **Stories Remaining** | 7 (US-029-FIX, US-030-033, V-008-009) |
+| 🔄 **Stories Remaining** | 6 (US-030-033, V-008-009) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** US-029-FIX (Fluid Mode UX Improvements)
+**Next Story:** US-030 (Word-by-Word Info Modal)
 
 **Story Order (optimized - API-dependent story LAST):**
 0. ~~US-TIMESTAMPS-V2~~ ✅ (end buffer increased to +0.70s)
-1. **US-029-FIX: Fluid Mode UX Improvements** ← NEXT
+1. ~~US-029-FIX~~ ✅ (Fluid Mode UX Improvements)
 2. ~~US-TIMESTAMPS~~ ✅ (needs V2 - end still cuts)
 3. ~~US-005-FIX~~ ⏹️ BLOCKED (auth API still 500)
 4. ~~US-029~~ ✅ (needs FIX - Fluid mode behavior)
-5. US-030: Word-by-Word Info Modal ← After fixes
-4. US-033: Pre-generate Word Data (manual JSON) ← No API
-5. US-032: Word Learning Tracking ← No API (uses localStorage)
-6. V-008: Verify Playback Modes ← No API
-7. V-009: Verify Word Info Modal ← No API
-8. **US-031: ElevenLabs Word Audio ← LAST (needs API key)**
+5. **US-030: Word-by-Word Info Modal** ← NEXT
+6. US-033: Pre-generate Word Data (manual JSON) ← No API
+7. US-032: Word Learning Tracking ← No API (uses localStorage)
+8. V-008: Verify Playback Modes ← No API
+9. V-009: Verify Word Info Modal ← No API
+10. **US-031: ElevenLabs Word Audio ← LAST (needs API key)**
 
 **API Key Needed (US-031 only):**
 - ElevenLabs: https://elevenlabs.io/ (free tier: ~10 min audio/month, supports Persian via v3)
@@ -225,14 +225,16 @@ Push timestamps even LATER (forward in time):
    - Fluid → Single/Loop: Mute video, use snippets from current line
 
 **Acceptance Criteria:**
-- [ ] Remove "Play Full Video" button - Fluid mode replaces this functionality
-- [ ] In Fluid mode: hide or disable Pause/Play button (video has native controls)
-- [ ] When switching TO Fluid: continue from current playback position, don't restart
-- [ ] When switching FROM Fluid to Single/Loop: stay at current line position
-- [ ] Optional: Add "Watch on YouTube" link that opens video in new tab
-- [ ] **BROWSER TEST**: In Single mode, click line 15, then switch to Fluid → video continues from ~65s
-- [ ] **BROWSER TEST**: In Loop mode on line 5, switch to Fluid → video continues from ~29s
-- [ ] Typecheck passes
+- [x] Remove "Play Full Video" button - Fluid mode replaces this functionality
+- [x] In Fluid mode: hide or disable Pause/Play button (video has native controls)
+- [x] When switching TO Fluid: continue from current playback position, don't restart
+- [x] When switching FROM Fluid to Single/Loop: stay at current line position
+- [x] Optional: Add "Watch on YouTube" link that opens video in new tab
+- [x] **BROWSER TEST**: In Single mode, click line 15, then switch to Fluid → video continues from ~65s
+- [x] **BROWSER TEST**: In Loop mode on line 5, switch to Fluid → video continues from ~29s (tested Line 20 instead)
+- [x] Typecheck passes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-029-FIX. Do not continue to US-005-FIX.**
 

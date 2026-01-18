@@ -18,6 +18,34 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-029-FIX: Fluid Mode UX Improvements ✅
+- Removed "Play Full Video" button - Fluid mode now replaces this functionality
+- Hidden Pause/Play button when in Fluid mode (video has native controls)
+- Updated `handlePlaybackModeChange` to continue from current position when switching TO Fluid:
+  - No longer seeks to beginning
+  - Just unmutes and plays from current position
+- When switching FROM Fluid to Single/Loop:
+  - Stays at current line position (uses activeLineIndex)
+  - Triggers snippet playback for the current line
+  - Seeks video to line start time (muted)
+- Added "Watch on YouTube" link that appears in Fluid mode
+- Browser verification completed:
+  - ✅ In Single mode, clicked line 15, switched to Fluid → video continued from ~65s
+  - ✅ Switched from Fluid to Loop mode → stayed at current line (Line 20)
+  - ✅ Pause/Play button hidden in Fluid mode
+  - ✅ "Watch on YouTube" link visible in Fluid mode
+  - ✅ "Snippets ready" indicator hidden in Fluid mode
+- Typecheck passes ✅
+
+**Learnings:**
+- Fluid mode = "Play Full Video" - no need for separate button
+- Mode transitions should preserve playback position for seamless UX
+- Watch on YouTube link provides fallback for users who want full YouTube experience
+
+**Next:** US-030 (Word-by-Word Info Modal)
+
+---
+
 ## Iteration - US-TIMESTAMPS-V2: Increase END Buffer ✅
 - Updated `scripts/baraye-new-timestamps.json`:
   - Kept start offset at +0.35s (working fine)

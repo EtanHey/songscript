@@ -145,40 +145,41 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
   // Handle playback mode change
   const handlePlaybackModeChange = useCallback((mode: PlaybackMode) => {
+    const previousMode = playbackMode;
     setPlaybackMode(mode);
 
     // Sync video mute state with mode
     if (mode === "fluid") {
-      // Fluid mode: video audio plays
+      // Switching TO Fluid mode: unmute video, continue from current position
       playerRef.current?.unmute();
       setIsVideoMuted(false);
+      // Continue playing from current position (don't restart)
+      playerRef.current?.play();
     } else {
-      // Single/Loop mode: video muted, audio from snippets
+      // Switching TO Single/Loop mode: mute video, audio from snippets
       playerRef.current?.mute();
       setIsVideoMuted(true);
+
+      // If coming FROM Fluid mode, stay at current line position
+      // The activeLineIndex already tracks where we are, so just trigger the snippet
+      if (previousMode === "fluid" && activeLineIndex !== undefined) {
+        const lineNumber = sortedLyrics[activeLineIndex]?.lineNumber;
+        if (lineNumber !== undefined && audioReady) {
+          setCurrentLineIndex(activeLineIndex);
+          playAudioSnippet(lineNumber);
+          // Keep video in sync (muted)
+          playerRef.current?.seekTo(sortedLyrics[activeLineIndex].startTime);
+          playerRef.current?.play();
+        }
+      }
     }
 
     // Update audio loop based on mode
     setAudioLoop(mode === "loop");
-  }, [setAudioLoop]);
+  }, [playbackMode, setAudioLoop, activeLineIndex, sortedLyrics, audioReady, playAudioSnippet]);
 
-  // Play full video from beginning with audio (switch to Fluid mode)
-  const playFullVideo = useCallback(() => {
-    if (playerRef.current) {
-      // Switch to Fluid mode
-      setPlaybackMode("fluid");
-      setAudioLoop(false);
-      // Unmute the video
-      playerRef.current.unmute();
-      setIsVideoMuted(false);
-      // Seek to beginning
-      playerRef.current.seekTo(0);
-      // Start playing
-      playerRef.current.play();
-      // Reset active line to start
-      setActiveLineIndex(0);
-    }
-  }, [setAudioLoop]);
+  // REMOVED: playFullVideo function - Fluid mode now replaces "Play Full Video" functionality
+  // When user switches to Fluid mode, video continues from current position instead of restarting
 
   // Handle video error (for fallback)
   const handleVideoError = useCallback((error: string) => {
@@ -379,35 +380,39 @@ function SongPageContent({ songId }: SongPageContentProps) {
             {/* Controls */}
             <div className="px-4 pb-4">
               <div className="flex flex-col gap-3 rounded-lg bg-gray-800 p-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
-                {/* Play Full Video Button */}
-                {song.videoUrl && !videoError && (
+                {/* Pause/Play Button - hidden in Fluid mode (video has native controls) */}
+                {playbackMode !== "fluid" && (
                   <button
-                    onClick={playFullVideo}
-                    className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                    onClick={togglePlayPause}
+                    className="flex items-center gap-2 rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-600 transition-colors"
+                    title={isVideoPlaying || isAudioPlaying ? "Pause (Space)" : "Play (Space)"}
                   >
-                    <Play className="h-4 w-4" />
-                    <span>Play Full Video</span>
+                    {isVideoPlaying || isAudioPlaying ? (
+                      <>
+                        <Pause className="h-4 w-4" />
+                        <span>Pause</span>
+                      </>
+                    ) : (
+                      <>
+                        <Play className="h-4 w-4" />
+                        <span>Play</span>
+                      </>
+                    )}
                   </button>
                 )}
 
-                {/* Pause/Play Button */}
-                <button
-                  onClick={togglePlayPause}
-                  className="flex items-center gap-2 rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-600 transition-colors"
-                  title={isVideoPlaying || isAudioPlaying ? "Pause (Space)" : "Play (Space)"}
-                >
-                  {isVideoPlaying || isAudioPlaying ? (
-                    <>
-                      <Pause className="h-4 w-4" />
-                      <span>Pause</span>
-                    </>
-                  ) : (
-                    <>
-                      <Play className="h-4 w-4" />
-                      <span>Play</span>
-                    </>
-                  )}
-                </button>
+                {/* Watch on YouTube link - shown in Fluid mode as alternative to native controls */}
+                {playbackMode === "fluid" && song.youtubeId && (
+                  <a
+                    href={`https://www.youtube.com/watch?v=${song.youtubeId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-600 transition-colors"
+                  >
+                    <Video className="h-4 w-4" />
+                    <span>Watch on YouTube</span>
+                  </a>
+                )}
 
                 {/* Playback Mode Toggle */}
                 <div className="flex items-center gap-2">
