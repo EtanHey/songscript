@@ -49,13 +49,13 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 44 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, US-SYNC-FIX, V-001-009, US-VIDEO-LOAD, US-MOBILE-DRAWER) |
+| ✅ **Stories Complete** | 45 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, US-SYNC-FIX, V-001-009, US-VIDEO-LOAD, US-MOBILE-DRAWER, US-MOBILE-LAYOUT) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), US-020 Phase 5 |
-| 🔄 **Stories Remaining** | 4 (US-MOBILE-LAYOUT, US-VIDEO-MOBILE, US-WORD-SYNC, US-031) |
+| 🔄 **Stories Remaining** | 3 (US-VIDEO-MOBILE, US-WORD-SYNC, US-031) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** US-MOBILE-LAYOUT (Mobile Controls Layout Fix)
+**Next Story:** US-VIDEO-MOBILE (Collapsible Video on Mobile)
 
 **Story Order (optimized - API-dependent story LAST):**
 0. ~~US-TIMESTAMPS-V2~~ ✅ (end buffer increased to +0.70s)
@@ -70,8 +70,8 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 9. ~~V-009~~ ✅ (Verify Word Info Modal)
 10. ~~US-VIDEO-LOAD~~ ✅ (Fix Video Load Issue - 5s timeout)
 11. ~~US-MOBILE-DRAWER~~ ✅ (Vertical card layout for mobile)
-12. **US-MOBILE-LAYOUT: Mobile Controls Layout ← NEXT**
-13. **US-VIDEO-MOBILE: Collapsible Video on Mobile**
+12. ~~US-MOBILE-LAYOUT~~ ✅ (Mobile line indicator on own row)
+13. **US-VIDEO-MOBILE: Collapsible Video on Mobile ← NEXT**
 14. **US-WORD-SYNC: Sync Repeated Words Learning State**
 15. **US-031: ElevenLabs Word Audio ← LAST (needs API key)**
 
@@ -1685,12 +1685,21 @@ You are NOT limited to the current drawer/modal approach. Feel free to:
 - On mobile, controls stack vertically but line indicator is hidden/awkward
 
 **Requirements:**
-- [ ] Show current line number indicator more prominently on mobile
-- [ ] Line indicator should be in same row as Mode toggle OR on its own row below it
-- [ ] Consider showing "Line X: {first few words of line}" on mobile for context
-- [ ] Works in all playback modes (Single, Loop, Fluid)
-- [ ] Typecheck passes
-- [ ] **BROWSER TEST**: Verify layout on mobile viewport (375px)
+- [x] Show current line number indicator more prominently on mobile
+- [x] Line indicator should be in same row as Mode toggle OR on its own row below it
+- [x] Consider showing "Line X: {first few words of line}" on mobile for context
+- [x] Works in all playback modes (Single, Loop, Fluid)
+- [x] Typecheck passes
+- [x] **BROWSER TEST**: Verify layout on mobile viewport (375px)
+
+**Solution Implemented:**
+- Added dedicated mobile line indicator on its own row above controls (`md:hidden`)
+- Shows "Select a line" with hint text when no line is selected
+- Shows "Line X" badge with full Persian text (RTL) when a line is active
+- Desktop keeps inline "Line X" badge with other controls (`hidden md:flex`)
+- Works in all playback modes (Single, Loop, Fluid)
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-MOBILE-LAYOUT**
 

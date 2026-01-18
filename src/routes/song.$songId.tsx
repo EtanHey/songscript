@@ -405,6 +405,25 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
             {/* Controls */}
             <div className="px-4 pb-4">
+              {/* Mobile: Current Line Indicator - always visible on its own row */}
+              <div className="md:hidden mb-2">
+                <div className="flex items-center gap-2 rounded-lg bg-gray-800/50 px-3 py-2 border border-gray-700">
+                  <span className="rounded bg-primary/20 px-2 py-1 text-xs font-medium text-primary whitespace-nowrap">
+                    {currentLineIndex !== undefined ? `Line ${currentLineIndex + 1}` : 'Select a line'}
+                  </span>
+                  {currentLineIndex !== undefined && sortedLyrics[currentLineIndex] && (
+                    <span className="text-xs text-gray-400 truncate flex-1" dir="rtl">
+                      {sortedLyrics[currentLineIndex].original}
+                    </span>
+                  )}
+                  {currentLineIndex === undefined && (
+                    <span className="text-xs text-gray-500 italic">
+                      Tap a lyric line below to start
+                    </span>
+                  )}
+                </div>
+              </div>
+
               <div className="flex flex-col gap-3 rounded-lg bg-gray-800 p-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
                 {/* Pause/Play Button - hidden in Fluid mode (video has native controls) */}
                 {playbackMode !== "fluid" && (
@@ -438,6 +457,15 @@ function SongPageContent({ songId }: SongPageContentProps) {
                     <Video className="h-4 w-4" />
                     <span>Watch on YouTube</span>
                   </a>
+                )}
+
+                {/* Desktop: Current Line Indicator - inline with other controls */}
+                {currentLineIndex !== undefined && (
+                  <div className="hidden md:flex items-center gap-2">
+                    <span className="rounded bg-primary/20 px-2 py-1 text-xs font-medium text-primary">
+                      Line {currentLineIndex + 1}
+                    </span>
+                  </div>
                 )}
 
                 {/* Playback Mode Toggle */}
@@ -474,12 +502,6 @@ function SongPageContent({ songId }: SongPageContentProps) {
                       Fluid
                     </ToggleGroupItem>
                   </ToggleGroup>
-                  {/* Show current line indicator in Loop mode */}
-                  {playbackMode === "loop" && currentLineIndex !== undefined && (
-                    <span className="rounded bg-primary/20 px-1.5 py-0.5 text-xs text-primary">
-                      Line {currentLineIndex + 1}
-                    </span>
-                  )}
                 </div>
 
                 {/* Speed Control */}

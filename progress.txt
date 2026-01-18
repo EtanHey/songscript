@@ -18,6 +18,36 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-MOBILE-LAYOUT: Mobile Controls Layout Fix ✅
+- **Issue investigated**: Line indicator only showed when a line was clicked, and was mixed with other controls on mobile
+- **Problems found**:
+  1. Line indicator disappeared when no line was selected
+  2. On mobile, line indicator was inline with other controls - hard to find
+  3. No hint text to guide users on initial page load
+- **Solution implemented**: Dedicated mobile line indicator row
+  - Added new `md:hidden` section above controls with its own row
+  - Shows "Select a line" badge with "Tap a lyric line below to start" hint when no line selected
+  - Shows "Line X" badge with full Persian text (RTL, truncated) when a line is active
+  - Desktop keeps inline "Line X" badge with other controls (`hidden md:flex`)
+  - Works in all playback modes (Single, Loop, Fluid)
+- **Files modified**: `src/routes/song.$songId.tsx`
+- **Browser verification**:
+  - ✅ Mobile (375px): Line indicator on own row, always visible
+  - ✅ Initial state shows "Select a line" with hint text
+  - ✅ After clicking line: Shows "Line X" with Persian text
+  - ✅ Works in Single, Loop, and Fluid modes
+  - ✅ Desktop: Inline "Line 5" badge with other controls
+- Typecheck passes ✅
+
+**Learnings:**
+- Mobile needs dedicated UI elements, not just responsive hiding of desktop elements
+- Hint text helps users understand what to do on initial page load
+- RTL text with `truncate` needs `flex-1` to properly handle overflow
+
+**Next:** US-VIDEO-MOBILE (Collapsible Video on Mobile)
+
+---
+
 ## Iteration - US-MOBILE-DRAWER: Redesign Mobile Word Info Experience ✅
 - **Issue investigated**: Current mobile drawer uses a 7-column table squeezed into 375px
 - **Problems found**:
