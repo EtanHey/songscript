@@ -1,36 +1,25 @@
 # Dependencies
 node_modules/
 
+# Environment
+.env
+.env*.local
+
 # Build
 dist/
 .next/
 out/
 
-# Environment
-.env
-.env.local
-.env*.local
-
 # IDE
 .vscode/
 .idea/
 
-# OS
+# macOS
 .DS_Store
 
-# Ralph working files (ephemeral)
+# Ralph working files
 PRD.md
 progress.txt
 
 # Local docs
 docs.local/
-
-# Logs
-*.log
-npm-debug.log*
-
-# TypeScript
-*.tsbuildinfo
-
-# Testing
-coverage/

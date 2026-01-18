@@ -1,28 +1,17 @@
 # SongScript
 
-Learn songs through transliteration - follow along line by line and learn to read/pronounce lyrics in any language.
+Learn to read and pronounce songs through line-by-line transliteration.
 
 ## Status
 
-🌱 **Greenfield** - Architecture and stack TBD.
+🌱 **Greenfield** - Architecture TBD
 
 ## Concept
 
-- Display song lyrics line by line
-- Show transliteration (phonetic spelling)
-- Learn pronunciation by following along
-- (Future) Audio sync, progress tracking, spaced repetition
+Follow along with song lyrics while learning pronunciation through transliteration (phonetic spelling in your native alphabet).
 
-## Development
+## Setup
 
 ```bash
-# Start Claude session
-songclod
-
-# Run Ralph for autonomous tasks
-ralph [iterations]
+songclod  # Open Claude in this project
 ```
-
-## License
-
-Private
