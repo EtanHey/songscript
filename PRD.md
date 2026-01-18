@@ -49,17 +49,17 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 34 (US-001-020A, US-022-029, US-TIMESTAMPS, V-001-007) |
+| ✅ **Stories Complete** | 35 (US-001-020A, US-022-029, US-TIMESTAMPS, US-TIMESTAMPS-V2, V-001-007) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), US-020 Phase 5 |
-| 🔄 **Stories Remaining** | 8 (US-TIMESTAMPS-V2, US-029-FIX, US-030-033, V-008-009) |
+| 🔄 **Stories Remaining** | 7 (US-029-FIX, US-030-033, V-008-009) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** US-TIMESTAMPS-V2 (Audio END buffer still cutting off)
+**Next Story:** US-029-FIX (Fluid Mode UX Improvements)
 
 **Story Order (optimized - API-dependent story LAST):**
-0. **US-TIMESTAMPS-V2: More END buffer for snippets** ← HIGHEST PRIORITY
-1. **US-029-FIX: Fluid Mode UX Improvements** ← HIGH PRIORITY
+0. ~~US-TIMESTAMPS-V2~~ ✅ (end buffer increased to +0.70s)
+1. **US-029-FIX: Fluid Mode UX Improvements** ← NEXT
 2. ~~US-TIMESTAMPS~~ ✅ (needs V2 - end still cuts)
 3. ~~US-005-FIX~~ ⏹️ BLOCKED (auth API still 500)
 4. ~~US-029~~ ✅ (needs FIX - Fluid mode behavior)
@@ -181,15 +181,17 @@ Push timestamps even LATER (forward in time):
 - Increase END from +0.45s to **+0.70s** (add 0.25s more)
 
 **Acceptance Criteria:**
-- [ ] Update `scripts/baraye-new-timestamps.json`:
+- [x] Update `scripts/baraye-new-timestamps.json`:
   - Keep start offset at +0.35s
   - Change end offset from +0.45s to +0.70s
   - Update the "note" field
-- [ ] Re-extract all 31 snippets: `./scripts/extract-snippets.sh scripts/baraye-new-timestamps.json public/audio/baraye/baraye_full.mp3`
-- [ ] **BROWSER TEST in Single mode**: Click line 28 - hear FULL "zan, zendegi, āzādi" with NO cutoff
-- [ ] **BROWSER TEST in Loop mode**: Click line 5, 15, 20 - endings are complete, no rush
-- [ ] If STILL cutting, increase end to +0.85s and re-test
-- [ ] Commit changes
+- [x] Re-extract all 31 snippets: `./scripts/extract-snippets.sh scripts/baraye-new-timestamps.json public/audio/baraye/baraye_full.mp3`
+- [x] **BROWSER TEST in Single mode**: Click line 28 - hear FULL "zan, zendegi, āzādi" with NO cutoff
+- [x] **BROWSER TEST in Loop mode**: Click line 5, 15, 20 - endings are complete, no rush
+- [x] If STILL cutting, increase end to +0.85s and re-test (NOT NEEDED - +0.70s works)
+- [x] Commit changes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-TIMESTAMPS-V2. Do not continue to US-029-FIX.**
 

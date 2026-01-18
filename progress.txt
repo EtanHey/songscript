@@ -18,6 +18,30 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-TIMESTAMPS-V2: Increase END Buffer ✅
+- Updated `scripts/baraye-new-timestamps.json`:
+  - Kept start offset at +0.35s (working fine)
+  - Increased end offset from +0.45s to +0.70s (added 0.25s more buffer)
+  - Updated the "note" field to reflect new offsets
+- Re-extracted all 31 audio snippets using extract-snippets.sh
+  - Total size: 3.40MB (under 5MB limit)
+  - Line 28 snippet is now 10.48s (113.78s - 124.26s)
+- Browser verification completed:
+  - ✅ Line 28 in Single mode: Full 10.48s audio plays without cutoff
+  - ✅ Line 5 in Loop mode: Looping correctly with complete endings
+  - ✅ Line 15 in Loop mode: Looping correctly with complete endings
+  - ✅ Line 20 in Loop mode: Looping correctly with complete endings
+- Typecheck passes ✅
+
+**Learnings:**
+- End offset of +0.70s provides sufficient buffer for all lines
+- Line 28 (iconic "zan, zendegi, āzādi") is ~10.5s long and now plays fully
+- The 0.25s additional buffer at the end prevents cutoff without adding noticeable silence
+
+**Next:** US-029-FIX (Fluid Mode UX Improvements)
+
+---
+
 ## Iteration - US-029: Pause/Play Controls ✅
 - Added `pause` and `resume` functions to `useAudioPreloader` hook
 - Added `isPlaying` state tracking to the hook
