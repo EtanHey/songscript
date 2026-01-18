@@ -33,4 +33,17 @@ export default defineSchema({
     // Local audio snippet URL (relative path) for instant playback
     audioSnippetUrl: v.optional(v.string()), // e.g., "/audio/baraye/baraye_001.mp3"
   }).index("by_song", ["songId", "lineNumber"]),
+
+  // Word-by-word breakdown for each lyric line
+  words: defineTable({
+    songId: v.id("songs"),
+    lineNumber: v.number(),
+    wordIndex: v.number(),
+    persian: v.string(),
+    transliteration: v.string(),
+    hebrew: v.string(),
+    english: v.string(),
+    grammarType: v.optional(v.string()), // noun, verb, preposition, adjective, etc.
+    forvoAudioUrl: v.optional(v.string()), // Future: audio from Forvo or ElevenLabs
+  }).index("by_song_line", ["songId", "lineNumber"]),
 });

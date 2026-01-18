@@ -18,6 +18,31 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-033: Pre-generate Word Data for Baraye ✅
+- Created `scripts/baraye-words.json` with word-by-word breakdown for all 31 Baraye lines
+- Each line contains array of words with: persian, transliteration, hebrew, english, grammarType
+- Grammar types include: preposition, noun, verb-infinitive, verb-past, verb-present, adjective, conjunction, demonstrative, pronoun, prefix, suffix, noun-plural, noun-possessive, proper-noun, determiner
+- Added `words` table to `convex/schema.ts` with fields: songId, lineNumber, wordIndex, persian, transliteration, hebrew, english, grammarType, forvoAudioUrl
+- Created `seedBarayeWords` mutation in `convex/seed.ts`:
+  - Finds Baraye song by youtubeId
+  - Deletes existing words if present
+  - Inserts all words with correct wordIndex ordering
+- Cleaned stray .js files from convex/ folder (Vite dev server artifacts)
+- Pushed schema to Convex: `npx convex dev --once`
+- Seeded word data: `npx convex run seed:seedBarayeWords`
+  - Result: 135 words across 31 lines
+- Verified data in Convex CLI: `npx convex data words`
+- Typecheck passes ✅
+
+**Learnings:**
+- Word data needs careful Persian linguistic work - compound words, possessive suffixes, etc.
+- Convex index `by_song_line` on (songId, lineNumber) enables efficient lookups
+- Grammar types help with learning - preposition, noun, verb, adjective patterns
+
+**Next:** US-032 (Word Learning Tracking - uses localStorage)
+
+---
+
 ## Iteration - US-030: Word-by-Word Info Modal ✅
 - Added ShadCN Sheet and Dialog components: `bunx shadcn@latest add sheet dialog`
 - Created `src/components/WordInfoModal.tsx`:
