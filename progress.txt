@@ -18,6 +18,20 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-022: Download Correct Baraye Video ✅
+- yt-dlp already installed (version 2025.12.08)
+- Downloaded correct Baraye video from https://www.youtube.com/watch?v=0th9_v-BbUI
+  - Video: public/video/baraye/baraye.mp4 (8.3 MB, 151.4 seconds)
+  - Audio: public/audio/baraye/baraye_full.mp3 (3.5 MB, 151.4 seconds)
+- Verified both files exist and have correct duration
+- Deleted 31 old placeholder audio snippets (baraye_001.mp3 through baraye_031.mp3)
+- Kept baraye_full.mp3 for snippet extraction in next story
+- Typecheck passes ✅
+
+**Next:** US-023 will get accurate timestamps for the new video using Megalobiz LRC or other methods.
+
+---
+
 ## Iteration - V-005 & V-006: Final Verification Stories ✅
 - Browser extension connected on tabs 1076981165 (desktop) and 1076981166 (mobile)
 

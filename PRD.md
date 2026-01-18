@@ -988,11 +988,13 @@ Replace YouTube embed with local video player using downloaded MP4:
 **Wrong URL (currently used):** `xLvUEF2zpj8` (some fingerstyle cover)
 
 **Acceptance Criteria:**
-- [ ] Install yt-dlp if needed: `brew install yt-dlp`
-- [ ] Download video: `yt-dlp -f "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]" -o "public/video/baraye/baraye.mp4" "https://www.youtube.com/watch?v=0th9_v-BbUI"`
-- [ ] Download audio: `yt-dlp -x --audio-format mp3 --audio-quality 192 -o "public/audio/baraye/baraye_full.mp3" "https://www.youtube.com/watch?v=0th9_v-BbUI"`
-- [ ] Verify files exist and play correctly
-- [ ] Delete old placeholder audio snippets: `rm public/audio/baraye/baraye_*.mp3` (keep baraye_full.mp3)
+- [x] Install yt-dlp if needed: `brew install yt-dlp`
+- [x] Download video: `yt-dlp -f "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]" -o "public/video/baraye/baraye.mp4" "https://www.youtube.com/watch?v=0th9_v-BbUI"`
+- [x] Download audio: `yt-dlp -x --audio-format mp3 --audio-quality 192 -o "public/audio/baraye/baraye_full.mp3" "https://www.youtube.com/watch?v=0th9_v-BbUI"`
+- [x] Verify files exist and play correctly
+- [x] Delete old placeholder audio snippets: `rm public/audio/baraye/baraye_*.mp3` (keep baraye_full.mp3)
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-022**
 
