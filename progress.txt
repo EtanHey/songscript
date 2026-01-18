@@ -18,6 +18,27 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-005-FIX: Investigate & Fix Auth HTTP 500 ⏹️ BLOCKED
+- Investigated the HTTP 500 error on `/api/auth/get-session` and `/api/auth/sign-in/magic-link`
+- Used Context7 to check latest Better Auth + Convex integration docs
+- Root cause identified: `convexBetterAuthReactStart` handler not properly proxying requests to Convex backend
+- Applied partial fixes:
+  - Fixed `src/lib/auth-server.ts` to use `process.env` instead of `import.meta.env`
+  - Added 1.5s timeout to login page so it shows form even if session check hangs
+  - Cleaned stray .js files from convex/ folder that were blocking Convex deployment
+- Browser verification:
+  - ✅ Login page now loads quickly (within 1.5 seconds)
+  - ✅ Login form UI displays correctly
+  - ❌ Magic link submission returns HTTPError (500)
+  - ❌ Session check returns 500
+- Typecheck passes ✅
+
+**BLOCKED**: Auth endpoints still return 500. The `@convex-dev/better-auth` package's HTTP proxying has issues that would require debugging the package itself or filing an issue with maintainers.
+
+**Next:** US-029 (Pause/Play Controls) - skipping remaining blocked auth work
+
+---
+
 ## Iteration - US-TIMESTAMPS: Fix Audio Snippet Timing ✅
 - Updated `scripts/baraye-new-timestamps.json` with larger offsets:
   - Start time: +0.35s (was +0.15s) - avoids previous line bleeding

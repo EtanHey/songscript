@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { authClient } from "../lib/auth-client";
 import { Button } from "../components/ui/button";
 
@@ -12,12 +12,23 @@ const ADMIN_EMAIL = "etan@heyman.net";
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { data: session, isPending, error: sessionError } = authClient.useSession();
+  // Try to get session, but don't block the UI - auth endpoints may be unreliable
+  const { data: session, isPending } = authClient.useSession();
 
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+
+  // After a short timeout, show the form regardless of session state
+  // This prevents infinite loading if auth endpoints are broken
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowForm(true);
+    }, 1500); // Show form after 1.5 seconds max
+    return () => clearTimeout(timer);
+  }, []);
 
   // If already logged in, show user info
   if (session?.user) {
@@ -45,8 +56,8 @@ function LoginPage() {
     );
   }
 
-  // Only show loading if pending AND no error (error means session check failed, treat as not logged in)
-  if (isPending && !sessionError) {
+  // Show loading only briefly - after timeout, show form anyway
+  if (isPending && !showForm) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-white">Loading...</div>
