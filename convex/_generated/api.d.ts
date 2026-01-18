@@ -9,12 +9,8 @@
  */
 
 import type * as betterAuth from "../betterAuth.js";
-import type * as betterAuth from "../betterAuth.js";
-import type * as lyrics from "../lyrics.js";
 import type * as lyrics from "../lyrics.js";
 import type * as seed from "../seed.js";
-import type * as seed from "../seed.js";
-import type * as songs from "../songs.js";
 import type * as songs from "../songs.js";
 
 import type {
@@ -25,12 +21,8 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   betterAuth: typeof betterAuth;
-  betterAuth: typeof betterAuth;
-  lyrics: typeof lyrics;
   lyrics: typeof lyrics;
   seed: typeof seed;
-  seed: typeof seed;
-  songs: typeof songs;
   songs: typeof songs;
 }>;
 

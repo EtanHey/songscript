@@ -28,5 +28,7 @@ export default defineSchema({
     transliteration: v.string(),
     hebrew: v.optional(v.string()),
     english: v.string(),
+    // Local audio snippet URL (relative path) for instant playback
+    audioSnippetUrl: v.optional(v.string()), // e.g., "/audio/baraye/baraye_001.mp3"
   }).index("by_song", ["songId", "lineNumber"]),
 });

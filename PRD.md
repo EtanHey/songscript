@@ -41,7 +41,7 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 | ⏹️ **BLOCKED** | US-005 (Auth - Convex/Better Auth API integration failing) |
 | 🔄 **Stories Remaining** | US-020 (Phase 2-5), US-018, US-019 + 6 verification |
 
-**🚨 NEXT STORY: US-020 Phase 2 (Schema Update for Audio Snippets)**
+**🚨 NEXT STORY: US-020 Phase 3 (Audio Preloader Hook)**
 
 US-020A layout is now FIXED. Desktop shows video LEFT 50%, lyrics RIGHT 50%. Mobile shows video TOP, lyrics BELOW.
 
@@ -695,12 +695,12 @@ lyrics: defineTable({
 ```
 
 **Acceptance Criteria (Phase 2):**
-- [ ] Add `audioSnippetUrl` field to lyrics schema (optional for backward compat)
-- [ ] Push schema update: `bunx convex dev`
-- [ ] Update seed script to include audioSnippetUrl for each line
-- [ ] Re-seed Baraye with audio URLs: `npx convex run seed:seedBaraye`
-- [ ] Verify in Convex dashboard: lyrics have audioSnippetUrl populated
-- [ ] Typecheck passes
+- [x] Add `audioSnippetUrl` field to lyrics schema (optional for backward compat)
+- [x] Push schema update: `bunx convex dev`
+- [x] Update seed script to include audioSnippetUrl for each line
+- [x] Re-seed Baraye with audio URLs: `npx convex run seed:seedBaraye`
+- [x] Verify in Convex dashboard: lyrics have audioSnippetUrl populated (31 lyrics updated)
+- [x] Typecheck passes
 
 ---
 
