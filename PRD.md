@@ -37,11 +37,13 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 25 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020A, V-001, V-002, V-003, V-004, V-005, V-006) |
+| ✅ **Stories Complete** | 25 (archived to `docs.local/prd-completed-archive.md`) |
 | ⏹️ **BLOCKED** | US-005 (Auth) |
-| 🔄 **Stories Remaining** | 0 |
+| 🔄 **Stories Remaining** | 7 (US-022 through US-027, V-007) |
 
-**Browser extension connected.** Proceeding with remaining verification stories.
+**Archive:** Completed stories (US-001-020A, V-001-006) moved to `docs.local/prd-completed-archive.md`
+
+**Current Focus:** Download correct video, extract timestamps, re-implement audio system.
 
 ---
 
@@ -975,6 +977,160 @@ Replace YouTube embed with local video player using downloaded MP4:
 - [ ] Fallback to YouTube embed if local video not found
 
 **⏹️ STOP - END OF US-021. Do not continue to next story.**
+
+---
+
+### US-022: Download Correct Baraye Video
+
+**Description:** Download the correct Baraye video (original, not cover) and store locally.
+
+**Correct YouTube URL:** `https://www.youtube.com/watch?v=0th9_v-BbUI`
+**Wrong URL (currently used):** `xLvUEF2zpj8` (some fingerstyle cover)
+
+**Acceptance Criteria:**
+- [ ] Install yt-dlp if needed: `brew install yt-dlp`
+- [ ] Download video: `yt-dlp -f "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]" -o "public/video/baraye/baraye.mp4" "https://www.youtube.com/watch?v=0th9_v-BbUI"`
+- [ ] Download audio: `yt-dlp -x --audio-format mp3 --audio-quality 192 -o "public/audio/baraye/baraye_full.mp3" "https://www.youtube.com/watch?v=0th9_v-BbUI"`
+- [ ] Verify files exist and play correctly
+- [ ] Delete old placeholder audio snippets: `rm public/audio/baraye/baraye_*.mp3` (keep baraye_full.mp3)
+
+**⏹️ STOP - END OF US-022**
+
+---
+
+### US-023: Get Timestamps for New Video
+
+**Description:** Get accurate line-by-line timestamps for the new video. Multiple options available - try in order until one works.
+
+**🎯 TIMESTAMP OPTIONS (try in order):**
+
+1. **Option A: Megalobiz LRC (FREE, FAST)**
+   - URL: https://www.megalobiz.com/lrc/maker/Baraye.55657462
+   - Download LRC file, parse timestamps
+   - May need offset adjustment for this specific video
+
+2. **Option B: QuickLRC AI (FREE tier)**
+   - URL: https://www.quicklrc.com
+   - Upload the downloaded audio file
+   - AI generates word-level timestamps
+   - Export as LRC format
+
+3. **Option C: whisper-timestamped (FREE, local)**
+   - Install: `pip install whisper-timestamped`
+   - Run: `whisper_timestamped baraye_full.mp3 --language fa`
+   - Outputs word/segment-level timestamps
+   - Reference: https://github.com/linto-ai/whisper-timestamped
+
+4. **Option D: Manual timing**
+   - Watch video, note timestamps manually
+   - Use existing lyrics text, just update times
+   - Time-consuming but accurate
+
+**Acceptance Criteria:**
+- [ ] Try Option A (Megalobiz) first - download and test timestamps
+- [ ] If Option A timestamps don't match video, try Option B (QuickLRC)
+- [ ] If Option B fails, try Option C (whisper-timestamped)
+- [ ] Create `scripts/baraye-new-timestamps.json` with accurate timestamps
+- [ ] Verify at least 3 random lines: timestamp matches when line is sung in video
+- [ ] Document which option worked in progress.txt
+
+**⏹️ STOP - END OF US-023**
+
+---
+
+### US-024: Update Seed Data with New Video + Timestamps
+
+**Description:** Update Convex seed data with correct YouTube ID and new timestamps.
+
+**Acceptance Criteria:**
+- [ ] Update `convex/seed.ts`: change `youtubeId` from `xLvUEF2zpj8` to `0th9_v-BbUI`
+- [ ] Update all 31 lyrics with new timestamps from `scripts/baraye-new-timestamps.json`
+- [ ] Add `videoUrl` field to songs schema: `v.optional(v.string())` for local video path
+- [ ] Update seed to include `videoUrl: "/video/baraye/baraye.mp4"`
+- [ ] Push schema: `bunx convex dev`
+- [ ] Re-seed: `npx convex run seed:seedBaraye`
+- [ ] Verify in Convex: new youtubeId and timestamps are correct
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-024**
+
+---
+
+### US-025: Extract Audio Snippets from New Video
+
+**Description:** Extract individual audio snippets for each lyric line from the new audio file.
+
+**Acceptance Criteria:**
+- [ ] Update `scripts/extract-snippets.sh` to use new timestamps
+- [ ] Run script: `./scripts/extract-snippets.sh scripts/baraye-new-timestamps.json public/audio/baraye/baraye_full.mp3`
+- [ ] Verify all 31 snippets created in `public/audio/baraye/`
+- [ ] Verify snippets play correct audio (spot check 3 random lines)
+- [ ] Total size < 5 MB
+- [ ] Update seed audioSnippetUrl paths if changed
+
+**⏹️ STOP - END OF US-025**
+
+---
+
+### US-026: Local Video Player with Muted Video + Audio Snippets
+
+**Description:** Replace YouTube iframe with local video player. Video is muted, audio comes from snippets.
+
+**🎯 THE VISION:**
+- Local `<video>` element plays downloaded MP4
+- Video is MUTED by default (user can unmute for full experience)
+- Clicking lyric line plays audio SNIPPET (instant, no buffering)
+- Video seeks to match the line (visual sync)
+- User can toggle between: snippets-only, video-audio, or both
+
+**Acceptance Criteria:**
+- [ ] Replace YouTubePlayer component usage with HTML5 `<video>` element
+- [ ] Video src: `/video/baraye/baraye.mp4`
+- [ ] Video `muted={true}` by default
+- [ ] Video `playsInline` for mobile
+- [ ] Clicking line: plays audio snippet + seeks video to startTime
+- [ ] Add "Unmute video" toggle to controls
+- [ ] When unmuted: video audio plays, snippets are paused/disabled
+- [ ] Fallback: if local video missing, show error or use YouTube embed
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-026**
+
+---
+
+### US-027: Full Video Playback Mode
+
+**Description:** Add mode where video plays with audio and lyrics auto-sync/highlight.
+
+**Acceptance Criteria:**
+- [ ] Add "Play Full Video" button
+- [ ] When clicked: unmute video, start from beginning, auto-play
+- [ ] Lyrics highlight based on video currentTime (existing logic)
+- [ ] Loop mode still works (re-seek to line startTime)
+- [ ] Speed control works on video
+- [ ] User can click line to jump (video seeks + continues playing)
+- [ ] Typecheck passes
+
+**⏹️ STOP - END OF US-027**
+
+---
+
+### V-007: Verify New Video + Audio System
+
+**Description:** Verify the new video/audio system works correctly.
+
+- [ ] **BROWSER TEST**: Navigate to `/song/{baraye-id}`
+- [ ] **BROWSER TEST**: Video shows correct Baraye video (not fingerstyle cover)
+- [ ] **BROWSER TEST**: Video is muted by default
+- [ ] **BROWSER TEST**: Click line 5 → audio snippet plays instantly
+- [ ] **BROWSER TEST**: Click line 15 → audio snippet plays, video seeks
+- [ ] **BROWSER TEST**: Enable "Unmute video" → video audio plays
+- [ ] **BROWSER TEST**: Click "Play Full Video" → video plays from start with audio
+- [ ] **BROWSER TEST**: Lyrics highlight correctly during full playback
+- [ ] **BROWSER TEST**: Loop mode works (line repeats)
+- [ ] Take screenshot showing new player
+
+**⏹️ STOP - END OF V-007**
 
 ---
 
