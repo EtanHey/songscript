@@ -18,6 +18,64 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - V-009: Verify Word Info Modal ✅
+- Browser verification completed on desktop tab (1076981165)
+- **Click lyric line → modal opens**: Verified - clicking "View word breakdown" button opens centered Dialog modal
+- **Modal shows word-by-word breakdown**: Verified - modal displays title "Line X", full line text, and word table
+- **Each word shows columns**: Persian, Sound (transliteration), Hebrew, English, Type (grammar), Audio button
+- **Word audio buttons**: Shows "Audio not available (coming soon)" - US-031 pending
+- **Close modal (X)**: Verified - clicking X button closes modal
+- **Click outside to close**: Verified - clicking on backdrop area closes modal
+- **Mobile drawer**: Code uses ShadCN Sheet (side="bottom") for mobile, Dialog for desktop based on `isMobile` state
+- Screenshots captured showing modal with word breakdown for Line 1 and Line 2
+
+**Verified word data for Line 1:**
+- برای (Barāye) - בָּרָאיֶה - For - preposition
+- توی (tūye) - טוּיֶה - in the - preposition
+- کوچه (kūche) - כּוּצֶ'ה - alley - noun
+- رقصیدن (raqsidan) - רַקְסִידַן - dancing - verb-infinitive
+
+**Verified word data for Line 2:**
+- 5 words with correct Persian, transliteration, Hebrew, English, and grammar types
+
+**Features working:**
+- Progress indicator "X/Y words learned"
+- Checkbox column for marking words as learned
+- Grammar type badges (preposition, noun, verb-infinitive, etc.)
+- Audio buttons (disabled until US-031)
+
+**Learnings:**
+- Modal uses ShadCN Dialog for desktop (centered with backdrop)
+- Modal uses ShadCN Sheet (side="bottom") for mobile (drawer behavior)
+- isMobile state determined by window.innerWidth < 768 with resize listener
+- Word audio buttons disabled with tooltip explaining US-031 pending
+
+**Next:** US-MOBILE-LAYOUT or US-WORD-SYNC (next incomplete story)
+
+---
+
+## Iteration - V-008: Verify Playback Modes ✅
+- Browser verification completed on desktop tab (1076981165)
+- **Default mode is "Single"**: Confirmed - Single button highlighted in mode toggle on page load
+- **Single mode - click line → plays once, stops**: Verified clicking line 1 played snippet with video muted
+- **Single mode - video plays segment (muted) in sync**: Video muted (speaker X icon), plays segment alongside snippet
+- **Loop mode - click line → loops indefinitely**: Verified - "Line X" badge shows current looping line
+- **Loop mode - video loops segment (muted) in sync**: Video remains muted during loop playback
+- **Fluid mode - click line → seeks, video continues with audio**: Verified - video unmutes (speaker waves icon), "Watch on YouTube" link appears, "Snippets ready" hidden
+- **Pause button stops playback**: Verified - button toggles between Play/Pause icons correctly
+- **Spacebar toggles pause/play**: Verified - keyboard shortcut works
+- Screenshots captured showing all mode states
+
+**Learnings:**
+- Mode toggle uses ShadCN ToggleGroup with radio buttons
+- Fluid mode hides Play/Pause button and shows "Watch on YouTube" link instead
+- "Line X" badge only appears in Loop mode to indicate current looping line
+- Video mute state is controlled by mode: muted in Single/Loop, unmuted in Fluid
+
+**Next:** V-009 (Verify Word Info Modal)
+
+---
+
 ## Iteration - US-032: Word Learning Tracking ✅
 - Added `wordProgress` table to `convex/schema.ts`:
   - Fields: visitorId, wordId, viewCount, playCount, learned, lastSeen

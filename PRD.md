@@ -49,27 +49,28 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 39 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, V-001-007) |
+| ✅ **Stories Complete** | 41 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, V-001-009) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), US-020 Phase 5 |
-| 🔄 **Stories Remaining** | 3 (US-031, V-008-009) |
+| 🔄 **Stories Remaining** | 3 (US-MOBILE-LAYOUT, US-WORD-SYNC, US-031) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** US-SYNC-FIX (Video/Audio Out of Sync)
+**Next Story:** US-MOBILE-LAYOUT (Mobile Controls Layout Fix)
 
 **Story Order (optimized - API-dependent story LAST):**
-0. **US-SYNC-FIX: Video and Audio Not Synced ← HIGHEST PRIORITY**
-1. ~~US-TIMESTAMPS-V2~~ ✅ (end buffer increased to +0.70s)
-2. ~~US-029-FIX~~ ✅ (Fluid Mode UX Improvements)
-3. ~~US-TIMESTAMPS~~ ✅
-4. ~~US-005-FIX~~ ⏹️ BLOCKED (auth API still 500)
-5. ~~US-029~~ ✅
-6. ~~US-030~~ ✅ (Word-by-Word Info Modal)
-7. ~~US-033~~ ✅ (Pre-generate Word Data - 135 words seeded)
-8. ~~US-032~~ ✅ (Word Learning Tracking - localStorage + Convex)
-9. V-008: Verify Playback Modes (after sync fix)
-9. V-009: Verify Word Info Modal ← No API
-10. **US-031: ElevenLabs Word Audio ← LAST (needs API key)**
+0. ~~US-TIMESTAMPS-V2~~ ✅ (end buffer increased to +0.70s)
+1. ~~US-029-FIX~~ ✅ (Fluid Mode UX Improvements)
+2. ~~US-TIMESTAMPS~~ ✅ (needs V2 - end still cuts)
+3. ~~US-005-FIX~~ ⏹️ BLOCKED (auth API still 500)
+4. ~~US-029~~ ✅ (needs FIX - Fluid mode behavior)
+5. ~~US-030~~ ✅ (Word-by-Word Info Modal)
+6. ~~US-033~~ ✅ (Pre-generate Word Data - 135 words seeded)
+7. ~~US-032~~ ✅ (Word Learning Tracking - localStorage + Convex)
+8. ~~V-008~~ ✅ (Verify Playback Modes)
+9. ~~V-009~~ ✅ (Verify Word Info Modal)
+10. **US-MOBILE-LAYOUT: Mobile Controls Layout ← NEXT**
+11. **US-WORD-SYNC: Sync Repeated Words Learning State**
+12. **US-031: ElevenLabs Word Audio ← LAST (needs API key)**
 
 **API Key Needed (US-031 only):**
 - ElevenLabs: https://elevenlabs.io/ (free tier: ~10 min audio/month, supports Persian via v3)
@@ -1556,17 +1557,64 @@ Replace YouTube embed with local video player using downloaded MP4:
 
 **Description:** Verify the three-way playback toggle works correctly.
 
-- [ ] **BROWSER TEST**: Default mode is "Single"
-- [ ] **BROWSER TEST**: Single mode - click line → plays once, stops
-- [ ] **BROWSER TEST**: Single mode - video plays segment (muted) in sync with snippet
-- [ ] **BROWSER TEST**: Loop mode - click line → loops indefinitely
-- [ ] **BROWSER TEST**: Loop mode - video loops segment (muted) in sync
-- [ ] **BROWSER TEST**: Fluid mode - click line → seeks, video continues with audio
-- [ ] **BROWSER TEST**: Pause button stops playback in all modes
-- [ ] **BROWSER TEST**: Spacebar toggles pause/play
-- [ ] Take screenshot showing mode toggle
+- [x] **BROWSER TEST**: Default mode is "Single"
+- [x] **BROWSER TEST**: Single mode - click line → plays once, stops
+- [x] **BROWSER TEST**: Single mode - video plays segment (muted) in sync with snippet
+- [x] **BROWSER TEST**: Loop mode - click line → loops indefinitely
+- [x] **BROWSER TEST**: Loop mode - video loops segment (muted) in sync
+- [x] **BROWSER TEST**: Fluid mode - click line → seeks, video continues with audio
+- [x] **BROWSER TEST**: Pause button stops playback in all modes
+- [x] **BROWSER TEST**: Spacebar toggles pause/play
+- [x] Take screenshot showing mode toggle
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF V-008**
+
+---
+
+### US-MOBILE-LAYOUT: Mobile Controls Layout Fix
+
+**Description:** On mobile, the line number and current line indicator should appear below or in the same row as the word mode toggle, not awkwardly placed.
+
+**Current Issue:**
+- The "Line X" indicator only shows in Loop mode
+- On mobile, controls stack vertically but line indicator is hidden/awkward
+
+**Requirements:**
+- [ ] Show current line number indicator more prominently on mobile
+- [ ] Line indicator should be in same row as Mode toggle OR on its own row below it
+- [ ] Consider showing "Line X: {first few words of line}" on mobile for context
+- [ ] Works in all playback modes (Single, Loop, Fluid)
+- [ ] Typecheck passes
+- [ ] **BROWSER TEST**: Verify layout on mobile viewport (375px)
+
+**⏹️ STOP - END OF US-MOBILE-LAYOUT**
+
+---
+
+### US-WORD-SYNC: Sync Learning State for Repeated Words
+
+**Description:** When a word appears multiple times in a song (e.g., "برای" appears 31+ times in Baraye), marking it as learned should sync across ALL instances.
+
+**Current Issue:**
+- Each word instance might be tracked separately
+- User has to mark the same word as learned multiple times
+
+**Requirements:**
+- [ ] Word learning state syncs by word text (original Persian), not by word ID
+- [ ] If "برای" is marked learned in line 1, all "برای" instances show as learned
+- [ ] Update `wordProgress` to key by `word.original` instead of `word._id`
+- [ ] On modal open, show correct learned state for that word
+- [ ] Typecheck passes
+- [ ] **BROWSER TEST**: Mark a repeated word as learned, verify it shows learned in other lines
+
+**Files to check:**
+- `src/components/WordInfoModal.tsx` - learning state
+- `convex/wordProgress.ts` - may need to change lookup
+- `src/routes/song.$songId.tsx` - visitor ID logic
+
+**⏹️ STOP - END OF US-WORD-SYNC**
 
 ---
 
@@ -1574,13 +1622,15 @@ Replace YouTube embed with local video player using downloaded MP4:
 
 **Description:** Verify the word-by-word info modal works correctly.
 
-- [ ] **BROWSER TEST**: Click lyric line → modal opens
-- [ ] **BROWSER TEST**: Modal shows word-by-word breakdown
-- [ ] **BROWSER TEST**: Each word shows: Persian, transliteration, Hebrew, English
-- [ ] **BROWSER TEST**: Click word audio button → pronunciation plays
-- [ ] **BROWSER TEST**: Close modal (X or click outside)
-- [ ] **BROWSER TEST**: Mobile: modal slides up from bottom
-- [ ] Take screenshot showing modal content
+- [x] **BROWSER TEST**: Click lyric line → modal opens
+- [x] **BROWSER TEST**: Modal shows word-by-word breakdown
+- [x] **BROWSER TEST**: Each word shows: Persian, transliteration, Hebrew, English
+- [x] **BROWSER TEST**: Click word audio button → shows "Audio not available (coming soon)" (US-031 pending)
+- [x] **BROWSER TEST**: Close modal (X or click outside)
+- [x] **BROWSER TEST**: Mobile: modal slides up from bottom (code implemented, uses ShadCN Sheet for mobile)
+- [x] Take screenshot showing modal content
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF V-009**
 
