@@ -51,7 +51,7 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 |--------|-------|
 | ✅ **Stories Complete** | 32 (US-001-020A, US-022-028, V-001-007) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-020 Phase 5 |
-| 🔄 **Stories Remaining** | 7 (US-029-033, V-008-009) |
+| 🔄 **Stories Remaining** | 9 (US-TIMESTAMPS, US-005-FIX, US-029-033, V-008-009) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
@@ -129,6 +129,39 @@ SongScript is a song transliteration learning app that helps users learn to pron
 ---
 
 ## User Stories
+
+### US-TIMESTAMPS: Fix Audio Snippet Timing (HIGHEST PRIORITY)
+
+**Description:** Audio snippets still have timing issues - they start with the end of the previous line and cut off before the current line ends. Need to adjust timestamps further forward.
+
+**🔍 CURRENT PROBLEM:**
+- Beginning of snippet plays the END of the previous line (bleeding)
+- End of snippet gets CUT OFF before the singer finishes the line
+- Current offsets (+0.15s start, +0.20s end) are NOT enough
+
+**🔧 FIX NEEDED:**
+Push timestamps even LATER (forward in time):
+- **Start time:** Increase offset from +0.15s to +0.35s or +0.40s
+- **End time:** Increase offset from +0.20s to +0.40s or +0.50s
+
+**📁 FILES TO UPDATE:**
+1. `scripts/baraye-new-timestamps.json` - Update all 31 line timestamps
+2. Re-extract snippets: `./scripts/extract-snippets.sh scripts/baraye-new-timestamps.json public/audio/baraye/baraye_full.mp3`
+
+**Acceptance Criteria:**
+- [ ] Update `scripts/baraye-new-timestamps.json` with larger offsets (try +0.35s start, +0.45s end)
+- [ ] Update the "note" field in JSON to reflect new offsets
+- [ ] Re-extract all 31 audio snippets using the extract script
+- [ ] **BROWSER TEST**: Navigate to song page, click line 1 - should NOT hear end of intro
+- [ ] **BROWSER TEST**: Click line 5 - should hear complete line without cutoff
+- [ ] **BROWSER TEST**: Click line 15 - verify no bleed from line 14
+- [ ] **BROWSER TEST**: Click line 28 ("zan, zendegi, āzādi") - must hear COMPLETE phrase
+- [ ] If still cutting off, increase offsets more (+0.50s start, +0.60s end) and re-test
+- [ ] Commit updated timestamps and snippets
+
+**⏹️ STOP - END OF US-TIMESTAMPS. Do not continue to US-005-FIX.**
+
+---
 
 ### US-005-FIX: Investigate & Fix Auth HTTP 500 Error (HIGH PRIORITY)
 
