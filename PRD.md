@@ -1158,6 +1158,18 @@ const handleLineClick = useCallback((startTime: number, lineIndex: number) => {
 
 **Reference:** See DOMICA repo (`~/Desktop/Gits/domica/.husky/pre-commit`) for working example.
 
+**🔧 REQUIRED: Use Context7 for documentation:**
+```
+mcp__Context7__resolve-library-id libraryName="vitest"
+mcp__Context7__query-docs query="vitest setup with react testing library"
+
+mcp__Context7__resolve-library-id libraryName="playwright"
+mcp__Context7__query-docs query="playwright test configuration"
+
+mcp__Context7__resolve-library-id libraryName="husky"
+mcp__Context7__query-docs query="husky pre-commit hook setup"
+```
+
 **Acceptance Criteria:**
 
 **1. Install Dependencies:**
@@ -1221,6 +1233,12 @@ const handleLineClick = useCallback((startTime: number, lineIndex: number) => {
 
 **Description:** Fix the login route dynamic import error and any other module loading issues preventing the app from working.
 
+**🔧 Use Context7 for TanStack Router docs:**
+```
+mcp__Context7__resolve-library-id libraryName="tanstack-router"
+mcp__Context7__query-docs query="tanstack router code splitting dynamic import"
+```
+
 **Current Error:**
 ```
 Failed to fetch dynamically imported module: http://localhost:3001/src/routes/login.tsx?tsr-split=component
@@ -1278,6 +1296,12 @@ Output this checklist for the user after tests pass:
 ### US-AUTOPLAY: Auto-Play Video + Fluid Mode on Page Load
 
 **Description:** When user navigates to a song page, the video should automatically start playing and fluid mode should be enabled so lines auto-advance as the song plays.
+
+**🔧 Use Context7 for YouTube API docs:**
+```
+mcp__Context7__resolve-library-id libraryName="react-youtube"
+mcp__Context7__query-docs query="react youtube player autoplay on load"
+```
 
 **Current Bug:** Video shows blurred/paused state or "Loading audio..." hangs. No auto-play.
 
