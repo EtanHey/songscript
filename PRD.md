@@ -1131,16 +1131,18 @@ Replace YouTube embed with local video player using downloaded MP4:
 
 **Description:** Verify the new video/audio system works correctly.
 
-- [ ] **BROWSER TEST**: Navigate to `/song/{baraye-id}`
-- [ ] **BROWSER TEST**: Video shows correct Baraye video (not fingerstyle cover)
-- [ ] **BROWSER TEST**: Video is muted by default
-- [ ] **BROWSER TEST**: Click line 5 → audio snippet plays instantly
-- [ ] **BROWSER TEST**: Click line 15 → audio snippet plays, video seeks
-- [ ] **BROWSER TEST**: Enable "Unmute video" → video audio plays
-- [ ] **BROWSER TEST**: Click "Play Full Video" → video plays from start with audio
-- [ ] **BROWSER TEST**: Lyrics highlight correctly during full playback
-- [ ] **BROWSER TEST**: Loop mode works (line repeats)
-- [ ] Take screenshot showing new player
+- [x] **BROWSER TEST**: Navigate to `/song/{baraye-id}`
+- [x] **BROWSER TEST**: Video shows correct Baraye video (not fingerstyle cover)
+- [x] **BROWSER TEST**: Video is muted by default
+- [x] **BROWSER TEST**: Click line 5 → audio snippet plays instantly
+- [x] **BROWSER TEST**: Click line 15 → audio snippet plays, video seeks
+- [x] **BROWSER TEST**: Enable "Unmute video" → video audio plays
+- [x] **BROWSER TEST**: Click "Play Full Video" → video plays from start with audio
+- [x] **BROWSER TEST**: Lyrics highlight correctly during full playback
+- [x] **BROWSER TEST**: Loop mode works (line repeats)
+- [x] Take screenshot showing new player
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF V-007**
 

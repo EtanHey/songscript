@@ -18,6 +18,22 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - V-007: Verify New Video + Audio System ✅
+- Browser extension connected, used desktop tab (1076981165) for testing
+- **Navigated to song page**: `/song/j972m34dzqgx6a0r5a00n9k6pd7zekfa` ✅
+- **Correct video verified**: Shows Shervin Hajipour's original Baraye video with social media overlays (not fingerstyle cover) ✅
+- **Video muted by default**: Speaker icon shows X, "Snippets ready" indicator visible ✅
+- **Click line 5**: Video seeked to ~28s, line 5 highlighted, audio snippet played ✅
+- **Click line 15**: Video seeked to ~65s, line 15 highlighted, audio snippet played ✅
+- **Play Full Video button**: Video seeked to beginning, unmuted (speaker icon shows waves), "Video Audio" toggle activated ✅
+- **Lyrics highlight during playback**: After 15 seconds of playback, line 8 was correctly highlighted as video played ✅
+- **Loop mode**: Enabled loop toggle, shows "Line 15" badge, video stays on line 15 region ✅
+- Screenshots captured showing all states
+
+**ALL VERIFICATION COMPLETE! PRD is done.**
+
+---
+
 ## Iteration - US-027: Full Video Playback Mode ✅
 - Added "Play Full Video" button to controls section with Play icon from lucide-react
 - Button styled with primary colors to stand out
