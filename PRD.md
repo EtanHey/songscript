@@ -38,10 +38,10 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 | Metric | Count |
 |--------|-------|
 | ✅ **Stories Complete** | 19 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020A) |
-| ⏹️ **BLOCKED** | US-005 (Auth), US-020 Phase 5 (browser extension not connected) |
-| 🔄 **Stories Remaining** | V-001 through V-006 |
+| ⏹️ **BLOCKED** | US-005 (Auth), US-020 Phase 5 (browser), V-001 through V-006 (browser extension not connected) |
+| 🔄 **Stories Remaining** | 0 (all remaining are blocked) |
 
-**Continue to: V-001 (Verify Project Setup)**
+**⛔ ALL REMAINING TASKS BLOCKED:** Browser extension not connected. V-001 through V-006 all require browser automation for visual verification and screenshots.
 
 ---
 
@@ -501,10 +501,12 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 
 ### V-001: Verify Project Setup
 
-- [ ] `bun dev` starts server without errors
-- [ ] Homepage loads at localhost:3001
+- [x] `bun dev` starts server without errors
+- [x] Homepage loads at localhost:3001
 - [ ] No console errors in browser
 - [ ] Take screenshot of homepage
+
+**Status:** ⏹️ BLOCKED: Browser extension not connected. Cannot verify console errors or take screenshots. Server verification passed via curl.
 
 **⏹️ STOP - END OF V-001**
 
@@ -516,6 +518,8 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 - [ ] Baraye song appears in songs table
 - [ ] 31 lyrics rows appear in lyrics table
 - [ ] Take screenshot of Convex dashboard
+
+**Status:** ⏹️ BLOCKED: Browser extension not connected. Cannot access Convex dashboard or take screenshots.
 
 **⏹️ STOP - END OF V-002**
 
@@ -530,6 +534,8 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 - [ ] Change speed to 0.5x - video slows down
 - [ ] Take screenshot showing player + lyrics
 
+**Status:** ⏹️ BLOCKED: Browser extension not connected. Cannot perform browser automation tests.
+
 **⏹️ STOP - END OF V-003**
 
 ---
@@ -540,6 +546,8 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 - [ ] Select "English only" - only English text shows
 - [ ] Select "All" - all languages show
 - [ ] Take screenshot of filtered view
+
+**Status:** ⏹️ BLOCKED: Browser extension not connected. Cannot perform browser automation tests.
 
 **⏹️ STOP - END OF V-004**
 
@@ -554,6 +562,8 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 - [ ] No horizontal scroll
 - [ ] Take screenshot of mobile view
 
+**Status:** ⏹️ BLOCKED: Browser extension not connected. Cannot perform browser automation tests.
+
 **⏹️ STOP - END OF V-005**
 
 ---
@@ -565,6 +575,8 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 - [ ] Text alignment is correct (text-right)
 - [ ] No visual glitches with mixed RTL/LTR
 - [ ] Take screenshot showing RTL text
+
+**Status:** ⏹️ BLOCKED: Browser extension not connected. Cannot perform browser automation tests.
 
 **⏹️ STOP - END OF V-006**
 

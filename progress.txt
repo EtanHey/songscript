@@ -18,6 +18,31 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - V-001 through V-006: Verification Stories (ALL BLOCKED)
+- Attempted to verify V-001 (Project Setup)
+- Server verification passed via curl - dev server running on localhost:3001
+- Typecheck passes
+- **BLOCKED**: Browser extension not connected - cannot:
+  - Check console errors in browser
+  - Take screenshots
+  - Navigate to song pages
+  - Test player functionality
+  - Test language filter
+  - Test mobile responsiveness
+  - Verify RTL support
+
+All 6 verification stories (V-001 through V-006) require browser automation and are BLOCKED.
+
+**Blockers:**
+- V-001: Browser extension not connected (partial - server verified)
+- V-002: Browser extension not connected (need Convex dashboard access)
+- V-003: Browser extension not connected (player functionality tests)
+- V-004: Browser extension not connected (language filter tests)
+- V-005: Browser extension not connected (mobile responsive tests)
+- V-006: Browser extension not connected (RTL support tests)
+
+---
+
 ## Iteration - US-019: Add Component Tests
 - Created `src/components/YouTubePlayer.test.tsx`:
   - Mocks window.YT and YT.Player constructor
