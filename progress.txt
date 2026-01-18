@@ -18,6 +18,24 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-007: YouTube Player Component
+- Created `src/components/YouTubePlayer.tsx` with full YouTube IFrame API integration
+- Implemented dynamic API loading with promise caching to avoid duplicate loads
+- Exposed player controls via forwardRef: play, pause, seekTo, getCurrentTime, setPlaybackRate
+- Added onTimeUpdate callback with 100ms interval for time tracking
+- Added onReady and onStateChange callbacks for player events
+- Used useRef to store player instance and interval references
+- Added loading state with spinner while API loads
+- Added error state handling for player errors
+- Typecheck passes
+
+**Learnings:**
+- YouTube IFrame API is loaded via global window callbacks - use promise caching pattern
+- Time tracking interval should only run when player state is PLAYING (state 1)
+- Clean up player.destroy() on unmount to avoid memory leaks
+
+---
+
 ## Iteration - US-005: Admin-Only Authentication Setup
 - Installed Better Auth packages: `@convex-dev/better-auth` and `better-auth@1.4.9`
 - Created convex.config.ts to register Better Auth component

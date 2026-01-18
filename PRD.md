@@ -31,11 +31,11 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 6 (US-001, US-002, US-003, US-004, US-005, US-006) |
-| 🔄 **Stories Remaining** | 13 + 6 verification |
-| ☑️ **Criteria Checked** | 41 / 97 (~42%) |
+| ✅ **Stories Complete** | 7 (US-001, US-002, US-003, US-004, US-005, US-006, US-007) |
+| 🔄 **Stories Remaining** | 12 + 6 verification |
+| ☑️ **Criteria Checked** | 49 / 97 (~51%) |
 
-**Next Story:** US-007 (YouTube Player)
+**Next Story:** US-008 (Lyrics Display Component)
 
 ---
 
@@ -227,14 +227,16 @@ SongScript is a song transliteration learning app that helps users learn to pron
 **Description:** Create a YouTube player component using the IFrame API.
 
 **Acceptance Criteria:**
-- [ ] Create `app/components/YouTubePlayer.tsx`
-- [ ] Load YouTube IFrame API dynamically
-- [ ] Expose player controls: play, pause, seekTo, getCurrentTime
-- [ ] Accept `videoId` prop
-- [ ] Accept `onTimeUpdate` callback for current time tracking
-- [ ] Use `useRef` to store player instance
-- [ ] Add loading state while API loads
-- [ ] Typecheck passes
+- [x] Create `app/components/YouTubePlayer.tsx`
+- [x] Load YouTube IFrame API dynamically
+- [x] Expose player controls: play, pause, seekTo, getCurrentTime
+- [x] Accept `videoId` prop
+- [x] Accept `onTimeUpdate` callback for current time tracking
+- [x] Use `useRef` to store player instance
+- [x] Add loading state while API loads
+- [x] Typecheck passes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-007. Do not continue to US-008.**
 
