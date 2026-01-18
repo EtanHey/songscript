@@ -1113,13 +1113,15 @@ Replace YouTube embed with local video player using downloaded MP4:
 **Description:** Add mode where video plays with audio and lyrics auto-sync/highlight.
 
 **Acceptance Criteria:**
-- [ ] Add "Play Full Video" button
-- [ ] When clicked: unmute video, start from beginning, auto-play
-- [ ] Lyrics highlight based on video currentTime (existing logic)
-- [ ] Loop mode still works (re-seek to line startTime)
-- [ ] Speed control works on video
-- [ ] User can click line to jump (video seeks + continues playing)
-- [ ] Typecheck passes
+- [x] Add "Play Full Video" button
+- [x] When clicked: unmute video, start from beginning, auto-play
+- [x] Lyrics highlight based on video currentTime (existing logic)
+- [x] Loop mode still works (re-seek to line startTime)
+- [x] Speed control works on video
+- [x] User can click line to jump (video seeks + continues playing)
+- [x] Typecheck passes
+
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF US-027**
 

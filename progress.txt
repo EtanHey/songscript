@@ -18,6 +18,29 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-027: Full Video Playback Mode ✅
+- Added "Play Full Video" button to controls section with Play icon from lucide-react
+- Button styled with primary colors to stand out
+- `playFullVideo` function: unmutes video, seeks to beginning (0), plays video, resets active line
+- Added loop mode logic for full video playback:
+  - When `isLooping` is true AND video is unmuted, runs interval to check if currentTime >= endTime
+  - Re-seeks to startTime when line ends (loops the current line)
+- Updated `handleLineClick` to call `playerRef.current?.play()` after seek when video is unmuted
+  - This allows users to click lines to jump during full video playback
+- Speed control already works via `handleSpeedChange` which calls `playerRef.current?.setPlaybackRate()`
+- Lyrics highlighting already works via `handleTimeUpdate` callback
+- Removed unused `isFullVideoMode` state variable (video unmuted state is sufficient)
+- Typecheck passes ✅
+
+**Implementation Details:**
+- Button appears only when video is available (`song.videoUrl && !videoError`)
+- Loop mode for video uses 100ms interval to check time (same as audio snippet loop)
+- User can toggle between snippet mode (video muted) and full video mode by clicking the button or toggling "Video Audio"
+
+**Next:** V-007 will verify the new video/audio system in the browser.
+
+---
+
 ## Iteration - US-026: Local Video Player with Muted Video + Audio Snippets ✅
 - Created `src/components/LocalVideoPlayer.tsx` - new HTML5 video player component
   - Uses `<video>` element instead of YouTube iframe

@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Repeat, Languages, Volume2, Video, VolumeX } from "lucide-react";
+import { Repeat, Languages, Volume2, Video, VolumeX, Play } from "lucide-react";
 
 export const Route = createFileRoute("/song/$songId")({
   component: SongPage,
@@ -146,6 +146,21 @@ function SongPageContent({ songId }: SongPageContentProps) {
     }
   }, []);
 
+  // Play full video from beginning with audio
+  const playFullVideo = useCallback(() => {
+    if (playerRef.current) {
+      // Unmute the video
+      playerRef.current.unmute();
+      setIsVideoMuted(false);
+      // Seek to beginning
+      playerRef.current.seekTo(0);
+      // Start playing
+      playerRef.current.play();
+      // Reset active line to start
+      setActiveLineIndex(0);
+    }
+  }, []);
+
   // Handle video error (for fallback)
   const handleVideoError = useCallback((error: string) => {
     setVideoError(error);
@@ -169,8 +184,13 @@ function SongPageContent({ songId }: SongPageContentProps) {
         playAudioSnippet(lineNumber);
       }
 
-      // Seek video to match the line (visual sync)
+      // Seek video to match the line
       playerRef.current?.seekTo(startTime);
+
+      // If video is unmuted (full video mode), continue playing after seek
+      if (!isVideoMuted) {
+        playerRef.current?.play();
+      }
 
       // Trigger visual feedback
       triggerClickAnimation(lineIndex);
@@ -195,10 +215,33 @@ function SongPageContent({ songId }: SongPageContentProps) {
     [sortedLyrics, activeLineIndex]
   );
 
-  // Sync loop mode to audio preloader
+  // Sync loop mode to audio preloader (for snippet mode)
   useEffect(() => {
     setAudioLoop(isLooping);
   }, [isLooping, setAudioLoop]);
+
+  // Loop mode for full video playback - re-seek to line start when line ends
+  useEffect(() => {
+    if (!isLooping || currentLineIndex === undefined || isVideoMuted) {
+      return; // Only handle looping when video audio is playing
+    }
+
+    const currentLine = sortedLyrics[currentLineIndex];
+    if (!currentLine) return;
+
+    const checkTime = setInterval(() => {
+      const player = playerRef.current;
+      if (!player) return;
+
+      const currentTime = player.getCurrentTime();
+      // If we've reached the end of the current line, loop back to start
+      if (currentTime >= currentLine.endTime) {
+        player.seekTo(currentLine.startTime);
+      }
+    }, 100);
+
+    return () => clearInterval(checkTime);
+  }, [isLooping, currentLineIndex, sortedLyrics, isVideoMuted]);
 
   if (!song) {
     throw notFound();
@@ -253,6 +296,17 @@ function SongPageContent({ songId }: SongPageContentProps) {
             {/* Controls */}
             <div className="px-4 pb-4">
               <div className="flex flex-col gap-3 rounded-lg bg-gray-800 p-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
+                {/* Play Full Video Button */}
+                {song.videoUrl && !videoError && (
+                  <button
+                    onClick={playFullVideo}
+                    className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                  >
+                    <Play className="h-4 w-4" />
+                    <span>Play Full Video</span>
+                  </button>
+                )}
+
                 {/* Loop Toggle */}
                 <div className="flex items-center gap-2">
                   <Switch
