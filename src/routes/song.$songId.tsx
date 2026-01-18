@@ -107,10 +107,18 @@ function SongPageContent({ songId }: SongPageContentProps) {
     [triggerClickAnimation]
   );
 
-  const handleTimeUpdate = useCallback((_currentTime: number) => {
-    // Time update tracking (will be used in US-013 for active line highlighting)
-    // For now, this is a placeholder for future use
-  }, []);
+  const handleTimeUpdate = useCallback(
+    (currentTime: number) => {
+      // Find which line's startTime <= currentTime < endTime
+      const lineIndex = sortedLyrics.findIndex(
+        (line) => currentTime >= line.startTime && currentTime < line.endTime
+      );
+      if (lineIndex !== -1 && lineIndex !== activeLineIndex) {
+        setActiveLineIndex(lineIndex);
+      }
+    },
+    [sortedLyrics, activeLineIndex]
+  );
 
   // Loop mode effect - check time every 100ms and seek back if needed
   useEffect(() => {

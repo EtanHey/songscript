@@ -37,12 +37,12 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 11 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012) |
+| ✅ **Stories Complete** | 12 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013) |
 | ⚠️ **BROKEN** | US-005 (Auth - HTTP 500 errors, needs passwordless rework) |
-| 🔄 **Stories Remaining** | 8 + 6 verification |
-| ☑️ **Criteria Checked** | 75 / 97 (~77%) |
+| 🔄 **Stories Remaining** | 7 + 6 verification |
+| ☑️ **Criteria Checked** | 80 / 97 (~82%) |
 
-**Next Story:** US-013 (Active Line Highlighting)
+**Next Story:** US-014 (Dark Theme with Iranian Flag Accent)
 
 ---
 
@@ -356,11 +356,11 @@ SongScript is a song transliteration learning app that helps users learn to pron
 **Description:** Highlight the currently playing line based on video time.
 
 **Acceptance Criteria:**
-- [ ] Track `currentTime` from YouTube player (via interval)
-- [ ] Find which line's `startTime <= currentTime < endTime`
-- [ ] Apply highlight class to active line (bg-primary/10 or similar)
-- [ ] Auto-scroll active line into view (smooth scroll)
-- [ ] Typecheck passes
+- [x] Track `currentTime` from YouTube player (via interval)
+- [x] Find which line's `startTime <= currentTime < endTime`
+- [x] Apply highlight class to active line (bg-primary/10 or similar)
+- [x] Auto-scroll active line into view (smooth scroll)
+- [x] Typecheck passes
 
 **⏹️ STOP - END OF US-013. Do not continue to US-014.**
 

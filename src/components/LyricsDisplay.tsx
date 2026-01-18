@@ -1,5 +1,6 @@
 import { convexQuery } from "@convex-dev/react-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { useRef, useEffect } from "react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 
@@ -41,11 +42,27 @@ export default function LyricsDisplay({
     (a, b) => a.lineNumber - b.lineNumber
   ) as LyricLine[];
 
+  // Refs for each line to enable auto-scroll
+  const lineRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // Auto-scroll active line into view
+  useEffect(() => {
+    if (activeLineIndex !== undefined && lineRefs.current[activeLineIndex]) {
+      lineRefs.current[activeLineIndex]?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [activeLineIndex]);
+
   return (
     <div className="flex flex-col gap-2">
       {sortedLyrics.map((line, index) => (
         <button
           key={line._id}
+          ref={(el) => {
+            lineRefs.current[index] = el;
+          }}
           type="button"
           onClick={() => onLineClick?.(line.startTime, index)}
           className={`flex flex-col gap-1 rounded-lg p-3 text-left transition-all duration-150 hover:bg-primary/5 ${

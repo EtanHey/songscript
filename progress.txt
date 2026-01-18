@@ -18,6 +18,22 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-013: Active Line Highlighting
+- Implemented time-based active line tracking in `handleTimeUpdate` callback
+- Finds which line's `startTime <= currentTime < endTime` using `findIndex`
+- Updates `activeLineIndex` state only when line changes (avoids unnecessary re-renders)
+- Added `lineRefs` ref array in LyricsDisplay to store references to each button element
+- Implemented `useEffect` to auto-scroll active line into view with `scrollIntoView({ behavior: "smooth", block: "center" })`
+- Highlight class already existed (`bg-primary/10 ring-1 ring-primary/20`)
+- Typecheck passes
+
+**Learnings:**
+- The YouTube player already provides time updates via `onTimeUpdate` callback at 100ms intervals
+- `scrollIntoView` with `block: "center"` keeps active line in middle of viewport for better UX
+- Using ref callback pattern `ref={(el) => { lineRefs.current[index] = el; }}` for dynamic refs array
+
+---
+
 ## Iteration - US-012: Language Filter Dropdown
 - Added `LanguageFilter` type to LyricsDisplay component (all | persian | transliteration | hebrew | english)
 - Added `languageFilter` prop to LyricsDisplay with "all" as default
