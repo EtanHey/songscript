@@ -4,11 +4,20 @@ node_modules/
 # Environment
 .env
 .env*.local
+*.local
 
 # Build
 dist/
+dist-ssr/
 .next/
 out/
+.output/
+
+# TanStack Start / Nitro / Vinxi
+.nitro/
+.tanstack/
+.wrangler/
+.vinxi/
 
 # IDE
 .vscode/
@@ -23,3 +32,7 @@ progress.txt
 
 # Local docs
 docs.local/
+
+# Misc
+count.txt
+todos.json
