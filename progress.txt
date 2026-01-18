@@ -18,6 +18,20 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - Ralph Status Check: All Remaining Tasks BLOCKED
+- **Checked**: PRD.md progress summary and remaining stories
+- **Status**: All non-blocked stories complete (50 stories completed)
+- **Remaining blocked stories**:
+  1. **US-031 (ElevenLabs Word Audio)** - BLOCKED: Needs ELEVENLABS_API_KEY
+     - Verified .env.local - no ELEVENLABS_API_KEY present
+     - User must obtain API key from https://elevenlabs.io/
+  2. **US-005 (Auth)** - BLOCKED: Convex + Better Auth HTTP 500 errors
+  3. **US-005-FIX** - BLOCKED: Auth API still returns 500
+  4. **US-020 Phase 5** - BLOCKED: Browser extension required for testing
+- **Action required**: User must provide ELEVENLABS_API_KEY to proceed with US-031
+
+---
+
 ## Iteration - US-WORD-TOKEN-FIX: Migrate and Sync Word States ✅
 - **Task**: Deduplicate wordProgress entries and fix mutations to prevent future duplicates
 - **Context7 Research**:
