@@ -37,11 +37,11 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 19 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020A) |
-| ⏹️ **BLOCKED** | US-005 (Auth), US-020 Phase 5 (browser), V-001 through V-006 (browser extension not connected) |
-| 🔄 **Stories Remaining** | 0 (all remaining are blocked) |
+| ✅ **Stories Complete** | 20 (US-001, US-002, US-003, US-004, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020A, V-001) |
+| ⏹️ **BLOCKED** | US-005 (Auth), US-020 Phase 5 (browser) |
+| 🔄 **Stories Remaining** | 5 (V-002, V-003, V-004, V-005, V-006) |
 
-**⛔ ALL REMAINING TASKS BLOCKED:** Browser extension not connected. V-001 through V-006 all require browser automation for visual verification and screenshots.
+**Browser extension now connected.** Proceeding with verification stories.
 
 ---
 
@@ -503,10 +503,10 @@ Do NOT claim COMPLETE until ALL V-* stories are executed.
 
 - [x] `bun dev` starts server without errors
 - [x] Homepage loads at localhost:3001
-- [ ] No console errors in browser
-- [ ] Take screenshot of homepage
+- [x] No console errors in browser
+- [x] Take screenshot of homepage
 
-**Status:** ⏹️ BLOCKED: Browser extension not connected. Cannot verify console errors or take screenshots. Server verification passed via curl.
+**✅ COMPLETE**
 
 **⏹️ STOP - END OF V-001**
 

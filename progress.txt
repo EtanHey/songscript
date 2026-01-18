@@ -18,6 +18,38 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - V-001: Verify Project Setup ✅
+- Browser extension now connected
+- Navigated to homepage at localhost:3001
+- Verified no console errors in browser
+- Took screenshot of homepage showing:
+  - SongScript header with Iranian flag gradient
+  - "Learn to read and pronounce songs in any language" tagline
+  - Songs section with Baraye card (YouTube thumbnail, title, artist)
+  - Dark theme working correctly
+- All V-001 acceptance criteria complete
+
+---
+
+## Iteration - Ralph Confirmation: ALL TASKS BLOCKED (Browser Extension Not Connected)
+- Typecheck passes ✅
+- Dev server running on localhost:3001 ✅ (verified via curl - HTTP 200)
+- All 36 tests pass ✅ (via `bunx vitest run`)
+- Browser extension NOT connected - mcp__claude-in-chrome__tabs_context_mcp returned connection error
+
+**ALL remaining tasks require browser extension for visual verification:**
+1. V-001: Verify Project Setup - console errors + screenshot
+2. V-002: Verify Convex Integration - dashboard access + screenshot
+3. V-003: Verify Player Functionality - player interaction tests
+4. V-004: Verify Language Filter - filter interaction tests
+5. V-005: Verify Mobile Responsiveness - viewport resize + screenshot
+6. V-006: Verify RTL Support - visual RTL inspection + screenshot
+7. US-020 Phase 5: Browser Testing for audio snippets
+
+**No further progress possible without browser extension.**
+
+---
+
 ## Iteration - Ralph Check: All Remaining Stories BLOCKED
 - Typecheck passes ✅
 - Dev server running on localhost:3001 ✅ (verified via curl)
