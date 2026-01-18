@@ -18,6 +18,23 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-023: Get Timestamps for New Video ✅
+- Attempted Option A (Megalobiz LRC) - WebFetch couldn't extract full LRC content due to copyright
+- Used existing PRD timestamps (which originally came from Megalobiz) to verify against new video
+- Browser verification on YouTube (https://www.youtube.com/watch?v=0th9_v-BbUI):
+  - ✅ Line 1 (14.81s): "For dancing in the alley" - MATCHES
+  - ✅ Line 28 (113.43s): "Woman, Life, Freedom" (زن زندگی آزادی) - MATCHES PERFECTLY
+  - ✅ Line 17 (72.75s): "For this forced paradise" - MATCHES
+- Video duration: 151.381s matches PRD timestamps (end at 151.46s)
+- Created `scripts/baraye-new-timestamps.json` with all 31 lyrics and verified timestamps
+- Typecheck passes ✅
+
+**Option Used:** Option A (Megalobiz/PRD existing timestamps) - no offset adjustment needed!
+
+**Next:** US-024 will update Convex seed data with the new youtubeId and videoUrl.
+
+---
+
 ## Iteration - US-022: Download Correct Baraye Video ✅
 - yt-dlp already installed (version 2025.12.08)
 - Downloaded correct Baraye video from https://www.youtube.com/watch?v=0th9_v-BbUI

@@ -1029,12 +1029,14 @@ Replace YouTube embed with local video player using downloaded MP4:
    - Time-consuming but accurate
 
 **Acceptance Criteria:**
-- [ ] Try Option A (Megalobiz) first - download and test timestamps
-- [ ] If Option A timestamps don't match video, try Option B (QuickLRC)
-- [ ] If Option B fails, try Option C (whisper-timestamped)
-- [ ] Create `scripts/baraye-new-timestamps.json` with accurate timestamps
-- [ ] Verify at least 3 random lines: timestamp matches when line is sung in video
-- [ ] Document which option worked in progress.txt
+- [x] Try Option A (Megalobiz) first - download and test timestamps
+- [x] If Option A timestamps don't match video, try Option B (QuickLRC)
+- [x] If Option B fails, try Option C (whisper-timestamped)
+- [x] Create `scripts/baraye-new-timestamps.json` with accurate timestamps
+- [x] Verify at least 3 random lines: timestamp matches when line is sung in video
+- [x] Document which option worked in progress.txt
+
+**✅ COMPLETE** - Option A (Megalobiz/existing PRD timestamps) worked perfectly with the new video!
 
 **⏹️ STOP - END OF US-023**
 
