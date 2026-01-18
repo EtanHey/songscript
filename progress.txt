@@ -18,6 +18,43 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-WORD-TOKEN-FIX: Migrate and Sync Word States ✅
+- **Task**: Deduplicate wordProgress entries and fix mutations to prevent future duplicates
+- **Context7 Research**:
+  - Used `/llmstxt/convex_dev_llms_txt` for Convex documentation
+  - Researched batch mutations, delete operations, and index queries
+- **Duplicate Analysis (before migration)**:
+  - 28 total records, 21 unique (visitorId, persian) pairs
+  - 2 pairs with duplicates: "برای" had 7 entries, "بی" had 2 entries
+- **Migration Script Created**: `convex/wordProgress.ts:deduplicateWordProgress`
+  - Groups entries by `(visitorId, persian)`
+  - Keeps entry with highest counts/learned state
+  - Merges viewCount and playCount from duplicates
+  - Deletes duplicate entries
+- **Migration Results**:
+  - 7 duplicates deleted
+  - 2 groups merged
+  - 28 → 21 records
+- **Bug Fix**: `incrementViewCount` and `incrementPlayCount` were creating duplicates
+  - Changed from looking up by `wordId` first to looking up by `persian` text
+  - Now all word instances share one progress record per (visitorId, persian)
+- **Browser Verification**:
+  - ✅ Marked "برای" as learned in Line 1 → Progress: 1/4 words
+  - ✅ Opened Line 2 → "برای" shows as learned (synced!) → Progress: 1/5 words
+  - ✅ No duplicate created when opening Line 2 modal (verified via checkDuplicates)
+- **Also Added**: `checkDuplicates` query for auditing duplicate entries
+- Typecheck passes ✅
+
+**Learnings:**
+- Convex doesn't support unique index constraints - must enforce uniqueness in mutation logic
+- When using a denormalized key (persian text) for syncing, all CRUD operations must use that key
+- The old code created duplicates by first checking wordId, then creating new entries for same persian word
+- Migration script should merge counts, not just delete - preserves user's learning history
+
+**Next:** V-WORD-TOKEN (Audit Word Sync Across All Lines)
+
+---
+
 ## Iteration - US-WORD-TOKEN: Verify Schema Indexes and Word Sync ✅
 - **Task**: Verify that word sync by persian text is working correctly after US-WORD-SYNC implementation
 - **Schema verification**:

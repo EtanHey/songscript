@@ -80,38 +80,34 @@ export const getByVisitorWords = query({
 });
 
 // Increment view count for a word
+// Uses persian text as the unique key - all word instances share one progress record
 export const incrementViewCount = mutation({
   args: { visitorId: v.string(), wordId: v.id("words"), persian: v.string() },
   handler: async (ctx, args) => {
-    const existing = await ctx.db
+    // Look up by persian text first - this is the canonical key
+    const existingPersian = await ctx.db
       .query("wordProgress")
-      .withIndex("by_visitor_word", (q) =>
-        q.eq("visitorId", args.visitorId).eq("wordId", args.wordId)
+      .withIndex("by_visitor_persian", (q) =>
+        q.eq("visitorId", args.visitorId).eq("persian", args.persian)
       )
       .first();
 
-    if (existing) {
-      await ctx.db.patch(existing._id, {
-        viewCount: existing.viewCount + 1,
+    if (existingPersian) {
+      // Update the existing record (shared across all instances of this word)
+      await ctx.db.patch(existingPersian._id, {
+        viewCount: existingPersian.viewCount + 1,
         lastSeen: Date.now(),
       });
-      return existing._id;
+      return existingPersian._id;
     } else {
-      // Check if this persian word has been learned before (from another instance)
-      const existingPersian = await ctx.db
-        .query("wordProgress")
-        .withIndex("by_visitor_persian", (q) =>
-          q.eq("visitorId", args.visitorId).eq("persian", args.persian)
-        )
-        .first();
-
+      // No record exists for this persian word - create one
       return await ctx.db.insert("wordProgress", {
         visitorId: args.visitorId,
         wordId: args.wordId,
         persian: args.persian,
         viewCount: 1,
         playCount: 0,
-        learned: existingPersian?.learned ?? false, // Sync learned state from other instances
+        learned: false,
         lastSeen: Date.now(),
       });
     }
@@ -119,38 +115,34 @@ export const incrementViewCount = mutation({
 });
 
 // Increment play count for a word
+// Uses persian text as the unique key - all word instances share one progress record
 export const incrementPlayCount = mutation({
   args: { visitorId: v.string(), wordId: v.id("words"), persian: v.string() },
   handler: async (ctx, args) => {
-    const existing = await ctx.db
+    // Look up by persian text first - this is the canonical key
+    const existingPersian = await ctx.db
       .query("wordProgress")
-      .withIndex("by_visitor_word", (q) =>
-        q.eq("visitorId", args.visitorId).eq("wordId", args.wordId)
+      .withIndex("by_visitor_persian", (q) =>
+        q.eq("visitorId", args.visitorId).eq("persian", args.persian)
       )
       .first();
 
-    if (existing) {
-      await ctx.db.patch(existing._id, {
-        playCount: existing.playCount + 1,
+    if (existingPersian) {
+      // Update the existing record (shared across all instances of this word)
+      await ctx.db.patch(existingPersian._id, {
+        playCount: existingPersian.playCount + 1,
         lastSeen: Date.now(),
       });
-      return existing._id;
+      return existingPersian._id;
     } else {
-      // Check if this persian word has been learned before (from another instance)
-      const existingPersian = await ctx.db
-        .query("wordProgress")
-        .withIndex("by_visitor_persian", (q) =>
-          q.eq("visitorId", args.visitorId).eq("persian", args.persian)
-        )
-        .first();
-
+      // No record exists for this persian word - create one
       return await ctx.db.insert("wordProgress", {
         visitorId: args.visitorId,
         wordId: args.wordId,
         persian: args.persian,
         viewCount: 0,
         playCount: 1,
-        learned: existingPersian?.learned ?? false, // Sync learned state from other instances
+        learned: false,
         lastSeen: Date.now(),
       });
     }
@@ -260,5 +252,110 @@ export const migrateAddPersian = mutation({
     }
 
     return { migrated, total: allProgress.length };
+  },
+});
+
+// Migration: Deduplicate wordProgress entries by (visitorId, persian)
+// Keeps the entry with highest viewCount+playCount, or most recent lastSeen if counts are equal
+// Merges counts from duplicates into the kept entry
+export const deduplicateWordProgress = mutation({
+  args: {},
+  handler: async (ctx) => {
+    // Get all wordProgress records
+    const allProgress = await ctx.db.query("wordProgress").collect();
+
+    // Group by (visitorId, persian)
+    const groups: Map<string, typeof allProgress> = new Map();
+    for (const progress of allProgress) {
+      if (!progress.persian) continue; // Skip entries without persian field
+      const key = `${progress.visitorId}:${progress.persian}`;
+      if (!groups.has(key)) {
+        groups.set(key, []);
+      }
+      groups.get(key)!.push(progress);
+    }
+
+    let deleted = 0;
+    let merged = 0;
+
+    // Process each group
+    for (const [_key, entries] of groups) {
+      if (entries.length <= 1) continue; // No duplicates
+
+      // Sort by: learned first, then by (viewCount + playCount) desc, then by lastSeen desc
+      entries.sort((a, b) => {
+        // Learned entries first
+        if (a.learned !== b.learned) return b.learned ? 1 : -1;
+        // Higher counts first
+        const aTotal = a.viewCount + a.playCount;
+        const bTotal = b.viewCount + b.playCount;
+        if (aTotal !== bTotal) return bTotal - aTotal;
+        // Most recent first
+        return b.lastSeen - a.lastSeen;
+      });
+
+      // Keep the first entry (best one), delete the rest
+      const keeper = entries[0];
+
+      // Merge counts from all duplicates into the keeper
+      let totalViewCount = keeper.viewCount;
+      let totalPlayCount = keeper.playCount;
+      let isLearned = keeper.learned;
+
+      for (let i = 1; i < entries.length; i++) {
+        const dup = entries[i];
+        totalViewCount += dup.viewCount;
+        totalPlayCount += dup.playCount;
+        isLearned = isLearned || dup.learned; // If any was learned, keep learned
+        await ctx.db.delete(dup._id);
+        deleted++;
+      }
+
+      // Update keeper with merged counts
+      await ctx.db.patch(keeper._id, {
+        viewCount: totalViewCount,
+        playCount: totalPlayCount,
+        learned: isLearned,
+      });
+      merged++;
+    }
+
+    return {
+      totalRecords: allProgress.length,
+      groupsProcessed: groups.size,
+      duplicatesDeleted: deleted,
+      recordsMerged: merged,
+    };
+  },
+});
+
+// Query: Check for duplicate wordProgress entries (for auditing)
+export const checkDuplicates = query({
+  args: {},
+  handler: async (ctx) => {
+    const allProgress = await ctx.db.query("wordProgress").collect();
+
+    // Group by (visitorId, persian)
+    const groups: Map<string, number> = new Map();
+    for (const progress of allProgress) {
+      if (!progress.persian) continue;
+      const key = `${progress.visitorId}:${progress.persian}`;
+      groups.set(key, (groups.get(key) || 0) + 1);
+    }
+
+    // Find groups with duplicates
+    const duplicates: Array<{ key: string; count: number }> = [];
+    for (const [key, count] of groups) {
+      if (count > 1) {
+        duplicates.push({ key, count });
+      }
+    }
+
+    return {
+      totalRecords: allProgress.length,
+      uniquePairs: groups.size,
+      duplicatePairs: duplicates.length,
+      duplicates: duplicates.sort((a, b) => b.count - a.count),
+    };
   },
 });
