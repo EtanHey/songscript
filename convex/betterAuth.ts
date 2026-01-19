@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth/minimal";
 import { createClient } from "@convex-dev/better-auth";
-import { convex } from "@convex-dev/better-auth/plugins";
+import { convex, crossDomain } from "@convex-dev/better-auth/plugins";
 import { magicLink } from "better-auth/plugins";
 import authConfig from "./auth.config";
 import { components } from "./_generated/api";
@@ -12,40 +12,8 @@ import { Resend } from "resend";
 // Admin email - only this email can sign up/in
 const ADMIN_EMAIL = "etan@heyman.net";
 
-// Trusted origins for dynamic URL construction
-const TRUSTED_ORIGINS = [
-  "http://localhost:3001",
-  "https://songscript-ten.vercel.app",
-];
-
-const defaultSiteUrl = process.env.SITE_URL!;
+const siteUrl = process.env.SITE_URL!;
 const resendApiKey = process.env.RESEND_API_KEY;
-
-// Helper to rewrite magic link URL based on request origin
-function rewriteMagicLinkUrl(originalUrl: string, origin: string | null): string {
-  if (!origin) return originalUrl;
-
-  // Only rewrite if origin is in trusted list
-  if (!TRUSTED_ORIGINS.includes(origin)) {
-    console.log("Origin not in trusted list:", origin);
-    return originalUrl;
-  }
-
-  try {
-    const url = new URL(originalUrl);
-    const originUrl = new URL(origin);
-
-    // Replace the host with the request origin
-    url.protocol = originUrl.protocol;
-    url.host = originUrl.host;
-
-    console.log("Rewrote magic link URL from", originalUrl, "to", url.toString());
-    return url.toString();
-  } catch (e) {
-    console.error("Failed to rewrite URL:", e);
-    return originalUrl;
-  }
-}
 
 // Initialize Resend client (only if API key is present)
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
@@ -56,30 +24,32 @@ export const authComponent = createClient<DataModel>(components.betterAuth);
 
 export const createAuth = (ctx: GenericCtx<DataModel>) => {
   return betterAuth({
-    baseURL: defaultSiteUrl,
-    trustedOrigins: TRUSTED_ORIGINS,
+    baseURL: siteUrl,
+    trustedOrigins: [
+      "http://localhost:3001",
+      "https://songscript-ten.vercel.app",
+    ],
     database: authComponent.adapter(ctx),
     plugins: [
       // The Convex plugin is required for Convex compatibility
       convex({ authConfig }),
+      // Cross-domain plugin enables OTT (one-time token) flow for session persistence
+      // This is required because auth server (Convex) and frontend are on different domains
+      crossDomain({ siteUrl }),
       // Magic link passwordless authentication
       magicLink({
-        sendMagicLink: async ({ email, url }, authCtx) => {
+        sendMagicLink: async ({ email, url }) => {
           // Block non-admin emails
           if (email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
             throw new Error("Only admin email is allowed to sign in");
           }
 
-          // Get origin from request headers to construct correct URL
-          const origin = authCtx?.headers?.get?.("origin") || null;
-          const finalUrl = rewriteMagicLinkUrl(url, origin);
-
-          // Always log the magic link for debugging
+          // Log the magic link for debugging
+          // Note: The URL should point to Convex auth server, not the frontend
+          // The callbackURL parameter (set in login.tsx) determines where to redirect after verification
           console.log("=".repeat(60));
           console.log("MAGIC LINK FOR:", email);
-          console.log("REQUEST ORIGIN:", origin || "not provided");
-          console.log("ORIGINAL URL:", url);
-          console.log("FINAL URL:", finalUrl);
+          console.log("URL:", url);
           console.log("=".repeat(60));
 
           // Send email via Resend if configured
@@ -93,10 +63,10 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
                   <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                     <h1 style="color: #10b981;">SongScript</h1>
                     <p>Click the button below to sign in to your account:</p>
-                    <a href="${finalUrl}" style="display: inline-block; background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0;">
+                    <a href="${url}" style="display: inline-block; background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0;">
                       Sign In
                     </a>
-                    <p style="color: #666; font-size: 14px;">Or copy this link: ${finalUrl}</p>
+                    <p style="color: #666; font-size: 14px;">Or copy this link: ${url}</p>
                     <p style="color: #999; font-size: 12px;">This link will expire in 1 hour.</p>
                   </div>
                 `,

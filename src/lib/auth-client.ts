@@ -10,9 +10,12 @@ export const authClient = createAuthClient({
   plugins: [
     convexClient(),
     magicLinkClient(),
-    // crossDomainClient handles localStorage-based session persistence
-    // Required because frontend (:3001) and auth server (convex.site) are different domains
-    crossDomainClient(),
+    // Cross-domain client handles the OTT (one-time token) flow
+    // After auth redirect, it detects ?ott= in URL, verifies it, and stores session in localStorage
+    crossDomainClient({
+      storage: typeof window !== "undefined" ? window.localStorage : undefined,
+      storagePrefix: "songscript",
+    }),
   ],
 });
 

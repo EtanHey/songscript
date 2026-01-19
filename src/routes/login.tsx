@@ -79,9 +79,11 @@ function LoginPage() {
     }
 
     try {
+      // Use absolute URL so redirect goes back to same origin (localhost or production)
+      const callbackURL = `${window.location.origin}/dashboard`;
       const result = await authClient.signIn.magicLink({
         email,
-        callbackURL: "/dashboard",
+        callbackURL,
       });
 
       if (result.error) {
