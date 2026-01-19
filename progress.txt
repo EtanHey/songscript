@@ -22,6 +22,23 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - V-AUTOPLAY-FIX: Verify Video Auto-Play (BLOCKED)
+- Attempted to verify video autoplay functionality via browser automation
+- **BLOCKED:** Dev server returns intermittent 503 errors for /video/baraye/baraye.mp4 when loaded via `<video>` tag
+- Video works perfectly when navigated to directly in browser
+- Network requests show 503 errors interspersed with occasional 200/206 responses
+- This is a TanStack Start + Nitro server-side Range request handling issue
+- Partial verification completed:
+  - ✅ Dev server running
+  - ✅ Page loads correctly
+  - ✅ Fluid mode button is selected by default
+  - ❌ Cannot verify video playback due to 503 errors
+  - ❌ Cannot test autoplay, Single mode, Loop mode
+- Marked story as BLOCKED in prd-json
+- **Learning:** TanStack Start + Nitro has issues serving video files with Range requests when embedded in a page. Direct URL navigation works.
+
+---
+
 ## Iteration - US-AUTOPLAY-FIX: Fix Video Not Auto-Playing on Fluid Mode ✅
 - **Root Cause Found:** Old auto-play logic depended on `audioReady` (audio snippets loaded), but in Fluid mode we use video audio, not snippets
 - **Fix Applied:** Moved auto-play logic to LocalVideoPlayer component itself:

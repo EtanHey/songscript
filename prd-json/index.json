@@ -4,12 +4,12 @@
   "projectName": "SongScript Critical Fixes + Dashboard Enhancement",
   "workingDirectory": ".",
   "stats": {
-    "total": 23,
+    "total": 24,
     "completed": 3,
-    "pending": 18,
-    "blocked": 2
+    "pending": 17,
+    "blocked": 4
   },
-  "nextStory": "V-AUTOPLAY-FIX",
+  "nextStory": "US-LOOP-FIX",
   "storyOrder": [
     "US-AUTH-FIX",
     "V-AUTH-FIX",
@@ -33,10 +33,10 @@
     "US-DASH-LANGUAGES",
     "US-DASH-WORD-DETAILS",
     "US-DASH-LAYOUT",
-    "V-DASH-BATCH3"
+    "V-DASH-BATCH3",
+    "US-SSR-SONG-LIST"
   ],
   "pending": [
-    "V-AUTOPLAY-FIX",
     "US-LOOP-FIX",
     "V-LOOP-FIX",
     "US-WORD-AUDIO",
@@ -57,7 +57,9 @@
   ],
   "blocked": [
     "US-EMAIL-RESEND",
-    "V-EMAIL-RESEND"
+    "V-EMAIL-RESEND",
+    "V-AUTOPLAY-FIX",
+    "US-SSR-SONG-LIST"
   ],
   "browserSetup": {
     "viewport": "desktop 1200px+",
@@ -73,6 +75,7 @@
     "resendKey": "Set in .env.local - RESEND_API_KEY",
     "archiveLocation": "Old 61 completed stories archived - this is a fresh focused PRD",
     "dashboardBatches": "Dashboard stories are batched: Batch1 (Songs/Words/Wishlist), Batch2 (Streaks/Recent/Stats), Batch3 (Goals/Languages/WordDetails/Layout). Each batch has a V-DASH-BATCH* verification story.",
-    "dashboardDesign": "MOBILE-FIRST: All dashboard components designed for 320px+ first, scaled up with Tailwind breakpoints (sm/md/lg/xl). High emphasis on UX/UI quality and responsive testing."
+    "dashboardDesign": "MOBILE-FIRST: All dashboard components designed for 320px+ first, scaled up with Tailwind breakpoints (sm/md/lg/xl). High emphasis on UX/UI quality and responsive testing.",
+    "videoBlocker": "V-AUTOPLAY-FIX blocked: TanStack Start + Nitro returns 503 for video Range requests embedded in page. Video works when navigated to directly."
   }
 }

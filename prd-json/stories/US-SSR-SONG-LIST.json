@@ -1,0 +1,24 @@
+{
+  "id": "US-SSR-SONG-LIST",
+  "title": "SSR: Pre-render Song List on Home Page",
+  "description": "Server-side render the song list on the home page for better SEO and initial load performance. Only names and thumbnails needed.",
+  "technicalContext": {
+    "framework": "TanStack Start with Convex",
+    "approach": "Use TanStack Start's server functions to fetch songs at request time",
+    "data": "Song titles, thumbnails, language flags - minimal data for list view",
+    "seo": "Songs should be crawlable by search engines"
+  },
+  "acceptanceCriteria": [
+    {"text": "Create server loader function to fetch songs from Convex", "checked": false},
+    {"text": "Home page uses loader data for initial render (not client-side fetch)", "checked": false},
+    {"text": "Song list renders with: title, thumbnail, language", "checked": false},
+    {"text": "View page source shows song titles in HTML (not just loading state)", "checked": false},
+    {"text": "Page loads with content visible before JS hydration", "checked": false},
+    {"text": "Convex real-time updates still work after hydration", "checked": false},
+    {"text": "MOBILE-FIRST: Song cards responsive on all screen sizes", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "All unit tests pass", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": null
+}
