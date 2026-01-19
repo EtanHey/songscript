@@ -6,10 +6,10 @@
   "stats": {
     "total": 23,
     "completed": 2,
-    "pending": 21,
-    "blocked": 0
+    "pending": 19,
+    "blocked": 2
   },
-  "nextStory": "US-EMAIL-RESEND",
+  "nextStory": "US-AUTOPLAY-FIX",
   "storyOrder": [
     "US-AUTH-FIX",
     "V-AUTH-FIX",
@@ -36,8 +36,6 @@
     "V-DASH-BATCH3"
   ],
   "pending": [
-    "US-EMAIL-RESEND",
-    "V-EMAIL-RESEND",
     "US-AUTOPLAY-FIX",
     "V-AUTOPLAY-FIX",
     "US-LOOP-FIX",
@@ -58,7 +56,10 @@
     "US-DASH-LAYOUT",
     "V-DASH-BATCH3"
   ],
-  "blocked": [],
+  "blocked": [
+    "US-EMAIL-RESEND",
+    "V-EMAIL-RESEND"
+  ],
   "browserSetup": {
     "viewport": "desktop 1200px+",
     "homeUrl": "http://localhost:3001",

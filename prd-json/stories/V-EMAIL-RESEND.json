@@ -18,5 +18,5 @@
     {"text": "No console errors via mcp__browser-tools__getConsoleErrors", "checked": false}
   ],
   "passes": false,
-  "blockedBy": "US-EMAIL-RESEND"
+  "blockedBy": "US-EMAIL-RESEND is blocked - RESEND_API_KEY must be added to Convex environment variables by user"
 }

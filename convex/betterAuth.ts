@@ -7,11 +7,16 @@ import { components } from "./_generated/api";
 import { query } from "./_generated/server";
 import type { GenericCtx } from "@convex-dev/better-auth";
 import type { DataModel } from "./_generated/dataModel";
+import { Resend } from "resend";
 
 // Admin email - only this email can sign up/in
 const ADMIN_EMAIL = "etan@heyman.net";
 
 const siteUrl = process.env.SITE_URL!;
+const resendApiKey = process.env.RESEND_API_KEY;
+
+// Initialize Resend client (only if API key is present)
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 // The component client has methods needed for integrating Convex with Better Auth,
 // as well as helper methods for general use.
@@ -31,12 +36,46 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
           if (email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
             throw new Error("Only admin email is allowed to sign in");
           }
-          // For development: log the magic link to console
-          // In production, this would send an email
+
+          // Always log the magic link for debugging
           console.log("=".repeat(60));
           console.log("MAGIC LINK FOR:", email);
           console.log("URL:", url);
           console.log("=".repeat(60));
+
+          // Send email via Resend if configured
+          if (resend) {
+            try {
+              const { error } = await resend.emails.send({
+                from: "SongScript <noreply@heyman.net>",
+                to: email,
+                subject: "Your SongScript Login Link",
+                html: `
+                  <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h1 style="color: #10b981;">SongScript</h1>
+                    <p>Click the button below to sign in to your account:</p>
+                    <a href="${url}" style="display: inline-block; background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0;">
+                      Sign In
+                    </a>
+                    <p style="color: #666; font-size: 14px;">Or copy this link: ${url}</p>
+                    <p style="color: #999; font-size: 12px;">This link will expire in 1 hour.</p>
+                  </div>
+                `,
+              });
+
+              if (error) {
+                console.error("Resend email error:", error);
+                // Don't throw - link is still logged to console as fallback
+              } else {
+                console.log("Magic link email sent successfully via Resend");
+              }
+            } catch (err) {
+              console.error("Failed to send email via Resend:", err);
+              // Don't throw - link is still logged to console as fallback
+            }
+          } else {
+            console.log("Resend not configured - check RESEND_API_KEY in .env.local");
+          }
         },
       }),
     ],

@@ -20,14 +20,14 @@
     {"text": "Configure Better Auth sendMagicLink to use Resend API", "checked": true},
     {"text": "Set from email to something like noreply@heyman.net or similar verified domain", "checked": true},
     {"text": "Update convex/betterAuth.ts with Resend email sending", "checked": true},
-    {"text": "Start dev server: bun run dev", "checked": false},
-    {"text": "Navigate to /login and enter etan@heyman.net", "checked": false},
-    {"text": "Click 'Send Magic Link'", "checked": false},
+    {"text": "Start dev server: bun run dev", "checked": true},
+    {"text": "Navigate to /login and enter etan@heyman.net", "checked": true},
+    {"text": "Click 'Send Magic Link'", "checked": true},
     {"text": "Check actual email inbox - magic link email should arrive", "checked": false},
     {"text": "Click magic link in email - should log in successfully", "checked": false},
-    {"text": "Typecheck passes", "checked": false},
-    {"text": "All unit tests pass", "checked": false}
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "All unit tests pass", "checked": true}
   ],
   "passes": false,
-  "blockedBy": "Convex bundler error: 'Two output files share the same path but have different contents' prevents deployment. This pre-existing issue blocks ALL Convex code changes from being deployed. The code changes are complete but cannot be tested until the bundler issue is resolved."
+  "blockedBy": "Code implementation complete. RESEND_API_KEY must be added to Convex environment variables at dashboard.convex.dev > Settings > Environment Variables. User needs to: 1) Go to dashboard.convex.dev 2) Navigate to Settings > Environment Variables 3) Add RESEND_API_KEY with value from .env.local. After that, email delivery can be verified."
 }

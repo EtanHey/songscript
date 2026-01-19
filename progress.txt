@@ -238,5 +238,28 @@
 
 ---
 
+## Iteration - US-EMAIL-RESEND: Resend Integration Implementation
+- **FIXED Convex bundler error!** Root cause: Duplicate .js files in convex/ folder alongside .ts files
+  - Removed: songs.js, wordProgress.js, words.js, betterAuth.js, http.js, lyrics.js, seed.js, schema.js, auth.config.js, convex.config.js
+  - These were accidentally committed compiled files that conflicted with TypeScript source files
+- Installed resend package: bun add resend@6.8.0
+- Updated convex/betterAuth.ts with Resend email integration:
+  - Import and initialize Resend client with RESEND_API_KEY from process.env
+  - sendMagicLink now sends HTML email via Resend (from: "SongScript <noreply@heyman.net>")
+  - Includes styled email template with sign-in button and fallback URL
+  - Graceful fallback: if Resend fails or not configured, magic link is still logged to console
+- Typecheck passes, all 51 unit tests pass
+- Browser verification: /login page works, "Magic link sent!" message displays correctly
+- **STILL BLOCKED:** RESEND_API_KEY needs to be added to Convex environment variables
+  - .env.local is only for local dev server
+  - Convex cloud functions need the key in dashboard.convex.dev > Settings > Environment Variables
+  - User must add this manually (API keys cannot be entered programmatically for security)
+- **Learning:** Convex bundler "Two output files share same path" error = duplicate .js and .ts files. Delete the .js files.
+- **Learning:** Convex environment variables are separate from .env.local - cloud functions need keys configured in dashboard
+
+[US-EMAIL-RESEND] BLOCKED: Code complete. User needs to add RESEND_API_KEY to Convex environment variables at dashboard.convex.dev.
+
+---
+
 ## Previous Archives
 - docs.local/prd-archive/progress-2026-01-19.txt (1307 lines)
