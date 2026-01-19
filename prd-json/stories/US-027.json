@@ -1,0 +1,37 @@
+{
+  "id": "US-027",
+  "title": "Full Video Playback Mode",
+  "description": "Add mode where video plays with audio and lyrics auto-sync/highlight.",
+  "acceptanceCriteria": [
+    {
+      "text": "Add \"Play Full Video\" button",
+      "checked": true
+    },
+    {
+      "text": "When clicked: unmute video, start from beginning, auto-play",
+      "checked": true
+    },
+    {
+      "text": "Lyrics highlight based on video currentTime (existing logic)",
+      "checked": true
+    },
+    {
+      "text": "Loop mode still works (re-seek to line startTime)",
+      "checked": true
+    },
+    {
+      "text": "Speed control works on video",
+      "checked": true
+    },
+    {
+      "text": "User can click line to jump (video seeks + continues playing)",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

@@ -1,0 +1,25 @@
+{
+  "id": "V-001",
+  "title": "Verify Project Setup",
+  "description": null,
+  "acceptanceCriteria": [
+    {
+      "text": "`bun dev` starts server without errors",
+      "checked": true
+    },
+    {
+      "text": "Homepage loads at localhost:3001",
+      "checked": true
+    },
+    {
+      "text": "No console errors in browser",
+      "checked": true
+    },
+    {
+      "text": "Take screenshot of homepage",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

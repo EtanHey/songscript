@@ -1,0 +1,25 @@
+{
+  "id": "V-004",
+  "title": "Verify Language Filter",
+  "description": null,
+  "acceptanceCriteria": [
+    {
+      "text": "Select \"Persian only\" - only Persian text shows",
+      "checked": true
+    },
+    {
+      "text": "Select \"English only\" - only English text shows",
+      "checked": true
+    },
+    {
+      "text": "Select \"All\" - all languages show",
+      "checked": true
+    },
+    {
+      "text": "Take screenshot of filtered view",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

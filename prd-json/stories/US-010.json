@@ -1,0 +1,37 @@
+{
+  "id": "US-010",
+  "title": "Loop Mode Toggle",
+  "description": "Add loop toggle that repeats the current line.",
+  "acceptanceCriteria": [
+    {
+      "text": "Add ShadCN Switch component for loop toggle",
+      "checked": true
+    },
+    {
+      "text": "Store `isLooping` and `currentLineIndex` in state",
+      "checked": true
+    },
+    {
+      "text": "When loop ON and time reaches `endTime`, seek back to `startTime`",
+      "checked": true
+    },
+    {
+      "text": "Use `setInterval` (100ms) to check currentTime",
+      "checked": true
+    },
+    {
+      "text": "Clear interval on unmount",
+      "checked": true
+    },
+    {
+      "text": "Visual indicator when loop is active (icon or badge)",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

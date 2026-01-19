@@ -1,0 +1,33 @@
+{
+  "id": "US-025",
+  "title": "Extract Audio Snippets from New Video",
+  "description": "Extract individual audio snippets for each lyric line from the new audio file.",
+  "acceptanceCriteria": [
+    {
+      "text": "Update `scripts/extract-snippets.sh` to use new timestamps",
+      "checked": true
+    },
+    {
+      "text": "Run script: `./scripts/extract-snippets.sh scripts/baraye-new-timestamps.json public/audio/baraye/baraye_full.mp3`",
+      "checked": true
+    },
+    {
+      "text": "Verify all 31 snippets created in `public/audio/baraye/`",
+      "checked": true
+    },
+    {
+      "text": "Verify snippets play correct audio (spot check 3 random lines)",
+      "checked": true
+    },
+    {
+      "text": "Total size < 5 MB (3.16MB)",
+      "checked": true
+    },
+    {
+      "text": "Update seed audioSnippetUrl paths if changed (paths unchanged - already using correct `/audio/baraye/baraye_XXX.mp3` format)",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

@@ -1,0 +1,37 @@
+{
+  "id": "US-032",
+  "title": "Word Learning Tracking",
+  "description": "Track user's progress learning individual words. Mark words as \"learned\" per user.",
+  "acceptanceCriteria": [
+    {
+      "text": "Add Convex table `wordProgress` with visitorId, wordId, viewCount, playCount, learned, lastSeen",
+      "checked": true
+    },
+    {
+      "text": "Generate visitor ID in localStorage if no auth session",
+      "checked": true
+    },
+    {
+      "text": "Track view count when word modal opens",
+      "checked": true
+    },
+    {
+      "text": "Track play count when word audio plays",
+      "checked": true
+    },
+    {
+      "text": "Add \"learned\" checkbox in word info modal",
+      "checked": true
+    },
+    {
+      "text": "Show learned status with visual indicator (checkmark badge)",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

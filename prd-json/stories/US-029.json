@@ -1,0 +1,37 @@
+{
+  "id": "US-029",
+  "title": "Pause/Play Controls",
+  "description": "Add pause/play button that works across all modes.",
+  "acceptanceCriteria": [
+    {
+      "text": "Add pause/play button to controls section",
+      "checked": true
+    },
+    {
+      "text": "Button shows play icon when paused, pause icon when playing",
+      "checked": true
+    },
+    {
+      "text": "In Single/Loop: pauses both snippet audio AND video",
+      "checked": true
+    },
+    {
+      "text": "In Fluid: pauses video (which includes audio)",
+      "checked": true
+    },
+    {
+      "text": "Clicking paused line resumes from that line",
+      "checked": true
+    },
+    {
+      "text": "Spacebar keyboard shortcut for pause/play",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

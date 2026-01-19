@@ -1,0 +1,33 @@
+{
+  "id": "US-023",
+  "title": "Get Timestamps for New Video",
+  "description": "Get accurate line-by-line timestamps for the new video. Multiple options available - try in order until one works.",
+  "acceptanceCriteria": [
+    {
+      "text": "Try Option A (Megalobiz) first - download and test timestamps",
+      "checked": true
+    },
+    {
+      "text": "If Option A timestamps don't match video, try Option B (QuickLRC)",
+      "checked": true
+    },
+    {
+      "text": "If Option B fails, try Option C (whisper-timestamped)",
+      "checked": true
+    },
+    {
+      "text": "Create `scripts/baraye-new-timestamps.json` with accurate timestamps",
+      "checked": true
+    },
+    {
+      "text": "Verify at least 3 random lines: timestamp matches when line is sung in video",
+      "checked": true
+    },
+    {
+      "text": "Document which option worked in progress.txt",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

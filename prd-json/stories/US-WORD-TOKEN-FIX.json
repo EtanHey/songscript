@@ -1,0 +1,37 @@
+{
+  "id": "US-WORD-TOKEN-FIX",
+  "title": "Migrate and Sync Word States",
+  "description": "Ensure all existing word progress data is properly synced by Persian text, and fix any duplicate/inconsistent entries.",
+  "acceptanceCriteria": [
+    {
+      "text": "CONTEXT7 FIRST: Research Convex batch mutations for data migration",
+      "checked": true
+    },
+    {
+      "text": "Create migration script `convex/wordProgress.ts:deduplicateWordProgress` that groups by `(visitorId, persian)` field",
+      "checked": true
+    },
+    {
+      "text": "Run migration via `npx convex run wordProgress:deduplicateWordProgress`",
+      "checked": true
+    },
+    {
+      "text": "Verify no duplicate entries exist for same `(visitorId, persian)` pair",
+      "checked": true
+    },
+    {
+      "text": "Fixed `incrementViewCount` and `incrementPlayCount` to use persian as key (prevents new duplicates)",
+      "checked": true
+    },
+    {
+      "text": "Test: After migration, word states are consistent (verified \"برای\" syncs between Line 1 and Line 2)",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

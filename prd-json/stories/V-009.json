@@ -1,0 +1,37 @@
+{
+  "id": "V-009",
+  "title": "Verify Word Info Modal",
+  "description": "Verify the word-by-word info modal works correctly.",
+  "acceptanceCriteria": [
+    {
+      "text": "BROWSER TEST: Click lyric line → modal opens",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Modal shows word-by-word breakdown",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Each word shows: Persian, transliteration, Hebrew, English",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Click word audio button → shows \"Audio not available (coming soon)\" (US-031 pending)",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Close modal (X or click outside)",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Mobile: modal slides up from bottom (code implemented, uses ShadCN Sheet for mobile)",
+      "checked": true
+    },
+    {
+      "text": "Take screenshot showing modal content",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

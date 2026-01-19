@@ -1,0 +1,37 @@
+{
+  "id": "US-015",
+  "title": "Mobile Responsive Design",
+  "description": "Ensure the app works well on mobile devices.",
+  "acceptanceCriteria": [
+    {
+      "text": "YouTube player: 100% width on mobile, fixed width on desktop",
+      "checked": true
+    },
+    {
+      "text": "Lyrics below video on mobile, beside on desktop (md: breakpoint)",
+      "checked": true
+    },
+    {
+      "text": "Line buttons have min-height 44px for touch",
+      "checked": true
+    },
+    {
+      "text": "Controls (loop, speed, filter) stack vertically on mobile",
+      "checked": true
+    },
+    {
+      "text": "No horizontal scroll on mobile",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    },
+    {
+      "text": "Verify in browser at 375px width",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

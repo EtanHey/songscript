@@ -1,0 +1,33 @@
+{
+  "id": "US-MOBILE-LAYOUT",
+  "title": "Mobile Controls Layout Fix",
+  "description": "On mobile, the line number and current line indicator should appear below or in the same row as the word mode toggle, not awkwardly placed.",
+  "acceptanceCriteria": [
+    {
+      "text": "Show current line number indicator more prominently on mobile",
+      "checked": true
+    },
+    {
+      "text": "Line indicator should be in same row as Mode toggle OR on its own row below it",
+      "checked": true
+    },
+    {
+      "text": "Consider showing \"Line X: {first few words of line}\" on mobile for context",
+      "checked": true
+    },
+    {
+      "text": "Works in all playback modes (Single, Loop, Fluid)",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Verify layout on mobile viewport (375px)",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

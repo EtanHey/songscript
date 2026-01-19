@@ -1,0 +1,33 @@
+{
+  "id": "US-001",
+  "title": "Project Scaffolding with TanStack Start + Bun",
+  "description": "Initialize the project with TanStack Start and Bun runtime.",
+  "acceptanceCriteria": [
+    {
+      "text": "Run `bun create @tanstack/start songscript-app` or equivalent to scaffold project",
+      "checked": true
+    },
+    {
+      "text": "Move scaffolded files to project root (not nested in songscript-app/)",
+      "checked": true
+    },
+    {
+      "text": "Configure `vite.config.ts` with `nitro({ preset: \"bun\" })` and `server: { port: 3001 }`",
+      "checked": true
+    },
+    {
+      "text": "Update `package.json` scripts (note: `bun --bun` caused issues, using plain vite commands)",
+      "checked": true
+    },
+    {
+      "text": "Verify `bun dev` starts the server on localhost:3001",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes (`bun run typecheck` or equivalent)",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

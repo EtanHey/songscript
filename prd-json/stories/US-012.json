@@ -1,0 +1,33 @@
+{
+  "id": "US-012",
+  "title": "Language Filter Dropdown",
+  "description": "Add dropdown to filter which language versions are shown.",
+  "acceptanceCriteria": [
+    {
+      "text": "Add ShadCN Select for language filter",
+      "checked": true
+    },
+    {
+      "text": "Options: All, Persian only, Transliteration only, Hebrew only, English only",
+      "checked": true
+    },
+    {
+      "text": "Filter affects which text rows are visible per line",
+      "checked": true
+    },
+    {
+      "text": "Default: All",
+      "checked": true
+    },
+    {
+      "text": "Filter state stored in component",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

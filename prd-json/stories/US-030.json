@@ -1,0 +1,41 @@
+{
+  "id": "US-030",
+  "title": "Word-by-Word Info Modal",
+  "description": "Clicking a lyric line opens a modal showing word-by-word breakdown.",
+  "acceptanceCriteria": [
+    {
+      "text": "Click/tap lyric line opens modal (in addition to playing audio)",
+      "checked": true
+    },
+    {
+      "text": "Modal shows line's full text at top",
+      "checked": true
+    },
+    {
+      "text": "Below: word-by-word table with all columns",
+      "checked": true
+    },
+    {
+      "text": "Each word row has audio button (speaker icon) - disabled until US-031 complete",
+      "checked": true
+    },
+    {
+      "text": "Close button (X) and click-outside-to-close",
+      "checked": true
+    },
+    {
+      "text": "Mobile: modal is full-screen drawer from bottom",
+      "checked": true
+    },
+    {
+      "text": "Desktop: centered modal with backdrop",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

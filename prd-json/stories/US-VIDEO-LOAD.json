@@ -1,0 +1,49 @@
+{
+  "id": "US-VIDEO-LOAD",
+  "title": "Fix Video Behavior on Page Load",
+  "description": "There's an issue with the video when the page first loads, without any user interaction.",
+  "acceptanceCriteria": [
+    {
+      "text": "BROWSER TEST: Navigate to song page fresh (hard refresh)",
+      "checked": true
+    },
+    {
+      "text": "Document what happens: Does video autoplay? Error? Wrong state?",
+      "checked": true
+    },
+    {
+      "text": "Check console for errors with `mcp__claude-in-chrome__read_console_messages`",
+      "checked": true
+    },
+    {
+      "text": "Identify root cause",
+      "checked": true
+    },
+    {
+      "text": "Video should NOT autoplay on page load (verified - paused by default)",
+      "checked": true
+    },
+    {
+      "text": "Video should be paused and muted by default (verified - VolumeX icon shown)",
+      "checked": true
+    },
+    {
+      "text": "No console errors on load (verified - only Vite connection logs)",
+      "checked": true
+    },
+    {
+      "text": "User must click a line or play button to start playback (verified)",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Verify video is visible within 5 seconds of page load (no more infinite spinner)",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

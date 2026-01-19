@@ -1,0 +1,149 @@
+{
+  "id": "US-020",
+  "title": "Local Audio Snippets for Instant Playback",
+  "description": "Replace YouTube seekTo with local audio snippets for instant, zero-latency playback when clicking lyric lines.",
+  "acceptanceCriteria": [
+    {
+      "text": "Create `scripts/extract-snippets.sh` that extracts snippets from a full audio file",
+      "checked": true
+    },
+    {
+      "text": "Script reads timestamps from `scripts/baraye-timestamps.json`",
+      "checked": true
+    },
+    {
+      "text": "Script outputs to `public/audio/{songSlug}/` directory",
+      "checked": true
+    },
+    {
+      "text": "All 31 Baraye snippets extracted at 192 kbps MP3",
+      "checked": true
+    },
+    {
+      "text": "Total size < 4 MB (3.07MB)",
+      "checked": true
+    },
+    {
+      "text": "Document the manual yt-dlp step in script comments",
+      "checked": true
+    },
+    {
+      "text": "Add `audioSnippetUrl` field to lyrics schema (optional for backward compat)",
+      "checked": true
+    },
+    {
+      "text": "Push schema update: `bunx convex dev`",
+      "checked": true
+    },
+    {
+      "text": "Update seed script to include audioSnippetUrl for each line",
+      "checked": true
+    },
+    {
+      "text": "Re-seed Baraye with audio URLs: `npx convex run seed:seedBaraye`",
+      "checked": true
+    },
+    {
+      "text": "Verify in Convex dashboard: lyrics have audioSnippetUrl populated (31 lyrics updated)",
+      "checked": true
+    },
+    {
+      "text": "Create `src/hooks/useAudioPreloader.ts` with above implementation",
+      "checked": true
+    },
+    {
+      "text": "Hook preloads all audio files on mount using `preload=\"auto\"`",
+      "checked": true
+    },
+    {
+      "text": "Hook tracks loading progress (loaded/total)",
+      "checked": true
+    },
+    {
+      "text": "Hook exposes `ready` boolean when all snippets loaded",
+      "checked": true
+    },
+    {
+      "text": "Hook exposes `play(lineNumber)` function for instant playback",
+      "checked": true
+    },
+    {
+      "text": "Hook exposes `stop()` function to stop all audio",
+      "checked": true
+    },
+    {
+      "text": "Hook cleans up audio elements on unmount",
+      "checked": true
+    },
+    {
+      "text": "Song page uses `useAudioPreloader` hook",
+      "checked": true
+    },
+    {
+      "text": "Show \"Loading audio... X/31\" while preloading",
+      "checked": true
+    },
+    {
+      "text": "Clicking a lyric line plays local audio snippet instantly",
+      "checked": true
+    },
+    {
+      "text": "Previous audio stops when new line is clicked",
+      "checked": true
+    },
+    {
+      "text": "Loop mode works with local audio (replay snippet when it ends)",
+      "checked": true
+    },
+    {
+      "text": "Playback speed control works (use `audio.playbackRate`)",
+      "checked": true
+    },
+    {
+      "text": "YouTube video is OPTIONAL - can be hidden or shown for reference",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Navigate to `/song/{baraye-id}`",
+      "checked": false
+    },
+    {
+      "text": "BROWSER TEST: Wait for \"Loading audio...\" to complete",
+      "checked": false
+    },
+    {
+      "text": "BROWSER TEST: Click line 1 → audio plays INSTANTLY (no buffering)",
+      "checked": false
+    },
+    {
+      "text": "BROWSER TEST: Click line 15 → audio plays INSTANTLY",
+      "checked": false
+    },
+    {
+      "text": "BROWSER TEST: Click line 28 → audio plays INSTANTLY",
+      "checked": false
+    },
+    {
+      "text": "BROWSER TEST: Rapid clicking between lines → each plays correctly",
+      "checked": false
+    },
+    {
+      "text": "BROWSER TEST: Enable loop → line replays automatically",
+      "checked": false
+    },
+    {
+      "text": "BROWSER TEST: Change speed to 0.5x → audio slows down",
+      "checked": false
+    },
+    {
+      "text": "BROWSER TEST: Measure latency: click-to-sound < 100ms",
+      "checked": false
+    },
+    {
+      "text": "Take screenshot showing song page with audio controls",
+      "checked": false
+    }
+  ],
+  "passes": false,
+  "blockedBy": null
+}

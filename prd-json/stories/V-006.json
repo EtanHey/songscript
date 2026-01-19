@@ -1,0 +1,29 @@
+{
+  "id": "V-006",
+  "title": "Verify RTL Support",
+  "description": null,
+  "acceptanceCriteria": [
+    {
+      "text": "Persian text displays right-to-left",
+      "checked": true
+    },
+    {
+      "text": "Hebrew text displays right-to-left",
+      "checked": true
+    },
+    {
+      "text": "Text alignment is correct (text-right)",
+      "checked": true
+    },
+    {
+      "text": "No visual glitches with mixed RTL/LTR",
+      "checked": true
+    },
+    {
+      "text": "Take screenshot showing RTL text",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

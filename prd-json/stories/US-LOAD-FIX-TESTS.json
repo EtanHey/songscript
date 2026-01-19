@@ -1,0 +1,37 @@
+{
+  "id": "US-LOAD-FIX-TESTS",
+  "title": "Tests for Route Loading",
+  "description": "Write unit and e2e tests to verify all routes load correctly. Include manual checklist for magic link auth.",
+  "acceptanceCriteria": [
+    {
+      "text": "Create `e2e/routes.spec.ts`",
+      "checked": false
+    },
+    {
+      "text": "E2E: Test `/` loads without console errors",
+      "checked": false
+    },
+    {
+      "text": "E2E: Test `/login` loads, form is visible",
+      "checked": false
+    },
+    {
+      "text": "E2E: Test `/song/{testSongId}` loads without console errors",
+      "checked": false
+    },
+    {
+      "text": "E2E: Test navigation between routes works",
+      "checked": false
+    },
+    {
+      "text": "All tests pass: `bun run test:e2e`",
+      "checked": false
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": false
+    }
+  ],
+  "passes": false,
+  "blockedBy": null
+}

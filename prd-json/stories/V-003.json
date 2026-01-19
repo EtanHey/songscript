@@ -1,0 +1,33 @@
+{
+  "id": "V-003",
+  "title": "Verify Player Functionality",
+  "description": null,
+  "acceptanceCriteria": [
+    {
+      "text": "Navigate to `/song/{baraye-id}`",
+      "checked": true
+    },
+    {
+      "text": "YouTube video loads and plays",
+      "checked": true
+    },
+    {
+      "text": "Click line 5 - video jumps to ~28.61s",
+      "checked": true
+    },
+    {
+      "text": "Enable loop - line repeats when reaching endTime",
+      "checked": true
+    },
+    {
+      "text": "Change speed to 0.5x - video slows down",
+      "checked": true
+    },
+    {
+      "text": "Take screenshot showing player + lyrics",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

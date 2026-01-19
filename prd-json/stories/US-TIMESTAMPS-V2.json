@@ -1,0 +1,33 @@
+{
+  "id": "US-TIMESTAMPS-V2",
+  "title": "Increase END Buffer (User Still Hearing Cutoff)",
+  "description": "User reports audio snippet ENDINGS are still getting cut off. The start is fine, but endings are cut.",
+  "acceptanceCriteria": [
+    {
+      "text": "Update `scripts/baraye-new-timestamps.json`: Keep start offset at +0.35s, Change end offset from +0.45s to +0.70s, Update the \"note\" field",
+      "checked": true
+    },
+    {
+      "text": "Re-extract all 31 snippets: `./scripts/extract-snippets.sh scripts/baraye-new-timestamps.json public/audio/baraye/baraye_full.mp3`",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST in Single mode: Click line 28 - hear FULL \"zan, zendegi, āzādi\" with NO cutoff",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST in Loop mode: Click line 5, 15, 20 - endings are complete, no rush",
+      "checked": true
+    },
+    {
+      "text": "If STILL cutting, increase end to +0.85s and re-test (NOT NEEDED - +0.70s works)",
+      "checked": true
+    },
+    {
+      "text": "Commit changes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

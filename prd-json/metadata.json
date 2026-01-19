@@ -1,0 +1,75 @@
+{
+  "projectName": "SongScript - Song Transliteration Learning App",
+  "workingDirectory": ".",
+  "testUrl": "http://localhost:3001",
+  "techStack": [
+    "TanStack Start",
+    "Bun runtime",
+    "Convex",
+    "Better Auth",
+    "Tailwind CSS",
+    "ShadCN UI",
+    "Vitest",
+    "Playwright"
+  ],
+  "iterationRules": [
+    "ONE STORY PER ITERATION - NO EXCEPTIONS",
+    "TYPECHECK IS MANDATORY",
+    "VERIFY VISUALLY in browser before marking complete",
+    "DO NOT BATCH - each story is separate iteration",
+    "V-* STORIES ARE MANDATORY",
+    "NO INLINE COLORS - use Tailwind preset tokens",
+    "NO ARBITRARY PIXELS - use Tailwind scale or CSS variables",
+    "NO SKIPPING - use all available tools",
+    "ACTUALLY TEST - run and verify end-to-end",
+    "MANDATORY BROWSER VERIFICATION AFTER EACH STORY",
+    "DESKTOP FIRST - MOBILE LATER",
+    "Test on desktop viewport (1200px+)"
+  ],
+  "rtlRules": [
+    "Think in START/END, not LEFT/RIGHT",
+    "START = RIGHT in RTL (beginning of reading)",
+    "END = LEFT in RTL (end of reading)",
+    "RTL must propagate to ALL inner flex containers",
+    "Persian/Hebrew text should be text-right, flex columns should be items-end",
+    "Prices/numbers: Wrap in <span dir=\"ltr\"> to prevent reversal",
+    "Flex items: Add min-w-0 to prevent overflow",
+    "Verify visually: Persian/Hebrew text flows right-to-left"
+  ],
+  "developmentSetup": {
+    "devServerUrl": "http://localhost:3001",
+    "devServerPort": 3001,
+    "devServerStatus": "ALREADY RUNNING - DO NOT START NEW SERVER",
+    "browserTabs": {
+      "count": 2,
+      "tab1": "Desktop viewport (1440px or larger)",
+      "tab2": "Mobile viewport (375px)",
+      "note": "NEVER resize the browser window - use appropriate tab for each test"
+    }
+  },
+  "progressStatus": {
+    "storiesComplete": 51,
+    "storiesBlocked": 3,
+    "storiesRemaining": 8,
+    "nextStory": "US-LOAD-FIX (Fix Dynamic Import Errors)",
+    "blockedStories": [
+      "US-005 (Auth)",
+      "US-005-FIX (partial)",
+      "US-031 (missing ElevenLabs API key)"
+    ]
+  },
+  "targetLanguages": [
+    "Persian",
+    "Transliteration",
+    "Hebrew",
+    "English"
+  ],
+  "keyFeatures": [
+    "Watch YouTube video of a song",
+    "See lyrics with transliterations and translations",
+    "Click any line to jump to timestamp",
+    "Loop single line for practice",
+    "Control playback speed",
+    "Filter by language"
+  ]
+}

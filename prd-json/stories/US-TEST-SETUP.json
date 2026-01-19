@@ -1,0 +1,57 @@
+{
+  "id": "US-TEST-SETUP",
+  "title": "Set Up Vitest + Playwright + Husky Pre-Commit",
+  "description": "Set up testing infrastructure with Vitest for unit tests, Playwright for e2e tests, and Husky pre-commit hook to run tests before every commit.",
+  "acceptanceCriteria": [
+    {
+      "text": "Install Vitest: `bun add -d vitest @testing-library/react @testing-library/dom jsdom`",
+      "checked": true
+    },
+    {
+      "text": "Install Playwright: `bun add -d @playwright/test`",
+      "checked": true
+    },
+    {
+      "text": "Install Husky: `bun add -d husky`",
+      "checked": true
+    },
+    {
+      "text": "Create `vitest.config.ts` with jsdom environment",
+      "checked": true
+    },
+    {
+      "text": "Create `playwright.config.ts` with localhost:3001 base URL",
+      "checked": true
+    },
+    {
+      "text": "Add scripts to `package.json`: \"test\": \"vitest run\", \"test:watch\": \"vitest\", \"test:e2e\": \"playwright test\", \"prepare\": \"husky\"",
+      "checked": true
+    },
+    {
+      "text": "Create `src/__tests__/` folder for unit tests",
+      "checked": true
+    },
+    {
+      "text": "Create `e2e/` folder for Playwright tests",
+      "checked": true
+    },
+    {
+      "text": "Add `e2e/`, `playwright-report/` and `test-results/` to `.gitignore`",
+      "checked": true
+    },
+    {
+      "text": "Run `bunx husky init` to create `.husky/` folder",
+      "checked": true
+    },
+    {
+      "text": "Create `.husky/pre-commit` with bash content to run tests",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

@@ -1,0 +1,37 @@
+{
+  "id": "US-LOOP-UX",
+  "title": "Fix Loop Mode Line Flashing",
+  "description": "When playing in loop mode, there's a visual bug where the line selection flashes incorrectly: When loop ends: next line briefly flashes as selected before current line restarts. When loop starts: previous line briefly flashes before current line is selected. This creates a jarring, unprofessional UX.",
+  "acceptanceCriteria": [
+    {
+      "text": "Identify the source of the flash (likely in time update handler or seek logic)",
+      "checked": false
+    },
+    {
+      "text": "Fix loop restart to not trigger line change events",
+      "checked": false
+    },
+    {
+      "text": "Current line stays visually selected during entire loop cycle",
+      "checked": false
+    },
+    {
+      "text": "No visual flicker or flash when loop restarts",
+      "checked": false
+    },
+    {
+      "text": "Loop mode feels smooth and polished",
+      "checked": false
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": false
+    },
+    {
+      "text": "Verify in browser: enable loop, watch 3+ loops, no flashing",
+      "checked": false
+    }
+  ],
+  "passes": false,
+  "blockedBy": null
+}

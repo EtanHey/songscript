@@ -1,0 +1,37 @@
+{
+  "id": "US-014",
+  "title": "Dark Theme with Iranian Flag Accent",
+  "description": "Style the app with dark theme and Iranian flag colors.",
+  "acceptanceCriteria": [
+    {
+      "text": "Set dark mode as default in Tailwind config",
+      "checked": true
+    },
+    {
+      "text": "Background: dark (bg-gray-900 or bg-slate-950)",
+      "checked": true
+    },
+    {
+      "text": "Title gradient: green → white → red (Iranian flag)",
+      "checked": true
+    },
+    {
+      "text": "Add CSS gradient class for title: `bg-gradient-to-r from-green-500 via-white to-red-500`",
+      "checked": true
+    },
+    {
+      "text": "Text colors contrast well on dark background",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    },
+    {
+      "text": "Verify in browser: app has dark theme with accent colors",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

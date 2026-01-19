@@ -1,0 +1,37 @@
+{
+  "id": "US-033",
+  "title": "Pre-generate Word Data for Baraye",
+  "description": "Create word-by-word breakdown for all 31 Baraye lines and store in Convex.",
+  "acceptanceCriteria": [
+    {
+      "text": "Create `scripts/baraye-words.json` with word-by-word breakdown for all 31 lines",
+      "checked": true
+    },
+    {
+      "text": "Each line contains array of words with: persian, transliteration, hebrew, english, grammarType",
+      "checked": true
+    },
+    {
+      "text": "Create Convex mutation to seed word data",
+      "checked": true
+    },
+    {
+      "text": "Add `words` table to schema",
+      "checked": true
+    },
+    {
+      "text": "Seed Baraye word data: `npx convex run seed:seedBarayeWords`",
+      "checked": true
+    },
+    {
+      "text": "Verify in Convex dashboard (135 words across 31 lines)",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

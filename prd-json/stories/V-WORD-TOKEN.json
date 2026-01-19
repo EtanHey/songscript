@@ -1,0 +1,45 @@
+{
+  "id": "V-WORD-TOKEN",
+  "title": "Audit Word Sync Across All Lines",
+  "description": "Comprehensive verification that word learning state syncs correctly across ALL occurrences in the song.",
+  "acceptanceCriteria": [
+    {
+      "text": "CONTEXT7 FIRST: Research Convex query patterns for data auditing",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Find a word that appears in multiple lines (e.g., \"برای\" or \"دل\")",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Click that word in FIRST occurrence → mark as \"learning\"",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Navigate to SECOND occurrence of same word → verify shows \"learning\" state",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Click second occurrence → mark as \"learned\"",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Go back to first occurrence → verify shows \"learned\" state",
+      "checked": true
+    },
+    {
+      "text": "DATABASE CHECK: Query `wordProgress` table → verify only ONE entry per `(visitorId, persian)` pair",
+      "checked": true
+    },
+    {
+      "text": "Take screenshots proving sync works across lines",
+      "checked": true
+    },
+    {
+      "text": "Document any words that still have sync issues",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

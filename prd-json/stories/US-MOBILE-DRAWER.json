@@ -1,0 +1,53 @@
+{
+  "id": "US-MOBILE-DRAWER",
+  "title": "Redesign Mobile Word Info Experience",
+  "description": "The word info modal/drawer is terrible on mobile. You have full creative freedom to redesign the layout and UX for mobile.",
+  "acceptanceCriteria": [
+    {
+      "text": "BROWSER TEST: Open current drawer on mobile (375px viewport)",
+      "checked": true
+    },
+    {
+      "text": "Document what's wrong with current approach",
+      "checked": true
+    },
+    {
+      "text": "Take screenshot of current state",
+      "checked": true
+    },
+    {
+      "text": "Research mobile UI patterns (use WebSearch if helpful)",
+      "checked": true
+    },
+    {
+      "text": "Redesign mobile word info experience (be creative!)",
+      "checked": true
+    },
+    {
+      "text": "Must show: word, transliteration, Hebrew, English, learned state",
+      "checked": true
+    },
+    {
+      "text": "Must allow toggling learned/not learned",
+      "checked": true
+    },
+    {
+      "text": "Must be dismissable (Escape key, X button)",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Verify new design looks good and is usable on mobile",
+      "checked": true
+    },
+    {
+      "text": "Take screenshot of new design",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

@@ -1,0 +1,53 @@
+{
+  "id": "US-031",
+  "title": "ElevenLabs Word Audio Generation (LAST - needs API key)",
+  "description": "Generate word pronunciations using ElevenLabs v3 API and save as local MP3 files.",
+  "acceptanceCriteria": [
+    {
+      "text": "Create `scripts/generate-word-audio.ts` script",
+      "checked": false
+    },
+    {
+      "text": "Script reads unique words from `scripts/baraye-words.json`",
+      "checked": false
+    },
+    {
+      "text": "Script calls ElevenLabs API for each word",
+      "checked": false
+    },
+    {
+      "text": "Script saves MP3 to `public/audio/baraye/words/{word}.mp3`",
+      "checked": false
+    },
+    {
+      "text": "Script updates `scripts/baraye-words.json` with audioUrl paths",
+      "checked": false
+    },
+    {
+      "text": "Run script: `ELEVENLABS_API_KEY=xxx bun run scripts/generate-word-audio.ts`",
+      "checked": false
+    },
+    {
+      "text": "Verify audio files exist (~100 files)",
+      "checked": false
+    },
+    {
+      "text": "Update Convex seed to include audioUrl for each word",
+      "checked": false
+    },
+    {
+      "text": "Re-seed: `npx convex run seed:seedBarayeWords`",
+      "checked": false
+    },
+    {
+      "text": "Word audio buttons in modal play local MP3s",
+      "checked": false
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": false
+    }
+  ],
+  "passes": false,
+  "blockedBy": "ELEVENLABS_API_KEY not found in .env.local. User must provide API key from https://elevenlabs.io/ to proceed."
+}

@@ -1,0 +1,29 @@
+{
+  "id": "US-013",
+  "title": "Active Line Highlighting",
+  "description": "Highlight the currently playing line based on video time.",
+  "acceptanceCriteria": [
+    {
+      "text": "Track `currentTime` from YouTube player (via interval)",
+      "checked": true
+    },
+    {
+      "text": "Find which line's `startTime <= currentTime < endTime`",
+      "checked": true
+    },
+    {
+      "text": "Apply highlight class to active line (bg-primary/10 or similar)",
+      "checked": true
+    },
+    {
+      "text": "Auto-scroll active line into view (smooth scroll)",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

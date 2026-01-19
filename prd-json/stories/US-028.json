@@ -1,0 +1,45 @@
+{
+  "id": "US-028",
+  "title": "Three-Way Playback Toggle (Single/Loop/Fluid)",
+  "description": "Replace current loop toggle with a three-way toggle that controls playback behavior.",
+  "acceptanceCriteria": [
+    {
+      "text": "Replace loop toggle with three-way toggle (Single/Loop/Fluid)",
+      "checked": true
+    },
+    {
+      "text": "Use ShadCN ToggleGroup or custom segmented control",
+      "checked": true
+    },
+    {
+      "text": "Default mode: Single",
+      "checked": true
+    },
+    {
+      "text": "Single mode: Click line → play snippet + play video segment (muted), both stop at endTime",
+      "checked": true
+    },
+    {
+      "text": "Loop mode: Click line → loop snippet + loop video segment (muted), in sync",
+      "checked": true
+    },
+    {
+      "text": "Fluid mode: Click line → seek video (unmuted), continue playing with video audio",
+      "checked": true
+    },
+    {
+      "text": "Visual indicator shows current mode",
+      "checked": true
+    },
+    {
+      "text": "Mode persists in component state",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

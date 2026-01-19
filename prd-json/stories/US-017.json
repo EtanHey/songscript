@@ -1,0 +1,33 @@
+{
+  "id": "US-017",
+  "title": "Homepage with Song List",
+  "description": "Create homepage showing available songs.",
+  "acceptanceCriteria": [
+    {
+      "text": "Homepage at `/` route",
+      "checked": true
+    },
+    {
+      "text": "Fetch all songs from Convex",
+      "checked": true
+    },
+    {
+      "text": "Display as cards with title, artist, thumbnail (YouTube)",
+      "checked": true
+    },
+    {
+      "text": "Each card links to `/song/$songId`",
+      "checked": true
+    },
+    {
+      "text": "Show \"No songs yet\" if empty",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

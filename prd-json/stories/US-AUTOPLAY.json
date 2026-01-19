@@ -1,0 +1,37 @@
+{
+  "id": "US-AUTOPLAY",
+  "title": "Auto-Play Video + Fluid Mode on Page Load",
+  "description": "When user navigates to a song page, the video should automatically start playing and fluid mode should be enabled so lines auto-advance as the song plays.",
+  "acceptanceCriteria": [
+    {
+      "text": "On song page load, video auto-plays after audio files are loaded",
+      "checked": false
+    },
+    {
+      "text": "Fluid mode is enabled by default (not just on toggle)",
+      "checked": false
+    },
+    {
+      "text": "Lines highlight and advance automatically as video plays",
+      "checked": false
+    },
+    {
+      "text": "Video player shows playing state (not blurred/paused)",
+      "checked": false
+    },
+    {
+      "text": "Loading state clears properly when audio files are ready",
+      "checked": false
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": false
+    },
+    {
+      "text": "Verify in browser: page load → video plays → lines advance",
+      "checked": false
+    }
+  ],
+  "passes": false,
+  "blockedBy": null
+}

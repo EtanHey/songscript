@@ -1,0 +1,33 @@
+{
+  "id": "US-011",
+  "title": "Playback Speed Control",
+  "description": "Add dropdown to control playback speed (0.5x, 0.75x, 1x).",
+  "acceptanceCriteria": [
+    {
+      "text": "Add ShadCN Select component for speed",
+      "checked": true
+    },
+    {
+      "text": "Options: 0.5x, 0.75x, 1x (default)",
+      "checked": true
+    },
+    {
+      "text": "Call `player.setPlaybackRate(speed)` on change",
+      "checked": true
+    },
+    {
+      "text": "Persist speed selection in component state",
+      "checked": true
+    },
+    {
+      "text": "Show current speed in dropdown",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

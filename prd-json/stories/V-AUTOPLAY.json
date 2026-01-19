@@ -1,0 +1,41 @@
+{
+  "id": "V-AUTOPLAY",
+  "title": "Verify Auto-Play, Fluid Mode, and Loop UX",
+  "description": "Verify that auto-play, fluid mode, and loop mode all work correctly.",
+  "acceptanceCriteria": [
+    {
+      "text": "Navigate to song page in browser",
+      "checked": false
+    },
+    {
+      "text": "Take screenshot showing video is playing (not paused/blurred)",
+      "checked": false
+    },
+    {
+      "text": "Verify lines are highlighting and advancing automatically (fluid mode)",
+      "checked": false
+    },
+    {
+      "text": "Test pause button stops playback",
+      "checked": false
+    },
+    {
+      "text": "Test clicking a line jumps to that position",
+      "checked": false
+    },
+    {
+      "text": "Enable loop mode and watch 3+ loops - NO flashing between lines",
+      "checked": false
+    },
+    {
+      "text": "Verify loop mode keeps current line highlighted smoothly",
+      "checked": false
+    },
+    {
+      "text": "Verify no console errors during playback",
+      "checked": false
+    }
+  ],
+  "passes": false,
+  "blockedBy": null
+}

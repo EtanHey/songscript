@@ -1,0 +1,41 @@
+{
+  "id": "US-007",
+  "title": "YouTube Player Component",
+  "description": "Create a YouTube player component using the IFrame API.",
+  "acceptanceCriteria": [
+    {
+      "text": "Create `app/components/YouTubePlayer.tsx`",
+      "checked": true
+    },
+    {
+      "text": "Load YouTube IFrame API dynamically",
+      "checked": true
+    },
+    {
+      "text": "Expose player controls: play, pause, seekTo, getCurrentTime",
+      "checked": true
+    },
+    {
+      "text": "Accept `videoId` prop",
+      "checked": true
+    },
+    {
+      "text": "Accept `onTimeUpdate` callback for current time tracking",
+      "checked": true
+    },
+    {
+      "text": "Use `useRef` to store player instance",
+      "checked": true
+    },
+    {
+      "text": "Add loading state while API loads",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

@@ -1,0 +1,45 @@
+{
+  "id": "US-LOAD-FIX",
+  "title": "Fix Dynamic Import and Initial Load Errors",
+  "description": "Fix the login route dynamic import error and any other module loading issues preventing the app from working.",
+  "acceptanceCriteria": [
+    {
+      "text": "Investigate the dynamic import error in TanStack Router",
+      "checked": true
+    },
+    {
+      "text": "Fix the login.tsx route so it loads without errors",
+      "checked": true
+    },
+    {
+      "text": "Check for any other broken dynamic imports",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    },
+    {
+      "text": "Create `e2e/routes.spec.ts` if not exists",
+      "checked": true
+    },
+    {
+      "text": "Test: navigate to `/` - page loads without errors",
+      "checked": true
+    },
+    {
+      "text": "Test: navigate to `/login` - page loads without errors",
+      "checked": true
+    },
+    {
+      "text": "Test: navigate to `/song/{testSongId}` - page loads without errors",
+      "checked": true
+    },
+    {
+      "text": "All e2e tests pass: `bun run test:e2e`",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

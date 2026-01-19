@@ -1,0 +1,45 @@
+{
+  "id": "US-TIMESTAMPS",
+  "title": "Fix Audio Snippet Timing (HIGHEST PRIORITY)",
+  "description": "Audio snippets still have timing issues - they start with the end of the previous line and cut off before the current line ends. Need to adjust timestamps further forward.",
+  "acceptanceCriteria": [
+    {
+      "text": "Update `scripts/baraye-new-timestamps.json` with larger offsets (try +0.35s start, +0.45s end)",
+      "checked": true
+    },
+    {
+      "text": "Update the \"note\" field in JSON to reflect new offsets",
+      "checked": true
+    },
+    {
+      "text": "Re-extract all 31 audio snippets using the extract script",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Navigate to song page, click line 1 - should NOT hear end of intro",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Click line 5 - should hear complete line without cutoff",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Click line 15 - verify no bleed from line 14",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Click line 28 (\"zan, zendegi, āzādi\") - must hear COMPLETE phrase",
+      "checked": true
+    },
+    {
+      "text": "If still cutting off, increase offsets more (+0.50s start, +0.60s end) and re-test",
+      "checked": true
+    },
+    {
+      "text": "Commit updated timestamps and snippets",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

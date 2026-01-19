@@ -1,0 +1,37 @@
+{
+  "id": "US-006",
+  "title": "Seed Baraye Song Data",
+  "description": "Create seed script to populate Convex with Baraye song.",
+  "acceptanceCriteria": [
+    {
+      "text": "Create `convex/seed.ts` with Baraye song data (31 lines)",
+      "checked": true
+    },
+    {
+      "text": "Song metadata: title=\"Baraye (برای)\", artist=\"Shervin Hajipour\", youtubeId=\"xLvUEF2zpj8\"",
+      "checked": true
+    },
+    {
+      "text": "All 31 lyrics lines with timestamps, Persian, transliteration, Hebrew, English",
+      "checked": true
+    },
+    {
+      "text": "Create Convex mutation `seedBaraye` that inserts data",
+      "checked": true
+    },
+    {
+      "text": "Run seed via Convex CLI: `npx convex run seed:seedBaraye`",
+      "checked": true
+    },
+    {
+      "text": "Verify song and lyrics appear in Convex dashboard (songId: j972m34dzqgx6a0r5a00n9k6pd7zekfa)",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

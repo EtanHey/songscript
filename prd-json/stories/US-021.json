@@ -1,0 +1,77 @@
+{
+  "id": "US-021",
+  "title": "Real Audio from YouTube + Practice Mode",
+  "description": "Replace placeholder audio files with real audio extracted from YouTube. Implement practice mode where clicking a line plays that segment, with loop toggle. Download video too for seamless seeking.",
+  "acceptanceCriteria": [
+    {
+      "text": "yt-dlp installed (or install with `brew install yt-dlp`)",
+      "checked": false
+    },
+    {
+      "text": "Real audio downloaded to `public/audio/baraye/baraye_full.mp3`",
+      "checked": false
+    },
+    {
+      "text": "Real video downloaded to `public/video/baraye/baraye_full.mp4`",
+      "checked": false
+    },
+    {
+      "text": "Placeholder MP3 files deleted",
+      "checked": false
+    },
+    {
+      "text": "Real snippets extracted using timestamps from lyrics data",
+      "checked": false
+    },
+    {
+      "text": "Verify snippets play actual song audio (not TTS)",
+      "checked": false
+    },
+    {
+      "text": "YouTube video is MUTED (audio from snippets only)",
+      "checked": false
+    },
+    {
+      "text": "Clicking line plays real audio snippet",
+      "checked": false
+    },
+    {
+      "text": "Snippet stops at end (not looping by default)",
+      "checked": false
+    },
+    {
+      "text": "Loop toggle makes snippet repeat",
+      "checked": false
+    },
+    {
+      "text": "Highlighting follows playback",
+      "checked": false
+    },
+    {
+      "text": "When snippet ends (no loop), highlight moves to next line OR stays (user choice)",
+      "checked": false
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": false
+    },
+    {
+      "text": "Local video plays from `public/video/baraye/baraye_full.mp4`",
+      "checked": false
+    },
+    {
+      "text": "Video seeks instantly when clicking lines",
+      "checked": false
+    },
+    {
+      "text": "Video is muted, audio from snippets",
+      "checked": false
+    },
+    {
+      "text": "Fallback to YouTube embed if local video not found",
+      "checked": false
+    }
+  ],
+  "passes": false,
+  "blockedBy": null
+}

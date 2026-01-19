@@ -1,0 +1,41 @@
+{
+  "id": "US-005-FIX",
+  "title": "Investigate & Fix Auth HTTP 500 Error (HIGH PRIORITY)",
+  "description": "The auth system returns HTTP 500 on `/api/auth/get-session`. This needs investigation and fixing. The login page takes forever to load because the session check fails.",
+  "acceptanceCriteria": [
+    {
+      "text": "Investigate the HTTP 500 error using browser tools and logs",
+      "checked": true
+    },
+    {
+      "text": "Use `mcp__Context7__query-docs` to check latest Better Auth + Convex integration docs",
+      "checked": true
+    },
+    {
+      "text": "Identify root cause of the error (Convex Better Auth handler not properly proxying to Convex backend)",
+      "checked": true
+    },
+    {
+      "text": "Fix the auth handler so `/api/auth/get-session` returns 200 (or proper auth response)",
+      "checked": false
+    },
+    {
+      "text": "BROWSER TEST: Navigate to `/login`, verify page loads quickly (< 2 seconds) ✅ (1.5s timeout workaround)",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Enter admin email `etan@heyman.net`, submit magic link form (returns 500)",
+      "checked": false
+    },
+    {
+      "text": "If fix requires env vars or external setup, document what's needed (see status below)",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": false,
+  "blockedBy": "Auth endpoints still return 500 - the `@convex-dev/better-auth` package's HTTP proxying has issues"
+}

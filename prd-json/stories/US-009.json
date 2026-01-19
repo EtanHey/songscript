@@ -1,0 +1,49 @@
+{
+  "id": "US-009",
+  "title": "Line Click to Seek + Auto-Play",
+  "description": "Clicking a lyric line seeks YouTube player to that timestamp. Player should auto-play on load and after seeking.",
+  "acceptanceCriteria": [
+    {
+      "text": "Pass `onLineClick(startTime)` callback to LyricsDisplay",
+      "checked": true
+    },
+    {
+      "text": "FIX SEEK: `player.seekTo(startTime, true)` - use second param `true` for allowSeekAhead",
+      "checked": true
+    },
+    {
+      "text": "AUTO-PLAY ON LOAD: Player starts playing automatically when page loads (use `autoplay: 1` in playerVars)",
+      "checked": true
+    },
+    {
+      "text": "AUTO-PLAY AFTER SEEK: After `seekTo()`, call `player.playVideo()` to resume without user click",
+      "checked": true
+    },
+    {
+      "text": "Visual feedback on click (brief highlight)",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Click line 1 → video seeks to ~14.8s (not 0)",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Click line 10 → video seeks to ~46.9s",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Click line 28 → video seeks to ~113.4s",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Verify auto-plays after seek without manual click",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

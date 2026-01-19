@@ -1,0 +1,37 @@
+{
+  "id": "US-WORD-TOKEN",
+  "title": "Words as Database Tokens (Schema Refactor)",
+  "description": "Words should be treated as unique tokens/enums in the database, NOT as per-sentence instances. When \"دل\" appears in line 3 and line 7, they MUST share the same learning state.",
+  "acceptanceCriteria": [
+    {
+      "text": "CONTEXT7 FIRST: Use `mcp__Context7__query-docs` to research Convex schema best practices for unique word tokens (US-WORD-SYNC already implemented this)",
+      "checked": true
+    },
+    {
+      "text": "Verify `convex/schema.ts` has proper indexes on `words` table by `persian` field (has `by_visitor_persian` index)",
+      "checked": true
+    },
+    {
+      "text": "Verify `wordProgress` table uses `persian` field (not `wordId`) as the word identifier (schema line 55, 63)",
+      "checked": true
+    },
+    {
+      "text": "Query `wordProgress.getByVisitorPersian` returns same state for same Persian word regardless of which line it came from (verified in wordProgress.ts)",
+      "checked": true
+    },
+    {
+      "text": "Test: Mark word \"برای\" as learned on Line 1 → Line 2 shows same \"learned\" state (browser verified!)",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    },
+    {
+      "text": "Verify in browser: same word across lines shows consistent state (bidirectional sync verified!)",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

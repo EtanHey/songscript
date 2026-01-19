@@ -1,0 +1,41 @@
+{
+  "id": "US-024",
+  "title": "Update Seed Data with New Video + Timestamps",
+  "description": "Update Convex seed data with correct YouTube ID and new timestamps.",
+  "acceptanceCriteria": [
+    {
+      "text": "Update `convex/seed.ts`: change `youtubeId` from `xLvUEF2zpj8` to `0th9_v-BbUI`",
+      "checked": true
+    },
+    {
+      "text": "Update all 31 lyrics with new timestamps from `scripts/baraye-new-timestamps.json`",
+      "checked": true
+    },
+    {
+      "text": "Add `videoUrl` field to songs schema: `v.optional(v.string())` for local video path",
+      "checked": true
+    },
+    {
+      "text": "Update seed to include `videoUrl: \"/video/baraye/baraye.mp4\"`",
+      "checked": true
+    },
+    {
+      "text": "Push schema: `bunx convex dev`",
+      "checked": true
+    },
+    {
+      "text": "Re-seed: `npx convex run seed:seedBaraye`",
+      "checked": true
+    },
+    {
+      "text": "Verify in Convex: new youtubeId and timestamps are correct",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

@@ -1,0 +1,57 @@
+{
+  "id": "US-VIDEO-MOBILE",
+  "title": "Collapsible Video on Mobile",
+  "description": "The video player with its controller takes too much vertical space on mobile, making it hard to scroll and focus on lyrics. The video should be collapsible OR the entire mobile layout should be rethought.",
+  "acceptanceCriteria": [
+    {
+      "text": "BROWSER TEST (mobile tab): Navigate to song page on 375px viewport",
+      "checked": true
+    },
+    {
+      "text": "Document how much screen space video + controls take",
+      "checked": true
+    },
+    {
+      "text": "Measure: Can user see at least 3-4 lyrics lines without scrolling?",
+      "checked": true
+    },
+    {
+      "text": "Take screenshot showing the problem",
+      "checked": true
+    },
+    {
+      "text": "Redesign mobile layout so lyrics get more screen space",
+      "checked": true
+    },
+    {
+      "text": "User should be able to collapse/minimize/hide video when focusing on lyrics",
+      "checked": true
+    },
+    {
+      "text": "When video is minimized, audio should still work (Single/Loop modes with snippets)",
+      "checked": true
+    },
+    {
+      "text": "Easy way to bring video back when needed",
+      "checked": true
+    },
+    {
+      "text": "Fluid mode should expand video automatically",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Verify new design on mobile - lyrics should dominate the view",
+      "checked": true
+    },
+    {
+      "text": "Take screenshot of new design",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

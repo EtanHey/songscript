@@ -1,0 +1,37 @@
+{
+  "id": "US-SYNC-FIX",
+  "title": "Video and Audio Not Synced (HIGHEST PRIORITY)",
+  "description": "User reports the video and audio (song) are not synced. When clicking a line, the audio snippet plays but the video is at a different position.",
+  "acceptanceCriteria": [
+    {
+      "text": "Investigate the sync issue - identify where the mismatch comes from",
+      "checked": true
+    },
+    {
+      "text": "Fix video seek to match audio snippet timing",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST in Single mode: Click line 5 - video and audio start at SAME moment",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST in Loop mode: Click line 15 - video and audio loop together in sync",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST in Fluid mode: Video plays with its own audio (should already be synced)",
+      "checked": true
+    },
+    {
+      "text": "Verify at least 3 different lines are properly synced",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

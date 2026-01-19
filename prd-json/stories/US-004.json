@@ -1,0 +1,29 @@
+{
+  "id": "US-004",
+  "title": "Convex Schema for Songs and Lyrics",
+  "description": "Define the database schema for songs and their lyrics.",
+  "acceptanceCriteria": [
+    {
+      "text": "Create `convex/schema.ts` with songs table: songs: defineTable({title: v.string(), artist: v.string(), youtubeId: v.string(), sourceLanguage: v.string(), createdAt: v.number()})",
+      "checked": true
+    },
+    {
+      "text": "Add lyrics table with timestamps: lyrics: defineTable({songId: v.id(\"songs\"), lineNumber: v.number(), startTime: v.number(), endTime: v.number(), original: v.string(), transliteration: v.string(), hebrew: v.optional(v.string()), english: v.string()}).index(\"by_song\", [\"songId\", \"lineNumber\"])",
+      "checked": true
+    },
+    {
+      "text": "Run `bunx convex dev` to push schema",
+      "checked": true
+    },
+    {
+      "text": "Verify tables appear in Convex dashboard",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

@@ -1,0 +1,33 @@
+{
+  "id": "V-005",
+  "title": "Verify Mobile Responsiveness",
+  "description": null,
+  "acceptanceCriteria": [
+    {
+      "text": "Resize browser to 375px width",
+      "checked": true
+    },
+    {
+      "text": "Video is full width",
+      "checked": true
+    },
+    {
+      "text": "Lyrics are below video",
+      "checked": true
+    },
+    {
+      "text": "Controls are accessible",
+      "checked": true
+    },
+    {
+      "text": "No horizontal scroll",
+      "checked": true
+    },
+    {
+      "text": "Take screenshot of mobile view",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

@@ -1,0 +1,33 @@
+{
+  "id": "US-019",
+  "title": "Add Component Tests",
+  "description": "Add tests for key components.",
+  "acceptanceCriteria": [
+    {
+      "text": "Test YouTubePlayer: mocks API, verifies seekTo called on play",
+      "checked": true
+    },
+    {
+      "text": "Test LyricsDisplay: renders all language versions correctly",
+      "checked": true
+    },
+    {
+      "text": "Test language filter: only selected language visible",
+      "checked": true
+    },
+    {
+      "text": "Test loop toggle: state changes correctly",
+      "checked": true
+    },
+    {
+      "text": "All tests pass with `bun test`",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

@@ -1,0 +1,45 @@
+{
+  "id": "US-026",
+  "title": "Local Video Player with Muted Video + Audio Snippets",
+  "description": "Replace YouTube iframe with local video player. Video is muted, audio comes from snippets.",
+  "acceptanceCriteria": [
+    {
+      "text": "Replace YouTubePlayer component usage with HTML5 `<video>` element",
+      "checked": true
+    },
+    {
+      "text": "Video src: `/video/baraye/baraye.mp4`",
+      "checked": true
+    },
+    {
+      "text": "Video `muted={true}` by default",
+      "checked": true
+    },
+    {
+      "text": "Video `playsInline` for mobile",
+      "checked": true
+    },
+    {
+      "text": "Clicking line: plays audio snippet + seeks video to startTime",
+      "checked": true
+    },
+    {
+      "text": "Add \"Unmute video\" toggle to controls",
+      "checked": true
+    },
+    {
+      "text": "When unmuted: video audio plays, snippets are paused/disabled",
+      "checked": true
+    },
+    {
+      "text": "Fallback: if local video missing, show error or use YouTube embed",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

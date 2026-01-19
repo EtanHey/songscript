@@ -1,0 +1,33 @@
+{
+  "id": "US-WORD-SYNC",
+  "title": "Sync Learning State for Repeated Words",
+  "description": "When a word appears multiple times in a song (e.g., \"برای\" appears 31+ times in Baraye), marking it as learned should sync across ALL instances.",
+  "acceptanceCriteria": [
+    {
+      "text": "Word learning state syncs by word text (original Persian), not by word ID",
+      "checked": true
+    },
+    {
+      "text": "If \"برای\" is marked learned in line 1, all \"برای\" instances show as learned",
+      "checked": true
+    },
+    {
+      "text": "Update `wordProgress` to key by `word.persian` instead of `word._id`",
+      "checked": true
+    },
+    {
+      "text": "On modal open, show correct learned state for that word",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Mark a repeated word as learned, verify it shows learned in other lines",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

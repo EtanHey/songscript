@@ -1,0 +1,45 @@
+{
+  "id": "US-005",
+  "title": "Admin-Only Passwordless Authentication",
+  "description": "Set up Convex + Better Auth with PASSWORDLESS auth (magic link OR passkey). No passwords, no signup page.",
+  "acceptanceCriteria": [
+    {
+      "text": "Remove password-based auth, implement magic link OR passkey",
+      "checked": true
+    },
+    {
+      "text": "Login page at `/login` - email input only, no password field, no signup toggle",
+      "checked": true
+    },
+    {
+      "text": "Server-side check: reject any email that isn't `etan@heyman.net`",
+      "checked": true
+    },
+    {
+      "text": "Auth API endpoints return 200 (not 500)",
+      "checked": false
+    },
+    {
+      "text": "Use Context7 (`mcp__Context7__query-docs`) to look up Better Auth magic link/passkey setup",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Navigate to `/login`, enter admin email, complete auth flow",
+      "checked": false
+    },
+    {
+      "text": "BROWSER TEST: Verify session persists after login (check `/api/auth/get-session` returns user)",
+      "checked": false
+    },
+    {
+      "text": "BROWSER TEST: Verify non-admin email is rejected with clear error message",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": false,
+  "blockedBy": "Auth API endpoints (`/api/auth/get-session`, `/api/auth/sign-in/magic-link`) return 500 or hang indefinitely. The Convex + Better Auth integration has a fundamental issue with request handling."
+}

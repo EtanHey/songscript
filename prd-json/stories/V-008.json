@@ -1,0 +1,45 @@
+{
+  "id": "V-008",
+  "title": "Verify Playback Modes",
+  "description": "Verify the three-way playback toggle works correctly.",
+  "acceptanceCriteria": [
+    {
+      "text": "BROWSER TEST: Default mode is \"Single\"",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Single mode - click line → plays once, stops",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Single mode - video plays segment (muted) in sync with snippet",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Loop mode - click line → loops indefinitely",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Loop mode - video loops segment (muted) in sync",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Fluid mode - click line → seeks, video continues with audio",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Pause button stops playback in all modes",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Spacebar toggles pause/play",
+      "checked": true
+    },
+    {
+      "text": "Take screenshot showing mode toggle",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

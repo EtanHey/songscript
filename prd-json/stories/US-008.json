@@ -1,0 +1,45 @@
+{
+  "id": "US-008",
+  "title": "Lyrics Display Component",
+  "description": "Create component to display lyrics from Convex.",
+  "acceptanceCriteria": [
+    {
+      "text": "Create `app/components/LyricsDisplay.tsx`",
+      "checked": true
+    },
+    {
+      "text": "Fetch lyrics from Convex using `useSuspenseQuery`",
+      "checked": true
+    },
+    {
+      "text": "Display each line with all language versions stacked",
+      "checked": true
+    },
+    {
+      "text": "Persian text: RTL, larger font (text-xl), `dir=\"rtl\"`",
+      "checked": true
+    },
+    {
+      "text": "Transliteration: italic, green color (text-emerald-500)",
+      "checked": true
+    },
+    {
+      "text": "Hebrew: RTL, blue color (text-blue-500), `dir=\"rtl\"`",
+      "checked": true
+    },
+    {
+      "text": "English: smaller, gray (text-gray-400)",
+      "checked": true
+    },
+    {
+      "text": "Each line is a clickable button/div",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

@@ -1,0 +1,45 @@
+{
+  "id": "US-AUTOPLAY-TESTS",
+  "title": "Tests for Auto-Play and Fluid Mode",
+  "description": "Write unit and e2e tests to verify auto-play and fluid mode work correctly.",
+  "acceptanceCriteria": [
+    {
+      "text": "Create `e2e/autoplay.spec.ts`",
+      "checked": false
+    },
+    {
+      "text": "E2E: Test song page auto-plays video on load",
+      "checked": false
+    },
+    {
+      "text": "E2E: Test fluid mode is enabled by default",
+      "checked": false
+    },
+    {
+      "text": "E2E: Test lines highlight and advance during playback",
+      "checked": false
+    },
+    {
+      "text": "E2E: Test pause button stops playback",
+      "checked": false
+    },
+    {
+      "text": "E2E: Test clicking a line seeks to that position",
+      "checked": false
+    },
+    {
+      "text": "Unit test: `useSongPlayback` hook initializes with fluid mode ON",
+      "checked": false
+    },
+    {
+      "text": "All tests pass: `bun run test && bun run test:e2e`",
+      "checked": false
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": false
+    }
+  ],
+  "passes": false,
+  "blockedBy": null
+}

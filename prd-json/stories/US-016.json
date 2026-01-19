@@ -1,0 +1,41 @@
+{
+  "id": "US-016",
+  "title": "Song Practice Page Route",
+  "description": "Create the main practice page that combines all components.",
+  "acceptanceCriteria": [
+    {
+      "text": "Create route `/song/$songId` using TanStack Router file-based routing",
+      "checked": true
+    },
+    {
+      "text": "Page fetches song by ID from Convex",
+      "checked": true
+    },
+    {
+      "text": "Renders YouTubePlayer with song's youtubeId",
+      "checked": true
+    },
+    {
+      "text": "Renders LyricsDisplay with song's lyrics",
+      "checked": true
+    },
+    {
+      "text": "Includes all controls (loop, speed, language filter)",
+      "checked": true
+    },
+    {
+      "text": "Shows song title and artist",
+      "checked": true
+    },
+    {
+      "text": "404 handling if song not found",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

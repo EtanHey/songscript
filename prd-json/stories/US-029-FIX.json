@@ -1,0 +1,41 @@
+{
+  "id": "US-029-FIX",
+  "title": "Fluid Mode UX Improvements (HIGH PRIORITY - User Feedback)",
+  "description": "User feedback on Fluid mode behavior and removing redundant controls.",
+  "acceptanceCriteria": [
+    {
+      "text": "Remove \"Play Full Video\" button - Fluid mode replaces this functionality",
+      "checked": true
+    },
+    {
+      "text": "In Fluid mode: hide or disable Pause/Play button (video has native controls)",
+      "checked": true
+    },
+    {
+      "text": "When switching TO Fluid: continue from current playback position, don't restart",
+      "checked": true
+    },
+    {
+      "text": "When switching FROM Fluid to Single/Loop: stay at current line position",
+      "checked": true
+    },
+    {
+      "text": "Optional: Add \"Watch on YouTube\" link that opens video in new tab",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: In Single mode, click line 15, then switch to Fluid → video continues from ~65s",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: In Loop mode on line 5, switch to Fluid → video continues from ~29s (tested Line 20 instead)",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

@@ -1,0 +1,37 @@
+{
+  "id": "US-018",
+  "title": "Set Up Vitest for Unit Testing",
+  "description": "Configure Vitest for component and utility testing.",
+  "acceptanceCriteria": [
+    {
+      "text": "Install: `bun add -D vitest @testing-library/react @testing-library/dom jsdom @vitejs/plugin-react`",
+      "checked": true
+    },
+    {
+      "text": "Create `vitest.config.ts` with jsdom environment",
+      "checked": true
+    },
+    {
+      "text": "Add test script to `package.json`: `\"test\": \"vitest\"`",
+      "checked": true
+    },
+    {
+      "text": "Create `src/test/setup.ts` for test utilities",
+      "checked": true
+    },
+    {
+      "text": "Write sample test for a utility function (e.g., time formatting)",
+      "checked": true
+    },
+    {
+      "text": "Run `bun test` - all tests pass",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

@@ -1,0 +1,49 @@
+{
+  "id": "V-007",
+  "title": "Verify New Video + Audio System",
+  "description": "Verify the new video/audio system works correctly.",
+  "acceptanceCriteria": [
+    {
+      "text": "BROWSER TEST: Navigate to `/song/{baraye-id}`",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Video shows correct Baraye video (not fingerstyle cover)",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Video is muted by default",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Click line 5 → audio snippet plays instantly",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Click line 15 → audio snippet plays, video seeks",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Enable \"Unmute video\" → video audio plays",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Click \"Play Full Video\" → video plays from start with audio",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Lyrics highlight correctly during full playback",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Loop mode works (line repeats)",
+      "checked": true
+    },
+    {
+      "text": "Take screenshot showing new player",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

@@ -1,0 +1,41 @@
+{
+  "id": "US-002",
+  "title": "Add Tailwind CSS v4 + ShadCN UI",
+  "description": "Set up Tailwind CSS v4 (2026 setup - different from v3!) and ShadCN UI.",
+  "acceptanceCriteria": [
+    {
+      "text": "Install: `bun add tailwindcss @tailwindcss/vite`",
+      "checked": true
+    },
+    {
+      "text": "Add `tailwindcss()` plugin to `vite.config.ts`",
+      "checked": true
+    },
+    {
+      "text": "Create `src/styles.css` with `@import \"tailwindcss\";` (using existing styles.css)",
+      "checked": true
+    },
+    {
+      "text": "Import CSS in `__root.tsx` with `?url` query (see TanStack docs)",
+      "checked": true
+    },
+    {
+      "text": "Initialize ShadCN UI: `bunx shadcn@latest init`",
+      "checked": true
+    },
+    {
+      "text": "Add Button component: `bunx shadcn@latest add button`",
+      "checked": true
+    },
+    {
+      "text": "Verify Tailwind classes work on homepage (e.g., `text-3xl font-bold`)",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

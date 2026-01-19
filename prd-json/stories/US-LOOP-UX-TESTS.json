@@ -1,0 +1,37 @@
+{
+  "id": "US-LOOP-UX-TESTS",
+  "title": "Tests for Loop Mode",
+  "description": "Write unit and e2e tests to verify loop mode has no visual flashing.",
+  "acceptanceCriteria": [
+    {
+      "text": "Create `e2e/loop-mode.spec.ts`",
+      "checked": false
+    },
+    {
+      "text": "E2E: Test enabling loop mode",
+      "checked": false
+    },
+    {
+      "text": "E2E: Test loop replays same line (wait for 2-3 loops)",
+      "checked": false
+    },
+    {
+      "text": "E2E: Verify no line change during loop restart (check DOM stability)",
+      "checked": false
+    },
+    {
+      "text": "Unit test: Loop seek logic doesn't emit line change events",
+      "checked": false
+    },
+    {
+      "text": "All tests pass: `bun run test && bun run test:e2e`",
+      "checked": false
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": false
+    }
+  ],
+  "passes": false,
+  "blockedBy": null
+}

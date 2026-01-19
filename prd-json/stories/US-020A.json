@@ -1,0 +1,49 @@
+{
+  "id": "US-020A",
+  "title": "Sticky Layout - Fixed Player, Scrollable Lyrics",
+  "description": "Fix the song page layout so the header, song title, video player, and controls stay fixed/sticky while only the lyrics list scrolls.",
+  "acceptanceCriteria": [
+    {
+      "text": "DESKTOP: Video takes LEFT 50%, Lyrics take RIGHT 50%",
+      "checked": true
+    },
+    {
+      "text": "DESKTOP: Lyrics scroll independently, video stays fixed",
+      "checked": true
+    },
+    {
+      "text": "MOBILE: Video on top (sticky), lyrics below (scrollable)",
+      "checked": true
+    },
+    {
+      "text": "Header stays fixed at top (never scrolls)",
+      "checked": true
+    },
+    {
+      "text": "Controls (loop, speed, language filter) stay with video",
+      "checked": true
+    },
+    {
+      "text": "Lyrics list scrolls independently",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: On desktop, video and lyrics are SIDE BY SIDE",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: Scroll through lyrics → video stays visible",
+      "checked": true
+    },
+    {
+      "text": "BROWSER TEST: On mobile (375px) → video on top, lyrics scroll below",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

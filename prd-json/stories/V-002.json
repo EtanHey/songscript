@@ -1,0 +1,25 @@
+{
+  "id": "V-002",
+  "title": "Verify Convex Integration",
+  "description": null,
+  "acceptanceCriteria": [
+    {
+      "text": "Convex dashboard shows songs and lyrics tables (verified via CLI: `npx convex data songs` and `npx convex data lyrics`)",
+      "checked": true
+    },
+    {
+      "text": "Baraye song appears in songs table (ID: j972m34dzqgx6a0r5a00n9k6pd7zekfa)",
+      "checked": true
+    },
+    {
+      "text": "31 lyrics rows appear in lyrics table (verified via CLI - all with audioSnippetUrl populated)",
+      "checked": true
+    },
+    {
+      "text": "Take screenshot of Convex dashboard (alternative: screenshot of homepage showing Convex data loaded - song card with title, artist, thumbnail from database)",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

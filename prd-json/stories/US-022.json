@@ -1,0 +1,29 @@
+{
+  "id": "US-022",
+  "title": "Download Correct Baraye Video",
+  "description": "Download the correct Baraye video (original, not cover) and store locally.",
+  "acceptanceCriteria": [
+    {
+      "text": "Install yt-dlp if needed: `brew install yt-dlp`",
+      "checked": true
+    },
+    {
+      "text": "Download video: `yt-dlp -f \"bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]\" -o \"public/video/baraye/baraye.mp4\" \"https://www.youtube.com/watch?v=0th9_v-BbUI\"`",
+      "checked": true
+    },
+    {
+      "text": "Download audio: `yt-dlp -x --audio-format mp3 --audio-quality 192 -o \"public/audio/baraye/baraye_full.mp3\" \"https://www.youtube.com/watch?v=0th9_v-BbUI\"`",
+      "checked": true
+    },
+    {
+      "text": "Verify files exist and play correctly",
+      "checked": true
+    },
+    {
+      "text": "Delete old placeholder audio snippets: `rm public/audio/baraye/baraye_*.mp3` (keep baraye_full.mp3)",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}

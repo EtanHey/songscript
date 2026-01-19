@@ -1,0 +1,37 @@
+{
+  "id": "US-003",
+  "title": "Set Up Convex Backend",
+  "description": "Initialize Convex and connect it to the TanStack Start app.",
+  "acceptanceCriteria": [
+    {
+      "text": "Install convex packages: `bun add convex`",
+      "checked": true
+    },
+    {
+      "text": "Run `bunx convex dev` to create Convex project (harmless-husky-580)",
+      "checked": true
+    },
+    {
+      "text": "Create `convex/` directory with initial schema",
+      "checked": true
+    },
+    {
+      "text": "Set up ConvexProvider in app router (`src/providers/ConvexClientProvider.tsx`)",
+      "checked": true
+    },
+    {
+      "text": "Configure environment variables for Convex (`.env.local`)",
+      "checked": true
+    },
+    {
+      "text": "Verify Convex dashboard shows project",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null
+}
