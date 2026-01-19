@@ -105,45 +105,45 @@
     },
     {
       "text": "BROWSER TEST: Navigate to `/song/{baraye-id}`",
-      "checked": false
+      "checked": true
     },
     {
       "text": "BROWSER TEST: Wait for \"Loading audio...\" to complete",
-      "checked": false
+      "checked": true
     },
     {
       "text": "BROWSER TEST: Click line 1 → audio plays INSTANTLY (no buffering)",
-      "checked": false
+      "checked": true
     },
     {
       "text": "BROWSER TEST: Click line 15 → audio plays INSTANTLY",
-      "checked": false
+      "checked": true
     },
     {
       "text": "BROWSER TEST: Click line 28 → audio plays INSTANTLY",
-      "checked": false
+      "checked": true
     },
     {
       "text": "BROWSER TEST: Rapid clicking between lines → each plays correctly",
-      "checked": false
+      "checked": true
     },
     {
       "text": "BROWSER TEST: Enable loop → line replays automatically",
-      "checked": false
+      "checked": true
     },
     {
       "text": "BROWSER TEST: Change speed to 0.5x → audio slows down",
-      "checked": false
+      "checked": true
     },
     {
       "text": "BROWSER TEST: Measure latency: click-to-sound < 100ms",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Take screenshot showing song page with audio controls",
-      "checked": false
+      "checked": true
     }
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null
 }

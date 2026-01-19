@@ -1,9 +1,9 @@
 # Progress Log
 
 ## 📊 Overall Stats
-- **Stories Completed:** 59
-- **Criteria Completed:** 472
-- **Stories Remaining:** 2
+- **Stories Completed:** 60
+- **Criteria Completed:** 507
+- **Stories Remaining:** 1
 - **Archive:** docs.local/prd-completed-archive.md
 
 ---
@@ -126,7 +126,22 @@
 
 ---
 
-**Next:** US-020, US-021 remain pending (3 stories still blocked)
+## Iteration - US-020: Local Audio Snippets Browser Verification ✅
+- Comprehensive browser verification of local audio snippet playback
+- Verified: "Snippets ready" indicator shows when all audio files are preloaded
+- Verified: Click Line 1 → audio plays INSTANTLY (no buffering delay)
+- Verified: Click Line 15 → audio plays INSTANTLY
+- Verified: Click Line 27/28 → audio plays INSTANTLY
+- Verified: Rapid clicking between multiple lines → each line plays correctly, previous stops
+- Verified: Loop mode auto-replays the current line smoothly
+- Verified: Speed control at 0.5x works (audio plays slower)
+- Verified: Latency < 100ms (instant response on all click tests)
+- Screenshot captured showing song page with all audio controls
+- All 35 acceptance criteria now verified and passed
+
+---
+
+**Next:** US-021 remains pending (3 stories still blocked)
 
 ---
 
