@@ -95,13 +95,7 @@ export const getRecentForContinue = query({
           lastPracticed: p.lastPracticed,
           lastLineIndex,
           lastLinePreview,
-          song: {
-            _id: song._id,
-            title: song.title,
-            artist: song.artist,
-            sourceLanguage: song.sourceLanguage,
-            videoUrl: song.videoUrl,
-          },
+          song,
           totalLines: lyrics.length,
           progressPercent: lyrics.length > 0
             ? Math.round((p.linesCompleted.length / lyrics.length) * 100)

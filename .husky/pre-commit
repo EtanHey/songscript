@@ -4,6 +4,10 @@
 rm -rf playwright-report test-results
 git reset HEAD -- playwright-report test-results 2>/dev/null
 
+# Clean Convex generated JS files (TS source is canonical)
+rm -f convex/*.js 2>/dev/null
+git reset HEAD -- convex/*.js 2>/dev/null
+
 # Run unit tests and typecheck
 echo "Running tests..."
 bun run test || { echo "Unit tests failed"; exit 1; }

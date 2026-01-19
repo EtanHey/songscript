@@ -576,7 +576,9 @@ type RecentSong = {
     title: string;
     artist: string;
     sourceLanguage: string;
+    youtubeId: string;
     videoUrl?: string;
+    createdAt: number;
   };
   totalLines: number;
   progressPercent: number;
@@ -653,12 +655,12 @@ function ContinueLearningCard({
       {/* Thumbnail with gradient overlay for text readability */}
       <div className="aspect-video w-full bg-gray-800 relative">
         <img
-          src={`https://i.ytimg.com/vi_webp/mVcc0HFnEOo/maxresdefault.webp`}
+          src={`https://i.ytimg.com/vi_webp/${item.song.youtubeId}/maxresdefault.webp`}
           alt={`${item.song.title} thumbnail`}
           className="h-full w-full object-cover"
           onError={(e) => {
-            // Fallback to YouTube thumbnail if custom image fails
-            e.currentTarget.src = "https://img.youtube.com/vi/mVcc0HFnEOo/mqdefault.jpg";
+            // Fallback to YouTube thumbnail if webp fails
+            e.currentTarget.src = `https://img.youtube.com/vi/${item.song.youtubeId}/mqdefault.jpg`;
           }}
         />
 
