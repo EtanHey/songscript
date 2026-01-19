@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+# Clean Playwright artifacts
+rm -rf playwright-report test-results
+git reset HEAD -- playwright-report test-results 2>/dev/null
+
+# Run unit tests and typecheck
+echo "Running tests..."
+bun run test || { echo "Unit tests failed"; exit 1; }
+
+echo "Running typecheck..."
+bun run typecheck || { echo "Typecheck failed"; exit 1; }
+
+echo "All checks passed"

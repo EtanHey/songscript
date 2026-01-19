@@ -42,6 +42,11 @@ public/audio/**/*.mp3
 *_full.mp3
 baraye_full.mp3
 
+# Playwright test artifacts
+e2e/
+playwright-report/
+test-results/
+
 # Misc
 count.txt
 todos.json

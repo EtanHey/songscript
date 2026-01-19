@@ -1173,14 +1173,14 @@ mcp__Context7__query-docs query="husky pre-commit hook setup"
 **Acceptance Criteria:**
 
 **1. Install Dependencies:**
-- [ ] Install Vitest: `bun add -d vitest @testing-library/react @testing-library/dom jsdom`
-- [ ] Install Playwright: `bun add -d @playwright/test`
-- [ ] Install Husky: `bun add -d husky`
+- [x] Install Vitest: `bun add -d vitest @testing-library/react @testing-library/dom jsdom`
+- [x] Install Playwright: `bun add -d @playwright/test`
+- [x] Install Husky: `bun add -d husky`
 
 **2. Configure Test Runners:**
-- [ ] Create `vitest.config.ts` with jsdom environment
-- [ ] Create `playwright.config.ts` with localhost:3001 base URL
-- [ ] Add scripts to `package.json`:
+- [x] Create `vitest.config.ts` with jsdom environment
+- [x] Create `playwright.config.ts` with localhost:3001 base URL
+- [x] Add scripts to `package.json`:
   ```json
   "test": "vitest run",
   "test:watch": "vitest",
@@ -1189,13 +1189,13 @@ mcp__Context7__query-docs query="husky pre-commit hook setup"
   ```
 
 **3. Create Test Folders:**
-- [ ] Create `app/__tests__/` folder for unit tests
-- [ ] Create `e2e/` folder for Playwright tests
-- [ ] Add `e2e/` and `playwright-report/` and `test-results/` to `.gitignore`
+- [x] Create `src/__tests__/` folder for unit tests (adapted from PRD's app/__tests__ to match codebase structure)
+- [x] Create `e2e/` folder for Playwright tests
+- [x] Add `e2e/` and `playwright-report/` and `test-results/` to `.gitignore`
 
 **4. Set Up Husky Pre-Commit Hook:**
-- [ ] Run `bunx husky init` to create `.husky/` folder
-- [ ] Create `.husky/pre-commit` with this content:
+- [x] Run `bunx husky init` to create `.husky/` folder
+- [x] Create `.husky/pre-commit` with this content:
   ```bash
   #!/usr/bin/env sh
 
@@ -1212,16 +1212,16 @@ mcp__Context7__query-docs query="husky pre-commit hook setup"
 
   echo "✅ All checks passed"
   ```
-- [ ] Make executable: `chmod +x .husky/pre-commit`
+- [x] Make executable: `chmod +x .husky/pre-commit`
 
 **5. Create Sample Tests:**
-- [ ] Create sample unit test in `app/__tests__/sample.test.ts`
-- [ ] Create sample e2e test in `e2e/sample.spec.ts`
+- [x] Create sample unit test in `src/__tests__/sample.test.ts`
+- [x] Create sample e2e test in `e2e/sample.spec.ts`
 
 **6. Verify Everything Works:**
-- [ ] `bun run test` passes
-- [ ] `bun run test:e2e` passes
-- [ ] `bun run typecheck` passes
+- [x] `bun run test` passes (39 tests pass)
+- [x] `bun run test:e2e` passes (2 e2e tests pass)
+- [x] `bun run typecheck` passes
 - [ ] Make a test commit - pre-commit hook runs tests automatically
 - [ ] Verify commit is blocked if tests fail
 

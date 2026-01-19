@@ -130,11 +130,12 @@ describe('LyricsDisplay', () => {
       { wrapper: createWrapper() }
     )
 
-    // The second line (index 1) should have the highlight class
-    const secondLine = screen.getByText('For being afraid at the moment of kissing').closest('button')
-    expect(secondLine).toHaveClass('bg-primary/10')
-    expect(secondLine).toHaveClass('ring-1')
-    expect(secondLine).toHaveClass('ring-primary/20')
+    // The second line (index 1) should have the highlight class on the outer container div
+    const button = screen.getByText('For being afraid at the moment of kissing').closest('button')
+    const lineContainer = button?.parentElement
+    expect(lineContainer).toHaveClass('bg-primary/10')
+    expect(lineContainer).toHaveClass('ring-1')
+    expect(lineContainer).toHaveClass('ring-primary/20')
   })
 
   it('applies click animation class to clicked line', () => {
@@ -143,9 +144,11 @@ describe('LyricsDisplay', () => {
       { wrapper: createWrapper() }
     )
 
-    const firstLine = screen.getByText('For dancing in the alley').closest('button')
-    expect(firstLine).toHaveClass('scale-[0.98]')
-    expect(firstLine).toHaveClass('bg-primary/20')
+    // The click animation class is on the outer container div, not the button
+    const button = screen.getByText('For dancing in the alley').closest('button')
+    const lineContainer = button?.parentElement
+    expect(lineContainer).toHaveClass('scale-[0.98]')
+    expect(lineContainer).toHaveClass('bg-primary/20')
   })
 
   describe('Language Filter', () => {
