@@ -1,0 +1,32 @@
+{
+  "id": "US-AUTH-PERSIST",
+  "title": "Fix Auth Session Persistence",
+  "description": "After clicking magic link, user should stay logged in. Currently session doesn't persist - user is prompted to login again when navigating.",
+  "priority": "HIGH",
+  "technicalContext": {
+    "symptoms": [
+      "Click magic link -> redirected but not logged in",
+      "Navigate to /dashboard -> prompted to login",
+      "Header doesn't show Dashboard/Sign Out buttons",
+      "Session cookie not being set or read correctly"
+    ],
+    "relatedFiles": [
+      "convex/betterAuth.ts - session handling",
+      "src/lib/auth-client.ts - client-side auth",
+      "src/components/Header.tsx - auth-aware nav"
+    ]
+  },
+  "acceptanceCriteria": [
+    {"text": "Investigate why session cookies aren't persisting after magic link verification", "checked": false},
+    {"text": "Check Better Auth session configuration (cookie settings, secure, sameSite)", "checked": false},
+    {"text": "Verify CORS allows credentials (Access-Control-Allow-Credentials)", "checked": false},
+    {"text": "After clicking magic link, user lands on /dashboard AND stays logged in", "checked": false},
+    {"text": "Header shows 'Dashboard' and 'Sign Out' buttons when logged in", "checked": false},
+    {"text": "Refreshing page maintains logged-in state", "checked": false},
+    {"text": "Navigating between pages maintains logged-in state", "checked": false},
+    {"text": "Sign Out button works and clears session", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "All unit tests pass", "checked": false}
+  ],
+  "passes": false
+}

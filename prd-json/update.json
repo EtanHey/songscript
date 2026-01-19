@@ -1,0 +1,50 @@
+{
+  "stats": {
+    "total": 29,
+    "completed": 13,
+    "pending": 9,
+    "blocked": 7
+  },
+  "storyOrder": [
+    "US-AUTH-FIX",
+    "V-AUTH-FIX",
+    "US-EMAIL-RESEND",
+    "V-EMAIL-RESEND",
+    "US-AUTOPLAY-FIX",
+    "V-AUTOPLAY-FIX",
+    "US-LOOP-FIX",
+    "V-LOOP-FIX",
+    "US-WORD-AUDIO",
+    "V-WORD-AUDIO",
+    "US-DASH-SONGS-PROGRESS",
+    "US-DASH-WORDS-KNOWN",
+    "US-DASH-WISHLIST",
+    "US-AUTH-NAV",
+    "US-AUTH-REDIRECT",
+    "V-DASH-BATCH1",
+    "US-DASH-STREAKS",
+    "US-DASH-RECENT",
+    "US-DASH-STATS",
+    "V-DASH-BATCH2",
+    "US-DASH-GOALS",
+    "US-DASH-LANGUAGES",
+    "US-DASH-WORD-DETAILS",
+    "US-DASH-LAYOUT",
+    "V-DASH-BATCH3",
+    "US-AUTH-DYNAMIC-URL",
+    "US-AUTH-PERSIST",
+    "US-AUTH-UX",
+    "US-SSR-SONG-LIST"
+  ],
+  "pending": [
+    "US-DASH-GOALS",
+    "US-DASH-LANGUAGES",
+    "US-DASH-WORD-DETAILS",
+    "US-DASH-LAYOUT",
+    "V-DASH-BATCH3",
+    "US-AUTH-DYNAMIC-URL",
+    "US-AUTH-PERSIST",
+    "US-AUTH-UX",
+    "US-SSR-SONG-LIST"
+  ]
+}

@@ -104,6 +104,44 @@ function DashboardPage() {
     })
   );
 
+  // Get goals with progress
+  const { data: goalsWithProgress, isLoading: goalsLoading, refetch: refetchGoals } = useQuery(
+    convexQuery(api.goals.getGoalsWithProgress, {
+      visitorId: visitorId || "",
+    })
+  );
+
+  // Initialize default goals mutation
+  const { mutate: initializeGoals } = useMutation({
+    mutationFn: useConvexMutation(api.goals.initializeDefaultGoals),
+    onSuccess: () => {
+      refetchGoals();
+    },
+  });
+
+  // Set goal mutation
+  const { mutate: setGoal } = useMutation({
+    mutationFn: useConvexMutation(api.goals.setGoal),
+    onSuccess: () => {
+      refetchGoals();
+    },
+  });
+
+  // Update goal mutation
+  const { mutate: updateGoal } = useMutation({
+    mutationFn: useConvexMutation(api.goals.updateGoal),
+    onSuccess: () => {
+      refetchGoals();
+    },
+  });
+
+  // Initialize goals on first visit (if no goals exist)
+  useEffect(() => {
+    if (visitorId && goalsWithProgress !== undefined && goalsWithProgress.length === 0) {
+      initializeGoals({ visitorId });
+    }
+  }, [visitorId, goalsWithProgress, initializeGoals]);
+
   // Reorder mutation
   const { mutate: reorderWishlist } = useMutation({
     mutationFn: useConvexMutation(api.wishlist.reorderWishlist),
@@ -185,6 +223,29 @@ function DashboardPage() {
             <UserStatsSection stats={userStats} />
           ) : (
             <StatsEmptyState />
+          )}
+        </section>
+
+        {/* My Goals Section */}
+        <section className="mb-8">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4">My Goals</h2>
+
+          {goalsLoading || !visitorId ? (
+            <div className="text-gray-400">Loading your goals...</div>
+          ) : goalsWithProgress && goalsWithProgress.length > 0 ? (
+            <MyGoalsSection
+              goals={goalsWithProgress}
+              onUpdateGoal={(goalId, targetValue) => updateGoal({ goalId, targetValue })}
+              onSetGoal={(goalType, period, targetValue) => {
+                if (visitorId) {
+                  setGoal({ visitorId, goalType, period, targetValue });
+                }
+              }}
+            />
+          ) : (
+            <GoalsEmptyState
+              onInitialize={() => visitorId && initializeGoals({ visitorId })}
+            />
           )}
         </section>
 
@@ -1631,6 +1692,281 @@ function StatsEmptyState() {
       >
         Browse Songs
       </Link>
+    </div>
+  );
+}
+
+// Goal type with progress
+type GoalWithProgress = {
+  _id: Id<"userGoals">;
+  visitorId: string;
+  goalType: string;
+  period: string;
+  targetValue: number;
+  isActive: boolean;
+  createdAt: number;
+  updatedAt: number;
+  currentValue: number;
+  progress: number;
+  isCompleted: boolean;
+};
+
+// Goal display config
+const GOAL_CONFIG: Record<string, { icon: string; label: string; unit: string; color: string }> = {
+  words: { icon: "📚", label: "Words", unit: "words", color: "from-blue-500 to-cyan-500" },
+  time: { icon: "⏱️", label: "Practice Time", unit: "min", color: "from-purple-500 to-pink-500" },
+  lines: { icon: "🎵", label: "Lines", unit: "lines", color: "from-emerald-500 to-teal-500" },
+};
+
+// Circular Progress Ring Component
+function CircularProgressRing({
+  progress,
+  size = 100,
+  strokeWidth = 8,
+  colorClass,
+  children,
+}: {
+  progress: number;
+  size?: number;
+  strokeWidth?: number;
+  colorClass: string;
+  children?: React.ReactNode;
+}) {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const strokeDashoffset = circumference - (progress / 100) * circumference;
+
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg className="transform -rotate-90" width={size} height={size}>
+        {/* Background circle */}
+        <circle
+          className="text-gray-800"
+          strokeWidth={strokeWidth}
+          stroke="currentColor"
+          fill="transparent"
+          r={radius}
+          cx={size / 2}
+          cy={size / 2}
+        />
+        {/* Progress circle */}
+        <circle
+          className={`transition-all duration-700 ease-out ${colorClass}`}
+          strokeWidth={strokeWidth}
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          stroke="url(#gradient)"
+          fill="transparent"
+          r={radius}
+          cx={size / 2}
+          cy={size / 2}
+        />
+        {/* Gradient definition */}
+        <defs>
+          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="currentColor" />
+            <stop offset="100%" stopColor="currentColor" />
+          </linearGradient>
+        </defs>
+      </svg>
+      {/* Center content */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// Single Goal Card Component
+function GoalCard({
+  goal,
+  onEdit,
+}: {
+  goal: GoalWithProgress;
+  onEdit: (targetValue: number) => void;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(goal.targetValue.toString());
+  const [showCelebration, setShowCelebration] = useState(false);
+  const wasCompletedRef = useRef(goal.isCompleted);
+
+  const config = GOAL_CONFIG[goal.goalType] || GOAL_CONFIG.words;
+
+  // Show celebration when goal is newly completed
+  useEffect(() => {
+    if (goal.isCompleted && !wasCompletedRef.current) {
+      setShowCelebration(true);
+      const timer = setTimeout(() => setShowCelebration(false), 3000);
+      return () => clearTimeout(timer);
+    }
+    wasCompletedRef.current = goal.isCompleted;
+  }, [goal.isCompleted]);
+
+  const handleSave = () => {
+    const newValue = parseInt(editValue, 10);
+    if (!isNaN(newValue) && newValue > 0) {
+      onEdit(newValue);
+    }
+    setIsEditing(false);
+  };
+
+  const periodLabel = goal.period === "daily" ? "Today" : "This Week";
+
+  return (
+    <div
+      className={`bg-gray-900 rounded-xl border border-gray-800 p-4 sm:p-6 relative overflow-hidden transition-all duration-300 ${
+        goal.isCompleted ? "border-emerald-500/50 shadow-lg shadow-emerald-500/10" : ""
+      }`}
+    >
+      {/* Celebration overlay */}
+      {showCelebration && (
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 animate-pulse flex items-center justify-center z-10">
+          <div className="text-4xl animate-bounce">🎉</div>
+        </div>
+      )}
+
+      {/* Header with period badge */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">{config.icon}</span>
+          <div>
+            <h3 className="font-semibold text-white text-sm sm:text-base">{config.label}</h3>
+            <span className="text-xs text-gray-400 capitalize">{periodLabel}</span>
+          </div>
+        </div>
+        {goal.isCompleted && (
+          <span className="px-2 py-1 bg-emerald-500/20 text-emerald-400 text-xs rounded-full font-medium">
+            Complete!
+          </span>
+        )}
+      </div>
+
+      {/* Progress Ring */}
+      <div className="flex justify-center mb-4">
+        <CircularProgressRing
+          progress={goal.progress}
+          size={120}
+          strokeWidth={10}
+          colorClass={goal.isCompleted ? "text-emerald-500" : "text-blue-500"}
+        >
+          <div className="text-center">
+            <div className="text-2xl sm:text-3xl font-bold text-white">
+              {goal.progress}%
+            </div>
+          </div>
+        </CircularProgressRing>
+      </div>
+
+      {/* Progress text */}
+      <div className="text-center mb-4">
+        <span className="text-lg font-semibold text-white">
+          {goal.currentValue}
+        </span>
+        <span className="text-gray-400 mx-1">/</span>
+        {isEditing ? (
+          <input
+            type="number"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={handleSave}
+            onKeyDown={(e) => e.key === "Enter" && handleSave()}
+            className="w-16 bg-gray-800 border border-gray-700 rounded px-2 py-1 text-center text-white focus:outline-none focus:border-emerald-500"
+            autoFocus
+            min={1}
+          />
+        ) : (
+          <button
+            onClick={() => {
+              setEditValue(goal.targetValue.toString());
+              setIsEditing(true);
+            }}
+            className="text-lg font-semibold text-gray-400 hover:text-emerald-400 transition-colors underline decoration-dashed underline-offset-4"
+          >
+            {goal.targetValue}
+          </button>
+        )}
+        <span className="text-gray-400 ml-1">{config.unit}</span>
+      </div>
+
+      {/* Tap to edit hint */}
+      <div className="text-center text-xs text-gray-500">
+        Tap target to edit
+      </div>
+    </div>
+  );
+}
+
+// My Goals Section Component
+function MyGoalsSection({
+  goals,
+  onUpdateGoal,
+  onSetGoal: _onSetGoal, // Prefixed with underscore - reserved for future "add new goal" feature
+}: {
+  goals: GoalWithProgress[];
+  onUpdateGoal: (goalId: Id<"userGoals">, targetValue: number) => void;
+  onSetGoal: (goalType: string, period: string, targetValue: number) => void;
+}) {
+  // Separate daily and weekly goals
+  const dailyGoals = goals.filter((g) => g.period === "daily");
+  const weeklyGoals = goals.filter((g) => g.period === "weekly");
+
+  return (
+    <div className="space-y-6">
+      {/* Daily Goals */}
+      {dailyGoals.length > 0 && (
+        <div>
+          <h3 className="text-sm font-medium text-gray-400 mb-3 uppercase tracking-wide">
+            Daily Goals
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {dailyGoals.map((goal) => (
+              <GoalCard
+                key={goal._id}
+                goal={goal}
+                onEdit={(targetValue) => onUpdateGoal(goal._id, targetValue)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Weekly Goals */}
+      {weeklyGoals.length > 0 && (
+        <div>
+          <h3 className="text-sm font-medium text-gray-400 mb-3 uppercase tracking-wide">
+            Weekly Goals
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {weeklyGoals.map((goal) => (
+              <GoalCard
+                key={goal._id}
+                goal={goal}
+                onEdit={(targetValue) => onUpdateGoal(goal._id, targetValue)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Goals Empty State Component
+function GoalsEmptyState({ onInitialize }: { onInitialize: () => void }) {
+  return (
+    <div className="bg-gray-900 rounded-lg border border-gray-800 p-8 text-center">
+      <div className="text-4xl mb-4">🎯</div>
+      <h3 className="text-lg font-semibold mb-2">Set your learning goals</h3>
+      <p className="text-gray-400 mb-6 max-w-sm mx-auto">
+        Track your daily and weekly progress with customizable learning goals!
+      </p>
+      <button
+        onClick={onInitialize}
+        className="inline-flex items-center justify-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors min-h-[44px]"
+      >
+        Create Default Goals
+      </button>
     </div>
   );
 }

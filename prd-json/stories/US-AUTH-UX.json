@@ -1,0 +1,18 @@
+{
+  "id": "US-AUTH-UX",
+  "title": "Auth UX - Visible Sign In Button and Flow",
+  "description": "Users should be able to easily find the sign-in option. Add visible Sign In button to header/nav that's always accessible.",
+  "priority": "MEDIUM",
+  "acceptanceCriteria": [
+    {"text": "Header shows 'Sign In' button when user is NOT logged in", "checked": false},
+    {"text": "Sign In button navigates to /login page", "checked": false},
+    {"text": "Login page has clear, user-friendly design", "checked": false},
+    {"text": "After successful login, user is redirected to /dashboard", "checked": false},
+    {"text": "Header shows 'Dashboard' link when logged in", "checked": false},
+    {"text": "Header shows 'Sign Out' button when logged in", "checked": false},
+    {"text": "Mobile: Auth buttons are accessible and properly sized (44px+ touch targets)", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "All unit tests pass", "checked": false}
+  ],
+  "passes": false
+}

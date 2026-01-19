@@ -1,0 +1,22 @@
+{
+  "id": "US-AUTH-DYNAMIC-URL",
+  "title": "Dynamic Magic Link URLs (Local vs Production)",
+  "description": "Magic links should use localhost:3001 when requested from local dev, and production URL when requested from production. Currently SITE_URL is hardcoded in Convex env vars.",
+  "priority": "HIGH",
+  "technicalContext": {
+    "problem": "SITE_URL env var is single value - can't be both localhost and production",
+    "currentCode": "convex/betterAuth.ts uses process.env.SITE_URL for baseURL",
+    "solution": "Use request origin header to determine base URL dynamically, or remove baseURL and let Better Auth infer from trustedOrigins"
+  },
+  "acceptanceCriteria": [
+    {"text": "Research Better Auth docs for dynamic baseURL or origin-based URL construction", "checked": false},
+    {"text": "Modify convex/betterAuth.ts to construct magic link URL based on request origin", "checked": false},
+    {"text": "If origin is localhost:3001, magic link should use http://localhost:3001", "checked": false},
+    {"text": "If origin is production, magic link should use production URL", "checked": false},
+    {"text": "Test locally: send magic link, verify email contains localhost:3001 URL", "checked": false},
+    {"text": "Test production: send magic link, verify email contains production URL", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "All unit tests pass", "checked": false}
+  ],
+  "passes": false
+}

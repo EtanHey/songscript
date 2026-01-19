@@ -93,4 +93,17 @@ export default defineSchema({
   })
     .index("by_visitor", ["visitorId"])
     .index("by_visitor_date", ["visitorId", "date"]),
+
+  // User learning goals (daily/weekly targets)
+  userGoals: defineTable({
+    visitorId: v.string(), // localStorage-generated ID if no auth
+    goalType: v.string(), // "words" | "time" | "lines" | "songs"
+    period: v.string(), // "daily" | "weekly"
+    targetValue: v.number(), // Target number to achieve
+    isActive: v.boolean(), // Whether this goal is currently active
+    createdAt: v.number(), // Timestamp when created
+    updatedAt: v.number(), // Timestamp when last updated
+  })
+    .index("by_visitor", ["visitorId"])
+    .index("by_visitor_type_period", ["visitorId", "goalType", "period"]),
 });

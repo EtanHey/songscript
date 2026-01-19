@@ -9,6 +9,7 @@
  */
 
 import type * as betterAuth from "../betterAuth.js";
+import type * as goals from "../goals.js";
 import type * as http from "../http.js";
 import type * as lyrics from "../lyrics.js";
 import type * as practiceLog from "../practiceLog.js";
@@ -28,6 +29,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   betterAuth: typeof betterAuth;
+  goals: typeof goals;
   http: typeof http;
   lyrics: typeof lyrics;
   practiceLog: typeof practiceLog;

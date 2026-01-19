@@ -22,6 +22,46 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-DASH-GOALS: Dashboard Daily/Weekly Learning Goals
+- Created `convex/schema.ts` - Added userGoals table:
+  - visitorId, goalType, period, targetValue, isActive, timestamps
+  - Indexes: by_visitor, by_visitor_type_period
+- Created `convex/goals.ts` - Full CRUD operations:
+  - `getByVisitor` - Get all goals for a visitor
+  - `getGoalsWithProgress` - Get goals with calculated progress from practice data
+  - `setGoal` - Create or update a goal
+  - `updateGoal` - Update a goal's target value
+  - `deleteGoal` - Deactivate a goal
+  - `initializeDefaultGoals` - Create default daily goals for new users
+- Progress calculation aggregates data from:
+  - wordProgress (unique words practiced by period)
+  - userPracticeLog (practice time by period)
+  - userSongProgress (lines practiced by period)
+- Updated `src/routes/dashboard.tsx` - Added "My Goals" section:
+  - `MyGoalsSection` - Full component with daily/weekly goal groups
+  - `GoalCard` - Individual goal card with circular progress ring
+  - `CircularProgressRing` - SVG-based animated progress indicator
+  - `GoalsEmptyState` - Empty state with "Create Default Goals" CTA
+- MOBILE-FIRST design:
+  - Stacked full-width goal cards on mobile (grid-cols-1)
+  - Side-by-side on sm+ (sm:grid-cols-2 lg:grid-cols-3)
+  - SVG rings scale nicely at all sizes
+  - Touch-friendly edit targets (tap target value to edit)
+- UX Features:
+  - Animated progress ring fill (transition duration 700ms)
+  - Tap goal target to edit inline
+  - Celebration animation/overlay when goal is completed (pulse + bounce emoji)
+  - "Complete!" badge on finished goals
+  - Period labels (Today/This Week)
+- Goal types supported: words, time (minutes), lines
+- Default goals: 10 words/day, 15 minutes/day
+- Goals auto-reset by period calculation (daily=today, weekly=since Monday)
+- Fixed Convex bundler error by removing duplicate .js files
+- Typecheck passes, all 54 unit tests pass
+- All 15 acceptance criteria completed
+
+---
+
 ## Iteration - V-DASH-BATCH2: Verify Dashboard Batch 2 (BLOCKED)
 - Attempted browser verification of Dashboard Batch 2 (Streaks, Recent, Stats)
 - Magic link authentication still fails with INVALID_TOKEN error
