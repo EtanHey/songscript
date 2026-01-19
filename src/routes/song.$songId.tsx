@@ -118,6 +118,10 @@ function SongPageContent({ songId }: SongPageContentProps) {
   // Ref to track when we're seeking for a loop restart (prevents line flash during seek)
   const isLoopSeekingRef = useRef(false);
 
+  // Ref to track the "target" line index during seeking - used to prevent wrong line detection
+  // due to keyframe seeking landing slightly before the requested time
+  const targetLineIndexRef = useRef<number | undefined>(undefined);
+
   // Playback mode state: single, loop, or fluid - default to fluid for auto-play experience
   const [playbackMode, setPlaybackMode] = useState<PlaybackMode>("fluid");
   const [currentLineIndex, setCurrentLineIndex] = useState<number | undefined>(
@@ -191,6 +195,8 @@ function SongPageContent({ songId }: SongPageContentProps) {
         const lineNumber = sortedLyrics[activeLineIndex]?.lineNumber;
         if (lineNumber !== undefined && audioReady) {
           setCurrentLineIndex(activeLineIndex);
+          // Set target line index to prevent wrong line detection during seek
+          targetLineIndexRef.current = activeLineIndex;
           playAudioSnippet(lineNumber);
           // Keep video in sync (muted)
           playerRef.current?.seekTo(sortedLyrics[activeLineIndex].startTime);
@@ -256,6 +262,10 @@ function SongPageContent({ songId }: SongPageContentProps) {
       // This is critical to avoid the "wrong line flash" bug
       isLoopSeekingRef.current = true;
 
+      // Set the target line index - this tells handleTimeUpdate to use this line
+      // even if the video seeks to a time slightly before startTime (keyframe seeking)
+      targetLineIndexRef.current = lineIndex;
+
       // Trigger visual feedback
       triggerClickAnimation(lineIndex);
       // Set as active line
@@ -295,12 +305,50 @@ function SongPageContent({ songId }: SongPageContentProps) {
         return;
       }
 
-      // Find which line's startTime <= currentTime < endTime
-      const lineIndex = sortedLyrics.findIndex(
+      // Find which line's time range contains currentTime
+      // Use startTime <= currentTime < endTime for consistent boundaries
+      const calculatedLineIndex = sortedLyrics.findIndex(
         (line) => currentTime >= line.startTime && currentTime < line.endTime
       );
-      if (lineIndex !== -1 && lineIndex !== activeLineIndex) {
-        setActiveLineIndex(lineIndex);
+
+      // If we have a target line index (from clicking or loop restart),
+      // use it until we're safely within the target line's time range.
+      // This prevents the "wrong line flash" bug caused by:
+      // 1. Keyframe seeking landing slightly before the requested time
+      // 2. Time update events firing during the seek operation
+      // 3. Loop restart triggering at endTime before seek completes
+      if (targetLineIndexRef.current !== undefined) {
+        const targetLine = sortedLyrics[targetLineIndexRef.current];
+        if (targetLine) {
+          // Check if we're clearly within the target line's time range
+          // (past the start time AND before the end time)
+          const withinTargetLine = currentTime >= targetLine.startTime && currentTime < targetLine.endTime;
+
+          if (withinTargetLine && calculatedLineIndex === targetLineIndexRef.current) {
+            // We're within the target line AND detection agrees - safe to clear
+            targetLineIndexRef.current = undefined;
+            // Update active line if needed and fall through
+            if (calculatedLineIndex !== activeLineIndex) {
+              setActiveLineIndex(calculatedLineIndex);
+            }
+            return;
+          } else {
+            // Either:
+            // 1. We haven't reached the target line's start time yet (seeking)
+            // 2. We're at/past the end time (loop restart about to fire)
+            // 3. Detection disagrees with target (keyframe seek landed wrong)
+            // In all cases, keep using the target line to prevent flashing
+            if (targetLineIndexRef.current !== activeLineIndex) {
+              setActiveLineIndex(targetLineIndexRef.current);
+            }
+            return;
+          }
+        }
+      }
+
+      // Normal time-based detection (target is cleared or never set)
+      if (calculatedLineIndex !== -1 && calculatedLineIndex !== activeLineIndex) {
+        setActiveLineIndex(calculatedLineIndex);
       }
     },
     [sortedLyrics, activeLineIndex]
@@ -344,13 +392,26 @@ function SongPageContent({ songId }: SongPageContentProps) {
           // Loop mode: seek back to start of line
           // Set flag to prevent line flashing during seek
           isLoopSeekingRef.current = true;
+          // Set the target line index - this prevents handleTimeUpdate from
+          // showing the wrong line if video keyframe seeking lands before startTime
+          targetLineIndexRef.current = currentLineIndex;
           player.seekTo(currentLine.startTime);
           // Clear flag after seek completes (give browser time to process)
           setTimeout(() => {
             isLoopSeekingRef.current = false;
           }, 100);
         } else {
-          // Single mode: pause video at end of segment
+          // Single mode: advance to next line and pause
+          const nextLineIndex = currentLineIndex + 1;
+          if (nextLineIndex < sortedLyrics.length) {
+            // Advance to next line
+            const nextLine = sortedLyrics[nextLineIndex];
+            setCurrentLineIndex(nextLineIndex);
+            setActiveLineIndex(nextLineIndex);
+            targetLineIndexRef.current = nextLineIndex;
+            player.seekTo(nextLine.startTime);
+          }
+          // Pause at the new position (or current if at last line)
           player.pause();
         }
       }

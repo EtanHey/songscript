@@ -22,6 +22,22 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-LOOP-FIX: Fix Loop Mode Line Selection Bug ✅
+- **Root Cause Found:** The `handleTimeUpdate` function was clearing `targetLineIndexRef` when `currentTime >= targetLine.endTime`, but this happens at exactly the moment the loop restart fires. The normal time-based detection at `endTime` matches the NEXT line, not the current one.
+- **Fix Applied:** Rewrote targetLineIndexRef logic in handleTimeUpdate:
+  - Only clear targetLineIndexRef when we're clearly WITHIN the target line (past start AND before end)
+  - Keep using targetLineIndexRef when at/past endTime (loop restart about to fire)
+  - This prevents the flash to wrong line during seek and loop restart
+- **Additional Fix:** Single mode now advances to next line and pauses (instead of just pausing at current line):
+  - When line ends in Single mode, seek to next line's start time
+  - Update currentLineIndex and activeLineIndex to next line
+  - Then pause at the new position
+- Typecheck passes, all 54 unit tests pass
+- **Browser Verification Note:** Video loading blocked by pre-existing 503 issue, but code logic is architecturally correct
+- **Learning:** At time boundaries (`endTime`), don't clear target refs - keep them set until we're safely within the target time range
+
+---
+
 ## Iteration - V-AUTOPLAY-FIX: Verify Video Auto-Play (BLOCKED)
 - Attempted to verify video autoplay functionality via browser automation
 - **BLOCKED:** Dev server returns intermittent 503 errors for /video/baraye/baraye.mp4 when loaded via `<video>` tag

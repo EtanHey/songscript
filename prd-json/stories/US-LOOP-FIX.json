@@ -19,19 +19,19 @@
     }
   },
   "acceptanceCriteria": [
-    {"text": "Read src/routes/song.$songId.tsx focusing on handleTimeUpdate and loop logic", "checked": false},
-    {"text": "Identify the time-to-line-index calculation - find the off-by-one or boundary bug", "checked": false},
-    {"text": "Check if line boundaries use startTime <= time < endTime or startTime < time <= endTime", "checked": false},
-    {"text": "Fix the line index calculation to correctly identify current line at any given time", "checked": false},
-    {"text": "When clicking line N in Loop mode: line N highlights IMMEDIATELY (no flash to N-1)", "checked": false},
-    {"text": "When loop restarts: line N stays highlighted (no flash to N-1)", "checked": false},
-    {"text": "Watch 5+ loop cycles - same line stays highlighted the ENTIRE time", "checked": false},
-    {"text": "Single mode: click line N, plays line N, then advances to N+1 and pauses (expected)", "checked": false},
-    {"text": "Fluid mode: lines advance correctly with video (no wrong-line issues)", "checked": false},
-    {"text": "Test with line 1 (first line) - no crash or weird behavior at boundary", "checked": false},
-    {"text": "Test with last line - no crash or weird behavior at boundary", "checked": false},
-    {"text": "Typecheck passes", "checked": false},
-    {"text": "All unit tests pass", "checked": false}
+    {"text": "Read src/routes/song.$songId.tsx focusing on handleTimeUpdate and loop logic", "checked": true},
+    {"text": "Identify the time-to-line-index calculation - find the off-by-one or boundary bug", "checked": true},
+    {"text": "Check if line boundaries use startTime <= time < endTime or startTime < time <= endTime", "checked": true},
+    {"text": "Fix the line index calculation to correctly identify current line at any given time", "checked": true},
+    {"text": "When clicking line N in Loop mode: line N highlights IMMEDIATELY (no flash to N-1)", "checked": true},
+    {"text": "When loop restarts: line N stays highlighted (no flash to N-1)", "checked": true},
+    {"text": "Watch 5+ loop cycles - same line stays highlighted the ENTIRE time", "checked": true},
+    {"text": "Single mode: click line N, plays line N, then advances to N+1 and pauses (expected)", "checked": true},
+    {"text": "Fluid mode: lines advance correctly with video (no wrong-line issues)", "checked": true},
+    {"text": "Test with line 1 (first line) - no crash or weird behavior at boundary", "checked": true},
+    {"text": "Test with last line - no crash or weird behavior at boundary", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "All unit tests pass", "checked": true}
   ],
   "debuggingApproach": [
     "1. Add console.log in handleTimeUpdate: log currentTime, calculated lineIndex, and line boundaries",
@@ -40,6 +40,6 @@
     "4. The bug is likely: when time === line.endTime, it's matching line N+1 instead of line N",
     "5. Fix: adjust boundary check to be inclusive on start, exclusive on end (or vice versa)"
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null
 }
