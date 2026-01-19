@@ -57,6 +57,83 @@ function getLanguageFlag(sourceLanguage: string): string {
   }
 }
 
+// Skeleton Loading Card Component
+function SkeletonCard({ height = "h-32" }: { height?: string }) {
+  return (
+    <div className={`bg-gray-900 rounded-lg border border-gray-800 ${height} animate-pulse`}>
+      <div className="p-4 space-y-3">
+        <div className="h-4 bg-gray-800 rounded w-3/4" />
+        <div className="h-4 bg-gray-800 rounded w-1/2" />
+        <div className="h-4 bg-gray-800 rounded w-2/3" />
+      </div>
+    </div>
+  );
+}
+
+// Collapsible Section Component - Mobile-friendly accordion
+function CollapsibleSection({
+  title,
+  badge,
+  filterIndicator,
+  defaultExpanded,
+  children,
+}: {
+  title: string;
+  badge?: number;
+  filterIndicator?: string;
+  defaultExpanded?: boolean;
+  children: React.ReactNode;
+}) {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded ?? true);
+
+  return (
+    <section className="bg-gray-900/50 rounded-xl border border-gray-800 overflow-hidden">
+      {/* Header - Clickable to expand/collapse on mobile */}
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full flex items-center justify-between p-4 hover:bg-gray-800/30 transition-colors md:cursor-default"
+      >
+        <div className="flex items-center gap-3">
+          <h2 className="text-lg font-semibold text-white">{title}</h2>
+          {badge !== undefined && badge > 0 && (
+            <span className="px-2 py-0.5 bg-gray-800 text-gray-300 text-xs rounded-full">
+              {badge}
+            </span>
+          )}
+          {filterIndicator && (
+            <span className="text-sm text-gray-400">{filterIndicator}</span>
+          )}
+        </div>
+        {/* Chevron - visible on mobile, hidden on md+ */}
+        <svg
+          className={`w-5 h-5 text-gray-400 transition-transform duration-200 md:hidden ${
+            isExpanded ? "rotate-180" : ""
+          }`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
+
+      {/* Content - Collapsible on mobile, always visible on md+ */}
+      <div
+        className={`transition-all duration-300 ease-in-out md:max-h-none md:opacity-100 ${
+          isExpanded ? "max-h-[5000px] opacity-100" : "max-h-0 opacity-0 md:max-h-none md:opacity-100"
+        }`}
+      >
+        <div className="px-4 pb-4">{children}</div>
+      </div>
+    </section>
+  );
+}
+
 function DashboardPage() {
   const navigate = useNavigate();
   const visitorId = useVisitorId();
@@ -267,7 +344,7 @@ function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <div className="container mx-auto px-4 py-6 sm:py-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold mb-1">Dashboard</h1>
@@ -276,12 +353,79 @@ function DashboardPage() {
           </p>
         </div>
 
-        {/* My Languages Section */}
-        <section className="mb-8">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4">My Languages</h2>
+        {/* === TOP SECTION: Continue Learning (Most Important) === */}
+        {!recentLoading && filteredRecentSongs && filteredRecentSongs.length > 0 && (
+          <section className="mb-6 sm:mb-8">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">
+              Continue Learning
+              {selectedLanguage && (
+                <span className="ml-2 text-sm font-normal text-gray-400">
+                  ({getLanguageFlag(selectedLanguage)} filtered)
+                </span>
+              )}
+            </h2>
+            <ContinueLearningCarousel items={filteredRecentSongs} />
+          </section>
+        )}
 
+        {/* === GOALS + STREAK: Side by Side on md+ === */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 sm:mb-8">
+          {/* My Goals Section */}
+          <section>
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">My Goals</h2>
+            {goalsLoading || !visitorId ? (
+              <SkeletonCard height="h-48" />
+            ) : goalsWithProgress && goalsWithProgress.length > 0 ? (
+              <MyGoalsSection
+                goals={goalsWithProgress}
+                onUpdateGoal={(goalId, targetValue) => updateGoal({ goalId, targetValue })}
+                onSetGoal={(goalType, period, targetValue) => {
+                  if (visitorId) {
+                    setGoal({ visitorId, goalType, period, targetValue });
+                  }
+                }}
+              />
+            ) : (
+              <GoalsEmptyState
+                onInitialize={() => visitorId && initializeGoals({ visitorId })}
+              />
+            )}
+          </section>
+
+          {/* Practice Streak Section */}
+          <section>
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">Practice Streak</h2>
+            {practiceLoading || !visitorId ? (
+              <SkeletonCard height="h-48" />
+            ) : practiceHistory ? (
+              <PracticeStreakSection
+                currentStreak={practiceHistory.currentStreak}
+                longestStreak={practiceHistory.longestStreak}
+                practiceData={practiceHistory.practiceData}
+              />
+            ) : (
+              <StreakEmptyState />
+            )}
+          </section>
+        </div>
+
+        {/* === STATS: Full Width === */}
+        <section className="mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4">Your Stats</h2>
+          {statsLoading || !visitorId ? (
+            <SkeletonCard height="h-32" />
+          ) : userStats ? (
+            <UserStatsSection stats={userStats} />
+          ) : (
+            <StatsEmptyState />
+          )}
+        </section>
+
+        {/* === LANGUAGES: Full Width === */}
+        <section className="mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4">My Languages</h2>
           {languageLoading || !visitorId ? (
-            <div className="text-gray-400">Loading your languages...</div>
+            <SkeletonCard height="h-24" />
           ) : languageProgress && languageProgress.length > 0 ? (
             <MyLanguagesSection
               languages={languageProgress}
@@ -295,183 +439,111 @@ function DashboardPage() {
           )}
         </section>
 
-        {/* Your Stats Section */}
-        <section className="mb-8">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4">Your Stats</h2>
-
-          {statsLoading || !visitorId ? (
-            <div className="text-gray-400">Loading your stats...</div>
-          ) : userStats ? (
-            <UserStatsSection stats={userStats} />
-          ) : (
-            <StatsEmptyState />
-          )}
-        </section>
-
-        {/* My Goals Section */}
-        <section className="mb-8">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4">My Goals</h2>
-
-          {goalsLoading || !visitorId ? (
-            <div className="text-gray-400">Loading your goals...</div>
-          ) : goalsWithProgress && goalsWithProgress.length > 0 ? (
-            <MyGoalsSection
-              goals={goalsWithProgress}
-              onUpdateGoal={(goalId, targetValue) => updateGoal({ goalId, targetValue })}
-              onSetGoal={(goalType, period, targetValue) => {
-                if (visitorId) {
-                  setGoal({ visitorId, goalType, period, targetValue });
-                }
-              }}
-            />
-          ) : (
-            <GoalsEmptyState
-              onInitialize={() => visitorId && initializeGoals({ visitorId })}
-            />
-          )}
-        </section>
-
-        {/* Continue Learning Section - Only show if there are recent songs */}
-        {!recentLoading && filteredRecentSongs && filteredRecentSongs.length > 0 && (
-          <section className="mb-8">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">
-              Continue Learning
-              {selectedLanguage && (
-                <span className="ml-2 text-sm font-normal text-gray-400">
-                  ({getLanguageFlag(selectedLanguage)} filtered)
-                </span>
+        {/* === MAIN CONTENT: Songs + Vocabulary + Queue === */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column: Songs + Vocabulary (takes 2 cols on lg) */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* My Songs Section - Collapsible on mobile */}
+            <CollapsibleSection
+              title="My Songs"
+              badge={filteredSongProgress?.length || 0}
+              filterIndicator={selectedLanguage ? `(${getLanguageFlag(selectedLanguage)} filtered)` : undefined}
+              defaultExpanded={true}
+            >
+              {progressLoading || !visitorId ? (
+                <SkeletonCard height="h-48" />
+              ) : filteredSongProgress && filteredSongProgress.length > 0 ? (
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+                  {filteredSongProgress.map((progress) => (
+                    <SongProgressCard
+                      key={progress._id}
+                      title={progress.song.title}
+                      artist={progress.song.artist}
+                      sourceLanguage={progress.song.sourceLanguage}
+                      youtubeId={progress.song.youtubeId}
+                      progressPercent={progress.progressPercent}
+                      linesCompleted={progress.linesCompleted.length}
+                      totalLines={progress.totalLines}
+                      lastPracticed={progress.lastPracticed}
+                      songId={progress.songId}
+                    />
+                  ))}
+                </div>
+              ) : selectedLanguage && songProgress && songProgress.length > 0 ? (
+                <div className="bg-gray-900 rounded-lg border border-gray-800 p-6 text-center">
+                  <p className="text-gray-400">
+                    No songs in {selectedLanguage}. <button onClick={() => setSelectedLanguage(null)} className="text-emerald-400 hover:text-emerald-300 underline">Show all songs</button>
+                  </p>
+                </div>
+              ) : (
+                <EmptyState />
               )}
-            </h2>
-            <ContinueLearningCarousel items={filteredRecentSongs} />
-          </section>
-        )}
+            </CollapsibleSection>
 
-        {/* Practice Streak Section */}
-        <section className="mb-8">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4">Practice Streak</h2>
+            {/* My Vocabulary Section - Collapsible on mobile */}
+            <CollapsibleSection
+              title="My Vocabulary"
+              badge={vocabulary?.reduce((sum, v) => sum + v.totalWords, 0) || 0}
+              filterIndicator={selectedLanguage ? `(${getLanguageFlag(selectedLanguage)} filtered)` : undefined}
+              defaultExpanded={false}
+            >
+              {vocabLoading || !visitorId ? (
+                <SkeletonCard height="h-32" />
+              ) : filteredVocabulary && filteredVocabulary.length > 0 ? (
+                <div className="space-y-4">
+                  {filteredVocabulary.map((langGroup) => (
+                    <LanguageVocabularySection
+                      key={langGroup.language}
+                      language={langGroup.language}
+                      totalWords={langGroup.totalWords}
+                      newCount={langGroup.newCount}
+                      learningCount={langGroup.learningCount}
+                      masteredCount={langGroup.masteredCount}
+                      words={langGroup.words}
+                      onWordClick={handleWordClick}
+                    />
+                  ))}
+                </div>
+              ) : selectedLanguage && vocabulary && vocabulary.length > 0 ? (
+                <div className="bg-gray-900 rounded-lg border border-gray-800 p-6 text-center">
+                  <p className="text-gray-400">
+                    No vocabulary in {selectedLanguage}. <button onClick={() => setSelectedLanguage(null)} className="text-emerald-400 hover:text-emerald-300 underline">Show all</button>
+                  </p>
+                </div>
+              ) : (
+                <VocabularyEmptyState />
+              )}
+            </CollapsibleSection>
+          </div>
 
-          {practiceLoading || !visitorId ? (
-            <div className="text-gray-400">Loading your streaks...</div>
-          ) : practiceHistory ? (
-            <PracticeStreakSection
-              currentStreak={practiceHistory.currentStreak}
-              longestStreak={practiceHistory.longestStreak}
-              practiceData={practiceHistory.practiceData}
-            />
-          ) : (
-            <StreakEmptyState />
-          )}
-        </section>
-
-        {/* My Songs Section */}
-        <section className="mb-8">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4">
-            My Songs
-            {selectedLanguage && (
-              <span className="ml-2 text-sm font-normal text-gray-400">
-                ({getLanguageFlag(selectedLanguage)} filtered)
-              </span>
-            )}
-          </h2>
-
-          {progressLoading || !visitorId ? (
-            <div className="text-gray-400">Loading your progress...</div>
-          ) : filteredSongProgress && filteredSongProgress.length > 0 ? (
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredSongProgress.map((progress) => (
-                <SongProgressCard
-                  key={progress._id}
-                  title={progress.song.title}
-                  artist={progress.song.artist}
-                  sourceLanguage={progress.song.sourceLanguage}
-                  youtubeId={progress.song.youtubeId}
-                  progressPercent={progress.progressPercent}
-                  linesCompleted={progress.linesCompleted.length}
-                  totalLines={progress.totalLines}
-                  lastPracticed={progress.lastPracticed}
-                  songId={progress.songId}
+          {/* Right Column / Bottom on Mobile: Learning Queue */}
+          <div className="lg:col-span-1">
+            <CollapsibleSection
+              title="Learning Queue"
+              badge={filteredWishlist?.length || 0}
+              filterIndicator={selectedLanguage ? `(${getLanguageFlag(selectedLanguage)} filtered)` : undefined}
+              defaultExpanded={true}
+            >
+              {wishlistLoading || !visitorId ? (
+                <SkeletonCard height="h-32" />
+              ) : filteredWishlist && filteredWishlist.length > 0 ? (
+                <LearningQueueList
+                  items={filteredWishlist}
+                  onReorder={handleReorder}
+                  onRemove={handleRemoveFromWishlist}
                 />
-              ))}
-            </div>
-          ) : selectedLanguage && songProgress && songProgress.length > 0 ? (
-            <div className="bg-gray-900 rounded-lg border border-gray-800 p-6 text-center">
-              <p className="text-gray-400">
-                No songs in {selectedLanguage}. <button onClick={() => setSelectedLanguage(null)} className="text-emerald-400 hover:text-emerald-300 underline">Show all songs</button>
-              </p>
-            </div>
-          ) : (
-            <EmptyState />
-          )}
-        </section>
-
-        {/* Learning Queue Section */}
-        <section className="mb-8">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4">
-            My Learning Queue
-            {selectedLanguage && (
-              <span className="ml-2 text-sm font-normal text-gray-400">
-                ({getLanguageFlag(selectedLanguage)} filtered)
-              </span>
-            )}
-          </h2>
-
-          {wishlistLoading || !visitorId ? (
-            <div className="text-gray-400">Loading your queue...</div>
-          ) : filteredWishlist && filteredWishlist.length > 0 ? (
-            <LearningQueueList
-              items={filteredWishlist}
-              onReorder={handleReorder}
-              onRemove={handleRemoveFromWishlist}
-            />
-          ) : selectedLanguage && wishlist && wishlist.length > 0 ? (
-            <div className="bg-gray-900 rounded-lg border border-gray-800 p-6 text-center">
-              <p className="text-gray-400">
-                No songs in your queue for {selectedLanguage}. <button onClick={() => setSelectedLanguage(null)} className="text-emerald-400 hover:text-emerald-300 underline">Show all</button>
-              </p>
-            </div>
-          ) : (
-            <WishlistEmptyState />
-          )}
-        </section>
-
-        {/* My Vocabulary Section */}
-        <section>
-          <h2 className="text-lg sm:text-xl font-semibold mb-4">
-            My Vocabulary
-            {selectedLanguage && (
-              <span className="ml-2 text-sm font-normal text-gray-400">
-                ({getLanguageFlag(selectedLanguage)} filtered)
-              </span>
-            )}
-          </h2>
-
-          {vocabLoading || !visitorId ? (
-            <div className="text-gray-400">Loading vocabulary...</div>
-          ) : filteredVocabulary && filteredVocabulary.length > 0 ? (
-            <div className="space-y-4">
-              {filteredVocabulary.map((langGroup) => (
-                <LanguageVocabularySection
-                  key={langGroup.language}
-                  language={langGroup.language}
-                  totalWords={langGroup.totalWords}
-                  newCount={langGroup.newCount}
-                  learningCount={langGroup.learningCount}
-                  masteredCount={langGroup.masteredCount}
-                  words={langGroup.words}
-                  onWordClick={handleWordClick}
-                />
-              ))}
-            </div>
-          ) : selectedLanguage && vocabulary && vocabulary.length > 0 ? (
-            <div className="bg-gray-900 rounded-lg border border-gray-800 p-6 text-center">
-              <p className="text-gray-400">
-                No vocabulary in {selectedLanguage}. <button onClick={() => setSelectedLanguage(null)} className="text-emerald-400 hover:text-emerald-300 underline">Show all</button>
-              </p>
-            </div>
-          ) : (
-            <VocabularyEmptyState />
-          )}
-        </section>
+              ) : selectedLanguage && wishlist && wishlist.length > 0 ? (
+                <div className="bg-gray-900 rounded-lg border border-gray-800 p-6 text-center">
+                  <p className="text-gray-400">
+                    No songs in your queue for {selectedLanguage}. <button onClick={() => setSelectedLanguage(null)} className="text-emerald-400 hover:text-emerald-300 underline">Show all</button>
+                  </p>
+                </div>
+              ) : (
+                <WishlistEmptyState />
+              )}
+            </CollapsibleSection>
+          </div>
+        </div>
       </div>
 
       {/* Word Details Modal */}

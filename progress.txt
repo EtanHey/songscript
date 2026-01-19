@@ -22,6 +22,33 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-DASH-LAYOUT: Dashboard Responsive Layout
+- Restructured dashboard.tsx to use a MOBILE-FIRST responsive layout:
+  - **Top Section:** "Continue Learning" carousel (most important, always visible)
+  - **Goals + Streak:** Side-by-side on md+ (2-column grid)
+  - **Stats:** Full width section
+  - **Languages:** Full width section with filtering
+  - **Main Content:** 3-column grid on lg+ with:
+    - Left (2 cols): My Songs + My Vocabulary
+    - Right (1 col): Learning Queue as sidebar
+- Added `SkeletonCard` component for loading states (skeleton placeholders)
+- Added `CollapsibleSection` component for mobile-friendly accordion sections:
+  - Sections are collapsible on mobile (click header to expand/collapse)
+  - Always expanded on md+ (chevron hidden)
+  - Shows badge with item count
+  - Shows filter indicator when language filter is active
+- Responsive breakpoints:
+  - Mobile (default): Single column stack, collapsible sections
+  - md (768px+): Goals+Streak side by side (2-col)
+  - lg (1024px+): Main content 3-col grid (Songs/Vocab + Queue sidebar)
+- Container constrained to max-w-7xl for large screens
+- Consistent gap-6 spacing throughout with Tailwind utilities
+- Header already has Dashboard nav link (verified in Header.tsx)
+- Typecheck passes, all 54 unit tests pass
+- All 17 acceptance criteria completed
+
+---
+
 ## Iteration - US-DASH-WORD-DETAILS: Dashboard Word Details Modal
 - Created `convex/wordProgress.ts` - Added two new queries:
   - `getWordDetailsWithSongs` - Finds all songs containing a specific word (by persian text)
