@@ -61,4 +61,15 @@ export default defineSchema({
     .index("by_visitor", ["visitorId"])
     .index("by_visitor_word", ["visitorId", "wordId"])
     .index("by_visitor_persian", ["visitorId", "persian"]),
+
+  // Track user's song-level practice progress
+  // Records which lines have been practiced/completed in each song
+  userSongProgress: defineTable({
+    visitorId: v.string(), // localStorage-generated ID if no auth
+    songId: v.id("songs"),
+    linesCompleted: v.array(v.number()), // Array of line numbers that have been practiced
+    lastPracticed: v.number(), // Timestamp of last practice
+  })
+    .index("by_visitor", ["visitorId"])
+    .index("by_visitor_song", ["visitorId", "songId"]),
 });

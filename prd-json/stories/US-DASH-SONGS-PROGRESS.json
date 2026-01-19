@@ -10,22 +10,22 @@
     "tailwind": "Use Tailwind responsive utilities: grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
   },
   "acceptanceCriteria": [
-    {"text": "Create Convex schema for userSongProgress table", "checked": false},
-    {"text": "Create mutation to record line completion when user clicks/practices a line", "checked": false},
-    {"text": "Create query to get all song progress for current user", "checked": false},
-    {"text": "Create dashboard route /dashboard (protected, requires auth)", "checked": false},
-    {"text": "Show 'My Songs' section with list of practiced songs", "checked": false},
-    {"text": "Each song shows: title, language flag, progress bar (X% complete)", "checked": false},
-    {"text": "Show 'Last practiced: X days ago' for each song", "checked": false},
-    {"text": "Click song card navigates to that song page", "checked": false},
-    {"text": "Empty state: 'Start practicing a song to track your progress!'", "checked": false},
-    {"text": "MOBILE-FIRST: Single column layout on mobile (320px+), no horizontal scroll", "checked": false},
-    {"text": "TAILWIND RESPONSIVE: Use sm:/md:/lg: breakpoints for grid scaling", "checked": false},
-    {"text": "UX: Touch targets min 44px, adequate spacing between interactive elements", "checked": false},
-    {"text": "UI: Consistent card design with shadow, rounded corners, hover states", "checked": false},
-    {"text": "Typecheck passes", "checked": false},
-    {"text": "All unit tests pass", "checked": false}
+    {"text": "Create Convex schema for userSongProgress table", "checked": true},
+    {"text": "Create mutation to record line completion when user clicks/practices a line", "checked": true},
+    {"text": "Create query to get all song progress for current user", "checked": true},
+    {"text": "Create dashboard route /dashboard (protected, requires auth)", "checked": true},
+    {"text": "Show 'My Songs' section with list of practiced songs", "checked": true},
+    {"text": "Each song shows: title, language flag, progress bar (X% complete)", "checked": true},
+    {"text": "Show 'Last practiced: X days ago' for each song", "checked": true},
+    {"text": "Click song card navigates to that song page", "checked": true},
+    {"text": "Empty state: 'Start practicing a song to track your progress!'", "checked": true},
+    {"text": "MOBILE-FIRST: Single column layout on mobile (320px+), no horizontal scroll", "checked": true},
+    {"text": "TAILWIND RESPONSIVE: Use sm:/md:/lg: breakpoints for grid scaling", "checked": true},
+    {"text": "UX: Touch targets min 44px, adequate spacing between interactive elements", "checked": true},
+    {"text": "UI: Consistent card design with shadow, rounded corners, hover states", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "All unit tests pass", "checked": true}
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null
 }

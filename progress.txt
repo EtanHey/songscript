@@ -22,6 +22,30 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-DASH-SONGS-PROGRESS: Dashboard Songs Progress Tracking ✅
+- Created `convex/schema.ts` - Added userSongProgress table with indexes:
+  - visitorId, songId, linesCompleted (array of line numbers), lastPracticed (timestamp)
+  - Indexes: by_visitor, by_visitor_song
+- Created `convex/songProgress.ts` - Queries and mutations:
+  - `getByVisitor` - Get all song progress for a visitor
+  - `getWithSongDetails` - Get progress with song info and percentage calculated
+  - `getByVisitorSong` - Get progress for specific song
+  - `recordLineCompletion` - Record single line practiced
+  - `recordLinesCompletion` - Record multiple lines at once
+- Created `src/routes/dashboard.tsx` - Dashboard page with:
+  - Protected route - shows "Sign in" prompt if not authenticated
+  - "My Songs" section with grid of practiced songs
+  - SongProgressCard component: thumbnail, progress bar, language flag, relative time
+  - Mobile-first responsive grid: 1 col → sm:2 cols → lg:3 cols
+  - Empty state with "Browse Songs" CTA
+  - Touch targets min 44px, hover/active states, consistent card design
+- Fixed Convex bundler error by removing duplicate .js files in convex/
+- Typecheck passes, all 54 unit tests pass
+- All 15 acceptance criteria completed
+- **Learning:** Convex bundler "Two output files share same path" error = duplicate .js and .ts files. Delete the .js files.
+
+---
+
 ## Iteration - US-WORD-AUDIO: ElevenLabs Word Pronunciation Audio (BLOCKED)
 - **Implementation Complete:** All code written and working
 - Created `scripts/generate-word-audio.ts` - ElevenLabs TTS generation script
