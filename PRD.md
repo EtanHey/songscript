@@ -65,13 +65,13 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 
 | Metric | Count |
 |--------|-------|
-| ✅ **Stories Complete** | 50 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, US-SYNC-FIX, V-001-009, US-VIDEO-LOAD, US-MOBILE-DRAWER, US-MOBILE-LAYOUT, US-VIDEO-MOBILE, US-WORD-SYNC, US-WORD-TOKEN, US-WORD-TOKEN-FIX, V-WORD-TOKEN) |
+| ✅ **Stories Complete** | 51 (US-001-020A, US-022-030, US-032-033, US-029-FIX, US-TIMESTAMPS, US-TIMESTAMPS-V2, US-SYNC-FIX, V-001-009, US-VIDEO-LOAD, US-MOBILE-DRAWER, US-MOBILE-LAYOUT, US-VIDEO-MOBILE, US-WORD-SYNC, US-WORD-TOKEN, US-WORD-TOKEN-FIX, V-WORD-TOKEN, US-TEST-SETUP) |
 | ⏹️ **BLOCKED** | US-005 (Auth), US-005-FIX (partial), **US-031 (missing API key)** |
-| 🔄 **Stories Remaining** | 9 (US-TEST-SETUP, US-LOAD-FIX, US-LOAD-FIX-TESTS, US-AUTOPLAY, US-AUTOPLAY-TESTS, US-LOOP-UX, US-LOOP-UX-TESTS, V-AUTOPLAY, US-020 Phase 5) |
+| 🔄 **Stories Remaining** | 8 (US-LOAD-FIX, US-LOAD-FIX-TESTS, US-AUTOPLAY, US-AUTOPLAY-TESTS, US-LOOP-UX, US-LOOP-UX-TESTS, V-AUTOPLAY, US-020 Phase 5) |
 
 **Archive:** Completed stories moved to `docs.local/prd-completed-archive.md`
 
-**Next Story:** US-TEST-SETUP (Set up Vitest + Playwright)
+**Next Story:** US-LOAD-FIX (Fix Dynamic Import Errors)
 
 **Story Order (optimized - API-dependent story LAST):**
 0. ~~US-TIMESTAMPS-V2~~ ✅ (end buffer increased to +0.70s)
@@ -89,8 +89,8 @@ Do NOT output `<promise>COMPLETE</promise>` until ALL V-* stories are done.
 12. ~~US-MOBILE-LAYOUT~~ ✅ (Mobile line indicator on own row)
 13. ~~US-VIDEO-MOBILE~~ ✅ (Collapsible Video on Mobile)
 14. ~~US-WORD-SYNC~~ ✅ (Sync Repeated Words Learning State)
-15. **US-TEST-SETUP: Set Up Vitest + Playwright ← NEXT**
-16. **US-LOAD-FIX: Fix Dynamic Import Errors**
+15. ~~US-TEST-SETUP~~ ✅ (Vitest + Playwright + Husky pre-commit)
+16. **US-LOAD-FIX: Fix Dynamic Import Errors ← NEXT**
 17. **US-LOAD-FIX-TESTS: Tests for Route Loading**
 18. **US-AUTOPLAY: Auto-Play Video + Fluid Mode**
 19. **US-AUTOPLAY-TESTS: Tests for Auto-Play**
@@ -1222,8 +1222,8 @@ mcp__Context7__query-docs query="husky pre-commit hook setup"
 - [x] `bun run test` passes (39 tests pass)
 - [x] `bun run test:e2e` passes (2 e2e tests pass)
 - [x] `bun run typecheck` passes
-- [ ] Make a test commit - pre-commit hook runs tests automatically
-- [ ] Verify commit is blocked if tests fail
+- [x] Make a test commit - pre-commit hook runs tests automatically
+- [x] Verify commit is blocked if tests fail (hook uses exit 1 on failure)
 
 **⏹️ STOP - END OF US-TEST-SETUP. Do not continue to next story.**
 
