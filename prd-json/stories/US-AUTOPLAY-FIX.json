@@ -1,0 +1,43 @@
+{
+  "id": "US-AUTOPLAY-FIX",
+  "title": "Fix Video Not Auto-Playing on Fluid Mode",
+  "description": "When loading a song page, the video shows as blurry (paused state) and doesn't auto-play even though Fluid mode is selected. User has to click a line to start playback. Fix so video auto-plays on page load when Fluid mode is enabled.",
+  "technicalContext": {
+    "mainFile": "src/routes/song.$songId.tsx",
+    "relevantCode": [
+      "playbackMode state - defaults to 'fluid'",
+      "hasAutoPlayedRef - prevents multiple auto-play triggers",
+      "useEffect that should trigger auto-play after audio files load",
+      "YouTubePlayer component and its play/pause methods"
+    ],
+    "symptoms": [
+      "Video shows blurry/paused on page load",
+      "Fluid mode toggle is correctly selected",
+      "User must click a line to start playback",
+      "After clicking, video plays and lines sync correctly"
+    ]
+  },
+  "acceptanceCriteria": [
+    {"text": "Read src/routes/song.$songId.tsx to understand current auto-play logic", "checked": false},
+    {"text": "Identify why auto-play isn't triggering (check useEffect dependencies, conditions)", "checked": false},
+    {"text": "Check if browser autoplay policy is blocking (need user interaction or muted video)", "checked": false},
+    {"text": "If autoplay policy issue: start video muted, then unmute after user interaction", "checked": false},
+    {"text": "If logic issue: fix the useEffect to properly trigger playback when audio files ready", "checked": false},
+    {"text": "Video MUST start playing automatically within 2 seconds of page load", "checked": false},
+    {"text": "Lines MUST start highlighting and advancing as video plays", "checked": false},
+    {"text": "If browser blocks autoplay, show a 'Click to play' overlay that starts playback on click", "checked": false},
+    {"text": "Fluid mode remains selected (don't change default mode)", "checked": false},
+    {"text": "Single mode and Loop mode still work correctly after fix", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "All unit tests pass", "checked": false}
+  ],
+  "browserAutoplayNotes": [
+    "Chrome/Safari block autoplay with sound unless:",
+    "- User has interacted with the site before",
+    "- Video is muted",
+    "- Site has Media Engagement Index score",
+    "Solution: Try autoplay, if it fails, show play button overlay"
+  ],
+  "passes": false,
+  "blockedBy": null
+}

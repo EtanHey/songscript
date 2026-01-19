@@ -1,0 +1,45 @@
+{
+  "id": "US-LOOP-FIX",
+  "title": "Fix Loop Mode Line Selection Bug - Goes to Wrong Line",
+  "description": "Loop mode has a consistent bug where it goes to the PREVIOUS line instead of the correct one. This happens in TWO scenarios: (1) When clicking a line to loop, it briefly highlights the line BEFORE the clicked line, then moves to correct line. (2) When the loop restarts, instead of staying on the current line, it jumps to the line BEFORE it. This is a timing/index calculation bug.",
+  "technicalContext": {
+    "mainFile": "src/routes/song.$songId.tsx",
+    "relevantCode": [
+      "handleTimeUpdate - calculates active line based on current video time",
+      "handleLineClick - handles clicking a line to play/loop it",
+      "isLoopSeekingRef - (existing) attempt to prevent flash during loop seek",
+      "activeLineIndex state - the currently highlighted line",
+      "Loop mode logic that seeks video back to line start"
+    ],
+    "bugAnalysis": {
+      "symptom1": "Click line N → line N-1 flashes → then line N highlights",
+      "symptom2": "Loop restarts → goes to line N-1 instead of staying on line N",
+      "likelyCause": "Time calculation uses wrong boundary (end time vs start time) or off-by-one in line index lookup",
+      "singleModeClue": "Single mode: plays line, then advances to NEXT line and stops - this suggests the time-to-line mapping has boundary issues"
+    }
+  },
+  "acceptanceCriteria": [
+    {"text": "Read src/routes/song.$songId.tsx focusing on handleTimeUpdate and loop logic", "checked": false},
+    {"text": "Identify the time-to-line-index calculation - find the off-by-one or boundary bug", "checked": false},
+    {"text": "Check if line boundaries use startTime <= time < endTime or startTime < time <= endTime", "checked": false},
+    {"text": "Fix the line index calculation to correctly identify current line at any given time", "checked": false},
+    {"text": "When clicking line N in Loop mode: line N highlights IMMEDIATELY (no flash to N-1)", "checked": false},
+    {"text": "When loop restarts: line N stays highlighted (no flash to N-1)", "checked": false},
+    {"text": "Watch 5+ loop cycles - same line stays highlighted the ENTIRE time", "checked": false},
+    {"text": "Single mode: click line N, plays line N, then advances to N+1 and pauses (expected)", "checked": false},
+    {"text": "Fluid mode: lines advance correctly with video (no wrong-line issues)", "checked": false},
+    {"text": "Test with line 1 (first line) - no crash or weird behavior at boundary", "checked": false},
+    {"text": "Test with last line - no crash or weird behavior at boundary", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "All unit tests pass", "checked": false}
+  ],
+  "debuggingApproach": [
+    "1. Add console.log in handleTimeUpdate: log currentTime, calculated lineIndex, and line boundaries",
+    "2. Click a line and observe: what time does it seek to? What lineIndex is calculated?",
+    "3. At loop restart: what time triggers the re-seek? What lineIndex does it calculate?",
+    "4. The bug is likely: when time === line.endTime, it's matching line N+1 instead of line N",
+    "5. Fix: adjust boundary check to be inclusive on start, exclusive on end (or vice versa)"
+  ],
+  "passes": false,
+  "blockedBy": null
+}

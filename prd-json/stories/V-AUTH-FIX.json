@@ -1,0 +1,27 @@
+{
+  "id": "V-AUTH-FIX",
+  "title": "Verify Auth Fix - Complete Flow Test",
+  "description": "End-to-end verification that auth works correctly. Must use browser tools to actually test the full flow.",
+  "verificationMethod": "Browser automation with mcp__claude-in-chrome tools",
+  "acceptanceCriteria": [
+    {"text": "Start dev server if not running: bun run dev", "checked": false},
+    {"text": "Use mcp__claude-in-chrome__navigate to go to http://localhost:3001/login", "checked": false},
+    {"text": "Take screenshot - verify login page loads (not stuck on 'Loading...')", "checked": false},
+    {"text": "Use mcp__claude-in-chrome__form_input to enter 'wrong@email.com' in email field", "checked": false},
+    {"text": "Click 'Send Magic Link' button", "checked": false},
+    {"text": "Take screenshot - verify error message 'Only admin email is allowed'", "checked": false},
+    {"text": "Clear email field, enter 'etan@heyman.net'", "checked": false},
+    {"text": "Click 'Send Magic Link' button", "checked": false},
+    {"text": "Take screenshot - verify success message about magic link sent", "checked": false},
+    {"text": "Check server console output for magic link URL (use Bash to read recent logs)", "checked": false},
+    {"text": "Navigate to the magic link URL", "checked": false},
+    {"text": "Take screenshot - verify redirected to home page or shows logged in state", "checked": false},
+    {"text": "Navigate to /login", "checked": false},
+    {"text": "Take screenshot - verify shows 'Welcome, Admin!' with user email and sign out button", "checked": false},
+    {"text": "Click 'Sign Out' button", "checked": false},
+    {"text": "Take screenshot - verify returns to login form", "checked": false},
+    {"text": "Use mcp__browser-tools__getConsoleErrors to verify no JavaScript errors", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "US-AUTH-FIX"
+}

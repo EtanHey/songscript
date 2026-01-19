@@ -1,0 +1,28 @@
+{
+  "id": "V-AUTOPLAY-FIX",
+  "title": "Verify Video Auto-Play on Page Load",
+  "description": "Verify that video auto-plays when navigating to a song page with Fluid mode enabled.",
+  "verificationMethod": "Browser automation with mcp__claude-in-chrome tools",
+  "testSetup": {
+    "clearBrowserData": "Use incognito or clear site data to test fresh user experience",
+    "testUrl": "http://localhost:3001/song/baraye"
+  },
+  "acceptanceCriteria": [
+    {"text": "Start dev server if not running: bun run dev", "checked": false},
+    {"text": "Use mcp__claude-in-chrome__navigate to go to http://localhost:3001/song/baraye", "checked": false},
+    {"text": "Wait 3 seconds for page to fully load", "checked": false},
+    {"text": "Take screenshot - verify video is NOT blurry (either playing or has play overlay)", "checked": false},
+    {"text": "Check if video is playing OR if there's a clear 'Click to play' button visible", "checked": false},
+    {"text": "If play overlay exists, click it", "checked": false},
+    {"text": "Take screenshot after 2 seconds - verify video is now playing (not blurry)", "checked": false},
+    {"text": "Verify Fluid mode button is selected/active", "checked": false},
+    {"text": "Verify lines are highlighting and advancing automatically", "checked": false},
+    {"text": "Watch for 5 seconds - confirm lines continue to advance with video", "checked": false},
+    {"text": "Take final screenshot showing video playing and a line highlighted", "checked": false},
+    {"text": "Use mcp__browser-tools__getConsoleErrors - verify no autoplay-related errors blocking playback", "checked": false},
+    {"text": "Test Single mode still works: click Single button, click a line, verify it plays once and stops", "checked": false},
+    {"text": "Test Loop mode still works: click Loop button, click a line, verify it loops", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "US-AUTOPLAY-FIX"
+}

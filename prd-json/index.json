@@ -1,34 +1,40 @@
 {
   "$schema": "https://ralph.dev/schemas/prd-index.schema.json",
-  "generatedAt": "2026-01-19T04:55:00Z",
+  "generatedAt": "2026-01-19T14:00:00Z",
+  "projectName": "SongScript Critical Fixes",
+  "workingDirectory": ".",
   "stats": {
-    "total": 64,
-    "completed": 61,
-    "pending": 0,
-    "blocked": 3
+    "total": 6,
+    "completed": 0,
+    "pending": 6,
+    "blocked": 0
   },
-  "nextStory": null,
+  "nextStory": "US-AUTH-FIX",
   "storyOrder": [
-    "US-001", "US-002", "US-003", "US-004", "US-005", "US-006",
-    "US-007", "US-008", "US-009", "US-010", "US-011", "US-012",
-    "US-013", "US-014", "US-015", "US-016", "US-017", "US-018",
-    "US-019", "US-020A", "US-020", "US-TEST-SETUP",
-    "US-TIMESTAMPS", "US-TIMESTAMPS-V2", "US-SYNC-FIX",
-    "US-029-FIX", "US-005-FIX",
-    "US-021", "US-022", "US-023", "US-024", "US-025", "US-026",
-    "US-027", "US-028", "US-029", "US-030", "US-031", "US-032", "US-033",
-    "US-VIDEO-LOAD", "US-MOBILE-DRAWER", "US-MOBILE-LAYOUT", "US-VIDEO-MOBILE",
-    "US-WORD-SYNC", "US-WORD-TOKEN", "US-WORD-TOKEN-FIX",
-    "US-LOAD-FIX", "US-LOAD-FIX-TESTS",
-    "US-AUTOPLAY", "US-AUTOPLAY-TESTS",
-    "US-LOOP-UX", "US-LOOP-UX-TESTS",
-    "V-001", "V-002", "V-003", "V-004", "V-005", "V-006", "V-007", "V-008", "V-009",
-    "V-WORD-TOKEN", "V-AUTOPLAY"
+    "US-AUTH-FIX",
+    "V-AUTH-FIX",
+    "US-AUTOPLAY-FIX",
+    "V-AUTOPLAY-FIX",
+    "US-LOOP-FIX",
+    "V-LOOP-FIX"
   ],
-  "blocked": [
-    {"id": "US-005", "reason": "Auth API endpoints return 500"},
-    {"id": "US-005-FIX", "reason": "Auth still broken"},
-    {"id": "US-031", "reason": "Missing ELEVENLABS_API_KEY"}
+  "pending": [
+    "US-AUTH-FIX",
+    "V-AUTH-FIX",
+    "US-AUTOPLAY-FIX",
+    "V-AUTOPLAY-FIX",
+    "US-LOOP-FIX",
+    "V-LOOP-FIX"
   ],
-  "pending": []
+  "blocked": [],
+  "browserSetup": {
+    "viewport": "desktop 1200px+",
+    "testUrl": "http://localhost:3001",
+    "devServer": "bun run dev"
+  },
+  "notes": {
+    "verificationRequired": "Each US-* story has a corresponding V-* verification story that MUST use MCP browser tools",
+    "adminEmail": "etan@heyman.net",
+    "archiveLocation": "Old 61 completed stories archived - this is a fresh focused PRD"
+  }
 }
