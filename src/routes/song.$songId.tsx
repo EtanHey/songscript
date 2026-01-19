@@ -115,8 +115,8 @@ function SongPageContent({ songId }: SongPageContentProps) {
     undefined
   );
 
-  // Playback mode state: single, loop, or fluid
-  const [playbackMode, setPlaybackMode] = useState<PlaybackMode>("single");
+  // Playback mode state: single, loop, or fluid - default to fluid for auto-play experience
+  const [playbackMode, setPlaybackMode] = useState<PlaybackMode>("fluid");
   const [currentLineIndex, setCurrentLineIndex] = useState<number | undefined>(
     undefined
   );
@@ -128,8 +128,8 @@ function SongPageContent({ songId }: SongPageContentProps) {
   const [languageFilter, setLanguageFilter] = useState<LanguageFilter>("all");
 
   // Video mute state - derived from playback mode (muted in single/loop, unmuted in fluid)
-  // But we also track it separately for edge cases
-  const [isVideoMuted, setIsVideoMuted] = useState(true);
+  // Start unmuted since we default to fluid mode for auto-play
+  const [isVideoMuted, setIsVideoMuted] = useState(false);
 
   // Video error state - for fallback handling
   const [videoError, setVideoError] = useState<string | null>(null);
@@ -358,6 +358,20 @@ function SongPageContent({ songId }: SongPageContentProps) {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [togglePlayPause]);
+
+  // Auto-play video when audio files are ready (for fluid mode on page load)
+  const hasAutoPlayedRef = useRef(false);
+  useEffect(() => {
+    // Only auto-play once when audio is ready and we're in fluid mode
+    if (audioReady && playbackMode === "fluid" && !hasAutoPlayedRef.current) {
+      hasAutoPlayedRef.current = true;
+      // Small delay to ensure video element is mounted and ready
+      const timer = setTimeout(() => {
+        playerRef.current?.play();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [audioReady, playbackMode]);
 
   if (!song) {
     throw notFound();

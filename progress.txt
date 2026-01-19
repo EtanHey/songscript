@@ -1,9 +1,9 @@
 # Progress Log
 
 ## 📊 Overall Stats
-- **Stories Completed:** 53
-- **Criteria Completed:** 440
-- **Stories Remaining:** 7
+- **Stories Completed:** 54
+- **Criteria Completed:** 447
+- **Stories Remaining:** 6
 - **Archive:** docs.local/prd-completed-archive.md
 
 ---
@@ -56,7 +56,18 @@
 
 ---
 
-**Next:** US-AUTOPLAY - Autoplay Feature
+## Iteration - US-AUTOPLAY: Auto-Play Video + Fluid Mode on Page Load ✅
+- Changed default playback mode from "single" to "fluid" in song.$songId.tsx
+- Changed default video mute state from true to false (fluid mode uses video audio)
+- Added useEffect hook with hasAutoPlayedRef to auto-play video once audio files are loaded
+- Auto-play triggers 100ms after audioReady becomes true in fluid mode
+- All 39 unit tests pass, typecheck passes
+- Browser verification: Fluid mode button is selected by default on page load
+- **Learning:** Use a ref (hasAutoPlayedRef) to prevent multiple auto-play triggers when effect re-runs
+
+---
+
+**Next:** US-AUTOPLAY-TESTS - Tests for Autoplay Feature
 
 ---
 

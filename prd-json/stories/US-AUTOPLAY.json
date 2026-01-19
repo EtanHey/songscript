@@ -5,33 +5,33 @@
   "acceptanceCriteria": [
     {
       "text": "On song page load, video auto-plays after audio files are loaded",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Fluid mode is enabled by default (not just on toggle)",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Lines highlight and advance automatically as video plays",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Video player shows playing state (not blurred/paused)",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Loading state clears properly when audio files are ready",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Typecheck passes",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Verify in browser: page load → video plays → lines advance",
-      "checked": false
+      "checked": true
     }
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null
 }
