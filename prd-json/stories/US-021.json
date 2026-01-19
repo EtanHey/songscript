@@ -5,73 +5,73 @@
   "acceptanceCriteria": [
     {
       "text": "yt-dlp installed (or install with `brew install yt-dlp`)",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Real audio downloaded to `public/audio/baraye/baraye_full.mp3`",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Real video downloaded to `public/video/baraye/baraye_full.mp4`",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Placeholder MP3 files deleted",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Real snippets extracted using timestamps from lyrics data",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Verify snippets play actual song audio (not TTS)",
-      "checked": false
+      "checked": true
     },
     {
       "text": "YouTube video is MUTED (audio from snippets only)",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Clicking line plays real audio snippet",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Snippet stops at end (not looping by default)",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Loop toggle makes snippet repeat",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Highlighting follows playback",
-      "checked": false
+      "checked": true
     },
     {
       "text": "When snippet ends (no loop), highlight moves to next line OR stays (user choice)",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Typecheck passes",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Local video plays from `public/video/baraye/baraye_full.mp4`",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Video seeks instantly when clicking lines",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Video is muted, audio from snippets",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Fallback to YouTube embed if local video not found",
-      "checked": false
+      "checked": true
     }
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null
 }

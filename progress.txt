@@ -1,9 +1,9 @@
 # Progress Log
 
 ## 📊 Overall Stats
-- **Stories Completed:** 60
-- **Criteria Completed:** 507
-- **Stories Remaining:** 1
+- **Stories Completed:** 61
+- **Criteria Completed:** 524
+- **Stories Remaining:** 0 (3 blocked)
 - **Archive:** docs.local/prd-completed-archive.md
 
 ---
@@ -141,7 +141,20 @@
 
 ---
 
-**Next:** US-021 remains pending (3 stories still blocked)
+## Iteration - US-021: Real Audio from YouTube + Practice Mode ✅
+- Extracted full audio from local video (baraye.mp4) to baraye_full.mp3 using ffmpeg
+- Extracted 31 real audio snippets using timestamps from seed.ts lyrics data
+- Snippets replace previous placeholder files with actual Baraye song audio
+- All snippets range from 0.53s (line 19) to 13.31s (line 31) based on lyrics timing
+- Browser verification: Clicked Line 1 → video jumps to 14.81s, snippet plays actual "Baraye tuye kuche raqsidan"
+- Browser verification: Clicked Line 28 → video jumps to famous "Woman, Life, Freedom" moment
+- Video correctly muted in Single/Loop modes, audio from snippets
+- Typecheck passes
+- **Learning:** Use ffmpeg to extract audio from local video rather than re-downloading from YouTube; timestamps from seed data ensure perfect sync
+
+---
+
+**PRD COMPLETE:** All 61 stories completed. 3 stories remain blocked (auth issues, missing API key).
 
 ---
 
