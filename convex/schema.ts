@@ -82,4 +82,14 @@ export default defineSchema({
   })
     .index("by_visitor", ["visitorId"])
     .index("by_visitor_song", ["visitorId", "songId"]),
+
+  // Daily practice log for streak tracking and heatmap
+  userPracticeLog: defineTable({
+    visitorId: v.string(), // localStorage-generated ID if no auth
+    date: v.string(), // YYYY-MM-DD format
+    practiceCount: v.number(), // Number of practice sessions that day
+    totalSeconds: v.number(), // Total practice time in seconds
+  })
+    .index("by_visitor", ["visitorId"])
+    .index("by_visitor_date", ["visitorId", "date"]),
 });

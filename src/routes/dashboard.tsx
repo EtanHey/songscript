@@ -5,7 +5,7 @@ import { api } from "../../convex/_generated/api";
 import { useVisitorId } from "../hooks/useVisitorId";
 import { authClient } from "../lib/auth-client";
 import { Button } from "../components/ui/button";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import type { Id } from "../../convex/_generated/dataModel";
 
 export const Route = createFileRoute("/dashboard")({
@@ -82,6 +82,14 @@ function DashboardPage() {
     })
   );
 
+  // Get practice history for streaks
+  const { data: practiceHistory, isLoading: practiceLoading } = useQuery(
+    convexQuery(api.practiceLog.getPracticeHistory, {
+      visitorId: visitorId || "",
+      days: 90,
+    })
+  );
+
   // Reorder mutation
   const { mutate: reorderWishlist } = useMutation({
     mutationFn: useConvexMutation(api.wishlist.reorderWishlist),
@@ -152,6 +160,23 @@ function DashboardPage() {
             Welcome back, {session.user.email}
           </p>
         </div>
+
+        {/* Practice Streak Section */}
+        <section className="mb-8">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4">Practice Streak</h2>
+
+          {practiceLoading || !visitorId ? (
+            <div className="text-gray-400">Loading your streaks...</div>
+          ) : practiceHistory ? (
+            <PracticeStreakSection
+              currentStreak={practiceHistory.currentStreak}
+              longestStreak={practiceHistory.longestStreak}
+              practiceData={practiceHistory.practiceData}
+            />
+          ) : (
+            <StreakEmptyState />
+          )}
+        </section>
 
         {/* My Songs Section */}
         <section className="mb-8">
@@ -929,6 +954,210 @@ function QueueCardMobile({
             <XIcon className="w-4 h-4 text-red-400" />
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Streak Empty State Component
+function StreakEmptyState() {
+  return (
+    <div className="bg-gray-900 rounded-lg border border-gray-800 p-8 text-center">
+      <div className="text-4xl mb-4">🔥</div>
+      <h3 className="text-lg font-semibold mb-2">Start your streak!</h3>
+      <p className="text-gray-400 mb-6 max-w-sm mx-auto">
+        Practice songs regularly to build your streak and see your progress on the calendar!
+      </p>
+      <Link
+        to="/"
+        className="inline-flex items-center justify-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors min-h-[44px]"
+      >
+        Start Practicing
+      </Link>
+    </div>
+  );
+}
+
+// Practice data type
+type PracticeDay = {
+  date: string;
+  practiceCount: number;
+  totalSeconds: number;
+};
+
+// Practice Streak Section Component with heatmap
+// Selected day type for heatmap (includes date even if no data)
+type SelectedDayInfo = {
+  date: string;
+  data: PracticeDay | null;
+};
+
+function PracticeStreakSection({
+  currentStreak,
+  longestStreak,
+  practiceData,
+}: {
+  currentStreak: number;
+  longestStreak: number;
+  practiceData: PracticeDay[];
+}) {
+  const [selectedDay, setSelectedDay] = useState<SelectedDayInfo | null>(null);
+
+  // Generate 90 days of data for the heatmap
+  const heatmapData = useMemo(() => {
+    const practiceMap = new Map(practiceData.map((d) => [d.date, d]));
+    const days: { date: string; data: PracticeDay | null }[] = [];
+
+    for (let i = 89; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split("T")[0];
+      days.push({
+        date: dateStr,
+        data: practiceMap.get(dateStr) || null,
+      });
+    }
+
+    return days;
+  }, [practiceData]);
+
+  // Calculate max practice count for intensity scaling
+  const maxPractice = useMemo(() => {
+    if (practiceData.length === 0) return 1;
+    return Math.max(...practiceData.map((d) => d.practiceCount), 1);
+  }, [practiceData]);
+
+  // Get intensity class based on practice count
+  const getIntensityClass = (data: PracticeDay | null) => {
+    if (!data || data.practiceCount === 0) return "bg-gray-800";
+
+    const ratio = data.practiceCount / maxPractice;
+    if (ratio >= 0.75) return "bg-green-500";
+    if (ratio >= 0.5) return "bg-green-600";
+    if (ratio >= 0.25) return "bg-green-700";
+    return "bg-green-800";
+  };
+
+  // Format date for display
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  // Format duration
+  const formatDuration = (seconds: number) => {
+    if (seconds < 60) return `${seconds}s`;
+    const mins = Math.floor(seconds / 60);
+    if (mins < 60) return `${mins}m`;
+    const hours = Math.floor(mins / 60);
+    const remainingMins = mins % 60;
+    return `${hours}h ${remainingMins}m`;
+  };
+
+  return (
+    <div className="bg-gray-900 rounded-lg border border-gray-800 overflow-hidden">
+      {/* Streak Stats Row */}
+      <div className="p-4 border-b border-gray-800">
+        <div className="flex flex-wrap items-center gap-4 sm:gap-8">
+          {/* Current Streak */}
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">🔥</span>
+            <div>
+              <div className="text-xl sm:text-2xl font-bold text-white">
+                {currentStreak} {currentStreak === 1 ? "day" : "days"}
+              </div>
+              <div className="text-xs text-gray-400">Current streak</div>
+            </div>
+          </div>
+
+          {/* Longest Streak */}
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">🏆</span>
+            <div>
+              <div className="text-xl sm:text-2xl font-bold text-amber-400">
+                {longestStreak} {longestStreak === 1 ? "day" : "days"}
+              </div>
+              <div className="text-xs text-gray-400">Longest streak</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Heatmap Container - horizontally scrollable on mobile */}
+      <div className="p-4">
+        {/* Legend */}
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs text-gray-400">Last 90 days</span>
+          <div className="flex items-center gap-1 text-xs text-gray-400">
+            <span>Less</span>
+            <div className="w-3 h-3 rounded-sm bg-gray-800" />
+            <div className="w-3 h-3 rounded-sm bg-green-800" />
+            <div className="w-3 h-3 rounded-sm bg-green-700" />
+            <div className="w-3 h-3 rounded-sm bg-green-600" />
+            <div className="w-3 h-3 rounded-sm bg-green-500" />
+            <span>More</span>
+          </div>
+        </div>
+
+        {/* Heatmap Grid - scrollable on mobile */}
+        <div className="overflow-x-auto md:overflow-x-visible pb-2">
+          <div
+            className="grid gap-1"
+            style={{
+              gridTemplateColumns: "repeat(13, minmax(24px, 1fr))",
+              gridTemplateRows: "repeat(7, minmax(24px, 1fr))",
+              gridAutoFlow: "column",
+              minWidth: "340px",
+            }}
+          >
+            {heatmapData.map((day) => {
+              const dayOfWeek = new Date(day.date).getDay();
+
+              return (
+                <button
+                  key={day.date}
+                  onClick={() =>
+                    setSelectedDay(selectedDay?.date === day.date ? null : day)
+                  }
+                  className={`
+                    w-6 h-6 min-w-[24px] min-h-[24px] rounded-sm transition-all duration-150
+                    ${getIntensityClass(day.data)}
+                    ${selectedDay?.date === day.date ? "ring-2 ring-white" : ""}
+                    hover:ring-2 hover:ring-gray-500
+                  `}
+                  style={{
+                    gridRow: dayOfWeek + 1,
+                  }}
+                  aria-label={`${formatDate(day.date)}: ${day.data?.practiceCount || 0} practice sessions`}
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Selected Day Tooltip */}
+        {selectedDay && (
+          <div className="mt-3 p-3 bg-gray-800 rounded-lg border border-gray-700">
+            <div className="font-medium text-white mb-1">
+              {formatDate(selectedDay.date)}
+            </div>
+            {selectedDay.data ? (
+              <div className="text-sm text-gray-300 space-y-1">
+                <div>
+                  {selectedDay.data.practiceCount} practice{" "}
+                  {selectedDay.data.practiceCount === 1 ? "session" : "sessions"}
+                </div>
+                <div>Total time: {formatDuration(selectedDay.data.totalSeconds)}</div>
+              </div>
+            ) : (
+              <div className="text-sm text-gray-400">No practice this day</div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

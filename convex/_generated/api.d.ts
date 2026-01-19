@@ -9,22 +9,14 @@
  */
 
 import type * as betterAuth from "../betterAuth.js";
-import type * as betterAuth from "../betterAuth.js";
-import type * as http from "../http.js";
 import type * as http from "../http.js";
 import type * as lyrics from "../lyrics.js";
-import type * as lyrics from "../lyrics.js";
-import type * as seed from "../seed.js";
+import type * as practiceLog from "../practiceLog.js";
 import type * as seed from "../seed.js";
 import type * as songProgress from "../songProgress.js";
-import type * as songProgress from "../songProgress.js";
-import type * as songs from "../songs.js";
 import type * as songs from "../songs.js";
 import type * as wishlist from "../wishlist.js";
-import type * as wishlist from "../wishlist.js";
 import type * as wordProgress from "../wordProgress.js";
-import type * as wordProgress from "../wordProgress.js";
-import type * as words from "../words.js";
 import type * as words from "../words.js";
 
 import type {
@@ -35,22 +27,14 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   betterAuth: typeof betterAuth;
-  betterAuth: typeof betterAuth;
-  http: typeof http;
   http: typeof http;
   lyrics: typeof lyrics;
-  lyrics: typeof lyrics;
-  seed: typeof seed;
+  practiceLog: typeof practiceLog;
   seed: typeof seed;
   songProgress: typeof songProgress;
-  songProgress: typeof songProgress;
-  songs: typeof songs;
   songs: typeof songs;
   wishlist: typeof wishlist;
-  wishlist: typeof wishlist;
   wordProgress: typeof wordProgress;
-  wordProgress: typeof wordProgress;
-  words: typeof words;
   words: typeof words;
 }>;
 
