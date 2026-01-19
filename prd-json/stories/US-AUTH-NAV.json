@@ -1,0 +1,21 @@
+{
+  "id": "US-AUTH-NAV",
+  "title": "Add Auth-Aware Navigation to Header",
+  "description": "Update the Header component to show Dashboard/Sign Out links when logged in, and Sign In link when logged out.",
+  "technicalContext": {
+    "component": "src/components/Header.tsx",
+    "auth": "authClient.useSession() from src/lib/auth-client.ts",
+    "routes": "/login, /dashboard"
+  },
+  "acceptanceCriteria": [
+    {"text": "Header shows 'Sign In' link when user is not logged in", "checked": false},
+    {"text": "Header shows 'Dashboard' link when user is logged in", "checked": false},
+    {"text": "Header shows 'Sign Out' button when user is logged in", "checked": false},
+    {"text": "Sign Out button calls authClient.signOut()", "checked": false},
+    {"text": "Links have hover states and proper styling", "checked": false},
+    {"text": "MOBILE-FIRST: Navigation works on 320px+ screens", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": null
+}

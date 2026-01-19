@@ -1,0 +1,17 @@
+{
+  "id": "US-AUTH-REDIRECT",
+  "title": "Fix Magic Link Redirect to Dashboard",
+  "description": "After clicking magic link, user should be redirected to /dashboard instead of home page.",
+  "technicalContext": {
+    "file": "src/routes/login.tsx",
+    "change": "callbackURL should be '/dashboard' not '/'"
+  },
+  "acceptanceCriteria": [
+    {"text": "Magic link callbackURL is set to '/dashboard'", "checked": false},
+    {"text": "After clicking magic link, user lands on /dashboard", "checked": false},
+    {"text": "Session persists after redirect (user stays logged in)", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": null
+}
