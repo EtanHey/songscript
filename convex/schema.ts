@@ -72,4 +72,14 @@ export default defineSchema({
   })
     .index("by_visitor", ["visitorId"])
     .index("by_visitor_song", ["visitorId", "songId"]),
+
+  // User's learning queue / wishlist of songs to learn later
+  userWishlist: defineTable({
+    visitorId: v.string(), // localStorage-generated ID if no auth
+    songId: v.id("songs"),
+    addedAt: v.number(), // Timestamp when added
+    sortOrder: v.number(), // User's custom order (lower = higher priority)
+  })
+    .index("by_visitor", ["visitorId"])
+    .index("by_visitor_song", ["visitorId", "songId"]),
 });

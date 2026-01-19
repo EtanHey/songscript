@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { convexQuery } from '@convex-dev/react-query'
 import { api } from '../../convex/_generated/api'
+import { WishlistButton } from '../components/WishlistButton'
 
 export const Route = createFileRoute('/')({ component: HomePage })
 
@@ -28,12 +29,16 @@ function HomePage() {
                 className="block overflow-hidden bg-gray-900 rounded-lg border border-gray-800 hover:border-green-500 transition-colors"
               >
                 {/* YouTube Thumbnail */}
-                <div className="aspect-video w-full bg-gray-800">
+                <div className="aspect-video w-full bg-gray-800 relative">
                   <img
                     src={`https://img.youtube.com/vi/${song.youtubeId}/mqdefault.jpg`}
                     alt={`${song.title} thumbnail`}
                     className="h-full w-full object-cover"
                   />
+                  {/* Wishlist button overlay */}
+                  <div className="absolute top-2 right-2">
+                    <WishlistButton songId={song._id} size="sm" />
+                  </div>
                 </div>
                 <div className="p-4">
                   <h3 className="text-xl font-semibold text-white mb-1">{song.title}</h3>

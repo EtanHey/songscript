@@ -22,6 +22,44 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-DASH-WISHLIST: Dashboard Learning Queue / Wishlist
+- Created `convex/schema.ts` - Added userWishlist table:
+  - visitorId, songId, addedAt (timestamp), sortOrder (for custom ordering)
+  - Indexes: by_visitor, by_visitor_song
+- Created `convex/wishlist.ts` - Full CRUD and toggle operations:
+  - `getByVisitor` - Get user's wishlist with song details, ordered by sortOrder
+  - `isInWishlist` - Check if a song is in user's wishlist
+  - `addToWishlist` - Add song to wishlist with auto sortOrder
+  - `removeFromWishlist` - Remove song from wishlist
+  - `reorderWishlist` - Update sortOrder for multiple songs
+  - `toggleWishlist` - Add/remove with single mutation (optimistic UI friendly)
+- Created `src/components/WishlistButton.tsx`:
+  - Reusable heart button component with optimistic UI updates
+  - Supports sm/md/lg sizes for different contexts
+  - Shows filled red heart when in wishlist, outline when not
+  - Click handler prevents navigation when inside Link components
+- Updated `src/routes/index.tsx` (home page):
+  - Added WishlistButton to song card thumbnails (top-right corner)
+- Updated `src/routes/song.$songId.tsx` (song page):
+  - Added WishlistButton to mobile header bar (next to song title)
+  - Added WishlistButton to desktop header section
+- Updated `src/routes/dashboard.tsx`:
+  - Added "My Learning Queue" section between Songs and Vocabulary
+  - `LearningQueueList` - Responsive list/grid component with reordering
+  - `QueueCardDesktop` - Grid card with hover actions (move up/down, remove)
+  - `QueueCardMobile` - List item with visible drag handle and up/down buttons
+  - `WishlistEmptyState` - CTA to browse songs when queue is empty
+  - Drag-and-drop reordering on mobile with visual feedback
+  - "Start Learning" button on each queue item
+- MOBILE-FIRST design:
+  - Mobile: Compact list view with drag handles, up/down buttons, touch-friendly targets
+  - Desktop: Grid view with hover overlay for reorder/remove actions
+  - All touch targets minimum 44px for accessibility
+- Typecheck passes, all 54 unit tests pass
+- All 15 acceptance criteria completed
+
+---
+
 ## Iteration - US-DASH-WORDS-KNOWN: Dashboard Vocabulary Bank by Language ✅
 - Created `convex/wordProgress.ts` - Added `getVocabularyByLanguage` query:
   - Fetches all word progress for visitor

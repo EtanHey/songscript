@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { Repeat, Languages, Volume2, Video, Play, Square, Waves, Pause, ChevronDown, ChevronUp } from "lucide-react";
+import { WishlistButton } from "../components/WishlistButton";
 
 // Playback modes
 type PlaybackMode = "single" | "loop" | "fluid";
@@ -470,6 +471,10 @@ function SongPageContent({ songId }: SongPageContentProps) {
                     <h1 className="text-sm font-bold truncate iran-gradient">{song.title}</h1>
                     <p className="text-xs text-gray-400 truncate">{song.artist}</p>
                   </div>
+                  {/* Wishlist button */}
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <WishlistButton songId={songId} size="sm" />
+                  </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   {/* Compact mode toggle when collapsed */}
@@ -516,9 +521,12 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
             {/* Desktop: Song title (always visible) */}
             {!isMobile && (
-              <div className="border-b border-gray-800 px-4 py-3">
-                <h1 className="text-xl font-bold iran-gradient">{song.title}</h1>
-                <p className="text-sm text-gray-400">{song.artist}</p>
+              <div className="border-b border-gray-800 px-4 py-3 flex items-center justify-between">
+                <div>
+                  <h1 className="text-xl font-bold iran-gradient">{song.title}</h1>
+                  <p className="text-sm text-gray-400">{song.artist}</p>
+                </div>
+                <WishlistButton songId={songId} size="md" />
               </div>
             )}
 
