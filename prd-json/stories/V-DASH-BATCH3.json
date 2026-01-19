@@ -25,5 +25,5 @@
     {"text": "If ANY issues found: create US-DASH-FIX-* story", "checked": false}
   ],
   "passes": false,
-  "blockedBy": "US-DASH-LAYOUT"
+  "blockedBy": "Magic link auth fails with INVALID_TOKEN. Same issue as V-DASH-BATCH1 and V-DASH-BATCH2."
 }

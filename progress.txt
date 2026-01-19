@@ -49,6 +49,17 @@
 
 ---
 
+## Iteration - V-DASH-BATCH3: Verify Dashboard Batch 3 (BLOCKED)
+- V-DASH-BATCH3 requires browser verification with login
+- Same auth blocker as V-DASH-BATCH1 and V-DASH-BATCH2
+- Magic link tokens generated correctly but verification fails with INVALID_TOKEN
+- Dashboard features (Goals, Languages, Word Details, Layout) implemented but cannot verify in browser
+- Marked as BLOCKED, moving to next story US-AUTH-DYNAMIC-URL
+
+[V-DASH-BATCH3] BLOCKED: Magic link auth fails with INVALID_TOKEN. Same issue as V-DASH-BATCH1 and V-DASH-BATCH2.
+
+---
+
 ## Iteration - US-DASH-WORD-DETAILS: Dashboard Word Details Modal
 - Created `convex/wordProgress.ts` - Added two new queries:
   - `getWordDetailsWithSongs` - Finds all songs containing a specific word (by persian text)

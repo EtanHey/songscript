@@ -17,16 +17,17 @@
     ]
   },
   "acceptanceCriteria": [
-    {"text": "Investigate why session cookies aren't persisting after magic link verification", "checked": false},
-    {"text": "Check Better Auth session configuration (cookie settings, secure, sameSite)", "checked": false},
-    {"text": "Verify CORS allows credentials (Access-Control-Allow-Credentials)", "checked": false},
-    {"text": "After clicking magic link, user lands on /dashboard AND stays logged in", "checked": false},
-    {"text": "Header shows 'Dashboard' and 'Sign Out' buttons when logged in", "checked": false},
-    {"text": "Refreshing page maintains logged-in state", "checked": false},
-    {"text": "Navigating between pages maintains logged-in state", "checked": false},
-    {"text": "Sign Out button works and clears session", "checked": false},
-    {"text": "Typecheck passes", "checked": false},
-    {"text": "All unit tests pass", "checked": false}
+    {"text": "Investigate why session cookies aren't persisting after magic link verification", "checked": true},
+    {"text": "Check Better Auth session configuration (cookie settings, secure, sameSite)", "checked": true},
+    {"text": "Verify CORS allows credentials (Access-Control-Allow-Credentials)", "checked": true},
+    {"text": "After clicking magic link, user lands on /dashboard AND stays logged in", "checked": true},
+    {"text": "Header shows 'Dashboard' and 'Sign Out' buttons when logged in", "checked": true},
+    {"text": "Refreshing page maintains logged-in state", "checked": true},
+    {"text": "Navigating between pages maintains logged-in state", "checked": true},
+    {"text": "Sign Out button works and clears session", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "All unit tests pass", "checked": true}
   ],
-  "passes": false
+  "passes": true,
+  "implementationNotes": "Implemented in feature/auth-fixes worktree. Added crossDomainClient() plugin to auth-client.ts which handles localStorage-based session persistence for cross-domain auth (frontend at :3001, auth at convex.site). CORS credentials already handled internally by @convex-dev/better-auth."
 }

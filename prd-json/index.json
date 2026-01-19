@@ -6,10 +6,10 @@
   "stats": {
     "total": 29,
     "completed": 17,
-    "pending": 5,
-    "blocked": 7
+    "pending": 4,
+    "blocked": 8
   },
-  "nextStory": "V-DASH-BATCH3",
+  "nextStory": "US-AUTH-DYNAMIC-URL",
   "storyOrder": [
     "US-AUTH-FIX",
     "V-AUTH-FIX",
@@ -42,7 +42,6 @@
     "US-SSR-SONG-LIST"
   ],
   "pending": [
-    "V-DASH-BATCH3",
     "US-AUTH-DYNAMIC-URL",
     "US-AUTH-PERSIST",
     "US-AUTH-UX",
@@ -55,7 +54,8 @@
     "US-WORD-AUDIO",
     "V-WORD-AUDIO",
     "V-DASH-BATCH1",
-    "V-DASH-BATCH2"
+    "V-DASH-BATCH2",
+    "V-DASH-BATCH3"
   ],
   "browserSetup": {
     "viewport": "desktop 1200px+",
@@ -74,6 +74,6 @@
     "dashboardDesign": "MOBILE-FIRST: All dashboard components designed for 320px+ first, scaled up with Tailwind breakpoints (sm/md/lg/xl). High emphasis on UX/UI quality and responsive testing.",
     "videoBlocker": "V-AUTOPLAY-FIX blocked: TanStack Start + Nitro returns 503 for video Range requests embedded in page. Video works when navigated to directly.",
     "elevenLabsBlocker": "US-WORD-AUDIO blocked: ElevenLabs API key has 0 credits. Code complete - run scripts/generate-word-audio.ts after adding credits.",
-    "authVerifyBlocker": "V-DASH-BATCH1 blocked: Magic link tokens generated correctly but verification fails with INVALID_TOKEN. Dashboard requires auth for verification. Likely Better Auth configuration issue."
+    "authVerifyBlocker": "V-DASH-BATCH1/2/3 blocked: Magic link tokens generated correctly but verification fails with INVALID_TOKEN. Dashboard requires auth for verification. Likely Better Auth configuration issue."
   }
 }

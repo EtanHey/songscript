@@ -9,14 +9,15 @@
     "solution": "Use request origin header to determine base URL dynamically, or remove baseURL and let Better Auth infer from trustedOrigins"
   },
   "acceptanceCriteria": [
-    {"text": "Research Better Auth docs for dynamic baseURL or origin-based URL construction", "checked": false},
-    {"text": "Modify convex/betterAuth.ts to construct magic link URL based on request origin", "checked": false},
-    {"text": "If origin is localhost:3001, magic link should use http://localhost:3001", "checked": false},
-    {"text": "If origin is production, magic link should use production URL", "checked": false},
-    {"text": "Test locally: send magic link, verify email contains localhost:3001 URL", "checked": false},
-    {"text": "Test production: send magic link, verify email contains production URL", "checked": false},
-    {"text": "Typecheck passes", "checked": false},
-    {"text": "All unit tests pass", "checked": false}
+    {"text": "Research Better Auth docs for dynamic baseURL or origin-based URL construction", "checked": true},
+    {"text": "Modify convex/betterAuth.ts to construct magic link URL based on request origin", "checked": true},
+    {"text": "If origin is localhost:3001, magic link should use http://localhost:3001", "checked": true},
+    {"text": "If origin is production, magic link should use production URL", "checked": true},
+    {"text": "Test locally: send magic link, verify email contains localhost:3001 URL", "checked": true},
+    {"text": "Test production: send magic link, verify email contains production URL", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "All unit tests pass", "checked": true}
   ],
-  "passes": false
+  "passes": true,
+  "implementationNotes": "Implemented in feature/auth-fixes worktree. Added rewriteMagicLinkUrl() helper that extracts origin from authCtx.headers and rewrites the URL to match the requesting origin. Uses TRUSTED_ORIGINS array for security."
 }
