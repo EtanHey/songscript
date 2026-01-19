@@ -88,7 +88,7 @@ function LoginPage() {
         setError(result.error.message || "Failed to send magic link");
       } else {
         setSuccess(
-          "Magic link sent! Check your email (or the server console in development)."
+          "Magic link sent! In dev mode, check the Convex dashboard logs at dashboard.convex.dev"
         );
       }
     } catch (err) {

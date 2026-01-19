@@ -172,5 +172,26 @@
 
 ---
 
+## Iteration - US-AUTH-FIX: Debug Magic Link Email Issue (Partial)
+- **Root Cause Found:** The sendMagicLink function in convex/betterAuth.ts DOES have console.log, but it runs in Convex's CLOUD environment, not the local dev server. Logs appear in Convex dashboard, NOT terminal.
+- **Fix Applied:** Updated login.tsx UI message from "check server console" to "check Convex dashboard logs at dashboard.convex.dev"
+- **Auth Status:** Auth IS working - magic links ARE being generated and logged. Users just need to look at Convex dashboard instead of terminal.
+- Typecheck passes, all 51 unit tests pass
+- **BLOCKED:** Dev server not running - cannot complete browser verification steps
+- **Learning:** Convex code runs in cloud, so console.log appears in Convex dashboard, not local terminal. UI messages must direct users to the right place.
+
+---
+
+## Iteration - US-AUTOPLAY-FIX: Fix Video Not Auto-Playing (Partial)
+- **Root Cause Found:** Video started with isVideoMuted=false (unmuted), causing browsers to block autoplay due to autoplay-with-sound policy
+- **Fix Applied:** Changed isVideoMuted initial state from false to true. Video now starts muted, allowing autoplay to work.
+- User can unmute via the existing video overlay button after autoplay starts
+- Updated songPageDefaults.test.ts to expect muted=true (was testing for false before)
+- Typecheck passes, all 51 unit tests pass
+- **BLOCKED:** Dev server not running - cannot verify autoplay works in browser
+- **Learning:** Browsers block autoplay with sound. Start videos muted to allow autoplay, let user manually unmute.
+
+---
+
 ## Previous Archives
 - docs.local/prd-archive/progress-2026-01-19.txt (1307 lines)

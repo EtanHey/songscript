@@ -19,9 +19,10 @@ describe('Song Page Default State', () => {
     expect(songPageContent).toMatch(playbackModeRegex)
   })
 
-  it('initializes video muted state to false (unmuted) for fluid mode', () => {
-    // Check that isVideoMuted is initialized to false (for fluid mode audio)
-    const videoMutedRegex = /const\s+\[isVideoMuted,\s*setIsVideoMuted\]\s*=\s*useState\s*\(\s*false\s*\)/
+  it('initializes video muted state to true (muted) to allow browser autoplay', () => {
+    // Check that isVideoMuted is initialized to true (browsers block autoplay with sound)
+    // User can unmute via the video overlay button after autoplay starts
+    const videoMutedRegex = /const\s+\[isVideoMuted,\s*setIsVideoMuted\]\s*=\s*useState\s*\(\s*true\s*\)/
     expect(songPageContent).toMatch(videoMutedRegex)
   })
 

@@ -131,8 +131,9 @@ function SongPageContent({ songId }: SongPageContentProps) {
   const [languageFilter, setLanguageFilter] = useState<LanguageFilter>("all");
 
   // Video mute state - derived from playback mode (muted in single/loop, unmuted in fluid)
-  // Start unmuted since we default to fluid mode for auto-play
-  const [isVideoMuted, setIsVideoMuted] = useState(false);
+  // Start MUTED to allow browser autoplay (browsers block autoplay with sound)
+  // User can unmute via the video overlay button after autoplay starts
+  const [isVideoMuted, setIsVideoMuted] = useState(true);
 
   // Video error state - for fallback handling
   const [videoError, setVideoError] = useState<string | null>(null);
@@ -251,6 +252,10 @@ function SongPageContent({ songId }: SongPageContentProps) {
     (startTime: number, lineIndex: number) => {
       const lineNumber = sortedLyrics[lineIndex]?.lineNumber;
 
+      // Set seeking flag to prevent handleTimeUpdate from overwriting our line selection
+      // This is critical to avoid the "wrong line flash" bug
+      isLoopSeekingRef.current = true;
+
       // Trigger visual feedback
       triggerClickAnimation(lineIndex);
       // Set as active line
@@ -260,6 +265,11 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
       // Seek video to match the line
       playerRef.current?.seekTo(startTime);
+
+      // Clear seeking flag after seek completes (give browser time to process)
+      setTimeout(() => {
+        isLoopSeekingRef.current = false;
+      }, 100);
 
       // Handle differently based on playback mode
       if (playbackMode === "fluid") {
@@ -338,7 +348,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
           // Clear flag after seek completes (give browser time to process)
           setTimeout(() => {
             isLoopSeekingRef.current = false;
-          }, 50);
+          }, 100);
         } else {
           // Single mode: pause video at end of segment
           player.pause();

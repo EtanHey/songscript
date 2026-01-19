@@ -64,10 +64,10 @@ describe('Loop Mode Seek Logic', () => {
     expect(songPageContent).toContain('seekTo')
   })
 
-  it('clears seeking flag with 50ms delay for browser seek processing', () => {
-    // The 50ms delay allows the browser to complete the seek operation
+  it('clears seeking flag with 100ms delay for browser seek processing', () => {
+    // The 100ms delay allows the browser to complete the seek operation
     // before resuming line update tracking
-    const timeoutPattern = /setTimeout\s*\(\s*\(\)\s*=>\s*\{[\s\S]*?isLoopSeekingRef\.current\s*=\s*false[\s\S]*?\}\s*,\s*50\s*\)/
+    const timeoutPattern = /setTimeout\s*\(\s*\(\)\s*=>\s*\{[\s\S]*?isLoopSeekingRef\.current\s*=\s*false[\s\S]*?\}\s*,\s*100\s*\)/
     expect(songPageContent).toMatch(timeoutPattern)
   })
 })
