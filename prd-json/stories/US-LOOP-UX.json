@@ -5,33 +5,33 @@
   "acceptanceCriteria": [
     {
       "text": "Identify the source of the flash (likely in time update handler or seek logic)",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Fix loop restart to not trigger line change events",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Current line stays visually selected during entire loop cycle",
-      "checked": false
+      "checked": true
     },
     {
       "text": "No visual flicker or flash when loop restarts",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Loop mode feels smooth and polished",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Typecheck passes",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Verify in browser: enable loop, watch 3+ loops, no flashing",
-      "checked": false
+      "checked": true
     }
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null
 }

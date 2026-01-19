@@ -1,9 +1,9 @@
 # Progress Log
 
 ## 📊 Overall Stats
-- **Stories Completed:** 55
-- **Criteria Completed:** 456
-- **Stories Remaining:** 5
+- **Stories Completed:** 56
+- **Criteria Completed:** 463
+- **Stories Remaining:** 4
 - **Archive:** docs.local/prd-completed-archive.md
 
 ---
@@ -78,6 +78,21 @@
 - Fixed Playwright config for better stability: reduced workers to 2, added retry mechanism, increased timeouts
 - All 44 unit tests pass, all 14 e2e tests pass (with retries for server load), typecheck passes
 - **Learning:** Playwright tests with heavy pages (video, database queries) need hydration waits and retries; use scrollIntoViewIfNeeded() before clicking toggle buttons
+
+---
+
+## Iteration - US-LOOP-UX: Fix Loop Mode Line Flashing ✅
+- Identified the source of the flash: handleTimeUpdate was updating activeLineIndex during seek operations
+- Root cause: When video seeks back to loop start, timeupdate events fire with intermediate positions
+- Fix: Added `isLoopSeekingRef` to track when we're in a loop restart seek operation
+- Guard added in handleTimeUpdate to skip line updates when isLoopSeekingRef.current is true
+- Loop restart now sets flag before seek, clears after 50ms timeout
+- Typecheck passes
+- **Learning:** Use a ref flag to guard against state updates during async seek operations - prevents visual flicker by "locking" UI state during transitions
+
+---
+
+**Next:** US-LOOP-UX-TESTS - Tests for Loop Mode UX Fix
 
 ---
 

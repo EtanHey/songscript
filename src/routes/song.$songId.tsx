@@ -115,6 +115,9 @@ function SongPageContent({ songId }: SongPageContentProps) {
     undefined
   );
 
+  // Ref to track when we're seeking for a loop restart (prevents line flash during seek)
+  const isLoopSeekingRef = useRef(false);
+
   // Playback mode state: single, loop, or fluid - default to fluid for auto-play experience
   const [playbackMode, setPlaybackMode] = useState<PlaybackMode>("fluid");
   const [currentLineIndex, setCurrentLineIndex] = useState<number | undefined>(
@@ -277,6 +280,11 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
   const handleTimeUpdate = useCallback(
     (currentTime: number) => {
+      // Skip line updates during loop restart seek to prevent visual flash
+      if (isLoopSeekingRef.current) {
+        return;
+      }
+
       // Find which line's startTime <= currentTime < endTime
       const lineIndex = sortedLyrics.findIndex(
         (line) => currentTime >= line.startTime && currentTime < line.endTime
@@ -324,7 +332,13 @@ function SongPageContent({ songId }: SongPageContentProps) {
       if (currentTime >= currentLine.endTime) {
         if (playbackMode === "loop") {
           // Loop mode: seek back to start of line
+          // Set flag to prevent line flashing during seek
+          isLoopSeekingRef.current = true;
           player.seekTo(currentLine.startTime);
+          // Clear flag after seek completes (give browser time to process)
+          setTimeout(() => {
+            isLoopSeekingRef.current = false;
+          }, 50);
         } else {
           // Single mode: pause video at end of segment
           player.pause();
