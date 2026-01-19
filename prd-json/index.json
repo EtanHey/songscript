@@ -5,11 +5,11 @@
   "workingDirectory": ".",
   "stats": {
     "total": 24,
-    "completed": 4,
-    "pending": 16,
+    "completed": 5,
+    "pending": 15,
     "blocked": 4
   },
-  "nextStory": "V-LOOP-FIX",
+  "nextStory": "US-WORD-AUDIO",
   "storyOrder": [
     "US-AUTH-FIX",
     "V-AUTH-FIX",
@@ -37,7 +37,6 @@
     "US-SSR-SONG-LIST"
   ],
   "pending": [
-    "V-LOOP-FIX",
     "US-WORD-AUDIO",
     "V-WORD-AUDIO",
     "US-DASH-SONGS-PROGRESS",

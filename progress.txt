@@ -22,6 +22,21 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - V-LOOP-FIX: Verify Loop Mode Fix - No Wrong Line Flash ✅
+- **Comprehensive browser verification of loop mode fix**
+- Verified all 5 test scenarios via browser automation:
+  - ✅ TEST 1: Click line 5 in Loop mode - line 5 highlighted immediately (NOT line 4), stayed highlighted through 3+ loop cycles
+  - ✅ TEST 2: Click line 1 (first line boundary) - line 1 highlighted, no crash, stable through 2 loops
+  - ✅ TEST 3: Click last line (line 31) - last line highlighted, stable through 2 loops, no end boundary issues
+  - ✅ TEST 4: Single mode click line 10 - line 10 highlighted immediately (NOT line 9), no flash during selection
+  - ✅ TEST 5: Fluid mode - lines advance correctly with video, no flashing to previous lines
+- Video playback working correctly in this session (intermittent 503 resolved)
+- No JavaScript console errors detected
+- All 23 acceptance criteria verified and passed
+- **Conclusion:** Loop mode fix (US-LOOP-FIX) is working correctly - no wrong-line flash in any playback mode
+
+---
+
 ## Iteration - US-LOOP-FIX: Fix Loop Mode Line Selection Bug ✅
 - **Root Cause Found:** The `handleTimeUpdate` function was clearing `targetLineIndexRef` when `currentTime >= targetLine.endTime`, but this happens at exactly the moment the loop restart fires. The normal time-based detection at `endTime` matches the NEXT line, not the current one.
 - **Fix Applied:** Rewrote targetLineIndexRef logic in handleTimeUpdate:
