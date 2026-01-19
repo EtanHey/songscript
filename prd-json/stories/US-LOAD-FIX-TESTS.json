@@ -5,33 +5,33 @@
   "acceptanceCriteria": [
     {
       "text": "Create `e2e/routes.spec.ts`",
-      "checked": false
+      "checked": true
     },
     {
       "text": "E2E: Test `/` loads without console errors",
-      "checked": false
+      "checked": true
     },
     {
       "text": "E2E: Test `/login` loads, form is visible",
-      "checked": false
+      "checked": true
     },
     {
       "text": "E2E: Test `/song/{testSongId}` loads without console errors",
-      "checked": false
+      "checked": true
     },
     {
       "text": "E2E: Test navigation between routes works",
-      "checked": false
+      "checked": true
     },
     {
       "text": "All tests pass: `bun run test:e2e`",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Typecheck passes",
-      "checked": false
+      "checked": true
     }
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null
 }

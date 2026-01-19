@@ -17,5 +17,10 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  // Don't start a web server - assume dev server is already running
+  webServer: {
+    command: 'bun run dev',
+    url: 'http://localhost:3001',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
+  },
 })
