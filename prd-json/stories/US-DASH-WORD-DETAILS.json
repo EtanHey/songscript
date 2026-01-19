@@ -1,0 +1,30 @@
+{
+  "id": "US-DASH-WORD-DETAILS",
+  "title": "Dashboard: Word Details Modal",
+  "description": "Word details sheet with songs and audio. MOBILE-FIRST bottom sheet on mobile, modal on desktop.",
+  "technicalContext": {
+    "database": "Query songs containing word, join with practice data",
+    "ui": "Bottom sheet (mobile) / Modal (desktop) with word details",
+    "responsive": "MOBILE-FIRST: Bottom sheet drawer on mobile, centered modal on desktop",
+    "tailwind": "Use Tailwind: fixed bottom-0, transform animations, backdrop blur"
+  },
+  "acceptanceCriteria": [
+    {"text": "Create query to find all songs containing a specific word", "checked": false},
+    {"text": "Create query to get word practice history", "checked": false},
+    {"text": "Add click handler to words in vocabulary bank", "checked": false},
+    {"text": "Open modal/sheet showing word details on click", "checked": false},
+    {"text": "Content shows: word in original script, transliteration, translation", "checked": false},
+    {"text": "Show 'Appears in X songs' with list of song titles", "checked": false},
+    {"text": "Click song title navigates to that song", "checked": false},
+    {"text": "Show practice stats: times practiced, last practiced date", "checked": false},
+    {"text": "If ElevenLabs audio available, show play button for pronunciation", "checked": false},
+    {"text": "MOBILE-FIRST: Bottom sheet sliding up from bottom with drag handle", "checked": false},
+    {"text": "TAILWIND RESPONSIVE: Centered modal with backdrop on md+ screens", "checked": false},
+    {"text": "UX: Swipe down to dismiss on mobile, click backdrop on desktop", "checked": false},
+    {"text": "UI: Large word display, clear sections, prominent audio button", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "All unit tests pass", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": null
+}

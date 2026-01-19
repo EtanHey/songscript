@@ -1,0 +1,29 @@
+{
+  "id": "US-DASH-LANGUAGES",
+  "title": "Dashboard: Languages Learning Overview",
+  "description": "Language progress cards with filtering. MOBILE-FIRST with swipeable language selector.",
+  "technicalContext": {
+    "database": "Aggregate from existing progress tables by language",
+    "ui": "Language cards with flags, progress bars, word counts",
+    "responsive": "MOBILE-FIRST: Horizontal scrolling language chips on mobile, grid on desktop",
+    "tailwind": "Use Tailwind: overflow-x-auto, snap-x, grid responsive breakpoints"
+  },
+  "acceptanceCriteria": [
+    {"text": "Create query to aggregate progress by language", "checked": false},
+    {"text": "Add 'My Languages' section to dashboard", "checked": false},
+    {"text": "Show card per language user has practiced", "checked": false},
+    {"text": "Each card shows: language flag/name, words learned, songs practiced", "checked": false},
+    {"text": "Show relative progress bar (e.g., vs total words in that language)", "checked": false},
+    {"text": "Order by most practiced language first", "checked": false},
+    {"text": "Click language card filters dashboard to show only that language", "checked": false},
+    {"text": "Show 'Add a language' prompt linking to song browse", "checked": false},
+    {"text": "MOBILE-FIRST: Horizontal scrolling language chips/cards on mobile", "checked": false},
+    {"text": "TAILWIND RESPONSIVE: Grid of language cards on md+ screens", "checked": false},
+    {"text": "UX: Tap to filter, clear 'active' state, easy to deselect filter", "checked": false},
+    {"text": "UI: Flag emojis or icons, progress bars with gradient fills", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "All unit tests pass", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": null
+}

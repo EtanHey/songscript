@@ -1,0 +1,31 @@
+{
+  "id": "US-DASH-STREAKS",
+  "title": "Dashboard: Practice Streaks Calendar",
+  "description": "GitHub-style contribution heatmap for practice streaks. MOBILE-FIRST with scrollable calendar.",
+  "technicalContext": {
+    "database": "Convex - userPracticeLog table",
+    "schema": "userPracticeLog: { userId, date (YYYY-MM-DD), practiceCount, totalSeconds }",
+    "ui": "Calendar heatmap with streak counter",
+    "responsive": "MOBILE-FIRST: Horizontally scrollable heatmap on mobile, full view on desktop",
+    "tailwind": "Use Tailwind: overflow-x-auto, grid sizing, color intensity classes"
+  },
+  "acceptanceCriteria": [
+    {"text": "Create Convex schema for userPracticeLog table", "checked": false},
+    {"text": "Create mutation to log practice session (called when user practices)", "checked": false},
+    {"text": "Create query to get practice history for last 90 days", "checked": false},
+    {"text": "Add 'Practice Streak' section to dashboard", "checked": false},
+    {"text": "Show current streak count prominently (e.g., '🔥 5 day streak!')", "checked": false},
+    {"text": "Display calendar heatmap (90 days, GitHub-style grid)", "checked": false},
+    {"text": "Color intensity based on practice amount that day", "checked": false},
+    {"text": "Tap/hover on day shows: date, practice time, lines practiced", "checked": false},
+    {"text": "Show longest streak achieved", "checked": false},
+    {"text": "MOBILE-FIRST: Horizontally scrollable heatmap on small screens", "checked": false},
+    {"text": "TAILWIND RESPONSIVE: Full heatmap visible on md+ breakpoints", "checked": false},
+    {"text": "UX: Touch-friendly day cells (min 24px), tooltip on tap for mobile", "checked": false},
+    {"text": "UI: Tailwind color scale (bg-green-100 to bg-green-900) for intensity", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "All unit tests pass", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": null
+}

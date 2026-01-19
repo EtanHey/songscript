@@ -1,15 +1,15 @@
 {
   "$schema": "https://ralph.dev/schemas/prd-index.schema.json",
   "generatedAt": "2026-01-19T15:50:00Z",
-  "projectName": "SongScript Critical Fixes + Word Audio",
+  "projectName": "SongScript Critical Fixes + Dashboard Enhancement",
   "workingDirectory": ".",
   "stats": {
-    "total": 10,
+    "total": 23,
     "completed": 2,
-    "pending": 8,
-    "blocked": 0
+    "pending": 19,
+    "blocked": 2
   },
-  "nextStory": "US-EMAIL-RESEND",
+  "nextStory": "US-AUTOPLAY-FIX",
   "storyOrder": [
     "US-AUTH-FIX",
     "V-AUTH-FIX",
@@ -20,23 +20,51 @@
     "US-LOOP-FIX",
     "V-LOOP-FIX",
     "US-WORD-AUDIO",
-    "V-WORD-AUDIO"
+    "V-WORD-AUDIO",
+    "US-DASH-SONGS-PROGRESS",
+    "US-DASH-WORDS-KNOWN",
+    "US-DASH-WISHLIST",
+    "V-DASH-BATCH1",
+    "US-DASH-STREAKS",
+    "US-DASH-RECENT",
+    "US-DASH-STATS",
+    "V-DASH-BATCH2",
+    "US-DASH-GOALS",
+    "US-DASH-LANGUAGES",
+    "US-DASH-WORD-DETAILS",
+    "US-DASH-LAYOUT",
+    "V-DASH-BATCH3"
   ],
   "pending": [
-    "US-EMAIL-RESEND",
-    "V-EMAIL-RESEND",
     "US-AUTOPLAY-FIX",
     "V-AUTOPLAY-FIX",
     "US-LOOP-FIX",
     "V-LOOP-FIX",
     "US-WORD-AUDIO",
-    "V-WORD-AUDIO"
+    "V-WORD-AUDIO",
+    "US-DASH-SONGS-PROGRESS",
+    "US-DASH-WORDS-KNOWN",
+    "US-DASH-WISHLIST",
+    "V-DASH-BATCH1",
+    "US-DASH-STREAKS",
+    "US-DASH-RECENT",
+    "US-DASH-STATS",
+    "V-DASH-BATCH2",
+    "US-DASH-GOALS",
+    "US-DASH-LANGUAGES",
+    "US-DASH-WORD-DETAILS",
+    "US-DASH-LAYOUT",
+    "V-DASH-BATCH3"
   ],
-  "blocked": [],
+  "blocked": [
+    "US-EMAIL-RESEND",
+    "V-EMAIL-RESEND"
+  ],
   "browserSetup": {
     "viewport": "desktop 1200px+",
     "homeUrl": "http://localhost:3001",
     "songUrl": "http://localhost:3001/song/j972m34dzqgx6a0r5a00n9k6pd7zekfa",
+    "dashboardUrl": "http://localhost:3001/dashboard",
     "devServer": "bun run dev"
   },
   "notes": {
@@ -44,6 +72,9 @@
     "adminEmail": "etan@heyman.net",
     "elevenLabsKey": "Set in .env.local",
     "resendKey": "Set in .env.local - RESEND_API_KEY",
-    "archiveLocation": "Old 61 completed stories archived - this is a fresh focused PRD"
+    "archiveLocation": "Old 61 completed stories archived - this is a fresh focused PRD",
+    "dashboardBatches": "Dashboard stories are batched: Batch1 (Songs/Words/Wishlist), Batch2 (Streaks/Recent/Stats), Batch3 (Goals/Languages/WordDetails/Layout). Each batch has a V-DASH-BATCH* verification story.",
+    "dashboardDesign": "MOBILE-FIRST: All dashboard components designed for 320px+ first, scaled up with Tailwind breakpoints (sm/md/lg/xl). High emphasis on UX/UI quality and responsive testing.",
+    "convexBlocker": "PRE-EXISTING: Convex bundler error 'Two output files share the same path' blocks deployment. US-EMAIL-RESEND and V-EMAIL-RESEND blocked until resolved."
   }
 }

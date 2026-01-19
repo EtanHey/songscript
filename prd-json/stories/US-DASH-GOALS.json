@@ -1,0 +1,31 @@
+{
+  "id": "US-DASH-GOALS",
+  "title": "Dashboard: Daily/Weekly Learning Goals",
+  "description": "Learning goals with progress rings. MOBILE-FIRST responsive with touch-friendly editing.",
+  "technicalContext": {
+    "database": "Convex - userGoals table",
+    "schema": "userGoals: { userId, goalType, targetValue, period: 'daily'|'weekly' }",
+    "ui": "Goal cards with circular progress indicators",
+    "responsive": "MOBILE-FIRST: Stacked goal cards on mobile, side-by-side on desktop",
+    "tailwind": "Use Tailwind: flex-col sm:flex-row, SVG ring animations"
+  },
+  "acceptanceCriteria": [
+    {"text": "Create Convex schema for userGoals table", "checked": false},
+    {"text": "Create mutations: setGoal, updateGoal, deleteGoal", "checked": false},
+    {"text": "Create query to get user goals with current progress", "checked": false},
+    {"text": "Add 'My Goals' section to dashboard", "checked": false},
+    {"text": "Show goal cards with circular progress indicator (SVG ring)", "checked": false},
+    {"text": "Default goals: 'Learn 10 words today', 'Practice 15 minutes'", "checked": false},
+    {"text": "Allow user to customize goal targets via settings modal", "checked": false},
+    {"text": "Show celebration animation/message when goal is met", "checked": false},
+    {"text": "Reset daily goals at midnight, weekly on Monday", "checked": false},
+    {"text": "MOBILE-FIRST: Stacked full-width goal cards on mobile", "checked": false},
+    {"text": "TAILWIND RESPONSIVE: Side-by-side goals on sm+, larger rings on lg+", "checked": false},
+    {"text": "UX: Tap goal to edit target, animated ring fill, confetti on completion", "checked": false},
+    {"text": "UI: Clean circular progress rings, percentage in center, subtle shadow", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "All unit tests pass", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": null
+}

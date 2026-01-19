@@ -1,0 +1,28 @@
+{
+  "id": "V-DASH-BATCH1",
+  "title": "Verify Dashboard Batch 1: Progress, Vocabulary, Wishlist",
+  "description": "End-to-end verification including MOBILE-FIRST responsive testing at 375px and 1200px widths.",
+  "verificationMethod": "Browser automation with mcp__claude-in-chrome tools",
+  "canSpawnStories": true,
+  "acceptanceCriteria": [
+    {"text": "Login as etan@heyman.net (use Convex dashboard magic link)", "checked": false},
+    {"text": "Navigate to /dashboard - take desktop screenshot (1200px)", "checked": false},
+    {"text": "Verify 'My Songs' section exists (may be empty initially)", "checked": false},
+    {"text": "Navigate to a song, practice a few lines by clicking them", "checked": false},
+    {"text": "Return to /dashboard - verify song appears in 'My Songs' with progress", "checked": false},
+    {"text": "Verify 'My Vocabulary' section shows practiced words grouped by language", "checked": false},
+    {"text": "Click to expand vocabulary section - verify words are listed", "checked": false},
+    {"text": "Go to song page, click wishlist/heart icon", "checked": false},
+    {"text": "Return to dashboard - verify song appears in 'My Learning Queue'", "checked": false},
+    {"text": "Remove from wishlist - verify it disappears from queue", "checked": false},
+    {"text": "MOBILE TEST: Resize browser to 375px width", "checked": false},
+    {"text": "MOBILE TEST: Take mobile screenshot - verify single column layout", "checked": false},
+    {"text": "MOBILE TEST: Verify no horizontal scroll, all content fits", "checked": false},
+    {"text": "MOBILE TEST: Verify touch targets are adequate (44px+)", "checked": false},
+    {"text": "MOBILE TEST: Test collapsible sections work on mobile", "checked": false},
+    {"text": "Check console for errors via mcp__browser-tools__getConsoleErrors", "checked": false},
+    {"text": "If ANY issues found: create US-DASH-FIX-* story with specific fix needed", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "US-DASH-WISHLIST"
+}

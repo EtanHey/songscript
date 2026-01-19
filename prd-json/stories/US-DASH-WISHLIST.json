@@ -1,0 +1,31 @@
+{
+  "id": "US-DASH-WISHLIST",
+  "title": "Dashboard: Learning Queue / Wishlist",
+  "description": "Bookmark songs to learn later. MOBILE-FIRST responsive with drag-and-drop reordering.",
+  "technicalContext": {
+    "database": "Convex - userWishlist table",
+    "schema": "userWishlist: { userId, songId, addedAt, sortOrder }",
+    "ui": "Heart icon on song cards, sortable queue on dashboard",
+    "responsive": "MOBILE-FIRST: Touch-friendly drag handles, swipe actions on mobile",
+    "tailwind": "Use Tailwind for drag states, touch targets, animation"
+  },
+  "acceptanceCriteria": [
+    {"text": "Create Convex schema for userWishlist table", "checked": false},
+    {"text": "Create mutations: addToWishlist, removeFromWishlist, reorderWishlist", "checked": false},
+    {"text": "Create query to get user's wishlist ordered by sortOrder", "checked": false},
+    {"text": "Add heart/bookmark icon to song cards (home page and song page)", "checked": false},
+    {"text": "Clicking heart toggles wishlist status with optimistic UI update", "checked": false},
+    {"text": "Add 'My Learning Queue' section to dashboard", "checked": false},
+    {"text": "Show wishlisted songs with 'Start Learning' button", "checked": false},
+    {"text": "Allow reordering queue (drag handles or up/down arrows)", "checked": false},
+    {"text": "Empty state: 'Browse songs and add them to your queue!'", "checked": false},
+    {"text": "MOBILE-FIRST: Touch-friendly reorder with visible drag handles", "checked": false},
+    {"text": "TAILWIND RESPONSIVE: List view on mobile, grid option on desktop", "checked": false},
+    {"text": "UX: Optimistic updates, smooth drag animations, haptic feedback feel", "checked": false},
+    {"text": "UI: Clear visual feedback for drag state, filled vs outline heart", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "All unit tests pass", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": null
+}

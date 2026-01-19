@@ -15,11 +15,11 @@
     "envReady": "RESEND_API_KEY=re_9qsS7JD5_... already in .env.local"
   },
   "acceptanceCriteria": [
-    {"text": "Use Context7 MCP to look up Better Auth magic link + email provider setup", "checked": false},
-    {"text": "Install resend package: bun add resend", "checked": false},
-    {"text": "Configure Better Auth sendMagicLink to use Resend API", "checked": false},
-    {"text": "Set from email to something like noreply@heyman.net or similar verified domain", "checked": false},
-    {"text": "Update convex/betterAuth.ts with Resend email sending", "checked": false},
+    {"text": "Use Context7 MCP to look up Better Auth magic link + email provider setup", "checked": true},
+    {"text": "Install resend package: bun add resend", "checked": true},
+    {"text": "Configure Better Auth sendMagicLink to use Resend API", "checked": true},
+    {"text": "Set from email to something like noreply@heyman.net or similar verified domain", "checked": true},
+    {"text": "Update convex/betterAuth.ts with Resend email sending", "checked": true},
     {"text": "Start dev server: bun run dev", "checked": false},
     {"text": "Navigate to /login and enter etan@heyman.net", "checked": false},
     {"text": "Click 'Send Magic Link'", "checked": false},
@@ -29,5 +29,5 @@
     {"text": "All unit tests pass", "checked": false}
   ],
   "passes": false,
-  "blockedBy": null
+  "blockedBy": "Convex bundler error: 'Two output files share the same path but have different contents' prevents deployment. This pre-existing issue blocks ALL Convex code changes from being deployed. The code changes are complete but cannot be tested until the bundler issue is resolved."
 }

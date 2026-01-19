@@ -1,0 +1,27 @@
+{
+  "id": "V-DASH-BATCH2",
+  "title": "Verify Dashboard Batch 2: Streaks, Recent, Stats",
+  "description": "End-to-end verification including MOBILE-FIRST responsive testing at 375px and 1200px widths.",
+  "verificationMethod": "Browser automation with mcp__claude-in-chrome tools",
+  "canSpawnStories": true,
+  "acceptanceCriteria": [
+    {"text": "Login and navigate to /dashboard", "checked": false},
+    {"text": "Take desktop screenshot (1200px width)", "checked": false},
+    {"text": "Verify 'Practice Streak' section shows streak count", "checked": false},
+    {"text": "Verify calendar heatmap is visible (even if mostly empty)", "checked": false},
+    {"text": "Practice a song for a minute, return to dashboard", "checked": false},
+    {"text": "Verify 'Continue Learning' shows the practiced song", "checked": false},
+    {"text": "Click the continue card - verify it navigates to correct line", "checked": false},
+    {"text": "Verify 'Your Stats' section shows words/lines/time numbers", "checked": false},
+    {"text": "Verify language breakdown is displayed", "checked": false},
+    {"text": "MOBILE TEST: Resize browser to 375px width", "checked": false},
+    {"text": "MOBILE TEST: Take mobile screenshot - verify single column stack", "checked": false},
+    {"text": "MOBILE TEST: Verify streak calendar scrolls horizontally (not page)", "checked": false},
+    {"text": "MOBILE TEST: Verify Continue Learning cards are swipeable", "checked": false},
+    {"text": "MOBILE TEST: Verify stats grid is 2-column on mobile", "checked": false},
+    {"text": "Check console for errors", "checked": false},
+    {"text": "If ANY issues found: create US-DASH-FIX-* story", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "US-DASH-STATS"
+}

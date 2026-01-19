@@ -1,0 +1,31 @@
+{
+  "id": "US-DASH-WORDS-KNOWN",
+  "title": "Dashboard: Vocabulary Bank by Language",
+  "description": "Display practiced words grouped by language and mastery level. MOBILE-FIRST responsive with Tailwind.",
+  "technicalContext": {
+    "database": "Convex - userWordProgress table",
+    "schema": "userWordProgress: { userId, word, language, practiceCount, lastPracticed }",
+    "masteryLevels": "new (1-2 practices), learning (3-9), mastered (10+)",
+    "responsive": "MOBILE-FIRST: Collapsible accordion on mobile, expanded grid on desktop",
+    "tailwind": "Use Tailwind: collapse/expand animations, responsive flex/grid"
+  },
+  "acceptanceCriteria": [
+    {"text": "Create Convex schema for userWordProgress table", "checked": false},
+    {"text": "Create mutation to record word practice when user clicks a word", "checked": false},
+    {"text": "Create query to get all words for current user grouped by language", "checked": false},
+    {"text": "Add 'My Vocabulary' section to dashboard", "checked": false},
+    {"text": "Group words by language with collapsible sections", "checked": false},
+    {"text": "Within each language, show mastery breakdown: New / Learning / Mastered", "checked": false},
+    {"text": "Display word count per level (e.g., 'Learning: 45 words')", "checked": false},
+    {"text": "Expandable to see actual words in each level", "checked": false},
+    {"text": "Click word shows tooltip with practice count and last practiced", "checked": false},
+    {"text": "MOBILE-FIRST: Accordion-style collapsible sections on mobile (320px+)", "checked": false},
+    {"text": "TAILWIND RESPONSIVE: Word chips wrap naturally with flex-wrap", "checked": false},
+    {"text": "UX: Smooth expand/collapse animations, clear tap targets", "checked": false},
+    {"text": "UI: Color-coded mastery levels (green=mastered, yellow=learning, gray=new)", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "All unit tests pass", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": null
+}

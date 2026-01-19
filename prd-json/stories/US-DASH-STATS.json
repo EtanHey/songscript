@@ -1,0 +1,30 @@
+{
+  "id": "US-DASH-STATS",
+  "title": "Dashboard: Summary Statistics by Language",
+  "description": "Learning stats with language breakdown. MOBILE-FIRST responsive stat cards.",
+  "technicalContext": {
+    "database": "Aggregate from userWordProgress, userSongProgress, userPracticeLog",
+    "ui": "Stats cards with numbers + language breakdown",
+    "responsive": "MOBILE-FIRST: 2-column stat grid on mobile, 4-column on desktop",
+    "tailwind": "Use Tailwind: grid-cols-2 md:grid-cols-4, responsive text sizing"
+  },
+  "acceptanceCriteria": [
+    {"text": "Create query to aggregate user stats across all tables", "checked": false},
+    {"text": "Calculate: total unique words, total lines practiced, total practice time", "checked": false},
+    {"text": "Group stats by language", "checked": false},
+    {"text": "Add 'Your Stats' section to dashboard", "checked": false},
+    {"text": "Show big number cards: Words Learned, Lines Practiced, Time Spent", "checked": false},
+    {"text": "Show language breakdown (e.g., 'Persian: 150 words, Hebrew: 30 words')", "checked": false},
+    {"text": "Optional: simple bar chart or pie chart for language distribution", "checked": false},
+    {"text": "Show 'Most practiced song' with title and practice count", "checked": false},
+    {"text": "Format time nicely (e.g., '2h 45m' not '9900 seconds')", "checked": false},
+    {"text": "MOBILE-FIRST: 2-column stat grid fitting 320px screens", "checked": false},
+    {"text": "TAILWIND RESPONSIVE: 4-column grid on lg+ with larger numbers", "checked": false},
+    {"text": "UX: Animated count-up on load, clear labels, easy to scan", "checked": false},
+    {"text": "UI: Consistent card styling, accent colors for each stat type", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "All unit tests pass", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": null
+}

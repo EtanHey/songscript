@@ -223,5 +223,20 @@
 
 ---
 
+## Iteration - US-EMAIL-RESEND: Configure Resend Email Provider (BLOCKED)
+- Looked up Better Auth magic link + Resend email provider docs via Context7
+- Installed @convex-dev/resend component (correct package for Convex)
+- Updated convex/betterAuth.ts to use Convex Resend component with requireActionCtx()
+- Updated convex/convex.config.ts to include Resend component
+- **BLOCKED:** Pre-existing Convex bundler error: "Two output files share the same path but have different contents"
+- This error prevents ANY Convex code deployment - tested without my changes, same error occurs
+- Reverted code changes since they can't be deployed
+- Marked US-EMAIL-RESEND and V-EMAIL-RESEND as BLOCKED
+- **Learning:** Convex uses @convex-dev/resend component, not the regular resend npm package. The bundler error is a pre-existing infrastructure issue that blocks all Convex deployments.
+
+[US-EMAIL-RESEND] BLOCKED: Convex bundler error prevents deployment. User needs to investigate/resolve bundler issue.
+
+---
+
 ## Previous Archives
 - docs.local/prd-archive/progress-2026-01-19.txt (1307 lines)

@@ -1,0 +1,29 @@
+{
+  "id": "V-DASH-BATCH3",
+  "title": "Verify Dashboard Batch 3: Goals, Languages, Word Details, Layout",
+  "description": "COMPREHENSIVE responsive verification at 320px, 375px, 768px, 1200px widths. Final UX/UI audit.",
+  "verificationMethod": "Browser automation with mcp__claude-in-chrome tools",
+  "canSpawnStories": true,
+  "acceptanceCriteria": [
+    {"text": "Login and navigate to /dashboard", "checked": false},
+    {"text": "DESKTOP (1200px): Take full-page screenshot of complete dashboard", "checked": false},
+    {"text": "Verify 'My Goals' section with progress ring indicators", "checked": false},
+    {"text": "Click to customize a goal - verify modal works", "checked": false},
+    {"text": "Verify 'My Languages' section shows practiced languages", "checked": false},
+    {"text": "Click a language card - verify filtering works", "checked": false},
+    {"text": "Go to vocabulary, click a word - verify details modal opens", "checked": false},
+    {"text": "Verify word modal shows songs containing that word", "checked": false},
+    {"text": "TABLET (768px): Resize and take screenshot - verify 2-column layout", "checked": false},
+    {"text": "MOBILE (375px): Resize and take screenshot - verify single column", "checked": false},
+    {"text": "MOBILE (320px): Resize to smallest - verify no overflow/horizontal scroll", "checked": false},
+    {"text": "MOBILE: Verify bottom sheet for word details (not centered modal)", "checked": false},
+    {"text": "MOBILE: Test all collapsible sections expand/collapse smoothly", "checked": false},
+    {"text": "UX AUDIT: Verify visual hierarchy makes sense, easy to scan", "checked": false},
+    {"text": "UI AUDIT: Verify consistent spacing, shadows, rounded corners", "checked": false},
+    {"text": "Verify header has 'Dashboard' link when logged in", "checked": false},
+    {"text": "Check console for errors", "checked": false},
+    {"text": "If ANY issues found: create US-DASH-FIX-* story", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "US-DASH-LAYOUT"
+}
