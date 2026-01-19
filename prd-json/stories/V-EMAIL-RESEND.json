@@ -1,0 +1,22 @@
+{
+  "id": "V-EMAIL-RESEND",
+  "title": "Verify Resend Email - Full Magic Link Flow via Email",
+  "description": "Verify that magic links are actually delivered to the user's email inbox and the full auth flow works via email.",
+  "verificationMethod": "Browser automation + actual email check",
+  "acceptanceCriteria": [
+    {"text": "Start dev server: bun run dev", "checked": false},
+    {"text": "Navigate to http://localhost:3001/login", "checked": false},
+    {"text": "Take screenshot - login page loads", "checked": false},
+    {"text": "Enter etan@heyman.net and click 'Send Magic Link'", "checked": false},
+    {"text": "Take screenshot - success message shown", "checked": false},
+    {"text": "Check actual email inbox for magic link email from Resend", "checked": false},
+    {"text": "Verify email contains clickable magic link URL", "checked": false},
+    {"text": "Click magic link from email (or copy/paste URL)", "checked": false},
+    {"text": "Take screenshot - user is logged in, shows 'Welcome, Admin!'", "checked": false},
+    {"text": "Click Sign Out", "checked": false},
+    {"text": "Take screenshot - returns to login form", "checked": false},
+    {"text": "No console errors via mcp__browser-tools__getConsoleErrors", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "US-EMAIL-RESEND"
+}

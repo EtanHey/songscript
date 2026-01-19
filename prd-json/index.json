@@ -1,18 +1,20 @@
 {
   "$schema": "https://ralph.dev/schemas/prd-index.schema.json",
-  "generatedAt": "2026-01-19T14:15:00Z",
+  "generatedAt": "2026-01-19T15:50:00Z",
   "projectName": "SongScript Critical Fixes + Word Audio",
   "workingDirectory": ".",
   "stats": {
-    "total": 8,
-    "completed": 1,
-    "pending": 7,
+    "total": 10,
+    "completed": 2,
+    "pending": 8,
     "blocked": 0
   },
-  "nextStory": "V-AUTH-FIX",
+  "nextStory": "US-EMAIL-RESEND",
   "storyOrder": [
     "US-AUTH-FIX",
     "V-AUTH-FIX",
+    "US-EMAIL-RESEND",
+    "V-EMAIL-RESEND",
     "US-AUTOPLAY-FIX",
     "V-AUTOPLAY-FIX",
     "US-LOOP-FIX",
@@ -21,7 +23,8 @@
     "V-WORD-AUDIO"
   ],
   "pending": [
-    "V-AUTH-FIX",
+    "US-EMAIL-RESEND",
+    "V-EMAIL-RESEND",
     "US-AUTOPLAY-FIX",
     "V-AUTOPLAY-FIX",
     "US-LOOP-FIX",
@@ -40,6 +43,7 @@
     "verificationRequired": "Each US-* story has a corresponding V-* verification story that MUST use MCP browser tools",
     "adminEmail": "etan@heyman.net",
     "elevenLabsKey": "Set in .env.local",
+    "resendKey": "Set in .env.local - RESEND_API_KEY",
     "archiveLocation": "Old 61 completed stories archived - this is a fresh focused PRD"
   }
 }

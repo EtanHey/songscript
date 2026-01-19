@@ -207,5 +207,21 @@
 
 ---
 
+## Iteration - V-AUTH-FIX: Verify Auth Fix - Complete Flow Test ✅
+- Comprehensive end-to-end browser verification of full auth flow
+- Verified: Login page loads correctly (not stuck on "Loading...")
+- Verified: Wrong email (wrong@email.com) shows "Only admin email is allowed to sign in" error
+- Verified: Correct email (etan@heyman.net) shows "Magic link sent!" success message pointing to Convex dashboard
+- Found magic link URL in Convex dashboard logs: `http://localhost:3001/api/auth/magic-link/verify?token=...`
+- Navigated to magic link - successfully redirected to home page with active session
+- Verified /login shows "Welcome, Admin!" with "Signed in as: etan@heyman.net" and Sign Out button
+- Clicked "Sign Out" - session cleared, returned to login form with email field
+- No JavaScript console errors detected
+- Typecheck passes
+- All 18 acceptance criteria verified via browser screenshots
+- **Learning:** The full auth flow is working correctly. Magic link appears in Convex dashboard logs (not email), users authenticate successfully, and sign out clears the session.
+
+---
+
 ## Previous Archives
 - docs.local/prd-archive/progress-2026-01-19.txt (1307 lines)

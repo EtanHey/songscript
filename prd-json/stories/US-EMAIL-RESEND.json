@@ -1,0 +1,33 @@
+{
+  "id": "US-EMAIL-RESEND",
+  "title": "Configure Resend Email Provider for Magic Links",
+  "description": "Set up Resend as the email provider so magic links are actually sent via email instead of just logged to Convex dashboard. RESEND_API_KEY is already in .env.local.",
+  "technicalContext": {
+    "currentFiles": [
+      "convex/betterAuth.ts - Better Auth config, needs Resend integration",
+      ".env.local - RESEND_API_KEY already set"
+    ],
+    "resources": [
+      "Better Auth docs: https://www.better-auth.com/docs/plugins/magic-link",
+      "Resend docs: https://resend.com/docs/send-with-nodejs",
+      "Context7 MCP for latest docs"
+    ],
+    "envReady": "RESEND_API_KEY=re_9qsS7JD5_... already in .env.local"
+  },
+  "acceptanceCriteria": [
+    {"text": "Use Context7 MCP to look up Better Auth magic link + email provider setup", "checked": false},
+    {"text": "Install resend package: bun add resend", "checked": false},
+    {"text": "Configure Better Auth sendMagicLink to use Resend API", "checked": false},
+    {"text": "Set from email to something like noreply@heyman.net or similar verified domain", "checked": false},
+    {"text": "Update convex/betterAuth.ts with Resend email sending", "checked": false},
+    {"text": "Start dev server: bun run dev", "checked": false},
+    {"text": "Navigate to /login and enter etan@heyman.net", "checked": false},
+    {"text": "Click 'Send Magic Link'", "checked": false},
+    {"text": "Check actual email inbox - magic link email should arrive", "checked": false},
+    {"text": "Click magic link in email - should log in successfully", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "All unit tests pass", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": null
+}
