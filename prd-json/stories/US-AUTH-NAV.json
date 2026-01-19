@@ -8,14 +8,14 @@
     "routes": "/login, /dashboard"
   },
   "acceptanceCriteria": [
-    {"text": "Header shows 'Sign In' link when user is not logged in", "checked": false},
-    {"text": "Header shows 'Dashboard' link when user is logged in", "checked": false},
-    {"text": "Header shows 'Sign Out' button when user is logged in", "checked": false},
-    {"text": "Sign Out button calls authClient.signOut()", "checked": false},
-    {"text": "Links have hover states and proper styling", "checked": false},
-    {"text": "MOBILE-FIRST: Navigation works on 320px+ screens", "checked": false},
-    {"text": "Typecheck passes", "checked": false}
+    {"text": "Header shows 'Sign In' link when user is not logged in", "checked": true},
+    {"text": "Header shows 'Dashboard' link when user is logged in", "checked": true},
+    {"text": "Header shows 'Sign Out' button when user is logged in", "checked": true},
+    {"text": "Sign Out button calls authClient.signOut()", "checked": true},
+    {"text": "Links have hover states and proper styling", "checked": true},
+    {"text": "MOBILE-FIRST: Navigation works on 320px+ screens", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null
 }

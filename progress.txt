@@ -22,6 +22,20 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-AUTH-NAV: Auth-Aware Header Navigation ✅
+- Story was already fully implemented from a previous iteration
+- Verified implementation in `src/components/Header.tsx`:
+  - Shows "Sign In" link when user is not logged in
+  - Shows "Dashboard" link when user is logged in
+  - Shows "Sign Out" button when user is logged in (calls authClient.signOut())
+  - Proper hover states and styling with Tailwind
+  - Mobile-first: responsive text sizes (sm:text-base for larger screens)
+- All 7 acceptance criteria were already checked in story JSON
+- Typecheck passes
+- Updated index.json: removed from pending, set nextStory to US-AUTH-REDIRECT
+
+---
+
 ## Iteration - US-DASH-WISHLIST: Dashboard Learning Queue / Wishlist
 - Created `convex/schema.ts` - Added userWishlist table:
   - visitorId, songId, addedAt (timestamp), sortOrder (for custom ordering)
