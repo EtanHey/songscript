@@ -81,7 +81,7 @@ function LoginPage() {
     try {
       const result = await authClient.signIn.magicLink({
         email,
-        callbackURL: "/",
+        callbackURL: "/dashboard",
       });
 
       if (result.error) {

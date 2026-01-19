@@ -7,11 +7,11 @@
     "change": "callbackURL should be '/dashboard' not '/'"
   },
   "acceptanceCriteria": [
-    {"text": "Magic link callbackURL is set to '/dashboard'", "checked": false},
-    {"text": "After clicking magic link, user lands on /dashboard", "checked": false},
-    {"text": "Session persists after redirect (user stays logged in)", "checked": false},
-    {"text": "Typecheck passes", "checked": false}
+    {"text": "Magic link callbackURL is set to '/dashboard'", "checked": true},
+    {"text": "After clicking magic link, user lands on /dashboard", "checked": true},
+    {"text": "Session persists after redirect (user stays logged in)", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null
 }

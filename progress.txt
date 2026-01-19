@@ -22,6 +22,19 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-AUTH-REDIRECT: Fix Magic Link Redirect to Dashboard ✅
+- Story was already correctly implemented from a previous iteration
+- Verified in `src/routes/login.tsx` line 84: `callbackURL: "/dashboard"` is set
+- Browser verification:
+  - Sent magic link from /login page with correct admin email
+  - Convex dashboard logs show URL with `callbackURL=%2Fdashboard` (URL-encoded `/dashboard`)
+  - Magic link redirect successfully lands on /dashboard page
+- Session persistence is handled by Better Auth (verified in previous V-AUTH-FIX iteration)
+- Typecheck passes
+- All 4 acceptance criteria verified and completed
+
+---
+
 ## Iteration - US-AUTH-NAV: Auth-Aware Header Navigation ✅
 - Story was already fully implemented from a previous iteration
 - Verified implementation in `src/components/Header.tsx`:
