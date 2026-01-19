@@ -15,6 +15,7 @@ import type * as practiceLog from "../practiceLog.js";
 import type * as seed from "../seed.js";
 import type * as songProgress from "../songProgress.js";
 import type * as songs from "../songs.js";
+import type * as userStats from "../userStats.js";
 import type * as wishlist from "../wishlist.js";
 import type * as wordProgress from "../wordProgress.js";
 import type * as words from "../words.js";
@@ -33,6 +34,7 @@ declare const fullApi: ApiFromModules<{
   seed: typeof seed;
   songProgress: typeof songProgress;
   songs: typeof songs;
+  userStats: typeof userStats;
   wishlist: typeof wishlist;
   wordProgress: typeof wordProgress;
   words: typeof words;

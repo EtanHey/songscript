@@ -5,7 +5,7 @@ import { api } from "../../convex/_generated/api";
 import { useVisitorId } from "../hooks/useVisitorId";
 import { authClient } from "../lib/auth-client";
 import { Button } from "../components/ui/button";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import type { Id } from "../../convex/_generated/dataModel";
 
 export const Route = createFileRoute("/dashboard")({
@@ -97,6 +97,13 @@ function DashboardPage() {
     })
   );
 
+  // Get aggregated stats
+  const { data: userStats, isLoading: statsLoading } = useQuery(
+    convexQuery(api.userStats.getAggregatedStats, {
+      visitorId: visitorId || "",
+    })
+  );
+
   // Reorder mutation
   const { mutate: reorderWishlist } = useMutation({
     mutationFn: useConvexMutation(api.wishlist.reorderWishlist),
@@ -167,6 +174,19 @@ function DashboardPage() {
             Welcome back, {session.user.email}
           </p>
         </div>
+
+        {/* Your Stats Section */}
+        <section className="mb-8">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4">Your Stats</h2>
+
+          {statsLoading || !visitorId ? (
+            <div className="text-gray-400">Loading your stats...</div>
+          ) : userStats ? (
+            <UserStatsSection stats={userStats} />
+          ) : (
+            <StatsEmptyState />
+          )}
+        </section>
 
         {/* Continue Learning Section - Only show if there are recent songs */}
         {!recentLoading && recentSongs && recentSongs.length > 0 && (
@@ -1356,5 +1376,261 @@ function GripVerticalIcon({ className }: { className?: string }) {
       <circle cx="15" cy="12" r="1.5" />
       <circle cx="15" cy="18" r="1.5" />
     </svg>
+  );
+}
+
+// User Stats types
+type UserStatsData = {
+  totalUniqueWords: number;
+  totalLinesPracticed: number;
+  totalPracticeTimeSeconds: number;
+  languageBreakdown: { language: string; wordCount: number }[];
+  mostPracticedSong: {
+    _id: string;
+    title: string;
+    artist: string;
+    sourceLanguage: string;
+    practiceCount: number;
+  } | null;
+  songsInProgress: number;
+};
+
+// Format time nicely (e.g., "2h 45m", "30m", "45s")
+function formatPracticeTime(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`;
+  const mins = Math.floor(seconds / 60);
+  if (mins < 60) return `${mins}m`;
+  const hours = Math.floor(mins / 60);
+  const remainingMins = mins % 60;
+  if (remainingMins === 0) return `${hours}h`;
+  return `${hours}h ${remainingMins}m`;
+}
+
+// Animated count-up hook
+function useCountUp(target: number, duration: number = 1000): number {
+  const [count, setCount] = useState(0);
+  const startTimeRef = useRef<number | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (target === 0) {
+      setCount(0);
+      return;
+    }
+
+    startTimeRef.current = null;
+
+    const animate = (timestamp: number) => {
+      if (startTimeRef.current === null) {
+        startTimeRef.current = timestamp;
+      }
+
+      const elapsed = timestamp - startTimeRef.current;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Ease-out cubic for smooth deceleration
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      const currentCount = Math.floor(easeOut * target);
+
+      setCount(currentCount);
+
+      if (progress < 1) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+      } else {
+        setCount(target);
+      }
+    };
+
+    animationFrameRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [target, duration]);
+
+  return count;
+}
+
+// Single Stat Card Component
+function StatCard({
+  icon,
+  label,
+  value,
+  displayValue,
+  subLabel,
+  colorClass,
+}: {
+  icon: string;
+  label: string;
+  value: number;
+  displayValue?: string;
+  subLabel?: string;
+  colorClass: string;
+}) {
+  const animatedValue = useCountUp(value);
+  const displayVal = displayValue || animatedValue.toLocaleString();
+
+  return (
+    <div className={`bg-gray-900 rounded-lg border border-gray-800 p-4 ${colorClass}`}>
+      <div className="flex items-center gap-2 mb-2">
+        <span className="text-xl sm:text-2xl">{icon}</span>
+        <span className="text-xs sm:text-sm text-gray-400 uppercase tracking-wide">{label}</span>
+      </div>
+      <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1">
+        {displayVal}
+      </div>
+      {subLabel && (
+        <div className="text-xs text-gray-500">{subLabel}</div>
+      )}
+    </div>
+  );
+}
+
+// User Stats Section Component
+function UserStatsSection({ stats }: { stats: UserStatsData }) {
+  const hasAnyData =
+    stats.totalUniqueWords > 0 ||
+    stats.totalLinesPracticed > 0 ||
+    stats.totalPracticeTimeSeconds > 0;
+
+  if (!hasAnyData) {
+    return <StatsEmptyState />;
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Main stat cards - 2 columns on mobile, 4 on desktop */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        <StatCard
+          icon="📚"
+          label="Words"
+          value={stats.totalUniqueWords}
+          subLabel="unique words learned"
+          colorClass="hover:border-blue-500/50"
+        />
+        <StatCard
+          icon="🎵"
+          label="Lines"
+          value={stats.totalLinesPracticed}
+          subLabel="lyrics practiced"
+          colorClass="hover:border-purple-500/50"
+        />
+        <StatCard
+          icon="⏱️"
+          label="Time"
+          value={stats.totalPracticeTimeSeconds}
+          displayValue={formatPracticeTime(stats.totalPracticeTimeSeconds)}
+          subLabel="total practice"
+          colorClass="hover:border-emerald-500/50"
+        />
+        <StatCard
+          icon="🎯"
+          label="Songs"
+          value={stats.songsInProgress}
+          subLabel="in progress"
+          colorClass="hover:border-amber-500/50"
+        />
+      </div>
+
+      {/* Language breakdown and most practiced song row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+        {/* Language breakdown */}
+        {stats.languageBreakdown.length > 0 && (
+          <div className="bg-gray-900 rounded-lg border border-gray-800 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xl">🌍</span>
+              <span className="text-sm font-medium text-white">Words by Language</span>
+            </div>
+            <div className="space-y-2">
+              {stats.languageBreakdown.map((lang) => {
+                const flag = getLanguageFlag(lang.language);
+                const percentage =
+                  stats.totalUniqueWords > 0
+                    ? Math.round((lang.wordCount / stats.totalUniqueWords) * 100)
+                    : 0;
+
+                return (
+                  <div key={lang.language} className="flex items-center gap-3">
+                    <span className="text-lg w-6 flex-shrink-0">{flag}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm text-gray-300 capitalize truncate">
+                          {lang.language}
+                        </span>
+                        <span className="text-sm text-gray-400 flex-shrink-0">
+                          {lang.wordCount} words
+                        </span>
+                      </div>
+                      {/* Progress bar */}
+                      <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500"
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Most practiced song */}
+        {stats.mostPracticedSong && (
+          <div className="bg-gray-900 rounded-lg border border-gray-800 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xl">🏆</span>
+              <span className="text-sm font-medium text-white">Most Practiced Song</span>
+            </div>
+            <Link
+              to="/song/$songId"
+              params={{ songId: stats.mostPracticedSong._id }}
+              className="block group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-amber-500/20 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-amber-500/30 transition-colors">
+                  <span className="text-2xl sm:text-3xl">
+                    {getLanguageFlag(stats.mostPracticedSong.sourceLanguage)}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold text-white truncate group-hover:text-amber-400 transition-colors">
+                    {stats.mostPracticedSong.title}
+                  </h4>
+                  <p className="text-sm text-gray-400 truncate">
+                    {stats.mostPracticedSong.artist}
+                  </p>
+                  <p className="text-xs text-amber-400 mt-1">
+                    {stats.mostPracticedSong.practiceCount} lines practiced
+                  </p>
+                </div>
+              </div>
+            </Link>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Stats Empty State Component
+function StatsEmptyState() {
+  return (
+    <div className="bg-gray-900 rounded-lg border border-gray-800 p-8 text-center">
+      <div className="text-4xl mb-4">📊</div>
+      <h3 className="text-lg font-semibold mb-2">No stats yet</h3>
+      <p className="text-gray-400 mb-6 max-w-sm mx-auto">
+        Start practicing songs to see your learning stats! Click on lyrics and words to track your progress.
+      </p>
+      <Link
+        to="/"
+        className="inline-flex items-center justify-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors min-h-[44px]"
+      >
+        Browse Songs
+      </Link>
+    </div>
   );
 }

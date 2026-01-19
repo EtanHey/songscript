@@ -22,6 +22,33 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-DASH-STATS: Dashboard Summary Statistics by Language
+- Created `convex/userStats.ts` - New query file for aggregated user stats:
+  - `getAggregatedStats` - Aggregates data from wordProgress, userSongProgress, and userPracticeLog tables
+  - Calculates: total unique words (deduped by persian text), total lines practiced, total practice time
+  - Groups words by language with bar chart visualization
+  - Finds most practiced song with title, artist, and practice count
+  - Returns songsInProgress count
+- Updated `src/routes/dashboard.tsx` - Added "Your Stats" section:
+  - `StatCard` - Reusable stat card with animated count-up effect
+  - `UserStatsSection` - Full stats display with 4 main stat cards and secondary panels
+  - `StatsEmptyState` - Empty state with CTA to browse songs
+  - `useCountUp` hook - Animated number counter with ease-out cubic easing
+  - `formatPracticeTime` - Formats seconds as "2h 45m", "30m", or "45s"
+- MOBILE-FIRST design with Tailwind:
+  - 2-column stat grid on mobile (grid-cols-2)
+  - 4-column stat grid on desktop (md:grid-cols-4)
+  - Language breakdown with progress bars
+  - Most practiced song card with clickable link
+  - Accent colors per stat type (blue/purple/emerald/amber)
+  - Animated count-up on load using requestAnimationFrame
+- Fixed Convex bundler error by removing duplicate .js files from convex/ folder
+- Typecheck passes, all 54 unit tests pass
+- All 15 acceptance criteria completed
+- **Learning:** Convex bundler error "Two output files share same path" recurs when .js files accumulate - always delete them before codegen
+
+---
+
 ## Iteration - US-DASH-RECENT: Dashboard Continue Where You Left Off
 - Updated `convex/schema.ts` - Added `lastLineIndex` field to userSongProgress table:
   - Optional v.number() to track the last line the user practiced
