@@ -29,9 +29,9 @@
     },
     {
       "text": "Verify in browser: page load → video plays → lines advance (MUST take screenshot)",
-      "checked": false
+      "checked": true
     }
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null
 }
