@@ -1,10 +1,21 @@
 # Progress Log
 
 ## 📊 Overall Stats
-- **Stories Completed:** 61
-- **Criteria Completed:** 524
-- **Stories Remaining:** 0 (3 blocked)
+- **Stories Completed:** 21 (of 29 in current PRD)
+- **Stories Blocked:** 8 (see below)
+- **Stories Pending:** 0
 - **Archive:** docs.local/prd-completed-archive.md
+
+## Blocked Stories Summary
+All remaining stories are blocked:
+1. **US-EMAIL-RESEND** - RESEND_API_KEY needs to be added to Convex env vars at dashboard.convex.dev
+2. **V-EMAIL-RESEND** - Depends on US-EMAIL-RESEND
+3. **V-AUTOPLAY-FIX** - TanStack Start + Nitro returns 503 for video Range requests when embedded in page
+4. **US-WORD-AUDIO** - ElevenLabs API key has 0 credits. Code complete.
+5. **V-WORD-AUDIO** - Depends on US-WORD-AUDIO
+6. **V-DASH-BATCH1** - Magic link auth fails with INVALID_TOKEN
+7. **V-DASH-BATCH2** - Magic link auth fails with INVALID_TOKEN
+8. **V-DASH-BATCH3** - Magic link auth fails with INVALID_TOKEN
 
 ---
 
