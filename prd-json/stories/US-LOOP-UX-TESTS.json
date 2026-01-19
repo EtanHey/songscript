@@ -5,33 +5,33 @@
   "acceptanceCriteria": [
     {
       "text": "Create `e2e/loop-mode.spec.ts`",
-      "checked": false
+      "checked": true
     },
     {
       "text": "E2E: Test enabling loop mode",
-      "checked": false
+      "checked": true
     },
     {
       "text": "E2E: Test loop replays same line (wait for 2-3 loops)",
-      "checked": false
+      "checked": true
     },
     {
       "text": "E2E: Verify no line change during loop restart (check DOM stability)",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Unit test: Loop seek logic doesn't emit line change events",
-      "checked": false
+      "checked": true
     },
     {
       "text": "All tests pass: `bun run test && bun run test:e2e`",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Typecheck passes",
-      "checked": false
+      "checked": true
     }
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null
 }

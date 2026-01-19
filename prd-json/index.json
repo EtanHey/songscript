@@ -1,13 +1,13 @@
 {
   "$schema": "https://ralph.dev/schemas/prd-index.schema.json",
-  "generatedAt": "2026-01-19T04:15:00Z",
+  "generatedAt": "2026-01-19T04:30:00Z",
   "stats": {
     "total": 64,
-    "completed": 56,
-    "pending": 5,
+    "completed": 55,
+    "pending": 6,
     "blocked": 3
   },
-  "nextStory": "US-LOOP-UX-TESTS",
+  "nextStory": "US-AUTOPLAY",
   "storyOrder": [
     "US-001", "US-002", "US-003", "US-004", "US-005", "US-006",
     "US-007", "US-008", "US-009", "US-010", "US-011", "US-012",
@@ -31,7 +31,8 @@
     {"id": "US-031", "reason": "Missing ELEVENLABS_API_KEY"}
   ],
   "pending": [
-    "US-LOOP-UX-TESTS",
+    "US-AUTOPLAY",
+    "US-LOOP-UX",
     "V-AUTOPLAY",
     "US-020",
     "US-021"

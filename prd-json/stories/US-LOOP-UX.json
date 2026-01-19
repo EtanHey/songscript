@@ -28,10 +28,10 @@
       "checked": true
     },
     {
-      "text": "Verify in browser: enable loop, watch 3+ loops, no flashing",
-      "checked": true
+      "text": "Verify in browser: enable loop, watch 3+ loops, no flashing (MUST take screenshot)",
+      "checked": false
     }
   ],
-  "passes": true,
+  "passes": false,
   "blockedBy": null
 }
