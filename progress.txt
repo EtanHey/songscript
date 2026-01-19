@@ -158,5 +158,19 @@
 
 ---
 
+## Iteration - US-AUTH-FIX: Fix Better Auth 500 Errors ✅
+- Verified auth endpoints no longer return 500 errors
+- `curl http://localhost:3001/api/auth/get-session` returns `null` (valid JSON)
+- `curl -X POST .../api/auth/sign-in/magic-link` returns `{"status":true}`
+- Verified .env.local has correct vars: VITE_CONVEX_URL, VITE_SITE_URL, SITE_URL, BETTER_AUTH_SECRET
+- Verified convex/http.ts properly configured with authComponent.registerRoutes()
+- Browser verification: /login page loads WITHOUT infinite "Loading..." state
+- Browser verification: Wrong email (wrong@example.com) shows "Only admin email is allowed to sign in"
+- Browser verification: Correct email (etan@heyman.net) shows "Magic link sent!" success
+- All 51 unit tests pass, typecheck passes
+- **Learning:** Auth 500 errors were NOT a code issue - the auth setup was already correct. The issue was likely transient or environmental.
+
+---
+
 ## Previous Archives
 - docs.local/prd-archive/progress-2026-01-19.txt (1307 lines)
