@@ -1,5 +1,6 @@
 import {
   HeadContent,
+  Outlet,
   Scripts,
   createRootRoute,
   Link,
@@ -51,7 +52,12 @@ export const Route = createRootRoute({
   }),
 
   shellComponent: RootDocument,
+  component: RootComponent,
 })
+
+function RootComponent() {
+  return <Outlet />
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (

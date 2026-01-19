@@ -1,9 +1,9 @@
 # Progress Log
 
 ## 📊 Overall Stats
-- **Stories Completed:** 51
-- **Criteria Completed:** 424
-- **Stories Remaining:** 8
+- **Stories Completed:** 52
+- **Criteria Completed:** 433
+- **Stories Remaining:** 7
 - **Archive:** docs.local/prd-completed-archive.md
 
 ---
@@ -35,7 +35,18 @@
 - **Committed:** 28adef0 - pre-commit hook ran tests and typecheck automatically
 ---
 
-**Next:** US-LOAD-FIX - Fix Dynamic Import and Initial Load Errors
+## Iteration - US-LOAD-FIX: Fix Dynamic Import and Initial Load Errors ✅
+- Investigated the "Failed to fetch dynamically imported module" error for login.tsx
+- Root cause: __root.tsx was using shellComponent but missing a component with <Outlet />
+- Fix: Added `component: RootComponent` with `<Outlet />` to __root.tsx
+- This allows TanStack Router's code splitting to properly render child routes
+- Created e2e/routes.spec.ts with tests for /, /login, and /song/{songId}
+- All 39 unit tests pass, all 6 e2e tests pass, typecheck passes
+- **Learning:** TanStack Start requires both shellComponent (for HTML shell) AND component (with <Outlet />) for child routes to render properly with code splitting
+
+---
+
+**Next:** US-LOAD-FIX-TESTS - Tests for Route Loading
 
 ---
 

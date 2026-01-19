@@ -42,8 +42,7 @@ public/audio/**/*.mp3
 *_full.mp3
 baraye_full.mp3
 
-# Playwright test artifacts
-e2e/
+# Playwright test artifacts (keep test files, ignore generated artifacts)
 playwright-report/
 test-results/
 

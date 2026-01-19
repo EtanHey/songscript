@@ -1245,17 +1245,17 @@ Failed to fetch dynamically imported module: http://localhost:3001/src/routes/lo
 ```
 
 **Acceptance Criteria:**
-- [ ] Investigate the dynamic import error in TanStack Router
-- [ ] Fix the login.tsx route so it loads without errors
-- [ ] Check for any other broken dynamic imports
-- [ ] Typecheck passes
+- [x] Investigate the dynamic import error in TanStack Router
+- [x] Fix the login.tsx route so it loads without errors
+- [x] Check for any other broken dynamic imports
+- [x] Typecheck passes
 
 **🧪 E2E TESTS (Playwright):**
-- [ ] Create `e2e/routes.spec.ts` if not exists
-- [ ] Test: navigate to `/` - page loads without errors
-- [ ] Test: navigate to `/login` - page loads without errors
-- [ ] Test: navigate to `/song/{testSongId}` - page loads without errors
-- [ ] All e2e tests pass: `bun run test:e2e`
+- [x] Create `e2e/routes.spec.ts` if not exists
+- [x] Test: navigate to `/` - page loads without errors
+- [x] Test: navigate to `/login` - page loads without errors
+- [x] Test: navigate to `/song/{testSongId}` - page loads without errors
+- [x] All e2e tests pass: `bun run test:e2e`
 
 **⏹️ STOP - END OF US-LOAD-FIX. Do not continue to next story.**
 
