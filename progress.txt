@@ -22,6 +22,26 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - V-DASH-BATCH1: Verify Dashboard Batch 1 (BLOCKED)
+- **Attempted browser verification of Dashboard features**
+- Magic link authentication consistently fails with INVALID_TOKEN error
+- Process attempted:
+  1. Navigated to localhost:3001/login, entered etan@heyman.net
+  2. Magic link generated successfully (visible in Convex dashboard logs)
+  3. Token extracted from logs (e.g., `SKdBZDYaefxPrNZprMB1ULtD0YPekGEc`)
+  4. Navigated to magic-link/verify URL
+  5. Redirected with error=INVALID_TOKEN
+  6. Tried multiple times with fresh tokens - same result
+- Also tried Vercel production URL (songscript-ten.vercel.app) - same issue
+- **Root cause:** Better Auth magic link verification failing. Tokens are generated but not validated correctly.
+- Dashboard requires authentication to show user-specific data (songs, vocabulary, wishlist)
+- **BLOCKED:** Cannot verify dashboard features without working auth
+- **Learning:** Magic link tokens may be single-use or have CORS/domain validation issues between auth endpoint and Convex
+
+[V-DASH-BATCH1] BLOCKED: Magic link auth fails with INVALID_TOKEN. Dashboard verification requires auth to be fixed first.
+
+---
+
 ## Iteration - US-AUTH-REDIRECT: Fix Magic Link Redirect to Dashboard ✅
 - Story was already correctly implemented from a previous iteration
 - Verified in `src/routes/login.tsx` line 84: `callbackURL: "/dashboard"` is set

@@ -24,5 +24,5 @@
     {"text": "If ANY issues found: create US-DASH-FIX-* story with specific fix needed", "checked": false}
   ],
   "passes": false,
-  "blockedBy": "US-DASH-WISHLIST"
+  "blockedBy": "Magic link authentication fails with INVALID_TOKEN error. Tokens are generated correctly but verification endpoint returns error. Likely a Better Auth configuration issue with token verification or CORS."
 }

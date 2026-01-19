@@ -6,10 +6,10 @@
   "stats": {
     "total": 26,
     "completed": 10,
-    "pending": 10,
-    "blocked": 6
+    "pending": 9,
+    "blocked": 7
   },
-  "nextStory": "V-DASH-BATCH1",
+  "nextStory": "US-DASH-STREAKS",
   "storyOrder": [
     "US-AUTH-FIX",
     "V-AUTH-FIX",
@@ -39,7 +39,6 @@
     "US-SSR-SONG-LIST"
   ],
   "pending": [
-    "V-DASH-BATCH1",
     "US-DASH-STREAKS",
     "US-DASH-RECENT",
     "US-DASH-STATS",
@@ -56,7 +55,8 @@
     "V-AUTOPLAY-FIX",
     "US-SSR-SONG-LIST",
     "US-WORD-AUDIO",
-    "V-WORD-AUDIO"
+    "V-WORD-AUDIO",
+    "V-DASH-BATCH1"
   ],
   "browserSetup": {
     "viewport": "desktop 1200px+",
@@ -74,6 +74,7 @@
     "dashboardBatches": "Dashboard stories are batched: Batch1 (Songs/Words/Wishlist), Batch2 (Streaks/Recent/Stats), Batch3 (Goals/Languages/WordDetails/Layout). Each batch has a V-DASH-BATCH* verification story.",
     "dashboardDesign": "MOBILE-FIRST: All dashboard components designed for 320px+ first, scaled up with Tailwind breakpoints (sm/md/lg/xl). High emphasis on UX/UI quality and responsive testing.",
     "videoBlocker": "V-AUTOPLAY-FIX blocked: TanStack Start + Nitro returns 503 for video Range requests embedded in page. Video works when navigated to directly.",
-    "elevenLabsBlocker": "US-WORD-AUDIO blocked: ElevenLabs API key has 0 credits. Code complete - run scripts/generate-word-audio.ts after adding credits."
+    "elevenLabsBlocker": "US-WORD-AUDIO blocked: ElevenLabs API key has 0 credits. Code complete - run scripts/generate-word-audio.ts after adding credits.",
+    "authVerifyBlocker": "V-DASH-BATCH1 blocked: Magic link tokens generated correctly but verification fails with INVALID_TOKEN. Dashboard requires auth for verification. Likely Better Auth configuration issue."
   }
 }
