@@ -9,15 +9,15 @@
     "seo": "Songs should be crawlable by search engines"
   },
   "acceptanceCriteria": [
-    {"text": "Create server loader function to fetch songs from Convex", "checked": false},
-    {"text": "Home page uses loader data for initial render (not client-side fetch)", "checked": false},
-    {"text": "Song list renders with: title, thumbnail, language", "checked": false},
-    {"text": "View page source shows song titles in HTML (not just loading state)", "checked": false},
-    {"text": "Page loads with content visible before JS hydration", "checked": false},
-    {"text": "Convex real-time updates still work after hydration", "checked": false},
-    {"text": "MOBILE-FIRST: Song cards responsive on all screen sizes", "checked": false},
-    {"text": "Typecheck passes", "checked": false},
-    {"text": "All unit tests pass", "checked": false}
+    {"text": "Create server loader function to fetch songs from Convex", "checked": true},
+    {"text": "Home page uses loader data for initial render (not client-side fetch)", "checked": true},
+    {"text": "Song list renders with: title, thumbnail, language", "checked": true},
+    {"text": "View page source shows song titles in HTML (not just loading state)", "checked": true},
+    {"text": "Page loads with content visible before JS hydration", "checked": true},
+    {"text": "Convex real-time updates still work after hydration", "checked": true},
+    {"text": "MOBILE-FIRST: Song cards responsive on all screen sizes", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "All unit tests pass", "checked": true}
   ],
-  "passes": false
+  "passes": true
 }

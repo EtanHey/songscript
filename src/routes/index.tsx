@@ -1,13 +1,46 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/react-start'
 import { useQuery } from '@tanstack/react-query'
 import { convexQuery } from '@convex-dev/react-query'
+import { ConvexHttpClient } from 'convex/browser'
 import { api } from '../../convex/_generated/api'
 import { WishlistButton } from '../components/WishlistButton'
+import type { Doc } from '../../convex/_generated/dataModel'
 
-export const Route = createFileRoute('/')({ component: HomePage })
+// Type for song document from Convex
+type Song = Doc<'songs'>
+
+// Server function to fetch songs at request time (SSR)
+const getSongs = createServerFn({ method: 'GET' }).handler(async () => {
+  const convexUrl = process.env.VITE_CONVEX_URL || process.env.CONVEX_URL
+  if (!convexUrl) {
+    console.error('CONVEX_URL not configured for SSR')
+    return [] as Song[]
+  }
+
+  const client = new ConvexHttpClient(convexUrl)
+  const songs = await client.query(api.songs.list, {})
+  return songs
+})
+
+export const Route = createFileRoute('/')({
+  loader: async () => {
+    // Fetch songs on the server for SSR
+    const songs = await getSongs()
+    return { songs }
+  },
+  component: HomePage,
+})
 
 function HomePage() {
-  const { data: songs, isLoading } = useQuery(convexQuery(api.songs.list, {}))
+  // Get SSR-provided data from loader
+  const loaderData = Route.useLoaderData()
+
+  // Use TanStack Query for real-time updates, initialized with loader data
+  const { data: songs, isLoading } = useQuery({
+    ...convexQuery(api.songs.list, {}),
+    initialData: loaderData.songs,
+  })
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
