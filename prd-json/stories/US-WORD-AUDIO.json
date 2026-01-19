@@ -9,21 +9,21 @@
     "fileFormat": "MP3"
   },
   "acceptanceCriteria": [
-    {"text": "Verify ELEVENLABS_API_KEY is set in .env.local", "checked": false},
-    {"text": "Create a utility function to call ElevenLabs TTS API", "checked": false},
-    {"text": "List available voices and select appropriate one for Persian/Farsi", "checked": false},
-    {"text": "Create script to generate audio for all unique words in seed data", "checked": false},
+    {"text": "Verify ELEVENLABS_API_KEY is set in .env.local", "checked": true},
+    {"text": "Create a utility function to call ElevenLabs TTS API", "checked": true},
+    {"text": "List available voices and select appropriate one for Persian/Farsi", "checked": true},
+    {"text": "Create script to generate audio for all unique words in seed data", "checked": true},
     {"text": "Save generated audio files to public/audio/words/{word}.mp3", "checked": false},
-    {"text": "Handle special characters in filenames (URL encode or transliterate)", "checked": false},
-    {"text": "Add click handler to word tokens in LyricsDisplay component", "checked": false},
-    {"text": "When word is clicked, play the corresponding audio file", "checked": false},
-    {"text": "Show visual feedback when word audio is playing (highlight or pulse)", "checked": false},
-    {"text": "Handle missing audio gracefully (word not yet generated)", "checked": false},
-    {"text": "Add loading state while audio is being fetched", "checked": false},
+    {"text": "Handle special characters in filenames (URL encode or transliterate)", "checked": true},
+    {"text": "Add click handler to word tokens in LyricsDisplay component", "checked": true},
+    {"text": "When word is clicked, play the corresponding audio file", "checked": true},
+    {"text": "Show visual feedback when word audio is playing (highlight or pulse)", "checked": true},
+    {"text": "Handle missing audio gracefully (word not yet generated)", "checked": true},
+    {"text": "Add loading state while audio is being fetched", "checked": true},
     {"text": "Audio plays at normal speech pace (not song pace)", "checked": false},
-    {"text": "Multiple rapid clicks don't overlap audio (stop previous, play new)", "checked": false},
-    {"text": "Typecheck passes", "checked": false},
-    {"text": "All unit tests pass", "checked": false}
+    {"text": "Multiple rapid clicks don't overlap audio (stop previous, play new)", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "All unit tests pass", "checked": true}
   ],
   "implementationNotes": {
     "apiCall": "POST https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
@@ -42,5 +42,5 @@
     "voiceSelection": "Use eleven_multilingual_v2 model for Persian/Farsi support"
   },
   "passes": false,
-  "blockedBy": null
+  "blockedBy": "ElevenLabs API key has 0 credits. User needs to add credits to ELEVENLABS_API_KEY before running scripts/generate-word-audio.ts to generate audio files."
 }

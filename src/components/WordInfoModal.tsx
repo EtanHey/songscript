@@ -1,9 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
-import { Volume2, Check } from "lucide-react";
+import { Volume2, Check, Loader2 } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id, Doc } from "../../convex/_generated/dataModel";
 import { useVisitorId } from "../hooks/useVisitorId";
+import { playWordAudio, stopWordAudio } from "../utils/wordAudio";
 import {
   Dialog,
   DialogContent,
@@ -49,11 +50,15 @@ function WordTable({
   wordProgress,
   onPlayWord,
   onToggleLearned,
+  playingWord,
+  loadingWord,
 }: {
   words: WordData[];
   wordProgress: Map<string, WordProgressData>; // Keyed by persian text for sync
   onPlayWord: (word: WordData) => void;
   onToggleLearned: (wordId: Id<"words">, persian: string) => void;
+  playingWord: string | null;
+  loadingWord: string | null;
 }) {
   return (
     <div className="overflow-x-auto">
@@ -74,13 +79,15 @@ function WordTable({
             // Look up progress by persian text (syncs across all instances)
             const progress = wordProgress.get(word.persian);
             const isLearned = progress?.learned ?? false;
+            const isPlaying = playingWord === word.persian;
+            const isLoading = loadingWord === word.persian;
 
             return (
               <tr
                 key={word._id}
                 className={`border-b border-gray-800 last:border-0 ${
                   isLearned ? "bg-green-900/10" : ""
-                }`}
+                } ${isPlaying ? "bg-primary/10" : ""}`}
               >
                 {/* Learned checkbox */}
                 <td className="py-2 pr-2">
@@ -99,7 +106,7 @@ function WordTable({
                   <span
                     className={`text-base font-medium ${
                       isLearned ? "text-green-400" : ""
-                    }`}
+                    } ${isPlaying ? "text-primary" : ""}`}
                   >
                     {word.persian}
                     {isLearned && (
@@ -139,19 +146,21 @@ function WordTable({
                 <td className="py-2 pl-2">
                   <button
                     onClick={() => onPlayWord(word)}
-                    disabled={!word.forvoAudioUrl}
+                    disabled={isLoading}
                     className={`rounded p-1 transition-colors ${
-                      word.forvoAudioUrl
-                        ? "text-gray-400 hover:bg-gray-700 hover:text-white"
-                        : "cursor-not-allowed text-gray-700"
+                      isPlaying
+                        ? "bg-primary text-white"
+                        : isLoading
+                          ? "text-gray-500"
+                          : "text-gray-400 hover:bg-gray-700 hover:text-white"
                     }`}
-                    title={
-                      word.forvoAudioUrl
-                        ? "Play pronunciation"
-                        : "Audio not available (coming soon)"
-                    }
+                    title="Play pronunciation"
                   >
-                    <Volume2 className="h-4 w-4" />
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Volume2 className="h-4 w-4" />
+                    )}
                   </button>
                 </td>
               </tr>
@@ -169,11 +178,15 @@ function MobileWordCards({
   wordProgress,
   onPlayWord,
   onToggleLearned,
+  playingWord,
+  loadingWord,
 }: {
   words: WordData[];
   wordProgress: Map<string, WordProgressData>; // Keyed by persian text for sync
   onPlayWord: (word: WordData) => void;
   onToggleLearned: (wordId: Id<"words">, persian: string) => void;
+  playingWord: string | null;
+  loadingWord: string | null;
 }) {
   return (
     <div className="flex flex-col gap-3">
@@ -181,6 +194,8 @@ function MobileWordCards({
         // Look up progress by persian text (syncs across all instances)
         const progress = wordProgress.get(word.persian);
         const isLearned = progress?.learned ?? false;
+        const isPlaying = playingWord === word.persian;
+        const isLoading = loadingWord === word.persian;
 
         return (
           <div
@@ -188,7 +203,9 @@ function MobileWordCards({
             className={`rounded-lg border p-4 transition-colors ${
               isLearned
                 ? "border-green-600/30 bg-green-900/20"
-                : "border-gray-700 bg-gray-800/50"
+                : isPlaying
+                  ? "border-primary/30 bg-primary/10"
+                  : "border-gray-700 bg-gray-800/50"
             }`}
           >
             {/* Top row: Persian word + checkbox + audio */}
@@ -197,7 +214,11 @@ function MobileWordCards({
               <div className="flex-1" dir="rtl">
                 <span
                   className={`text-2xl font-medium ${
-                    isLearned ? "text-green-400" : "text-white"
+                    isLearned
+                      ? "text-green-400"
+                      : isPlaying
+                        ? "text-primary"
+                        : "text-white"
                   }`}
                 >
                   {word.persian}
@@ -209,19 +230,21 @@ function MobileWordCards({
                 {/* Audio button - large touch target */}
                 <button
                   onClick={() => onPlayWord(word)}
-                  disabled={!word.forvoAudioUrl}
+                  disabled={isLoading}
                   className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors ${
-                    word.forvoAudioUrl
-                      ? "bg-gray-700 text-white active:bg-gray-600"
-                      : "bg-gray-800 text-gray-600"
+                    isPlaying
+                      ? "bg-primary text-white"
+                      : isLoading
+                        ? "bg-gray-800 text-gray-500"
+                        : "bg-gray-700 text-white active:bg-gray-600"
                   }`}
-                  title={
-                    word.forvoAudioUrl
-                      ? "Play pronunciation"
-                      : "Audio coming soon"
-                  }
+                  title="Play pronunciation"
                 >
-                  <Volume2 className="h-5 w-5" />
+                  {isLoading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Volume2 className="h-5 w-5" />
+                  )}
                 </button>
 
                 {/* Learned checkbox - large touch target */}
@@ -295,6 +318,10 @@ export default function WordInfoModal({
     Map<string, WordProgressData>
   >(new Map());
 
+  // Audio playback state
+  const [playingWord, setPlayingWord] = useState<string | null>(null);
+  const [loadingWord, setLoadingWord] = useState<string | null>(null);
+
   useEffect(() => {
     if (progressData) {
       const map = new Map<string, WordProgressData>();
@@ -304,6 +331,15 @@ export default function WordInfoModal({
       setWordProgressMap(map);
     }
   }, [progressData]);
+
+  // Stop audio when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      stopWordAudio();
+      setPlayingWord(null);
+      setLoadingWord(null);
+    }
+  }, [isOpen]);
 
   // Mutations for tracking
   const incrementViewCount = useMutation(api.wordProgress.incrementViewCount);
@@ -322,15 +358,35 @@ export default function WordInfoModal({
 
   // Play word pronunciation and track play count
   const handlePlayWord = useCallback(
-    (word: WordData) => {
-      if (word.forvoAudioUrl) {
-        const audio = new Audio(word.forvoAudioUrl);
-        audio.play();
+    async (word: WordData) => {
+      // Set loading state
+      setLoadingWord(word.persian);
+      setPlayingWord(null);
 
-        // Track play count
-        if (visitorId) {
-          incrementPlayCount({ visitorId, wordId: word._id, persian: word.persian });
+      try {
+        // Try to play the audio (from generated file or forvoAudioUrl)
+        const result = await playWordAudio(word.persian);
+
+        if (result.success) {
+          setPlayingWord(word.persian);
+          // Track play count
+          if (visitorId) {
+            incrementPlayCount({ visitorId, wordId: word._id, persian: word.persian });
+          }
+          // Clear playing state after a short delay (audio is typically short)
+          setTimeout(() => {
+            setPlayingWord((current) =>
+              current === word.persian ? null : current
+            );
+          }, 2000);
+        } else {
+          // Audio not available - clear states
+          console.log(`Audio not available for "${word.persian}": ${result.error}`);
         }
+      } catch (error) {
+        console.error("Error playing word audio:", error);
+      } finally {
+        setLoadingWord(null);
       }
     },
     [visitorId, incrementPlayCount]
@@ -426,6 +482,8 @@ export default function WordInfoModal({
             wordProgress={wordProgressMap}
             onPlayWord={handlePlayWord}
             onToggleLearned={handleToggleLearned}
+            playingWord={playingWord}
+            loadingWord={loadingWord}
           />
         ) : (
           <p className="py-8 text-center text-sm text-gray-500">
@@ -434,9 +492,9 @@ export default function WordInfoModal({
         )}
       </div>
 
-      {/* Note about audio */}
+      {/* Audio help text */}
       <p className="mt-2 text-center text-xs text-gray-500">
-        Word audio coming soon (US-031)
+        Tap the speaker icon to hear pronunciation
       </p>
     </>
   );
@@ -500,6 +558,8 @@ export default function WordInfoModal({
                 wordProgress={wordProgressMap}
                 onPlayWord={handlePlayWord}
                 onToggleLearned={handleToggleLearned}
+                playingWord={playingWord}
+                loadingWord={loadingWord}
               />
             ) : (
               <p className="py-8 text-center text-sm text-gray-500">

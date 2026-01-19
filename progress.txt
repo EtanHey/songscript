@@ -22,6 +22,33 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-WORD-AUDIO: ElevenLabs Word Pronunciation Audio (BLOCKED)
+- **Implementation Complete:** All code written and working
+- Created `scripts/generate-word-audio.ts` - ElevenLabs TTS generation script
+  - Lists available voices and selects multilingual voice
+  - Generates MP3 files for 86 unique Persian words
+  - Uses URL-safe base64 encoding for filenames (handles Persian chars)
+  - Rate-limited API calls to avoid quota issues
+- Created `src/utils/wordAudio.ts` - Client-side audio utility
+  - `playWordAudio(persian)` - generates audio URL and plays it
+  - `stopWordAudio()` - stops current playback
+  - Singleton audio player prevents overlapping playback
+- Updated `src/components/WordInfoModal.tsx`:
+  - Added playingWord/loadingWord state for visual feedback
+  - Words highlight when playing (bg-primary/10, text-primary)
+  - Loading spinner while audio loads
+  - Gracefully handles missing audio files (logs to console)
+  - Stops audio when modal closes
+- 13/15 acceptance criteria checked (all code criteria pass)
+- Typecheck passes, all 54 unit tests pass
+- **BLOCKED:** ElevenLabs API key has 0 credits - cannot generate audio files
+- **To Unblock:** Add credits to ELEVENLABS_API_KEY, then run: `bun run scripts/generate-word-audio.ts`
+- **Learning:** ElevenLabs API returns 401 with quota_exceeded when out of credits, not a specific quota error code
+
+[US-WORD-AUDIO] BLOCKED: ElevenLabs API key has 0 credits. Code complete, run script after adding credits.
+
+---
+
 ## Iteration - V-LOOP-FIX: Verify Loop Mode Fix - No Wrong Line Flash ✅
 - **Comprehensive browser verification of loop mode fix**
 - Verified all 5 test scenarios via browser automation:

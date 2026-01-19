@@ -6,10 +6,10 @@
   "stats": {
     "total": 24,
     "completed": 5,
-    "pending": 15,
-    "blocked": 4
+    "pending": 13,
+    "blocked": 6
   },
-  "nextStory": "US-WORD-AUDIO",
+  "nextStory": "US-DASH-SONGS-PROGRESS",
   "storyOrder": [
     "US-AUTH-FIX",
     "V-AUTH-FIX",
@@ -37,8 +37,6 @@
     "US-SSR-SONG-LIST"
   ],
   "pending": [
-    "US-WORD-AUDIO",
-    "V-WORD-AUDIO",
     "US-DASH-SONGS-PROGRESS",
     "US-DASH-WORDS-KNOWN",
     "US-DASH-WISHLIST",
@@ -57,7 +55,9 @@
     "US-EMAIL-RESEND",
     "V-EMAIL-RESEND",
     "V-AUTOPLAY-FIX",
-    "US-SSR-SONG-LIST"
+    "US-SSR-SONG-LIST",
+    "US-WORD-AUDIO",
+    "V-WORD-AUDIO"
   ],
   "browserSetup": {
     "viewport": "desktop 1200px+",
@@ -69,11 +69,12 @@
   "notes": {
     "verificationRequired": "Each US-* story has a corresponding V-* verification story that MUST use MCP browser tools",
     "adminEmail": "etan@heyman.net",
-    "elevenLabsKey": "Set in .env.local",
+    "elevenLabsKey": "Set in .env.local - NEEDS CREDITS ADDED",
     "resendKey": "Set in .env.local - RESEND_API_KEY",
     "archiveLocation": "Old 61 completed stories archived - this is a fresh focused PRD",
     "dashboardBatches": "Dashboard stories are batched: Batch1 (Songs/Words/Wishlist), Batch2 (Streaks/Recent/Stats), Batch3 (Goals/Languages/WordDetails/Layout). Each batch has a V-DASH-BATCH* verification story.",
     "dashboardDesign": "MOBILE-FIRST: All dashboard components designed for 320px+ first, scaled up with Tailwind breakpoints (sm/md/lg/xl). High emphasis on UX/UI quality and responsive testing.",
-    "videoBlocker": "V-AUTOPLAY-FIX blocked: TanStack Start + Nitro returns 503 for video Range requests embedded in page. Video works when navigated to directly."
+    "videoBlocker": "V-AUTOPLAY-FIX blocked: TanStack Start + Nitro returns 503 for video Range requests embedded in page. Video works when navigated to directly.",
+    "elevenLabsBlocker": "US-WORD-AUDIO blocked: ElevenLabs API key has 0 credits. Code complete - run scripts/generate-word-audio.ts after adding credits."
   }
 }
