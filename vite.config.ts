@@ -19,7 +19,7 @@ const config = defineConfig({
   plugins: [
     devtools(),
     tailwindcss(),
-    nitro({ preset: 'bun' }),
+    nitro({ preset: process.env.VERCEL ? 'vercel' : 'bun' }),
     // this is the plugin that enables path aliases
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],

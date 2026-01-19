@@ -47,7 +47,7 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
           if (resend) {
             try {
               const { error } = await resend.emails.send({
-                from: "SongScript <noreply@heyman.net>",
+                from: "SongScript <songscript@contact.heymans.dev>",
                 to: email,
                 subject: "Your SongScript Login Link",
                 html: `
