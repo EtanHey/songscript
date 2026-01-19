@@ -4,6 +4,14 @@ import { authComponent, createAuth } from "./betterAuth";
 const http = httpRouter();
 
 // CORS handling is required for client-side frameworks
-authComponent.registerRoutes(http, createAuth, { cors: true });
+authComponent.registerRoutes(http, createAuth, {
+  cors: {
+    allowedOrigins: [
+      "http://localhost:3001",
+      "https://songscript-ten.vercel.app",
+    ],
+    allowedHeaders: ["Content-Type", "Authorization", "Better-Auth-Cookie"],
+  },
+});
 
 export default http;

@@ -25,6 +25,10 @@ export const authComponent = createClient<DataModel>(components.betterAuth);
 export const createAuth = (ctx: GenericCtx<DataModel>) => {
   return betterAuth({
     baseURL: siteUrl,
+    trustedOrigins: [
+      "http://localhost:3001",
+      "https://songscript-ten.vercel.app",
+    ],
     database: authComponent.adapter(ctx),
     plugins: [
       // The Convex plugin is required for Convex compatibility
