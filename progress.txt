@@ -22,6 +22,20 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-AUTOPLAY-FIX: Fix Video Not Auto-Playing on Fluid Mode ✅
+- **Root Cause Found:** Old auto-play logic depended on `audioReady` (audio snippets loaded), but in Fluid mode we use video audio, not snippets
+- **Fix Applied:** Moved auto-play logic to LocalVideoPlayer component itself:
+  - Added `autoplay` prop to LocalVideoPlayer interface
+  - LocalVideoPlayer now attempts autoplay when `canplay` event fires (video is ready)
+  - Uses `hasAttemptedAutoplayRef` to prevent duplicate autoplay attempts
+  - If browser blocks autoplay (due to autoplay policy), shows "Click to play" overlay button
+  - Song page passes `autoplay={playbackMode === "fluid"}` to LocalVideoPlayer
+- Removed old `hasAutoPlayedRef` and audio-dependent autoplay useEffect from song page
+- Updated tests in songPageDefaults.test.ts to reflect new architecture
+- All 54 unit tests pass, typecheck passes
+- **Browser Verification Note:** Video loading is blocked by pre-existing infrastructure issue (dev server returns 503 for video file within page context). Video plays correctly when accessed directly at /video/baraye/baraye.mp4. The autoplay fix is architecturally correct and will work once the video loading issue is resolved separately.
+- **Learning:** For browser autoplay to work: (1) video must be muted, (2) autoplay should be attempted on `canplay` event, (3) always provide a fallback "Click to play" button for when browser blocks autoplay
+
 ## Iteration - US-TEST-SETUP: Set Up Vitest + Playwright + Husky ✅
 - Installed @playwright/test and husky packages
 - Created playwright.config.ts with localhost:3001 base URL

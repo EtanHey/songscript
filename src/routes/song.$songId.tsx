@@ -383,19 +383,8 @@ function SongPageContent({ songId }: SongPageContentProps) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [togglePlayPause]);
 
-  // Auto-play video when audio files are ready (for fluid mode on page load)
-  const hasAutoPlayedRef = useRef(false);
-  useEffect(() => {
-    // Only auto-play once when audio is ready and we're in fluid mode
-    if (audioReady && playbackMode === "fluid" && !hasAutoPlayedRef.current) {
-      hasAutoPlayedRef.current = true;
-      // Small delay to ensure video element is mounted and ready
-      const timer = setTimeout(() => {
-        playerRef.current?.play();
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [audioReady, playbackMode]);
+  // Note: Auto-play is now handled directly by LocalVideoPlayer component
+  // via the autoplay prop when playbackMode === "fluid"
 
   if (!song) {
     throw notFound();
@@ -483,6 +472,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
                     onStateChange={handleVideoStateChange}
                     onError={handleVideoError}
                     muted={isVideoMuted}
+                    autoplay={playbackMode === "fluid"}
                   />
                 ) : (
                   <div className="flex aspect-video w-full items-center justify-center rounded-lg bg-gray-800 text-gray-400">

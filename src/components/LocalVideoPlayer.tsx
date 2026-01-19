@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback, useImperativeHandle, forwardRef } from 'react'
-import { VolumeX, Volume2 } from 'lucide-react'
+import { VolumeX, Volume2, Play } from 'lucide-react'
 
 export interface LocalVideoPlayerHandle {
   play: () => void
@@ -19,17 +19,27 @@ interface LocalVideoPlayerProps {
   onStateChange?: (state: 'playing' | 'paused' | 'ended') => void
   onError?: (error: string) => void
   muted?: boolean
+  autoplay?: boolean
 }
 
 const LocalVideoPlayer = forwardRef<LocalVideoPlayerHandle, LocalVideoPlayerProps>(
-  function LocalVideoPlayer({ videoUrl, onTimeUpdate, onReady, onStateChange, onError, muted = true }, ref) {
+  function LocalVideoPlayer({ videoUrl, onTimeUpdate, onReady, onStateChange, onError, muted = true, autoplay = false }, ref) {
     const videoRef = useRef<HTMLVideoElement>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [isMutedState, setIsMutedState] = useState(muted)
+    const [showPlayButton, setShowPlayButton] = useState(false)
+    const hasAttemptedAutoplayRef = useRef(false)
 
     const play = useCallback(() => {
-      videoRef.current?.play()
+      const playPromise = videoRef.current?.play()
+      // Handle autoplay failure - show play button if browser blocks it
+      if (playPromise) {
+        playPromise.catch(() => {
+          // Autoplay was blocked, show play button
+          setShowPlayButton(true)
+        })
+      }
     }, [])
 
     const pause = useCallback(() => {
@@ -89,6 +99,18 @@ const LocalVideoPlayer = forwardRef<LocalVideoPlayerHandle, LocalVideoPlayerProp
       const handleCanPlay = () => {
         setIsLoading(false)
         onReady?.()
+
+        // Attempt autoplay if requested and not already attempted
+        if (autoplay && !hasAttemptedAutoplayRef.current) {
+          hasAttemptedAutoplayRef.current = true
+          const playPromise = video.play()
+          if (playPromise) {
+            playPromise.catch(() => {
+              // Autoplay was blocked by browser, show play button
+              setShowPlayButton(true)
+            })
+          }
+        }
       }
 
       const handleTimeUpdate = () => {
@@ -97,6 +119,8 @@ const LocalVideoPlayer = forwardRef<LocalVideoPlayerHandle, LocalVideoPlayerProp
 
       const handlePlay = () => {
         onStateChange?.('playing')
+        // Hide play button overlay when video starts playing
+        setShowPlayButton(false)
       }
 
       const handlePause = () => {
@@ -129,7 +153,7 @@ const LocalVideoPlayer = forwardRef<LocalVideoPlayerHandle, LocalVideoPlayerProp
         video.removeEventListener('ended', handleEnded)
         video.removeEventListener('error', handleError)
       }
-    }, [onTimeUpdate, onReady, onStateChange, onError])
+    }, [onTimeUpdate, onReady, onStateChange, onError, autoplay])
 
     // Sync muted prop to video element
     useEffect(() => {
@@ -144,6 +168,12 @@ const LocalVideoPlayer = forwardRef<LocalVideoPlayerHandle, LocalVideoPlayerProp
         videoRef.current.muted = !videoRef.current.muted
         setIsMutedState(videoRef.current.muted)
       }
+    }, [])
+
+    // Handle click to play (for when autoplay was blocked)
+    const handlePlayButtonClick = useCallback(() => {
+      setShowPlayButton(false)
+      videoRef.current?.play()
     }, [])
 
     if (error) {
@@ -175,6 +205,21 @@ const LocalVideoPlayer = forwardRef<LocalVideoPlayerHandle, LocalVideoPlayerProp
           playsInline
           preload="auto"
         />
+        {/* Click to play overlay (shown when autoplay is blocked) */}
+        {showPlayButton && (
+          <button
+            onClick={handlePlayButtonClick}
+            className="absolute inset-0 flex items-center justify-center bg-black/50 text-white hover:bg-black/40 transition-colors cursor-pointer"
+            aria-label="Click to play"
+          >
+            <div className="flex flex-col items-center gap-2">
+              <div className="rounded-full bg-white/20 p-4">
+                <Play className="h-12 w-12 fill-white" />
+              </div>
+              <span className="text-sm font-medium">Click to play</span>
+            </div>
+          </button>
+        )}
         {/* Mute/Unmute button overlay */}
         <button
           onClick={toggleMute}

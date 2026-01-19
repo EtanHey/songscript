@@ -5,11 +5,11 @@
   "workingDirectory": ".",
   "stats": {
     "total": 23,
-    "completed": 2,
-    "pending": 19,
+    "completed": 3,
+    "pending": 18,
     "blocked": 2
   },
-  "nextStory": "US-AUTOPLAY-FIX",
+  "nextStory": "V-AUTOPLAY-FIX",
   "storyOrder": [
     "US-AUTH-FIX",
     "V-AUTH-FIX",
@@ -36,7 +36,6 @@
     "V-DASH-BATCH3"
   ],
   "pending": [
-    "US-AUTOPLAY-FIX",
     "V-AUTOPLAY-FIX",
     "US-LOOP-FIX",
     "V-LOOP-FIX",

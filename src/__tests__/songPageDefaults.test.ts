@@ -26,21 +26,41 @@ describe('Song Page Default State', () => {
     expect(songPageContent).toMatch(videoMutedRegex)
   })
 
-  it('has auto-play logic that triggers in fluid mode when audio is ready', () => {
-    // Verify the auto-play useEffect exists with the correct conditions
-    expect(songPageContent).toContain('hasAutoPlayedRef')
-    expect(songPageContent).toContain('audioReady && playbackMode === "fluid"')
-    expect(songPageContent).toContain('playerRef.current?.play()')
-  })
-
-  it('uses a ref to prevent multiple auto-play triggers', () => {
-    // Verify hasAutoPlayedRef is used to prevent duplicate auto-plays
-    expect(songPageContent).toContain('const hasAutoPlayedRef = useRef(false)')
-    expect(songPageContent).toContain('hasAutoPlayedRef.current = true')
+  it('passes autoplay prop to LocalVideoPlayer when in fluid mode', () => {
+    // Auto-play logic has been moved to LocalVideoPlayer component
+    // Song page passes autoplay={playbackMode === "fluid"} to LocalVideoPlayer
+    expect(songPageContent).toContain('autoplay={playbackMode === "fluid"}')
   })
 
   it('has three playback modes: single, loop, and fluid', () => {
     // Verify the PlaybackMode type includes all three modes
     expect(songPageContent).toContain('type PlaybackMode = "single" | "loop" | "fluid"')
+  })
+})
+
+describe('LocalVideoPlayer Auto-Play', () => {
+  const localVideoPlayerPath = path.join(__dirname, '..', 'components', 'LocalVideoPlayer.tsx')
+  const localVideoPlayerContent = fs.readFileSync(localVideoPlayerPath, 'utf-8')
+
+  it('supports autoplay prop', () => {
+    // Check that autoplay is in the props interface
+    expect(localVideoPlayerContent).toContain('autoplay?: boolean')
+  })
+
+  it('uses a ref to prevent multiple auto-play triggers', () => {
+    // Verify hasAttemptedAutoplayRef is used to prevent duplicate auto-plays
+    expect(localVideoPlayerContent).toContain('hasAttemptedAutoplayRef')
+    expect(localVideoPlayerContent).toContain('hasAttemptedAutoplayRef.current = true')
+  })
+
+  it('shows play button overlay when autoplay is blocked', () => {
+    // Verify the fallback play button exists for when browser blocks autoplay
+    expect(localVideoPlayerContent).toContain('showPlayButton')
+    expect(localVideoPlayerContent).toContain('Click to play')
+  })
+
+  it('handles autoplay attempt in canplay event', () => {
+    // Verify autoplay is attempted when video is ready
+    expect(localVideoPlayerContent).toContain('autoplay && !hasAttemptedAutoplayRef.current')
   })
 })

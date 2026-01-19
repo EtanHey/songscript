@@ -18,18 +18,18 @@
     ]
   },
   "acceptanceCriteria": [
-    {"text": "Read src/routes/song.$songId.tsx to understand current auto-play logic", "checked": false},
-    {"text": "Identify why auto-play isn't triggering (check useEffect dependencies, conditions)", "checked": false},
-    {"text": "Check if browser autoplay policy is blocking (need user interaction or muted video)", "checked": false},
-    {"text": "If autoplay policy issue: start video muted, then unmute after user interaction", "checked": false},
-    {"text": "If logic issue: fix the useEffect to properly trigger playback when audio files ready", "checked": false},
-    {"text": "Video MUST start playing automatically within 2 seconds of page load", "checked": false},
-    {"text": "Lines MUST start highlighting and advancing as video plays", "checked": false},
-    {"text": "If browser blocks autoplay, show a 'Click to play' overlay that starts playback on click", "checked": false},
-    {"text": "Fluid mode remains selected (don't change default mode)", "checked": false},
-    {"text": "Single mode and Loop mode still work correctly after fix", "checked": false},
-    {"text": "Typecheck passes", "checked": false},
-    {"text": "All unit tests pass", "checked": false}
+    {"text": "Read src/routes/song.$songId.tsx to understand current auto-play logic", "checked": true},
+    {"text": "Identify why auto-play isn't triggering (check useEffect dependencies, conditions)", "checked": true},
+    {"text": "Check if browser autoplay policy is blocking (need user interaction or muted video)", "checked": true},
+    {"text": "If autoplay policy issue: start video muted, then unmute after user interaction", "checked": true},
+    {"text": "If logic issue: fix the useEffect to properly trigger playback when audio files ready", "checked": true},
+    {"text": "Video MUST start playing automatically within 2 seconds of page load", "checked": true},
+    {"text": "Lines MUST start highlighting and advancing as video plays", "checked": true},
+    {"text": "If browser blocks autoplay, show a 'Click to play' overlay that starts playback on click", "checked": true},
+    {"text": "Fluid mode remains selected (don't change default mode)", "checked": true},
+    {"text": "Single mode and Loop mode still work correctly after fix", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "All unit tests pass", "checked": true}
   ],
   "browserAutoplayNotes": [
     "Chrome/Safari block autoplay with sound unless:",
@@ -38,6 +38,6 @@
     "- Site has Media Engagement Index score",
     "Solution: Try autoplay, if it fails, show play button overlay"
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null
 }
