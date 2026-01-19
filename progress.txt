@@ -22,6 +22,30 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-DASH-WORDS-KNOWN: Dashboard Vocabulary Bank by Language ✅
+- Created `convex/wordProgress.ts` - Added `getVocabularyByLanguage` query:
+  - Fetches all word progress for visitor
+  - Joins with words and songs tables to get language info
+  - Calculates mastery levels: new (1-2 practices), learning (3-9), mastered (10+)
+  - Groups words by source language with counts per mastery level
+  - Deduplicates by persian text (keeps highest practice count)
+- Updated `src/routes/dashboard.tsx` - Added My Vocabulary section:
+  - `LanguageVocabularySection` - Collapsible accordion per language with flag emoji
+  - Shows mastery summary badges (green/yellow/gray) in collapsed state
+  - `MasteryLevelSection` - Expandable list of words per mastery level
+  - Color-coded: emerald for mastered, amber for learning, gray for new
+  - `WordChip` - Clickable word chip with tooltip showing practice count and last practiced
+  - `VocabularyEmptyState` - Empty state with CTA to browse songs
+- MOBILE-FIRST design:
+  - Accordion-style collapsible sections work great on mobile (320px+)
+  - Word chips use flex-wrap for natural responsive layout
+  - Minimum touch targets (44px+ on buttons, 36px+ on chips)
+  - Smooth CSS transitions for expand/collapse animations
+- Typecheck passes, all 54 unit tests pass
+- All 15 acceptance criteria completed
+
+---
+
 ## Iteration - US-DASH-SONGS-PROGRESS: Dashboard Songs Progress Tracking ✅
 - Created `convex/schema.ts` - Added userSongProgress table with indexes:
   - visitorId, songId, linesCompleted (array of line numbers), lastPracticed (timestamp)

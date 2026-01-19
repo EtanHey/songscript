@@ -10,22 +10,22 @@
     "tailwind": "Use Tailwind: collapse/expand animations, responsive flex/grid"
   },
   "acceptanceCriteria": [
-    {"text": "Create Convex schema for userWordProgress table", "checked": false},
-    {"text": "Create mutation to record word practice when user clicks a word", "checked": false},
-    {"text": "Create query to get all words for current user grouped by language", "checked": false},
-    {"text": "Add 'My Vocabulary' section to dashboard", "checked": false},
-    {"text": "Group words by language with collapsible sections", "checked": false},
-    {"text": "Within each language, show mastery breakdown: New / Learning / Mastered", "checked": false},
-    {"text": "Display word count per level (e.g., 'Learning: 45 words')", "checked": false},
-    {"text": "Expandable to see actual words in each level", "checked": false},
-    {"text": "Click word shows tooltip with practice count and last practiced", "checked": false},
-    {"text": "MOBILE-FIRST: Accordion-style collapsible sections on mobile (320px+)", "checked": false},
-    {"text": "TAILWIND RESPONSIVE: Word chips wrap naturally with flex-wrap", "checked": false},
-    {"text": "UX: Smooth expand/collapse animations, clear tap targets", "checked": false},
-    {"text": "UI: Color-coded mastery levels (green=mastered, yellow=learning, gray=new)", "checked": false},
-    {"text": "Typecheck passes", "checked": false},
-    {"text": "All unit tests pass", "checked": false}
+    {"text": "Create Convex schema for userWordProgress table", "checked": true},
+    {"text": "Create mutation to record word practice when user clicks a word", "checked": true},
+    {"text": "Create query to get all words for current user grouped by language", "checked": true},
+    {"text": "Add 'My Vocabulary' section to dashboard", "checked": true},
+    {"text": "Group words by language with collapsible sections", "checked": true},
+    {"text": "Within each language, show mastery breakdown: New / Learning / Mastered", "checked": true},
+    {"text": "Display word count per level (e.g., 'Learning: 45 words')", "checked": true},
+    {"text": "Expandable to see actual words in each level", "checked": true},
+    {"text": "Click word shows tooltip with practice count and last practiced", "checked": true},
+    {"text": "MOBILE-FIRST: Accordion-style collapsible sections on mobile (320px+)", "checked": true},
+    {"text": "TAILWIND RESPONSIVE: Word chips wrap naturally with flex-wrap", "checked": true},
+    {"text": "UX: Smooth expand/collapse animations, clear tap targets", "checked": true},
+    {"text": "UI: Color-coded mastery levels (green=mastered, yellow=learning, gray=new)", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "All unit tests pass", "checked": true}
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null
 }

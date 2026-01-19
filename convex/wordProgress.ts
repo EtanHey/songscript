@@ -329,6 +329,108 @@ export const deduplicateWordProgress = mutation({
   },
 });
 
+// Get vocabulary for dashboard - grouped by language with mastery levels
+// Mastery levels: new (1-2 practices), learning (3-9), mastered (10+)
+export const getVocabularyByLanguage = query({
+  args: { visitorId: v.string() },
+  handler: async (ctx, args) => {
+    // Get all word progress for this visitor
+    const progressRecords = await ctx.db
+      .query("wordProgress")
+      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .collect();
+
+    if (progressRecords.length === 0) {
+      return [];
+    }
+
+    // For each progress record, get the word details and song language
+    const wordsWithProgress = await Promise.all(
+      progressRecords.map(async (progress) => {
+        // Get the word to find its song
+        const word = await ctx.db.get(progress.wordId);
+        if (!word) return null;
+
+        // Get the song to find the language
+        const song = await ctx.db.get(word.songId);
+        if (!song) return null;
+
+        // Calculate practice count (view + play)
+        const practiceCount = progress.viewCount + progress.playCount;
+
+        // Determine mastery level
+        let masteryLevel: "new" | "learning" | "mastered";
+        if (practiceCount >= 10) {
+          masteryLevel = "mastered";
+        } else if (practiceCount >= 3) {
+          masteryLevel = "learning";
+        } else {
+          masteryLevel = "new";
+        }
+
+        return {
+          persian: progress.persian || word.persian,
+          transliteration: word.transliteration,
+          english: word.english,
+          hebrew: word.hebrew,
+          practiceCount,
+          lastSeen: progress.lastSeen,
+          learned: progress.learned,
+          masteryLevel,
+          sourceLanguage: song.sourceLanguage,
+        };
+      })
+    );
+
+    // Filter out nulls and dedupe by persian text (keep highest practice count)
+    const validWords = wordsWithProgress.filter(Boolean) as NonNullable<
+      (typeof wordsWithProgress)[0]
+    >[];
+
+    const deduped = new Map<string, (typeof validWords)[0]>();
+    for (const word of validWords) {
+      const existing = deduped.get(word.persian);
+      if (!existing || word.practiceCount > existing.practiceCount) {
+        deduped.set(word.persian, word);
+      }
+    }
+    const uniqueWords = Array.from(deduped.values());
+
+    // Group by language
+    const byLanguage = new Map<string, typeof uniqueWords>();
+    for (const word of uniqueWords) {
+      const lang = word.sourceLanguage;
+      if (!byLanguage.has(lang)) {
+        byLanguage.set(lang, []);
+      }
+      byLanguage.get(lang)!.push(word);
+    }
+
+    // Convert to array format with counts
+    const result = Array.from(byLanguage.entries()).map(([language, words]) => {
+      const newWords = words.filter((w) => w.masteryLevel === "new");
+      const learningWords = words.filter((w) => w.masteryLevel === "learning");
+      const masteredWords = words.filter((w) => w.masteryLevel === "mastered");
+
+      return {
+        language,
+        totalWords: words.length,
+        newCount: newWords.length,
+        learningCount: learningWords.length,
+        masteredCount: masteredWords.length,
+        words: {
+          new: newWords.sort((a, b) => b.lastSeen - a.lastSeen),
+          learning: learningWords.sort((a, b) => b.lastSeen - a.lastSeen),
+          mastered: masteredWords.sort((a, b) => b.lastSeen - a.lastSeen),
+        },
+      };
+    });
+
+    // Sort languages by total word count (descending)
+    return result.sort((a, b) => b.totalWords - a.totalWords);
+  },
+});
+
 // Query: Check for duplicate wordProgress entries (for auditing)
 export const checkDuplicates = query({
   args: {},

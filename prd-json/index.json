@@ -5,11 +5,11 @@
   "workingDirectory": ".",
   "stats": {
     "total": 24,
-    "completed": 6,
-    "pending": 12,
+    "completed": 7,
+    "pending": 11,
     "blocked": 6
   },
-  "nextStory": "US-DASH-WORDS-KNOWN",
+  "nextStory": "US-DASH-WISHLIST",
   "storyOrder": [
     "US-AUTH-FIX",
     "V-AUTH-FIX",
@@ -37,7 +37,6 @@
     "US-SSR-SONG-LIST"
   ],
   "pending": [
-    "US-DASH-WORDS-KNOWN",
     "US-DASH-WISHLIST",
     "V-DASH-BATCH1",
     "US-DASH-STREAKS",
