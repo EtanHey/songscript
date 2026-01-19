@@ -22,6 +22,24 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - V-DASH-BATCH2: Verify Dashboard Batch 2 (BLOCKED)
+- Attempted browser verification of Dashboard Batch 2 (Streaks, Recent, Stats)
+- Magic link authentication still fails with INVALID_TOKEN error
+- Process attempted:
+  1. Navigated to localhost:3001/login, entered etan@heyman.net
+  2. Magic link generated successfully (visible in Convex dashboard logs)
+  3. URL points to production: https://songscript-ten.vercel.app/api/auth/magic-link/verify?token=...
+  4. Navigated to magic link URL
+  5. Redirected with error=INVALID_TOKEN
+- Same blocker as V-DASH-BATCH1 - auth verification fails
+- Dashboard requires authentication to show user-specific data
+- **BLOCKED:** Cannot verify dashboard features without working auth
+- Moving to next non-verification story (US-DASH-GOALS)
+
+[V-DASH-BATCH2] BLOCKED: Magic link auth fails with INVALID_TOKEN. Same issue as V-DASH-BATCH1.
+
+---
+
 ## Iteration - US-DASH-STATS: Dashboard Summary Statistics by Language
 - Created `convex/userStats.ts` - New query file for aggregated user stats:
   - `getAggregatedStats` - Aggregates data from wordProgress, userSongProgress, and userPracticeLog tables

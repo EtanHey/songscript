@@ -9,7 +9,7 @@
     "pending": 6,
     "blocked": 7
   },
-  "nextStory": "V-DASH-BATCH2",
+  "nextStory": "US-DASH-GOALS",
   "storyOrder": [
     "US-AUTH-FIX",
     "V-AUTH-FIX",
@@ -39,21 +39,21 @@
     "US-SSR-SONG-LIST"
   ],
   "pending": [
-    "V-DASH-BATCH2",
     "US-DASH-GOALS",
     "US-DASH-LANGUAGES",
     "US-DASH-WORD-DETAILS",
     "US-DASH-LAYOUT",
-    "V-DASH-BATCH3"
+    "V-DASH-BATCH3",
+    "US-SSR-SONG-LIST"
   ],
   "blocked": [
     "US-EMAIL-RESEND",
     "V-EMAIL-RESEND",
     "V-AUTOPLAY-FIX",
-    "US-SSR-SONG-LIST",
     "US-WORD-AUDIO",
     "V-WORD-AUDIO",
-    "V-DASH-BATCH1"
+    "V-DASH-BATCH1",
+    "V-DASH-BATCH2"
   ],
   "browserSetup": {
     "viewport": "desktop 1200px+",
