@@ -1,15 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
-import { api } from "../../convex/_generated/api";
-import { useVisitorId } from "../hooks/useVisitorId";
-import { authClient } from "../lib/auth-client";
-import { Button } from "../components/ui/button";
+import { api } from "../../../convex/_generated/api";
+import { useVisitorId } from "../../hooks/useVisitorId";
+import { authClient } from "../../lib/auth-client";
+import { Button } from "../../components/ui/button";
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
-import type { Id } from "../../convex/_generated/dataModel";
-import WordDetailsModal from "../components/WordDetailsModal";
+import type { Id } from "../../../convex/_generated/dataModel";
+import WordDetailsModal from "../../components/WordDetailsModal";
 
-export const Route = createFileRoute("/dashboard")({
+export const Route = createFileRoute("/_authed/dashboard")({
   component: DashboardPage,
 });
 
@@ -138,6 +138,13 @@ function DashboardPage() {
   const navigate = useNavigate();
   const visitorId = useVisitorId();
   const { data: session, isPending: sessionPending } = authClient.useSession();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!sessionPending && !session?.user) {
+      navigate({ to: "/login" });
+    }
+  }, [session, sessionPending, navigate]);
 
   // Get song progress with details
   const { data: songProgress, isLoading: progressLoading } = useQuery(

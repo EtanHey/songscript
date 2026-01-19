@@ -33,8 +33,7 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
     plugins: [
       // The Convex plugin is required for Convex compatibility
       convex({ authConfig }),
-      // Cross-domain plugin enables OTT (one-time token) flow for session persistence
-      // This is required because auth server (Convex) and frontend are on different domains
+      // Cross-domain plugin required for Convex auth
       crossDomain({ siteUrl }),
       // Magic link passwordless authentication
       magicLink({
