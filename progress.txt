@@ -22,6 +22,42 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-DASH-WORD-DETAILS: Dashboard Word Details Modal
+- Created `convex/wordProgress.ts` - Added two new queries:
+  - `getWordDetailsWithSongs` - Finds all songs containing a specific word (by persian text)
+    - Returns: word details (persian, transliteration, hebrew, english, grammarType)
+    - Returns: list of songs with title, artist, language, line number, line preview
+    - Joins words table with songs and lyrics to get full context
+  - `getWordPracticeHistory` - Gets practice stats for a word
+    - Returns: viewCount, playCount, totalPracticeCount, learned, lastSeen
+- Created `src/components/WordDetailsModal.tsx` - MOBILE-FIRST word details modal:
+  - Mobile: Bottom sheet (`Sheet`) sliding up from bottom with drag handle
+  - Desktop: Centered modal (`Dialog`) with backdrop click to dismiss
+  - Large word display with original script (4xl), transliteration, hebrew, english
+  - Prominent audio play button (calls `playWordAudio` utility)
+  - Practice stats grid: times practiced, views, audio plays
+  - "Appears in X songs" section with clickable song list
+  - Song links navigate to `/song/$songId?line=N` for direct line navigation
+  - Language flags on song items
+- Updated `src/routes/dashboard.tsx`:
+  - Added `selectedWord` and `isWordModalOpen` state
+  - Added `isMobile` detection via resize listener
+  - Added `handleWordClick` callback
+  - Updated `LanguageVocabularySection` to accept `onWordClick` prop
+  - Updated `MasteryLevelSection` to accept `onWordClick` prop
+  - Updated `WordChip` to accept `onClick` prop and removed tooltip (modal replaces it)
+  - Added `WordDetailsModal` component to page
+- UI/UX Features:
+  - WordChip has hover scale-105 and active scale-95 for tactile feedback
+  - Swipe down to dismiss on mobile (via Sheet component)
+  - Click backdrop to dismiss on desktop (via Dialog component)
+  - Loading spinner while fetching word details
+  - Relative time formatting for "last practiced"
+- Typecheck passes, all 54 unit tests pass
+- All 15 acceptance criteria completed
+
+---
+
 ## Iteration - US-DASH-LANGUAGES: Dashboard Languages Learning Overview
 - Created `convex/userStats.ts` - Added `getLanguageProgress` query:
   - Aggregates progress from userSongProgress and wordProgress tables

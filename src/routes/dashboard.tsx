@@ -7,6 +7,7 @@ import { authClient } from "../lib/auth-client";
 import { Button } from "../components/ui/button";
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import type { Id } from "../../convex/_generated/dataModel";
+import WordDetailsModal from "../components/WordDetailsModal";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
@@ -120,6 +121,25 @@ function DashboardPage() {
 
   // Language filter state
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
+
+  // Word details modal state
+  const [selectedWord, setSelectedWord] = useState<string | null>(null);
+  const [isWordModalOpen, setIsWordModalOpen] = useState(false);
+
+  // Mobile detection (simple approach)
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Handle word click to open details modal
+  const handleWordClick = useCallback((persian: string) => {
+    setSelectedWord(persian);
+    setIsWordModalOpen(true);
+  }, []);
 
   // Filter data by selected language
   const filteredSongProgress = useMemo(() => {
@@ -438,6 +458,7 @@ function DashboardPage() {
                   learningCount={langGroup.learningCount}
                   masteredCount={langGroup.masteredCount}
                   words={langGroup.words}
+                  onWordClick={handleWordClick}
                 />
               ))}
             </div>
@@ -452,6 +473,14 @@ function DashboardPage() {
           )}
         </section>
       </div>
+
+      {/* Word Details Modal */}
+      <WordDetailsModal
+        isOpen={isWordModalOpen}
+        onClose={() => setIsWordModalOpen(false)}
+        persian={selectedWord}
+        isMobile={isMobile}
+      />
     </div>
   );
 }
@@ -734,6 +763,7 @@ function LanguageVocabularySection({
   learningCount,
   masteredCount,
   words,
+  onWordClick,
 }: {
   language: string;
   totalWords: number;
@@ -745,6 +775,7 @@ function LanguageVocabularySection({
     learning: VocabWord[];
     mastered: VocabWord[];
   };
+  onWordClick: (persian: string) => void;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const flag = getLanguageFlag(language);
@@ -810,6 +841,7 @@ function LanguageVocabularySection({
               label="Mastered"
               count={masteredCount}
               words={words.mastered}
+              onWordClick={onWordClick}
             />
           )}
 
@@ -820,6 +852,7 @@ function LanguageVocabularySection({
               label="Learning"
               count={learningCount}
               words={words.learning}
+              onWordClick={onWordClick}
             />
           )}
 
@@ -830,6 +863,7 @@ function LanguageVocabularySection({
               label="New"
               count={newCount}
               words={words.new}
+              onWordClick={onWordClick}
             />
           )}
         </div>
@@ -844,11 +878,13 @@ function MasteryLevelSection({
   label,
   count,
   words,
+  onWordClick,
 }: {
   level: "new" | "learning" | "mastered";
   label: string;
   count: number;
   words: VocabWord[];
+  onWordClick: (persian: string) => void;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -917,6 +953,7 @@ function MasteryLevelSection({
               key={word.persian}
               word={word}
               colorSet={colorSet}
+              onClick={() => onWordClick(word.persian)}
             />
           ))}
         </div>
@@ -925,48 +962,27 @@ function MasteryLevelSection({
   );
 }
 
-// Word Chip Component with tooltip
+// Word Chip Component - clickable to open word details modal
 function WordChip({
   word,
   colorSet,
+  onClick,
 }: {
   word: VocabWord;
   colorSet: {
     chipBg: string;
     chipText: string;
   };
+  onClick: () => void;
 }) {
-  const [showTooltip, setShowTooltip] = useState(false);
-
   return (
-    <div className="relative">
-      <button
-        onClick={() => setShowTooltip(!showTooltip)}
-        onBlur={() => setShowTooltip(false)}
-        className={`px-3 py-1.5 rounded-full ${colorSet.chipBg} ${colorSet.chipText} text-sm font-medium hover:opacity-80 transition-opacity min-h-[36px] flex items-center`}
-      >
-        {word.persian}
-      </button>
-
-      {/* Tooltip */}
-      {showTooltip && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-10">
-          <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-3 min-w-[180px] text-sm">
-            <div className="text-white font-semibold mb-1">{word.persian}</div>
-            <div className="text-gray-400 text-xs mb-2">{word.transliteration}</div>
-            <div className="text-gray-300 mb-2">{word.english}</div>
-            <div className="border-t border-gray-700 pt-2 space-y-1 text-xs text-gray-400">
-              <div>Practice count: {word.practiceCount}</div>
-              <div>Last practiced: {formatRelativeTime(word.lastSeen)}</div>
-            </div>
-            {/* Arrow */}
-            <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px">
-              <div className="border-8 border-transparent border-t-gray-700" />
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    <button
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded-full ${colorSet.chipBg} ${colorSet.chipText} text-sm font-medium hover:opacity-80 hover:scale-105 active:scale-95 transition-all min-h-[36px] flex items-center`}
+      title={`${word.transliteration} - ${word.english}`}
+    >
+      {word.persian}
+    </button>
   );
 }
 

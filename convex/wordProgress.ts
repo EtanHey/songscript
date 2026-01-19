@@ -431,6 +431,101 @@ export const getVocabularyByLanguage = query({
   },
 });
 
+// Get word details with all songs it appears in (for word details modal)
+export const getWordDetailsWithSongs = query({
+  args: { persian: v.string() },
+  handler: async (ctx, args) => {
+    // Find all word instances with this persian text across all songs
+    const allWords = await ctx.db.query("words").collect();
+    const matchingWords = allWords.filter((w) => w.persian === args.persian);
+
+    if (matchingWords.length === 0) {
+      return null;
+    }
+
+    // Get word info from the first match (they all have same text/translations)
+    const word = matchingWords[0];
+
+    // Get unique song IDs
+    const songIds = [...new Set(matchingWords.map((w) => w.songId))];
+
+    // Get song details for each song
+    const songsWithContext = await Promise.all(
+      songIds.map(async (songId) => {
+        const song = await ctx.db.get(songId);
+        if (!song) return null;
+
+        // Find the specific word instance in this song to get line number
+        const wordInSong = matchingWords.find((w) => w.songId === songId);
+        const lineNumber = wordInSong?.lineNumber ?? 0;
+
+        // Get the line context
+        const line = await ctx.db
+          .query("lyrics")
+          .withIndex("by_song", (q) =>
+            q.eq("songId", songId).eq("lineNumber", lineNumber)
+          )
+          .first();
+
+        return {
+          songId,
+          title: song.title,
+          artist: song.artist,
+          sourceLanguage: song.sourceLanguage,
+          lineNumber,
+          linePreview: line?.original?.slice(0, 50) || "",
+        };
+      })
+    );
+
+    const validSongs = songsWithContext.filter(Boolean) as NonNullable<
+      (typeof songsWithContext)[0]
+    >[];
+
+    return {
+      persian: word.persian,
+      transliteration: word.transliteration,
+      hebrew: word.hebrew,
+      english: word.english,
+      grammarType: word.grammarType,
+      songs: validSongs,
+      songCount: validSongs.length,
+    };
+  },
+});
+
+// Get practice history for a word (by persian text)
+export const getWordPracticeHistory = query({
+  args: { visitorId: v.string(), persian: v.string() },
+  handler: async (ctx, args) => {
+    // Get the progress record for this word
+    const progress = await ctx.db
+      .query("wordProgress")
+      .withIndex("by_visitor_persian", (q) =>
+        q.eq("visitorId", args.visitorId).eq("persian", args.persian)
+      )
+      .first();
+
+    if (!progress) {
+      return {
+        viewCount: 0,
+        playCount: 0,
+        learned: false,
+        lastSeen: null,
+        totalPracticeCount: 0,
+      };
+    }
+
+    return {
+      viewCount: progress.viewCount,
+      playCount: progress.playCount,
+      learned: progress.learned,
+      lastSeen: progress.lastSeen,
+      totalPracticeCount: progress.viewCount + progress.playCount,
+    };
+  },
+});
+
 // Query: Check for duplicate wordProgress entries (for auditing)
 export const checkDuplicates = query({
   args: {},
