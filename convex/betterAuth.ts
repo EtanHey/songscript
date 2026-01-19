@@ -38,18 +38,33 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
       crossDomain({ siteUrl }),
       // Magic link passwordless authentication
       magicLink({
-        sendMagicLink: async ({ email, url }) => {
+        sendMagicLink: async ({ email, url, token }) => {
           // Block non-admin emails
           if (email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
             throw new Error("Only admin email is allowed to sign in");
           }
 
-          // Log the magic link for debugging
-          // Note: The URL should point to Convex auth server, not the frontend
-          // The callbackURL parameter (set in login.tsx) determines where to redirect after verification
+          // Extract frontend origin from the callbackURL in the original URL
+          // The URL looks like: .../verify?token=xxx&callbackURL=http://localhost:3001/dashboard
+          const urlObj = new URL(url);
+          const callbackURL = urlObj.searchParams.get("callbackURL") || "";
+
+          // Get frontend origin from callbackURL, fallback to trusted origins
+          let frontendOrigin = "https://songscript-ten.vercel.app";
+          if (callbackURL) {
+            try {
+              frontendOrigin = new URL(callbackURL).origin;
+            } catch {
+              // Keep default
+            }
+          }
+
+          // Build frontend verify URL - user goes directly to our app, no redirect through Convex
+          const frontendVerifyUrl = `${frontendOrigin}/auth/verify?token=${token}`;
+
           console.log("=".repeat(60));
           console.log("MAGIC LINK FOR:", email);
-          console.log("URL:", url);
+          console.log("FRONTEND URL:", frontendVerifyUrl);
           console.log("=".repeat(60));
 
           // Send email via Resend if configured
@@ -63,10 +78,10 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
                   <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                     <h1 style="color: #10b981;">SongScript</h1>
                     <p>Click the button below to sign in to your account:</p>
-                    <a href="${url}" style="display: inline-block; background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0;">
+                    <a href="${frontendVerifyUrl}" style="display: inline-block; background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0;">
                       Sign In
                     </a>
-                    <p style="color: #666; font-size: 14px;">Or copy this link: ${url}</p>
+                    <p style="color: #666; font-size: 14px;">Or copy this link: ${frontendVerifyUrl}</p>
                     <p style="color: #999; font-size: 12px;">This link will expire in 1 hour.</p>
                   </div>
                 `,
@@ -74,13 +89,11 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
 
               if (error) {
                 console.error("Resend email error:", error);
-                // Don't throw - link is still logged to console as fallback
               } else {
                 console.log("Magic link email sent successfully via Resend");
               }
             } catch (err) {
               console.error("Failed to send email via Resend:", err);
-              // Don't throw - link is still logged to console as fallback
             }
           } else {
             console.log("Resend not configured - check RESEND_API_KEY in .env.local");

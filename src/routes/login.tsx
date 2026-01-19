@@ -30,31 +30,12 @@ function LoginPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  // If already logged in, show user info
-  if (session?.user) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-        <div className="bg-slate-900 p-8 rounded-lg shadow-xl w-full max-w-md">
-          <h1 className="text-2xl font-bold text-white mb-6 text-center">
-            Welcome, Admin!
-          </h1>
-          <p className="text-gray-300 text-center mb-4">
-            Signed in as: {session.user.email}
-          </p>
-          <Button
-            onClick={async () => {
-              await authClient.signOut();
-              navigate({ to: "/" });
-            }}
-            variant="outline"
-            className="w-full"
-          >
-            Sign Out
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  // If already logged in, redirect to dashboard
+  useEffect(() => {
+    if (session?.user) {
+      navigate({ to: "/dashboard" });
+    }
+  }, [session, navigate]);
 
   // Show loading only briefly - after timeout, show form anyway
   if (isPending && !showForm) {
