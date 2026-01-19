@@ -22,6 +22,40 @@
 ## Current Iteration
 (Continue from here)
 
+## Iteration - US-DASH-LANGUAGES: Dashboard Languages Learning Overview
+- Created `convex/userStats.ts` - Added `getLanguageProgress` query:
+  - Aggregates progress from userSongProgress and wordProgress tables
+  - Groups data by sourceLanguage from songs
+  - Returns: wordsLearned, totalWordsAvailable, wordProgress%, songsPracticed, linesPracticed, linesProgress%
+  - Sorts by most practiced (songs count, then words count)
+- Updated `src/routes/dashboard.tsx` - Added "My Languages" section:
+  - `MyLanguagesSection` - Mobile: horizontal scrolling chips, Desktop: grid of cards
+  - `LanguageChip` - Compact mobile chip with flag, name, stats, and mini progress ring
+  - `LanguageCard` - Full desktop card with stats grid, gradient progress bar, selection indicator
+  - `AddLanguageChip` / `AddLanguageCard` - CTA to browse more songs
+  - `LanguagesEmptyState` - Empty state with CTA to browse songs
+- Language filtering feature:
+  - `selectedLanguage` state with click-to-filter/click-to-clear
+  - Filtered memos for: songProgress, vocabulary, wishlist, recentSongs
+  - Each section shows "(flag filtered)" indicator when filter active
+  - "Clear filter" button in active filter indicator
+  - Filtered empty states with "Show all" link
+- MOBILE-FIRST design using Tailwind:
+  - Mobile: flex overflow-x-auto snap-x snap-mandatory scroll-smooth
+  - Desktop: hidden md:block md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4
+  - Progress rings with SVG circles and strokeDasharray
+  - Gradient progress bars (from-blue-500 to-purple-500, emerald when selected)
+- UX Features:
+  - Tap any language to filter all dashboard sections
+  - Tap again to clear filter
+  - Active filter indicator bar with clear button
+  - Selection checkmark on selected card
+  - "Tap to filter dashboard" / "Tap to clear filter" hints
+- Typecheck passes, all 54 unit tests pass
+- All 14 acceptance criteria completed
+
+---
+
 ## Iteration - US-DASH-GOALS: Dashboard Daily/Weekly Learning Goals
 - Created `convex/schema.ts` - Added userGoals table:
   - visitorId, goalType, period, targetValue, isActive, timestamps

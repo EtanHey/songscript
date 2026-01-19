@@ -111,6 +111,49 @@ function DashboardPage() {
     })
   );
 
+  // Get language progress
+  const { data: languageProgress, isLoading: languageLoading } = useQuery(
+    convexQuery(api.userStats.getLanguageProgress, {
+      visitorId: visitorId || "",
+    })
+  );
+
+  // Language filter state
+  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
+
+  // Filter data by selected language
+  const filteredSongProgress = useMemo(() => {
+    if (!songProgress) return [];
+    if (!selectedLanguage) return songProgress;
+    return songProgress.filter(
+      (p) => p.song.sourceLanguage.toLowerCase() === selectedLanguage.toLowerCase()
+    );
+  }, [songProgress, selectedLanguage]);
+
+  const filteredVocabulary = useMemo(() => {
+    if (!vocabulary) return [];
+    if (!selectedLanguage) return vocabulary;
+    return vocabulary.filter(
+      (v) => v.language.toLowerCase() === selectedLanguage.toLowerCase()
+    );
+  }, [vocabulary, selectedLanguage]);
+
+  const filteredWishlist = useMemo(() => {
+    if (!wishlist) return [];
+    if (!selectedLanguage) return wishlist;
+    return wishlist.filter(
+      (w) => w.song?.sourceLanguage.toLowerCase() === selectedLanguage.toLowerCase()
+    );
+  }, [wishlist, selectedLanguage]);
+
+  const filteredRecentSongs = useMemo(() => {
+    if (!recentSongs) return [];
+    if (!selectedLanguage) return recentSongs;
+    return recentSongs.filter(
+      (s) => s.song.sourceLanguage.toLowerCase() === selectedLanguage.toLowerCase()
+    );
+  }, [recentSongs, selectedLanguage]);
+
   // Initialize default goals mutation
   const { mutate: initializeGoals } = useMutation({
     mutationFn: useConvexMutation(api.goals.initializeDefaultGoals),
@@ -213,6 +256,25 @@ function DashboardPage() {
           </p>
         </div>
 
+        {/* My Languages Section */}
+        <section className="mb-8">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4">My Languages</h2>
+
+          {languageLoading || !visitorId ? (
+            <div className="text-gray-400">Loading your languages...</div>
+          ) : languageProgress && languageProgress.length > 0 ? (
+            <MyLanguagesSection
+              languages={languageProgress}
+              selectedLanguage={selectedLanguage}
+              onSelectLanguage={(lang) =>
+                setSelectedLanguage(selectedLanguage === lang ? null : lang)
+              }
+            />
+          ) : (
+            <LanguagesEmptyState />
+          )}
+        </section>
+
         {/* Your Stats Section */}
         <section className="mb-8">
           <h2 className="text-lg sm:text-xl font-semibold mb-4">Your Stats</h2>
@@ -250,10 +312,17 @@ function DashboardPage() {
         </section>
 
         {/* Continue Learning Section - Only show if there are recent songs */}
-        {!recentLoading && recentSongs && recentSongs.length > 0 && (
+        {!recentLoading && filteredRecentSongs && filteredRecentSongs.length > 0 && (
           <section className="mb-8">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">Continue Learning</h2>
-            <ContinueLearningCarousel items={recentSongs} />
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">
+              Continue Learning
+              {selectedLanguage && (
+                <span className="ml-2 text-sm font-normal text-gray-400">
+                  ({getLanguageFlag(selectedLanguage)} filtered)
+                </span>
+              )}
+            </h2>
+            <ContinueLearningCarousel items={filteredRecentSongs} />
           </section>
         )}
 
@@ -276,13 +345,20 @@ function DashboardPage() {
 
         {/* My Songs Section */}
         <section className="mb-8">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4">My Songs</h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-4">
+            My Songs
+            {selectedLanguage && (
+              <span className="ml-2 text-sm font-normal text-gray-400">
+                ({getLanguageFlag(selectedLanguage)} filtered)
+              </span>
+            )}
+          </h2>
 
           {progressLoading || !visitorId ? (
             <div className="text-gray-400">Loading your progress...</div>
-          ) : songProgress && songProgress.length > 0 ? (
+          ) : filteredSongProgress && filteredSongProgress.length > 0 ? (
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {songProgress.map((progress) => (
+              {filteredSongProgress.map((progress) => (
                 <SongProgressCard
                   key={progress._id}
                   title={progress.song.title}
@@ -297,6 +373,12 @@ function DashboardPage() {
                 />
               ))}
             </div>
+          ) : selectedLanguage && songProgress && songProgress.length > 0 ? (
+            <div className="bg-gray-900 rounded-lg border border-gray-800 p-6 text-center">
+              <p className="text-gray-400">
+                No songs in {selectedLanguage}. <button onClick={() => setSelectedLanguage(null)} className="text-emerald-400 hover:text-emerald-300 underline">Show all songs</button>
+              </p>
+            </div>
           ) : (
             <EmptyState />
           )}
@@ -304,16 +386,29 @@ function DashboardPage() {
 
         {/* Learning Queue Section */}
         <section className="mb-8">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4">My Learning Queue</h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-4">
+            My Learning Queue
+            {selectedLanguage && (
+              <span className="ml-2 text-sm font-normal text-gray-400">
+                ({getLanguageFlag(selectedLanguage)} filtered)
+              </span>
+            )}
+          </h2>
 
           {wishlistLoading || !visitorId ? (
             <div className="text-gray-400">Loading your queue...</div>
-          ) : wishlist && wishlist.length > 0 ? (
+          ) : filteredWishlist && filteredWishlist.length > 0 ? (
             <LearningQueueList
-              items={wishlist}
+              items={filteredWishlist}
               onReorder={handleReorder}
               onRemove={handleRemoveFromWishlist}
             />
+          ) : selectedLanguage && wishlist && wishlist.length > 0 ? (
+            <div className="bg-gray-900 rounded-lg border border-gray-800 p-6 text-center">
+              <p className="text-gray-400">
+                No songs in your queue for {selectedLanguage}. <button onClick={() => setSelectedLanguage(null)} className="text-emerald-400 hover:text-emerald-300 underline">Show all</button>
+              </p>
+            </div>
           ) : (
             <WishlistEmptyState />
           )}
@@ -321,13 +416,20 @@ function DashboardPage() {
 
         {/* My Vocabulary Section */}
         <section>
-          <h2 className="text-lg sm:text-xl font-semibold mb-4">My Vocabulary</h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-4">
+            My Vocabulary
+            {selectedLanguage && (
+              <span className="ml-2 text-sm font-normal text-gray-400">
+                ({getLanguageFlag(selectedLanguage)} filtered)
+              </span>
+            )}
+          </h2>
 
           {vocabLoading || !visitorId ? (
             <div className="text-gray-400">Loading vocabulary...</div>
-          ) : vocabulary && vocabulary.length > 0 ? (
+          ) : filteredVocabulary && filteredVocabulary.length > 0 ? (
             <div className="space-y-4">
-              {vocabulary.map((langGroup) => (
+              {filteredVocabulary.map((langGroup) => (
                 <LanguageVocabularySection
                   key={langGroup.language}
                   language={langGroup.language}
@@ -338,6 +440,12 @@ function DashboardPage() {
                   words={langGroup.words}
                 />
               ))}
+            </div>
+          ) : selectedLanguage && vocabulary && vocabulary.length > 0 ? (
+            <div className="bg-gray-900 rounded-lg border border-gray-800 p-6 text-center">
+              <p className="text-gray-400">
+                No vocabulary in {selectedLanguage}. <button onClick={() => setSelectedLanguage(null)} className="text-emerald-400 hover:text-emerald-300 underline">Show all</button>
+              </p>
             </div>
           ) : (
             <VocabularyEmptyState />
@@ -1967,6 +2075,312 @@ function GoalsEmptyState({ onInitialize }: { onInitialize: () => void }) {
       >
         Create Default Goals
       </button>
+    </div>
+  );
+}
+
+// Language progress type for My Languages section
+type LanguageProgressData = {
+  language: string;
+  wordsLearned: number;
+  totalWordsAvailable: number;
+  wordProgress: number;
+  songsPracticed: number;
+  linesPracticed: number;
+  totalLinesAvailable: number;
+  linesProgress: number;
+  lastPracticed: number;
+};
+
+// Get language display name (capitalize and expand abbreviations)
+function getLanguageDisplayName(lang: string): string {
+  const names: Record<string, string> = {
+    fa: "Persian",
+    persian: "Persian",
+    farsi: "Farsi",
+    ko: "Korean",
+    korean: "Korean",
+    ar: "Arabic",
+    arabic: "Arabic",
+    he: "Hebrew",
+    hebrew: "Hebrew",
+    ja: "Japanese",
+    japanese: "Japanese",
+    zh: "Chinese",
+    chinese: "Chinese",
+  };
+  return names[lang.toLowerCase()] || lang.charAt(0).toUpperCase() + lang.slice(1);
+}
+
+// My Languages Section Component - Mobile: horizontal scroll, Desktop: grid
+function MyLanguagesSection({
+  languages,
+  selectedLanguage,
+  onSelectLanguage,
+}: {
+  languages: LanguageProgressData[];
+  selectedLanguage: string | null;
+  onSelectLanguage: (lang: string) => void;
+}) {
+  return (
+    <div>
+      {/* Mobile: Horizontal scrolling chips/cards */}
+      <div className="md:hidden">
+        <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 -mx-4 px-4">
+          {languages.map((lang) => (
+            <LanguageChip
+              key={lang.language}
+              language={lang}
+              isSelected={selectedLanguage === lang.language}
+              onSelect={() => onSelectLanguage(lang.language)}
+            />
+          ))}
+          {/* Add a language chip */}
+          <AddLanguageChip />
+        </div>
+
+        {/* Filter active indicator */}
+        {selectedLanguage && (
+          <div className="flex items-center justify-between bg-emerald-900/20 rounded-lg px-4 py-2 border border-emerald-500/30">
+            <span className="text-sm text-emerald-400">
+              Filtering by {getLanguageFlag(selectedLanguage)} {getLanguageDisplayName(selectedLanguage)}
+            </span>
+            <button
+              onClick={() => onSelectLanguage(selectedLanguage)}
+              className="text-emerald-400 hover:text-emerald-300 text-sm font-medium"
+            >
+              Clear filter
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Desktop: Grid of language cards */}
+      <div className="hidden md:block">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {languages.map((lang) => (
+            <LanguageCard
+              key={lang.language}
+              language={lang}
+              isSelected={selectedLanguage === lang.language}
+              onSelect={() => onSelectLanguage(lang.language)}
+            />
+          ))}
+          {/* Add a language card */}
+          <AddLanguageCard />
+        </div>
+
+        {/* Filter active indicator for desktop */}
+        {selectedLanguage && (
+          <div className="mt-4 flex items-center justify-between bg-emerald-900/20 rounded-lg px-4 py-3 border border-emerald-500/30">
+            <span className="text-sm text-emerald-400">
+              <span className="text-lg mr-2">{getLanguageFlag(selectedLanguage)}</span>
+              Dashboard filtered to show only {getLanguageDisplayName(selectedLanguage)} content
+            </span>
+            <button
+              onClick={() => onSelectLanguage(selectedLanguage)}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors"
+            >
+              Clear filter
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Mobile: Language chip (compact, horizontal scroll item)
+function LanguageChip({
+  language,
+  isSelected,
+  onSelect,
+}: {
+  language: LanguageProgressData;
+  isSelected: boolean;
+  onSelect: () => void;
+}) {
+  const flag = getLanguageFlag(language.language);
+  const displayName = getLanguageDisplayName(language.language);
+
+  return (
+    <button
+      onClick={onSelect}
+      className={`flex-shrink-0 snap-start flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-200 min-w-[200px] active:scale-[0.98] ${
+        isSelected
+          ? "bg-emerald-900/30 border-emerald-500 shadow-lg shadow-emerald-500/10"
+          : "bg-gray-900 border-gray-800 hover:border-gray-700"
+      }`}
+    >
+      {/* Flag and name */}
+      <span className="text-2xl">{flag}</span>
+      <div className="flex-1 text-left">
+        <div className="font-semibold text-white text-sm">{displayName}</div>
+        <div className="text-xs text-gray-400">
+          {language.wordsLearned} words · {language.songsPracticed} song{language.songsPracticed !== 1 ? "s" : ""}
+        </div>
+      </div>
+
+      {/* Progress ring */}
+      <div className="w-10 h-10 relative">
+        <svg className="w-10 h-10 transform -rotate-90" viewBox="0 0 40 40">
+          <circle
+            className="text-gray-800"
+            strokeWidth="4"
+            stroke="currentColor"
+            fill="transparent"
+            r="16"
+            cx="20"
+            cy="20"
+          />
+          <circle
+            className={isSelected ? "text-emerald-500" : "text-blue-500"}
+            strokeWidth="4"
+            strokeDasharray={100.53}
+            strokeDashoffset={100.53 - (language.wordProgress / 100) * 100.53}
+            strokeLinecap="round"
+            stroke="currentColor"
+            fill="transparent"
+            r="16"
+            cx="20"
+            cy="20"
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-xs font-bold text-white">{language.wordProgress}%</span>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+// Desktop: Language card (full details)
+function LanguageCard({
+  language,
+  isSelected,
+  onSelect,
+}: {
+  language: LanguageProgressData;
+  isSelected: boolean;
+  onSelect: () => void;
+}) {
+  const flag = getLanguageFlag(language.language);
+  const displayName = getLanguageDisplayName(language.language);
+
+  return (
+    <button
+      onClick={onSelect}
+      className={`text-left p-4 rounded-xl border transition-all duration-200 active:scale-[0.98] ${
+        isSelected
+          ? "bg-emerald-900/30 border-emerald-500 shadow-lg shadow-emerald-500/10"
+          : "bg-gray-900 border-gray-800 hover:border-gray-700 hover:shadow-lg"
+      }`}
+    >
+      {/* Header with flag, name, and selection indicator */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <span className="text-3xl">{flag}</span>
+          <div>
+            <h3 className="font-bold text-white">{displayName}</h3>
+            <p className="text-xs text-gray-400">
+              Last practiced {formatRelativeTime(language.lastPracticed)}
+            </p>
+          </div>
+        </div>
+        {isSelected && (
+          <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
+            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+        )}
+      </div>
+
+      {/* Stats grid */}
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="bg-gray-800/50 rounded-lg px-3 py-2">
+          <div className="text-lg font-bold text-white">{language.wordsLearned}</div>
+          <div className="text-xs text-gray-400">words learned</div>
+        </div>
+        <div className="bg-gray-800/50 rounded-lg px-3 py-2">
+          <div className="text-lg font-bold text-white">{language.songsPracticed}</div>
+          <div className="text-xs text-gray-400">songs practiced</div>
+        </div>
+      </div>
+
+      {/* Progress bar with gradient */}
+      <div className="mb-2">
+        <div className="flex items-center justify-between text-xs mb-1">
+          <span className="text-gray-400">Word progress</span>
+          <span className="text-white font-medium">{language.wordProgress}%</span>
+        </div>
+        <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${
+              isSelected
+                ? "bg-gradient-to-r from-emerald-500 to-teal-500"
+                : "bg-gradient-to-r from-blue-500 to-purple-500"
+            }`}
+            style={{ width: `${language.wordProgress}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Tap to filter hint */}
+      <div className="text-center text-xs text-gray-500 mt-3">
+        {isSelected ? "Tap to clear filter" : "Tap to filter dashboard"}
+      </div>
+    </button>
+  );
+}
+
+// Add Language Chip (Mobile) - CTA to browse more songs
+function AddLanguageChip() {
+  return (
+    <Link
+      to="/"
+      className="flex-shrink-0 snap-start flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed border-gray-700 hover:border-gray-600 bg-gray-900/50 min-w-[160px] transition-colors"
+    >
+      <span className="text-2xl text-gray-500">🌍</span>
+      <div className="text-left">
+        <div className="font-medium text-gray-400 text-sm">Add a language</div>
+        <div className="text-xs text-gray-500">Browse songs</div>
+      </div>
+    </Link>
+  );
+}
+
+// Add Language Card (Desktop) - CTA to browse more songs
+function AddLanguageCard() {
+  return (
+    <Link
+      to="/"
+      className="flex flex-col items-center justify-center p-6 rounded-xl border border-dashed border-gray-700 hover:border-gray-600 bg-gray-900/50 transition-all duration-200 hover:shadow-lg min-h-[200px]"
+    >
+      <span className="text-4xl mb-3 opacity-50">🌍</span>
+      <h3 className="font-medium text-gray-400 mb-1">Add a language</h3>
+      <p className="text-xs text-gray-500 text-center">
+        Browse songs to start learning a new language
+      </p>
+    </Link>
+  );
+}
+
+// Languages Empty State Component
+function LanguagesEmptyState() {
+  return (
+    <div className="bg-gray-900 rounded-lg border border-gray-800 p-8 text-center">
+      <div className="text-4xl mb-4">🌍</div>
+      <h3 className="text-lg font-semibold mb-2">Start learning a language</h3>
+      <p className="text-gray-400 mb-6 max-w-sm mx-auto">
+        Practice songs in different languages to see your progress here!
+      </p>
+      <Link
+        to="/"
+        className="inline-flex items-center justify-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors min-h-[44px]"
+      >
+        Browse Songs
+      </Link>
     </div>
   );
 }

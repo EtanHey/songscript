@@ -4,12 +4,12 @@
   "projectName": "SongScript Critical Fixes + Dashboard Enhancement",
   "workingDirectory": ".",
   "stats": {
-    "total": 26,
-    "completed": 14,
-    "pending": 5,
+    "total": 29,
+    "completed": 15,
+    "pending": 7,
     "blocked": 7
   },
-  "nextStory": "US-DASH-LANGUAGES",
+  "nextStory": "US-DASH-WORD-DETAILS",
   "storyOrder": [
     "US-AUTH-FIX",
     "V-AUTH-FIX",
@@ -36,13 +36,18 @@
     "US-DASH-WORD-DETAILS",
     "US-DASH-LAYOUT",
     "V-DASH-BATCH3",
+    "US-AUTH-DYNAMIC-URL",
+    "US-AUTH-PERSIST",
+    "US-AUTH-UX",
     "US-SSR-SONG-LIST"
   ],
   "pending": [
-    "US-DASH-LANGUAGES",
     "US-DASH-WORD-DETAILS",
     "US-DASH-LAYOUT",
     "V-DASH-BATCH3",
+    "US-AUTH-DYNAMIC-URL",
+    "US-AUTH-PERSIST",
+    "US-AUTH-UX",
     "US-SSR-SONG-LIST"
   ],
   "blocked": [
