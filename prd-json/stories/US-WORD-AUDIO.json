@@ -1,0 +1,46 @@
+{
+  "id": "US-WORD-AUDIO",
+  "title": "ElevenLabs Word Pronunciation Audio",
+  "description": "Generate audio pronunciations for individual words using ElevenLabs Text-to-Speech API. Users can click on a word to hear how it's pronounced, helping them learn correct pronunciation even when song delivery differs from normal speech.",
+  "technicalContext": {
+    "apiKey": "ELEVENLABS_API_KEY in .env.local",
+    "endpoints": ["Text to Speech", "Models", "Voices (read)"],
+    "outputDir": "public/audio/words/",
+    "fileFormat": "MP3"
+  },
+  "acceptanceCriteria": [
+    {"text": "Verify ELEVENLABS_API_KEY is set in .env.local", "checked": false},
+    {"text": "Create a utility function to call ElevenLabs TTS API", "checked": false},
+    {"text": "List available voices and select appropriate one for Persian/Farsi", "checked": false},
+    {"text": "Create script to generate audio for all unique words in seed data", "checked": false},
+    {"text": "Save generated audio files to public/audio/words/{word}.mp3", "checked": false},
+    {"text": "Handle special characters in filenames (URL encode or transliterate)", "checked": false},
+    {"text": "Add click handler to word tokens in LyricsDisplay component", "checked": false},
+    {"text": "When word is clicked, play the corresponding audio file", "checked": false},
+    {"text": "Show visual feedback when word audio is playing (highlight or pulse)", "checked": false},
+    {"text": "Handle missing audio gracefully (word not yet generated)", "checked": false},
+    {"text": "Add loading state while audio is being fetched", "checked": false},
+    {"text": "Audio plays at normal speech pace (not song pace)", "checked": false},
+    {"text": "Multiple rapid clicks don't overlap audio (stop previous, play new)", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "All unit tests pass", "checked": false}
+  ],
+  "implementationNotes": {
+    "apiCall": "POST https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+    "headers": {
+      "xi-api-key": "ELEVENLABS_API_KEY",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "text": "word to pronounce",
+      "model_id": "eleven_multilingual_v2",
+      "voice_settings": {
+        "stability": 0.5,
+        "similarity_boost": 0.75
+      }
+    },
+    "voiceSelection": "Use eleven_multilingual_v2 model for Persian/Farsi support"
+  },
+  "passes": false,
+  "blockedBy": null
+}

@@ -1,0 +1,26 @@
+{
+  "id": "V-WORD-AUDIO",
+  "title": "Verify Word Pronunciation Feature",
+  "description": "End-to-end verification that word pronunciation audio works correctly.",
+  "verificationMethod": "Browser automation with mcp__claude-in-chrome tools",
+  "testUrl": "http://localhost:3001/song/baraye",
+  "acceptanceCriteria": [
+    {"text": "Start dev server if not running: bun run dev", "checked": false},
+    {"text": "Verify audio files exist in public/audio/words/ directory", "checked": false},
+    {"text": "Navigate to http://localhost:3001/song/baraye", "checked": false},
+    {"text": "Take screenshot showing lyrics with word tokens visible", "checked": false},
+    {"text": "Click on a Persian word (e.g., 'برای' - baraye)", "checked": false},
+    {"text": "Verify audio plays (check for no console errors, visual feedback shown)", "checked": false},
+    {"text": "Take screenshot showing word highlight/feedback during playback", "checked": false},
+    {"text": "Click another word quickly - verify previous audio stops, new plays", "checked": false},
+    {"text": "Click same word multiple times rapidly - no audio overlap or errors", "checked": false},
+    {"text": "Test word from different line to ensure all words work", "checked": false},
+    {"text": "Use mcp__browser-tools__getConsoleErrors - verify no JavaScript errors", "checked": false},
+    {"text": "Use mcp__browser-tools__getNetworkErrors - verify no failed audio requests", "checked": false},
+    {"text": "Verify clicking word does NOT interfere with line playback modes", "checked": false},
+    {"text": "Test in Loop mode - clicking word plays pronunciation, loop continues after", "checked": false},
+    {"text": "Final screenshot showing successful word audio feature", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "US-WORD-AUDIO"
+}
