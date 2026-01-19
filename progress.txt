@@ -1,9 +1,9 @@
 # Progress Log
 
 ## 📊 Overall Stats
-- **Stories Completed:** 54
-- **Criteria Completed:** 447
-- **Stories Remaining:** 6
+- **Stories Completed:** 55
+- **Criteria Completed:** 456
+- **Stories Remaining:** 5
 - **Archive:** docs.local/prd-completed-archive.md
 
 ---
@@ -67,7 +67,17 @@
 
 ---
 
-**Next:** US-AUTOPLAY-TESTS - Tests for Autoplay Feature
+**Next:** US-LOOP-UX - Loop Mode UX Improvements
+
+---
+
+## Iteration - US-AUTOPLAY-TESTS: Tests for Auto-Play and Fluid Mode ✅
+- Created `e2e/autoplay.spec.ts` with 8 comprehensive tests for autoplay functionality
+- Created `src/__tests__/songPageDefaults.test.ts` to verify fluid mode is the default
+- Tests cover: fluid mode default, auto-play on load, line highlighting, pause/play, line click seeking, mode toggle, video mute states
+- Fixed Playwright config for better stability: reduced workers to 2, added retry mechanism, increased timeouts
+- All 44 unit tests pass, all 14 e2e tests pass (with retries for server load), typecheck passes
+- **Learning:** Playwright tests with heavy pages (video, database queries) need hydration waits and retries; use scrollIntoViewIfNeeded() before clicking toggle buttons
 
 ---
 

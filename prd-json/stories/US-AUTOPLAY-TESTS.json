@@ -5,41 +5,41 @@
   "acceptanceCriteria": [
     {
       "text": "Create `e2e/autoplay.spec.ts`",
-      "checked": false
+      "checked": true
     },
     {
       "text": "E2E: Test song page auto-plays video on load",
-      "checked": false
+      "checked": true
     },
     {
       "text": "E2E: Test fluid mode is enabled by default",
-      "checked": false
+      "checked": true
     },
     {
       "text": "E2E: Test lines highlight and advance during playback",
-      "checked": false
+      "checked": true
     },
     {
       "text": "E2E: Test pause button stops playback",
-      "checked": false
+      "checked": true
     },
     {
       "text": "E2E: Test clicking a line seeks to that position",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Unit test: `useSongPlayback` hook initializes with fluid mode ON",
-      "checked": false
+      "checked": true
     },
     {
       "text": "All tests pass: `bun run test && bun run test:e2e`",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Typecheck passes",
-      "checked": false
+      "checked": true
     }
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null
 }
