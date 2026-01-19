@@ -193,5 +193,19 @@
 
 ---
 
+## Iteration - US-AUTH-FIX: Complete End-to-End Auth Flow Verification ✅
+- Verified full magic link auth flow works end-to-end
+- Entered correct admin email etan@heyman.net, clicked "Send Magic Link"
+- UI shows success: "Magic link sent! In dev mode, check the Convex dashboard logs at dashboard.convex.dev"
+- Found magic link URL in Convex dashboard logs at dashboard.convex.dev
+- Navigated to magic link URL - successfully redirected to / with active session
+- Verified /login shows "Welcome, Admin!" with "Signed in as: etan@heyman.net"
+- Clicked "Sign Out" - session cleared, returned to login form
+- All 10 acceptance criteria verified via browser screenshots
+- Typecheck passes
+- **Learning:** The auth flow is fully functional - magic link appears in Convex cloud logs (dashboard.convex.dev), not local terminal. Users must check the dashboard to get the link.
+
+---
+
 ## Previous Archives
 - docs.local/prd-archive/progress-2026-01-19.txt (1307 lines)

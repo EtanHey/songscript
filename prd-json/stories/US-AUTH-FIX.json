@@ -15,17 +15,17 @@
     "userReport": "User clicked 'Send Magic Link', UI showed success, but couldn't find email. Link is in Convex dashboard logs."
   },
   "acceptanceCriteria": [
-    {"text": "Start dev server: bun run dev", "checked": false},
-    {"text": "Navigate to http://localhost:3001/login in browser", "checked": false},
-    {"text": "Enter etan@heyman.net and click 'Send Magic Link'", "checked": false},
-    {"text": "UI shows success message pointing to Convex dashboard", "checked": false},
-    {"text": "Open Convex dashboard (dashboard.convex.dev) and check logs", "checked": false},
-    {"text": "Find magic link URL in the logs", "checked": false},
-    {"text": "Copy magic link URL and navigate to it in browser", "checked": false},
-    {"text": "After clicking magic link, user is redirected to / and session is active", "checked": false},
-    {"text": "Navigate back to /login - shows 'Welcome, Admin!' with sign out button", "checked": false},
-    {"text": "Click 'Sign Out' - session is cleared, returns to login form", "checked": false}
+    {"text": "Start dev server: bun run dev", "checked": true},
+    {"text": "Navigate to http://localhost:3001/login in browser", "checked": true},
+    {"text": "Enter etan@heyman.net and click 'Send Magic Link'", "checked": true},
+    {"text": "UI shows success message pointing to Convex dashboard", "checked": true},
+    {"text": "Open Convex dashboard (dashboard.convex.dev) and check logs", "checked": true},
+    {"text": "Find magic link URL in the logs", "checked": true},
+    {"text": "Copy magic link URL and navigate to it in browser", "checked": true},
+    {"text": "After clicking magic link, user is redirected to / and session is active", "checked": true},
+    {"text": "Navigate back to /login - shows 'Welcome, Admin!' with sign out button", "checked": true},
+    {"text": "Click 'Sign Out' - session is cleared, returns to login form", "checked": true}
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null
 }

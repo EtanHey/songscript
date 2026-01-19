@@ -5,11 +5,11 @@
   "workingDirectory": ".",
   "stats": {
     "total": 8,
-    "completed": 0,
-    "pending": 8,
+    "completed": 1,
+    "pending": 7,
     "blocked": 0
   },
-  "nextStory": "US-AUTH-FIX",
+  "nextStory": "V-AUTH-FIX",
   "storyOrder": [
     "US-AUTH-FIX",
     "V-AUTH-FIX",
@@ -21,7 +21,6 @@
     "V-WORD-AUDIO"
   ],
   "pending": [
-    "US-AUTH-FIX",
     "V-AUTH-FIX",
     "US-AUTOPLAY-FIX",
     "V-AUTOPLAY-FIX",
