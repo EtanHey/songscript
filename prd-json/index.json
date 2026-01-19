@@ -5,11 +5,11 @@
   "workingDirectory": ".",
   "stats": {
     "total": 26,
-    "completed": 11,
-    "pending": 8,
+    "completed": 12,
+    "pending": 7,
     "blocked": 7
   },
-  "nextStory": "US-DASH-RECENT",
+  "nextStory": "US-DASH-STATS",
   "storyOrder": [
     "US-AUTH-FIX",
     "V-AUTH-FIX",
@@ -39,7 +39,6 @@
     "US-SSR-SONG-LIST"
   ],
   "pending": [
-    "US-DASH-RECENT",
     "US-DASH-STATS",
     "V-DASH-BATCH2",
     "US-DASH-GOALS",

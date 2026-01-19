@@ -69,6 +69,7 @@ export default defineSchema({
     songId: v.id("songs"),
     linesCompleted: v.array(v.number()), // Array of line numbers that have been practiced
     lastPracticed: v.number(), // Timestamp of last practice
+    lastLineIndex: v.optional(v.number()), // Last line index the user was on (for "continue where you left off")
   })
     .index("by_visitor", ["visitorId"])
     .index("by_visitor_song", ["visitorId", "songId"]),

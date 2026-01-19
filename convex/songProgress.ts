@@ -54,6 +54,66 @@ export const getWithSongDetails = query({
   },
 });
 
+// Get 3 most recently practiced songs with details for "Continue Learning" section
+export const getRecentForContinue = query({
+  args: { visitorId: v.string() },
+  handler: async (ctx, args) => {
+    if (!args.visitorId) return [];
+
+    const progress = await ctx.db
+      .query("userSongProgress")
+      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .collect();
+
+    // Sort by lastPracticed descending and take top 3
+    const recent = progress
+      .sort((a, b) => b.lastPracticed - a.lastPracticed)
+      .slice(0, 3);
+
+    // Get song details, lyrics count, and last line preview for each
+    const withDetails = await Promise.all(
+      recent.map(async (p) => {
+        const song = await ctx.db.get(p.songId);
+        if (!song) return null;
+
+        // Get all lyrics for this song
+        const lyrics = await ctx.db
+          .query("lyrics")
+          .withIndex("by_song", (q) => q.eq("songId", p.songId))
+          .collect();
+
+        // Find the last practiced line (or first line if none recorded)
+        const lastLineIndex = p.lastLineIndex ?? 0;
+        const lastLine = lyrics.find((l) => l.lineNumber === lastLineIndex) ?? lyrics[0];
+        const lastLinePreview = lastLine
+          ? lastLine.original.substring(0, 50) + (lastLine.original.length > 50 ? "..." : "")
+          : "";
+
+        return {
+          _id: p._id,
+          songId: p.songId,
+          lastPracticed: p.lastPracticed,
+          lastLineIndex,
+          lastLinePreview,
+          song: {
+            _id: song._id,
+            title: song.title,
+            artist: song.artist,
+            sourceLanguage: song.sourceLanguage,
+            videoUrl: song.videoUrl,
+          },
+          totalLines: lyrics.length,
+          progressPercent: lyrics.length > 0
+            ? Math.round((p.linesCompleted.length / lyrics.length) * 100)
+            : 0,
+        };
+      })
+    );
+
+    return withDetails.filter((p): p is NonNullable<typeof p> => p !== null);
+  },
+});
+
 // Get progress for a specific song
 export const getByVisitorSong = query({
   args: { visitorId: v.string(), songId: v.id("songs") },
@@ -94,6 +154,7 @@ export const recordLineCompletion = mutation({
       await ctx.db.patch(existing._id, {
         linesCompleted,
         lastPracticed: Date.now(),
+        lastLineIndex: args.lineNumber,
       });
       return existing._id;
     } else {
@@ -103,6 +164,7 @@ export const recordLineCompletion = mutation({
         songId: args.songId,
         linesCompleted: [args.lineNumber],
         lastPracticed: Date.now(),
+        lastLineIndex: args.lineNumber,
       });
     }
   },
@@ -125,6 +187,9 @@ export const recordLinesCompletion = mutation({
       )
       .first();
 
+    // Track the highest line number as the "last" position
+    const lastLineIndex = Math.max(...args.lineNumbers);
+
     if (existing) {
       // Merge new lines with existing, avoiding duplicates
       const lineSet = new Set([...existing.linesCompleted, ...args.lineNumbers]);
@@ -133,6 +198,7 @@ export const recordLinesCompletion = mutation({
       await ctx.db.patch(existing._id, {
         linesCompleted,
         lastPracticed: Date.now(),
+        lastLineIndex,
       });
       return existing._id;
     } else {
@@ -143,6 +209,7 @@ export const recordLinesCompletion = mutation({
         songId: args.songId,
         linesCompleted,
         lastPracticed: Date.now(),
+        lastLineIndex,
       });
     }
   },

@@ -9,22 +9,22 @@
     "tailwind": "Use Tailwind: snap-x, scroll-smooth, flex, gap utilities"
   },
   "acceptanceCriteria": [
-    {"text": "Update userSongProgress schema to track lastLineIndex", "checked": false},
-    {"text": "Update line practice mutation to save current line position", "checked": false},
-    {"text": "Create query to get 3 most recently practiced songs", "checked": false},
-    {"text": "Add 'Continue Learning' section at top of dashboard", "checked": false},
-    {"text": "Show up to 3 song cards with song art/thumbnail", "checked": false},
-    {"text": "Each card shows: song title, progress %, 'Last line: [line text preview]'", "checked": false},
-    {"text": "Click card navigates to song AND auto-scrolls to last practiced line", "checked": false},
-    {"text": "'Resume' button on each card", "checked": false},
-    {"text": "If no recent songs, hide section or show 'Start your first song!'", "checked": false},
-    {"text": "MOBILE-FIRST: Full-width swipeable cards with snap scrolling", "checked": false},
-    {"text": "TAILWIND RESPONSIVE: Horizontal row of cards on md+ screens", "checked": false},
-    {"text": "UX: Swipe indicators (dots), smooth scroll snap, prominent Resume CTA", "checked": false},
-    {"text": "UI: Card with thumbnail, gradient overlay for text readability", "checked": false},
-    {"text": "Typecheck passes", "checked": false},
-    {"text": "All unit tests pass", "checked": false}
+    {"text": "Update userSongProgress schema to track lastLineIndex", "checked": true},
+    {"text": "Update line practice mutation to save current line position", "checked": true},
+    {"text": "Create query to get 3 most recently practiced songs", "checked": true},
+    {"text": "Add 'Continue Learning' section at top of dashboard", "checked": true},
+    {"text": "Show up to 3 song cards with song art/thumbnail", "checked": true},
+    {"text": "Each card shows: song title, progress %, 'Last line: [line text preview]'", "checked": true},
+    {"text": "Click card navigates to song AND auto-scrolls to last practiced line", "checked": true},
+    {"text": "'Resume' button on each card", "checked": true},
+    {"text": "If no recent songs, hide section or show 'Start your first song!'", "checked": true},
+    {"text": "MOBILE-FIRST: Full-width swipeable cards with snap scrolling", "checked": true},
+    {"text": "TAILWIND RESPONSIVE: Horizontal row of cards on md+ screens", "checked": true},
+    {"text": "UX: Swipe indicators (dots), smooth scroll snap, prominent Resume CTA", "checked": true},
+    {"text": "UI: Card with thumbnail, gradient overlay for text readability", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "All unit tests pass", "checked": true}
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null
 }
