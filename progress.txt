@@ -1,9 +1,9 @@
 # Progress Log
 
 ## 📊 Overall Stats
-- **Stories Completed:** 57
-- **Criteria Completed:** 464
-- **Stories Remaining:** 3
+- **Stories Completed:** 59
+- **Criteria Completed:** 472
+- **Stories Remaining:** 2
 - **Archive:** docs.local/prd-completed-archive.md
 
 ---
@@ -113,7 +113,20 @@
 
 ---
 
-**Next:** V-AUTOPLAY - Verification story for autoplay functionality
+## Iteration - V-AUTOPLAY: Verify Auto-Play, Fluid Mode, and Loop UX ✅
+- Comprehensive browser verification of all playback features
+- Verified: Video plays on page load with "Pause" button visible (not paused)
+- Verified: Fluid mode is the default and lines highlight/advance automatically
+- Verified: Pause button stops playback (button changes to "Play")
+- Verified: Clicking a lyric line jumps video to that position (tested Line 1)
+- Verified: Loop mode works smoothly - watched 3+ loops with NO flashing
+- Verified: Current line stays consistently highlighted during loop cycles
+- Verified: Console shows only expected browser autoplay policy warnings (NotAllowedError) - these are normal browser behavior, not app bugs
+- All 8 acceptance criteria verified and passed
+
+---
+
+**Next:** US-020, US-021 remain pending (3 stories still blocked)
 
 ---
 

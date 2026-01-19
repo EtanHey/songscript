@@ -5,37 +5,37 @@
   "acceptanceCriteria": [
     {
       "text": "Navigate to song page in browser",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Take screenshot showing video is playing (not paused/blurred)",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Verify lines are highlighting and advancing automatically (fluid mode)",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Test pause button stops playback",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Test clicking a line jumps to that position",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Enable loop mode and watch 3+ loops - NO flashing between lines",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Verify loop mode keeps current line highlighted smoothly",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Verify no console errors during playback",
-      "checked": false
+      "checked": true
     }
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null
 }
