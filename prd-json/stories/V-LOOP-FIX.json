@@ -3,10 +3,10 @@
   "title": "Verify Loop Mode Fix - No Wrong Line Flash",
   "description": "Comprehensive verification that loop mode no longer flashes to the wrong line. Must test multiple scenarios with actual browser interaction.",
   "verificationMethod": "Browser automation with mcp__claude-in-chrome tools",
-  "testUrl": "http://localhost:3001/song/baraye",
+  "testUrl": "http://localhost:3001/song/j972m34dzqgx6a0r5a00n9k6pd7zekfa",
   "acceptanceCriteria": [
     {"text": "Start dev server if not running: bun run dev", "checked": false},
-    {"text": "Use mcp__claude-in-chrome__navigate to go to http://localhost:3001/song/baraye", "checked": false},
+    {"text": "Use mcp__claude-in-chrome__navigate to go to http://localhost:3001/song/j972m34dzqgx6a0r5a00n9k6pd7zekfa", "checked": false},
     {"text": "Wait for page to load, take screenshot of initial state", "checked": false},
     {"text": "Click the 'Loop' mode button to enable loop mode", "checked": false},
     {"text": "Take screenshot - verify Loop mode is selected", "checked": false},

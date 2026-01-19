@@ -5,11 +5,11 @@
   "verificationMethod": "Browser automation with mcp__claude-in-chrome tools",
   "testSetup": {
     "clearBrowserData": "Use incognito or clear site data to test fresh user experience",
-    "testUrl": "http://localhost:3001/song/baraye"
+    "testUrl": "http://localhost:3001/song/j972m34dzqgx6a0r5a00n9k6pd7zekfa"
   },
   "acceptanceCriteria": [
     {"text": "Start dev server if not running: bun run dev", "checked": false},
-    {"text": "Use mcp__claude-in-chrome__navigate to go to http://localhost:3001/song/baraye", "checked": false},
+    {"text": "Use mcp__claude-in-chrome__navigate to go to http://localhost:3001/song/j972m34dzqgx6a0r5a00n9k6pd7zekfa", "checked": false},
     {"text": "Wait 3 seconds for page to fully load", "checked": false},
     {"text": "Take screenshot - verify video is NOT blurry (either playing or has play overlay)", "checked": false},
     {"text": "Check if video is playing OR if there's a clear 'Click to play' button visible", "checked": false},

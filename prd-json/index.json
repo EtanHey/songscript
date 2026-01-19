@@ -33,7 +33,8 @@
   "blocked": [],
   "browserSetup": {
     "viewport": "desktop 1200px+",
-    "testUrl": "http://localhost:3001",
+    "homeUrl": "http://localhost:3001",
+    "songUrl": "http://localhost:3001/song/j972m34dzqgx6a0r5a00n9k6pd7zekfa",
     "devServer": "bun run dev"
   },
   "notes": {

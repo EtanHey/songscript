@@ -3,11 +3,11 @@
   "title": "Verify Word Pronunciation Feature",
   "description": "End-to-end verification that word pronunciation audio works correctly.",
   "verificationMethod": "Browser automation with mcp__claude-in-chrome tools",
-  "testUrl": "http://localhost:3001/song/baraye",
+  "testUrl": "http://localhost:3001/song/j972m34dzqgx6a0r5a00n9k6pd7zekfa",
   "acceptanceCriteria": [
     {"text": "Start dev server if not running: bun run dev", "checked": false},
     {"text": "Verify audio files exist in public/audio/words/ directory", "checked": false},
-    {"text": "Navigate to http://localhost:3001/song/baraye", "checked": false},
+    {"text": "Navigate to http://localhost:3001/song/j972m34dzqgx6a0r5a00n9k6pd7zekfa", "checked": false},
     {"text": "Take screenshot showing lyrics with word tokens visible", "checked": false},
     {"text": "Click on a Persian word (e.g., 'برای' - baraye)", "checked": false},
     {"text": "Verify audio plays (check for no console errors, visual feedback shown)", "checked": false},
