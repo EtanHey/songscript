@@ -236,3 +236,15 @@ Key blockers from previous PRD:
 - Typecheck passes - no TypeScript errors
 - Learnings: When implementing mode-based behavior, ensure all related components (video, audio, UI) are synchronized with the mode state, not just the UI toggles
 ---
+## Iteration - Implement song view counting system (US-034)
+- Added songViews table to schema with songId, visitorId, timestamp, completionPct, and practiceTime fields
+- Added viewCount and uniqueViewers fields to songs table for aggregated statistics
+- Created recordSongView mutation that validates 30s practice OR 80% completion thresholds
+- Implemented 5-minute cooldown per user per song to prevent double-counting views
+- Added view tracking logic to song page that monitors total practice time and completion percentage
+- Connected frontend to call recordSongView mutation when thresholds are reached during practice
+- Added view count display to both desktop and mobile song page headers showing total views and unique viewers
+- All acceptance criteria met: schema updates, mutation with validation and cooldown, frontend integration, UI display
+- Typecheck passes - no TypeScript errors
+- Learnings: Song view tracking requires careful threshold monitoring and cooldown logic to provide accurate analytics while preventing gaming of the system
+---

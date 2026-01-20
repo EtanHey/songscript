@@ -3,14 +3,15 @@
   "title": "Implement song view counting system",
   "description": "Track when users complete watching/practicing a song. Industry standard is 30 seconds (YouTube, Spotify). For SongScript: count a 'view' when user reaches 30 seconds of practice OR 80% song completion (whichever comes first). Same user can have multiple views on same song with 5+ minute gap between counts. Store: total views, unique viewers, and average completion percentage.",
   "acceptanceCriteria": [
-    { "text": "Add songViews table to schema (songId, userId, timestamp, completionPct, practiceTime)", "checked": false },
-    { "text": "Add viewCount and uniqueViewers fields to songs table", "checked": false },
-    { "text": "Create recordSongView mutation that validates: 30s practice OR 80% completion", "checked": false },
-    { "text": "Mutation enforces 5-minute cooldown per user per song (no double-counting)", "checked": false },
-    { "text": "Call recordSongView from frontend when threshold reached during practice", "checked": false },
-    { "text": "Dashboard or song page displays view count", "checked": false },
-    { "text": "Typecheck passes", "checked": false }
+    { "text": "Add songViews table to schema (songId, userId, timestamp, completionPct, practiceTime)", "checked": true },
+    { "text": "Add viewCount and uniqueViewers fields to songs table", "checked": true },
+    { "text": "Create recordSongView mutation that validates: 30s practice OR 80% completion", "checked": true },
+    { "text": "Mutation enforces 5-minute cooldown per user per song (no double-counting)", "checked": true },
+    { "text": "Call recordSongView from frontend when threshold reached during practice", "checked": true },
+    { "text": "Dashboard or song page displays view count", "checked": true },
+    { "text": "Typecheck passes", "checked": true }
   ],
-  "passes": false,
+  "passes": true,
+  "completedAt": "2026-01-20T10:49:28Z",
   "blockedBy": null
 }
