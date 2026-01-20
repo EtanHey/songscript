@@ -782,7 +782,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
                     onStateChange={handleVideoStateChange}
                     onError={handleVideoError}
                     onMuteChange={handleVideoMuteChange}
-                    muted={isVideoMuted}
+                    muted={isVideoMuted || playbackMode !== "fluid"}
                     autoplay={playbackMode === "fluid"}
                   />
                 ) : (

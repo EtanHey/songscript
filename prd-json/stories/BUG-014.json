@@ -1,0 +1,16 @@
+{
+  "id": "BUG-014",
+  "title": "Mode switching doesn't apply behavior until line clicked",
+  "description": "After fresh page load, switching between Fluid/Loop/Single modes via the toggle doesn't change playback behavior. Video keeps playing with audio regardless of mode selected. Only when user clicks a line does the mode behavior kick in. The mode switch handler sets state but doesn't apply the actual behavior (mute/unmute video, set audio loop) until there's user interaction with a line.",
+  "acceptanceCriteria": [
+    { "text": "Test case 1: Fresh load -> switch Fluid to Loop -> video should mute immediately (no line click)", "checked": false },
+    { "text": "Test case 2: Fresh load -> switch Fluid to Single -> video should mute immediately", "checked": false },
+    { "text": "Test case 3: Fresh load in Loop -> switch to Fluid -> video should unmute immediately", "checked": false },
+    { "text": "Mode switch handler must call playerRef.current?.mute() or unmute() based on mode", "checked": false },
+    { "text": "Mode switch handler must set audioLoop state immediately", "checked": false },
+    { "text": "Behavior changes should NOT require clicking a line first", "checked": false },
+    { "text": "Typecheck passes", "checked": false }
+  ],
+  "passes": false,
+  "blockedBy": null
+}

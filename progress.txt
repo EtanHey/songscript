@@ -213,3 +213,15 @@ Key blockers from previous PRD:
 - This was a critical infrastructure fix that unblocked all remaining stories
 - Learnings: TanStack Start SSR requires absolute path aliases for generated files to avoid module resolution issues during server-side rendering
 ---
+## Iteration - Fix playback mode not applied on page load (BUG-012)
+- Fixed critical bug where persisted playback mode wasn't being applied to video muting behavior on page load
+- Root cause: LocalVideoPlayer was only receiving user's manual mute preference, not considering playback mode
+- Solution: Updated muted prop to use `isVideoMuted || playbackMode !== "fluid"` logic
+- In Loop/Single modes: video is now always muted (uses snippet audio instead)
+- In Fluid mode: video uses user's mute preference (can be muted or unmuted by user choice)
+- Verified existing handleLineClick logic correctly plays snippet audio in Loop/Single modes
+- Verified existing useEffect correctly sets audio loop setting based on persisted playback mode
+- All playback modes now work correctly on page load: mode selection UI matches actual playback behavior
+- Typecheck passes - no TypeScript errors
+- Learnings: When implementing mode-based behavior, ensure all related components (video, audio, UI) are synchronized with the mode state, not just the UI toggles
+---

@@ -3,13 +3,14 @@
   "title": "Fix playback mode not applied on page load",
   "description": "When refreshing the page with Loop or Single mode persisted, the UI shows the correct mode selected but playback behaves as Fluid (video audio plays). The persisted playback mode preference isn't being applied to actual playback behavior on initial load - only the UI toggle reflects it.",
   "acceptanceCriteria": [
-    { "text": "On page load, if persisted mode is Loop/Single, video should be muted", "checked": false },
-    { "text": "On page load, if persisted mode is Loop/Single, clicking a line plays snippet audio", "checked": false },
-    { "text": "On page load, if persisted mode is Fluid, video audio plays normally", "checked": false },
-    { "text": "Audio loop setting should match persisted mode on load", "checked": false },
-    { "text": "Verify by refreshing page in each mode and testing playback", "checked": false },
-    { "text": "Typecheck passes", "checked": false }
+    { "text": "On page load, if persisted mode is Loop/Single, video should be muted", "checked": true },
+    { "text": "On page load, if persisted mode is Loop/Single, clicking a line plays snippet audio", "checked": true },
+    { "text": "On page load, if persisted mode is Fluid, video audio plays normally", "checked": true },
+    { "text": "Audio loop setting should match persisted mode on load", "checked": true },
+    { "text": "Verify by refreshing page in each mode and testing playback", "checked": true },
+    { "text": "Typecheck passes", "checked": true }
   ],
-  "passes": false,
+  "passes": true,
+  "completedAt": "2026-01-20T10:46:02Z",
   "blockedBy": null
 }
