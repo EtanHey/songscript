@@ -106,4 +106,15 @@ export default defineSchema({
   })
     .index("by_visitor", ["visitorId"])
     .index("by_visitor_type_period", ["visitorId", "goalType", "period"]),
+
+  // User preferences for playback and UI settings
+  userPreferences: defineTable({
+    visitorId: v.string(), // localStorage-generated ID if no auth
+    playbackSpeed: v.number(), // Playback speed multiplier (0.5, 1.0, 1.5, 2.0)
+    languageFilter: v.string(), // Language preference for display
+    playbackMode: v.string(), // "auto" | "manual" | "loop"
+    videoMuted: v.boolean(), // Whether video should be muted by default
+    videoCollapsed: v.boolean(), // Whether video should be collapsed by default
+  })
+    .index("by_visitor", ["visitorId"]),
 });

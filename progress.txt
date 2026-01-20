@@ -38,7 +38,12 @@
 ---
 
 ## Current Iteration
-(Continue from here)
+## Iteration - Add userPreferences table to Convex schema
+- Added userPreferences table to convex/schema.ts with all required fields: visitorId, playbackSpeed, languageFilter, playbackMode, videoMuted, videoCollapsed
+- Created by_visitor index on visitorId field for efficient queries
+- Typecheck passes successfully
+- Learnings: Schema follows existing pattern with visitorId for anonymous users, consistent with other tables
+---
 
 ---
 
