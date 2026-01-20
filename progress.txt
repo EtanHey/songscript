@@ -38,11 +38,11 @@
 ---
 
 ## Current Iteration
-## Iteration - Add userPreferences table to Convex schema
-- Added userPreferences table to convex/schema.ts with all required fields: visitorId, playbackSpeed, languageFilter, playbackMode, videoMuted, videoCollapsed
-- Created by_visitor index on visitorId field for efficient queries
+## Iteration - Create userPreferences queries and mutations
+- Created convex/userPreferences.ts with getByVisitor query following existing patterns from wordProgress.ts
+- Added updatePreferences mutation that upserts preferences (creates with defaults if not exists, updates only provided fields if exists)
 - Typecheck passes successfully
-- Learnings: Schema follows existing pattern with visitorId for anonymous users, consistent with other tables
+- Learnings: Followed existing Convex patterns with visitorId index, used optional parameters for partial updates, provided sensible defaults for new preferences
 ---
 
 ---
