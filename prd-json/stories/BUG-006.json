@@ -1,0 +1,15 @@
+{
+  "id": "BUG-006",
+  "title": "Fix WordInfoModal infinite re-render crash",
+  "description": "Clicking the info button on a lyric line causes an infinite re-render loop that crashes React and shows 404. Root cause: lineAudioSnippets array is recreated on every render in WordInfoModal, triggering useAudioPreloader's useEffect in an infinite loop. The fix is to memoize the lineAudioSnippets array with useMemo.",
+  "acceptanceCriteria": [
+    { "text": "Memoize lineAudioSnippets array in WordInfoModal using useMemo with proper dependencies", "checked": false },
+    { "text": "Clicking info button opens modal without crashing", "checked": false },
+    { "text": "Modal displays word breakdown correctly", "checked": false },
+    { "text": "Line audio playback controls work in modal", "checked": false },
+    { "text": "No 'Maximum update depth exceeded' errors in console", "checked": false },
+    { "text": "Typecheck passes", "checked": false }
+  ],
+  "passes": false,
+  "blockedBy": null
+}

@@ -1,0 +1,16 @@
+{
+  "id": "BUG-007",
+  "title": "Fix dashboard stats showing zeros and empty heatmap",
+  "description": "Dashboard shows 0 for practice time, lines learned, and songs practiced even after user has practiced. Heatmap shows no activity for today despite practice sessions. The practice logging mutations may not be storing data correctly, or the dashboard queries aren't aggregating properly.",
+  "acceptanceCriteria": [
+    { "text": "Verify practiceLog mutation is being called with correct data when playing audio", "checked": false },
+    { "text": "Verify dashboard queries aggregate practiceLog data correctly", "checked": false },
+    { "text": "Practice time stat shows accumulated minutes from audio_time events", "checked": false },
+    { "text": "Lines learned stat shows count of lines with learned=true", "checked": false },
+    { "text": "Songs practiced stat shows unique songs from practice sessions", "checked": false },
+    { "text": "Heatmap shows activity dots for days with practice (including today)", "checked": false },
+    { "text": "Typecheck passes", "checked": false }
+  ],
+  "passes": false,
+  "blockedBy": null
+}
