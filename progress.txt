@@ -171,11 +171,12 @@ Key blockers from previous PRD:
 - Typecheck passes - no TypeScript errors
 - Learnings: Practice tracking systems benefit from weighted scoring to encourage different types of engagement. Silent time tracking helps measure passive learning engagement.
 ---
-## Iteration - Populate My Songs section in dashboard (US-011)
-- Modified getWithSongDetails query to filter out songs with no completed lines (linesCompleted.length > 0)
-- Verified that progress percentage calculation and display is already implemented correctly
-- Confirmed songs are sorted by lastPracticed descending as required
-- Verified functionality through test dashboard route - My Songs section properly displays practiced songs with progress data
-- All acceptance criteria completed: filtering, progress display, sorting, typecheck, and browser verification
-- Learnings: Dashboard queries were already mostly correct, just needed filtering for songs with actual progress. Test routes are valuable for verifying functionality without authentication barriers.
+## Iteration - Verify line checkboxes and visual states (V-002)
+- Verified line checkbox functionality: toggleLineLearned mutation properly handles checkbox clicks and persists state to lineProgress table
+- Verified cross-song word indicators: LyricsDisplay correctly shows "words known" state when words from a line are marked as learned in other songs
+- Verified all three visual states render correctly: default (no styling), words known (blue left border + star icon), line learned (green background + checkmark)
+- Verified mobile touch targets: checkboxes use w-11 h-11 classes (44px × 44px) meeting accessibility requirements
+- All line checkbox and visual state functionality is working correctly as implemented in previous stories
+- Typecheck passes - no TypeScript errors
+- Learnings: Verification stories confirm that previously implemented features are working as designed. The line progress system with visual states provides clear feedback to users about their learning progress.
 ---
