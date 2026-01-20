@@ -3,12 +3,12 @@
   "title": "Populate My Songs section in dashboard",
   "description": "The My Songs section shows 'No songs yet' even when user has practiced songs. Wire up to show songs with progress.",
   "acceptanceCriteria": [
-    { "text": "My Songs shows songs where user has linesCompleted > 0", "checked": false },
-    { "text": "Each song shows progress percentage", "checked": false },
-    { "text": "Songs sorted by lastPracticed descending", "checked": false },
-    { "text": "Typecheck passes", "checked": false },
-    { "text": "Verify in browser: practiced songs appear in My Songs", "checked": false }
+    { "text": "My Songs shows songs where user has linesCompleted > 0", "checked": true },
+    { "text": "Each song shows progress percentage", "checked": true },
+    { "text": "Songs sorted by lastPracticed descending", "checked": true },
+    { "text": "Typecheck passes", "checked": true },
+    { "text": "Verify in browser: practiced songs appear in My Songs", "checked": true }
   ],
-  "passes": false,
-  "blockedBy": "US-005"
+  "passes": true,
+  "completedAt": "2026-01-20T09:43:08Z"
 }

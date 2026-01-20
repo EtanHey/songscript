@@ -162,3 +162,11 @@ Key blockers from previous PRD:
 - Typecheck passes - no TypeScript errors
 - Learnings: Practice tracking systems benefit from weighted scoring to encourage different types of engagement. Silent time tracking helps measure passive learning engagement.
 ---
+## Iteration - Populate My Songs section in dashboard (US-011)
+- Modified getWithSongDetails query to filter out songs with no completed lines (linesCompleted.length > 0)
+- Verified that progress percentage calculation and display is already implemented correctly
+- Confirmed songs are sorted by lastPracticed descending as required
+- Verified functionality through test dashboard route - My Songs section properly displays practiced songs with progress data
+- All acceptance criteria completed: filtering, progress display, sorting, typecheck, and browser verification
+- Learnings: Dashboard queries were already mostly correct, just needed filtering for songs with actual progress. Test routes are valuable for verifying functionality without authentication barriers.
+---
