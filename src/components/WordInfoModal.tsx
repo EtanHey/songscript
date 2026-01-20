@@ -364,8 +364,8 @@ export default function WordInfoModal({
       setPlayingWord(null);
 
       try {
-        // Try to play the audio (from generated file or forvoAudioUrl)
-        const result = await playWordAudio(word.persian);
+        // Try to play the audio (Forvo first, then generated file)
+        const result = await playWordAudio(word.persian, word.forvoAudioUrl);
 
         if (result.success) {
           setPlayingWord(word.persian);

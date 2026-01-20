@@ -37,6 +37,16 @@
 
 ---
 
+## Iteration - Fix pronunciation button in word details modal
+- Fixed pronunciation button in WordInfoModal to support Forvo audio URLs
+- Updated playWordAudio function to accept optional forvoAudioUrl parameter and try Forvo audio first, then fall back to generated audio files
+- Enhanced error handling with graceful fallback from Forvo to generated audio when Forvo fails
+- Loading state and error handling were already properly implemented in the modal
+- All acceptance criteria met: Forvo audio support, loading state, error handling, typecheck passes
+- Typecheck passes - no TypeScript errors
+- Learnings: When adding audio fallback logic, use recursive calls to try alternative sources while maintaining the same Promise interface
+---
+
 ## Current Iteration
 ## Iteration - Fix user preferences not persisting on reload
 - Fixed critical bug where user preferences (playback speed, language filter, playback mode, video muted/collapsed state) were not persisting between page reloads

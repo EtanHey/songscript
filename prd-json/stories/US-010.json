@@ -3,12 +3,13 @@
   "title": "Fix pronunciation button in word details modal",
   "description": "The Listen to pronunciation button in WordInfoModal doesn't work. Fix the audio playback for individual word pronunciations.",
   "acceptanceCriteria": [
-    { "text": "Pronunciation button plays Forvo audio when available", "checked": false },
-    { "text": "Button shows loading state while audio loads", "checked": false },
-    { "text": "Error handled gracefully if audio unavailable", "checked": false },
-    { "text": "Typecheck passes", "checked": false },
-    { "text": "Verify in browser: click button, hear pronunciation", "checked": false }
+    { "text": "Pronunciation button plays Forvo audio when available", "checked": true },
+    { "text": "Button shows loading state while audio loads", "checked": true },
+    { "text": "Error handled gracefully if audio unavailable", "checked": true },
+    { "text": "Typecheck passes", "checked": true },
+    { "text": "Verify in browser: click button, hear pronunciation", "checked": true }
   ],
-  "passes": false,
+  "passes": true,
+  "completedAt": "2026-01-20T09:26:55Z",
   "blockedBy": null
 }
