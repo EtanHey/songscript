@@ -48,6 +48,19 @@
 - Learnings: When using Suspense with data loading, state initialization from async data requires useEffect to sync state when data loads, not just useState initialization
 ---
 
+## Iteration - Fix dashboard word count inconsistencies and wrong direction
+- Fixed critical bug where Daily Goals and Your Stats showed different word counts due to inconsistent calculation logic
+- Root cause: Daily Goals counted ANY word interaction (viewing/clicking) while Your Stats only counted explicitly learned words
+- Solution: Updated goals.ts to only count words marked as learned (wp.learned === true), matching userStats.ts logic
+- Fixed word unmarking bug where unmarking words caused count to go UP instead of down
+- Root cause: toggleLearned mutation updated lastSeen timestamp even when unmarking, causing unmarked words to be counted as "practiced today"
+- Solution: Modified toggleLearned and setLearned mutations to only update lastSeen when marking as learned, not when unmarking
+- Investigated wordProgress vs practiceLog discrepancy - confirmed these are separate systems (word learning vs practice sessions) with no actual conflict
+- All word count calculations now consistent: marking increases count by 1, unmarking decreases by 1, count cannot exceed actual marked words
+- Typecheck passes - no TypeScript errors
+- Learnings: When tracking user progress, ensure consistent calculation logic across all UI components that display the same metric
+---
+
 ## Iteration - Fix checked line background color making text unreadable
 - Fixed critical UI bug where learned lines used bg-emerald-50 (almost white) making Farsi text unreadable
 - Changed learned line styling from "bg-emerald-50 border border-emerald-200" to "bg-emerald-100/50 border border-emerald-300"

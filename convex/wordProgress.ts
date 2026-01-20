@@ -166,12 +166,15 @@ export const toggleLearned = mutation({
     const newLearned = !currentLearned;
 
     // Update ALL matching records
+    // Only update lastSeen when marking as learned, not when unmarking
+    const updateData: { learned: boolean; lastSeen?: number } = { learned: newLearned };
+    if (newLearned) {
+      updateData.lastSeen = Date.now();
+    }
+
     await Promise.all(
       allMatching.map((record) =>
-        ctx.db.patch(record._id, {
-          learned: newLearned,
-          lastSeen: Date.now(),
-        })
+        ctx.db.patch(record._id, updateData)
       )
     );
 
@@ -206,12 +209,15 @@ export const setLearned = mutation({
       .collect();
 
     // Update ALL matching records
+    // Only update lastSeen when marking as learned, not when unmarking
+    const updateData: { learned: boolean; lastSeen?: number } = { learned: args.learned };
+    if (args.learned) {
+      updateData.lastSeen = Date.now();
+    }
+
     await Promise.all(
       allMatching.map((record) =>
-        ctx.db.patch(record._id, {
-          learned: args.learned,
-          lastSeen: Date.now(),
-        })
+        ctx.db.patch(record._id, updateData)
       )
     );
 
@@ -224,7 +230,7 @@ export const setLearned = mutation({
         viewCount: 0,
         playCount: 0,
         learned: args.learned,
-        lastSeen: Date.now(),
+        lastSeen: args.learned ? Date.now() : 0,
       });
     }
 

@@ -3,13 +3,14 @@
   "title": "Fix dashboard word count inconsistencies and wrong direction",
   "description": "Dashboard shows inconsistent word counts: Daily Goals shows different number than Your Stats. Worse, unmarking words causes count to go UP instead of down (went from 25 to 32 after unmarking). The calculation logic is broken.",
   "acceptanceCriteria": [
-    { "text": "Daily Goals word count matches Your Stats word count", "checked": false },
-    { "text": "Marking a word increases count by 1", "checked": false },
-    { "text": "Unmarking a word decreases count by 1", "checked": false },
-    { "text": "Word count cannot exceed actual number of marked words", "checked": false },
-    { "text": "Investigate wordProgress vs practiceLog discrepancy", "checked": false },
-    { "text": "Typecheck passes", "checked": false }
+    { "text": "Daily Goals word count matches Your Stats word count", "checked": true },
+    { "text": "Marking a word increases count by 1", "checked": true },
+    { "text": "Unmarking a word decreases count by 1", "checked": true },
+    { "text": "Word count cannot exceed actual number of marked words", "checked": true },
+    { "text": "Investigate wordProgress vs practiceLog discrepancy", "checked": true },
+    { "text": "Typecheck passes", "checked": true }
   ],
-  "passes": false,
+  "passes": true,
+  "completedAt": "2026-01-20T09:14:55Z",
   "blockedBy": null
 }

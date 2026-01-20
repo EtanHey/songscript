@@ -70,8 +70,8 @@ export const getGoalsWithProgress = query({
       0
     );
 
-    // Get word progress for today (unique words learned today)
-    // We'll use lastSeen timestamp to determine if learned today
+    // Get word progress for today (unique words LEARNED today)
+    // Only count words that are marked as learned (consistent with userStats)
     const todayStart = new Date(todayStr).getTime();
     const todayEnd = todayStart + 24 * 60 * 60 * 1000;
 
@@ -80,16 +80,17 @@ export const getGoalsWithProgress = query({
       .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
       .collect();
 
-    // Words practiced today (based on lastSeen)
+    // Words learned today (based on lastSeen AND learned=true)
+    // Only count words that are CURRENTLY learned and were interacted with today
     const wordsToday = allWordProgress.filter(
-      (wp) => wp.lastSeen >= todayStart && wp.lastSeen < todayEnd
+      (wp) => wp.learned && wp.lastSeen >= todayStart && wp.lastSeen < todayEnd
     );
     const uniqueWordsToday = new Set(wordsToday.map((wp) => wp.persian)).size;
 
-    // Words practiced this week
+    // Words learned this week
     const weekStart = new Date(mondayStr).getTime();
     const wordsThisWeek = allWordProgress.filter(
-      (wp) => wp.lastSeen >= weekStart
+      (wp) => wp.learned && wp.lastSeen >= weekStart
     );
     const uniqueWordsThisWeek = new Set(wordsThisWeek.map((wp) => wp.persian))
       .size;
