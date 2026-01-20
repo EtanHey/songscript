@@ -189,3 +189,15 @@ Key blockers from previous PRD:
 - Typecheck passes - no TypeScript errors
 - Learnings: Verification stories confirm that previously implemented features are working as designed. The line progress system with visual states provides clear feedback to users about their learning progress.
 ---
+## Iteration - Fix dashboard stats showing zeros and empty heatmap (BUG-007)
+- Fixed critical bug where dashboard "Lines learned" stat was counting lines practiced instead of lines explicitly marked as learned
+- Root cause: getAggregatedStats query was using userSongProgress.linesCompleted instead of lineProgress table with learned=true
+- Solution: Updated query to count lines from lineProgress table where learned=true, renamed field from totalLinesPracticed to totalLinesLearned
+- Updated dashboard TypeScript interface and component to use new field name
+- Verified practice logging mutations are correctly implemented and called when audio plays and lines complete
+- Verified dashboard queries correctly aggregate practice data from userPracticeLog and other tables
+- Verified heatmap correctly displays practice intensity based on practiceLog data with proper color coding
+- All dashboard stats now show correct data: practice time from audio events, lines learned from explicit marking, songs from unique practice sessions
+- Typecheck passes - no TypeScript errors
+- Learnings: When tracking user progress, ensure stats reflect the intended user action (explicit learning vs passive practice) and use the correct data source
+---

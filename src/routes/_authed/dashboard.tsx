@@ -1673,7 +1673,7 @@ function GripVerticalIcon({ className }: { className?: string }) {
 // User Stats types
 type UserStatsData = {
   totalUniqueWords: number;
-  totalLinesPracticed: number;
+  totalLinesLearned: number;
   totalPracticeTimeSeconds: number;
   languageBreakdown: { language: string; wordCount: number }[];
   mostPracticedSong: {
@@ -1783,7 +1783,7 @@ function StatCard({
 function UserStatsSection({ stats }: { stats: UserStatsData }) {
   const hasAnyData =
     stats.totalUniqueWords > 0 ||
-    stats.totalLinesPracticed > 0 ||
+    stats.totalLinesLearned > 0 ||
     stats.totalPracticeTimeSeconds > 0;
 
   if (!hasAnyData) {
@@ -1804,7 +1804,7 @@ function UserStatsSection({ stats }: { stats: UserStatsData }) {
         <StatCard
           icon="🎵"
           label="Lines"
-          value={stats.totalLinesPracticed}
+          value={stats.totalLinesLearned}
           subLabel="lines learned"
           colorClass="hover:border-purple-500/50"
         />

@@ -4,12 +4,12 @@
   "projectName": "SongScript Practice Tracking Overhaul",
   "workingDirectory": ".",
   "stats": {
-    "total": 27,
-    "completed": 21,
-    "pending": 6,
+    "total": 29,
+    "completed": 22,
+    "pending": 7,
     "blocked": 0
   },
-  "nextStory": "BUG-007",
+  "nextStory": "BUG-008",
   "storyOrder": [
     "US-001",
     "US-002",
@@ -37,9 +37,11 @@
     "BUG-009",
     "BUG-010",
     "BUG-011",
-    "BUG-012"
+    "BUG-012",
+    "US-034",
+    "US-035"
   ],
-  "pending": ["BUG-007", "BUG-008", "BUG-009", "BUG-010", "BUG-011", "BUG-012"],
+  "pending": ["BUG-008", "BUG-009", "BUG-010", "BUG-011", "BUG-012", "US-034", "US-035"],
   "blocked": [],
   "browserSetup": {
     "viewport": "desktop 1200px+",

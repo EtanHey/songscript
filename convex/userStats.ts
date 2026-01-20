@@ -32,6 +32,15 @@ export const getAggregatedStats = query({
       .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
       .collect();
 
+    // Get line progress for lines marked as learned
+    const lineProgress = await ctx.db
+      .query("lineProgress")
+      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+      .collect();
+
+    // Calculate total lines learned (marked as learned=true)
+    const totalLinesLearned = lineProgress.filter(lp => lp.learned).length;
+
     // Calculate total lines practiced and track by song
     let totalLinesPracticed = 0;
     const songPracticeCounts: Map<string, { songId: string; count: number }> = new Map();
@@ -116,7 +125,7 @@ export const getAggregatedStats = query({
 
     return {
       totalUniqueWords,
-      totalLinesPracticed,
+      totalLinesLearned, // Use lines marked as learned instead of lines practiced
       totalPracticeTimeSeconds,
       languageBreakdown,
       mostPracticedSong,
