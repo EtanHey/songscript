@@ -48,6 +48,15 @@
 - Learnings: When using Suspense with data loading, state initialization from async data requires useEffect to sync state when data loads, not just useState initialization
 ---
 
+## Iteration - Fix checked line background color making text unreadable
+- Fixed critical UI bug where learned lines used bg-emerald-50 (almost white) making Farsi text unreadable
+- Changed learned line styling from "bg-emerald-50 border border-emerald-200" to "bg-emerald-100/50 border border-emerald-300"
+- The new bg-emerald-100/50 provides a more subtle green with 50% opacity that maintains text readability
+- Visual distinction between learned/not-learned lines is still clear with the emerald-300 border
+- Typecheck passes - no TypeScript errors
+- Learnings: When using background colors for text overlays, always test with actual content to ensure readability, especially with non-Latin scripts like Farsi/Persian
+---
+
 ---
 
 ## Learnings
