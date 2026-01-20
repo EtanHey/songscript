@@ -1,7 +1,7 @@
 import { convexQuery } from "@convex-dev/react-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useRef, useEffect } from "react";
-import { Info, Check, Star } from "lucide-react";
+import { Info, Check } from "lucide-react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 
@@ -39,7 +39,7 @@ interface LyricsDisplayProps {
 
 export default function LyricsDisplay({
   songId,
-  visitorId,
+  visitorId: _visitorId,
   onLineClick,
   onLineInfoClick,
   onLineCheckboxClick,
@@ -52,11 +52,6 @@ export default function LyricsDisplay({
     convexQuery(api.lyrics.getBySong, { songId })
   );
 
-  // Get word progress to determine "words known" state
-  const { data: wordProgress } = useSuspenseQuery(
-    convexQuery(api.wordProgress.getByVisitor, { visitorId })
-  );
-
   // Sort lyrics by lineNumber to ensure correct order
   const sortedLyrics = [...(lyrics || [])].sort(
     (a, b) => a.lineNumber - b.lineNumber
@@ -66,27 +61,12 @@ export default function LyricsDisplay({
   const lineLearnedMap = new Map(
     lineProgress.map(lp => [lp.lineNumber, lp.learned])
   );
-  
-  const learnedWordsSet = new Set(
-    (wordProgress || [])
-      .filter(wp => wp.learned)
-      .map(wp => wp.persian)
-      .filter(Boolean)
-  );
 
   // Determine visual state for each line
-  const getLineState = (line: LyricLine): 'default' | 'wordsKnown' | 'learned' => {
+  const getLineState = (line: LyricLine): 'default' | 'learned' => {
     // Check if line is explicitly marked as learned
     if (lineLearnedMap.get(line.lineNumber)) {
       return 'learned';
-    }
-    
-    // Check if any words in this line are known from other songs
-    const words = line.original.split(/\s+/);
-    const hasKnownWords = words.some(word => learnedWordsSet.has(word.trim()));
-    
-    if (hasKnownWords) {
-      return 'wordsKnown';
     }
     
     return 'default';
@@ -129,8 +109,6 @@ export default function LyricsDisplay({
             // Visual state styling
             lineState === 'learned'
               ? "border-l-4 border-l-emerald-500"
-              : lineState === 'wordsKnown'
-              ? "border-l-2 border-l-blue-300"
               : ""
           }`}
         >
@@ -201,13 +179,6 @@ export default function LyricsDisplay({
           >
             <Info className="h-4 w-4" />
           </button>
-          
-          {/* Words known indicator */}
-          {lineState === 'wordsKnown' && (
-            <div className="flex-shrink-0 rounded p-1.5 text-blue-500" title="Some words known from other songs">
-              <Star className="h-4 w-4" />
-            </div>
-          )}
         </div>
         )
       })}
