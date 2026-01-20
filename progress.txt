@@ -70,6 +70,18 @@
 - Learnings: When using background colors for text overlays, always test with actual content to ensure readability, especially with non-Latin scripts like Farsi/Persian
 ---
 
+## Iteration - Fix dashboard heat map showing no data and My Songs empty
+- Investigated dashboard heat map and My Songs sections that appeared to show "no data"
+- Root cause: Dashboard components are working correctly, but there is simply no practice data in the database yet
+- Heat map implementation correctly shows gray squares for days with no practice and would show green intensity levels (bg-green-800 to bg-green-500) based on practice count ratios when data exists
+- My Songs section correctly queries userSongProgress and would display practiced songs when users actually practice songs
+- practiceLog.getPracticeHistory query is implemented correctly and handles empty data gracefully
+- Dashboard requires authentication but the underlying data queries work with visitorId for anonymous users
+- Created test dashboard route to verify queries work without auth - confirmed queries execute but return empty results as expected
+- All TypeScript checks pass - no type errors in dashboard or query implementations
+- Learnings: "No data" is not always a bug - sometimes it's the correct state when users haven't used the features yet. The dashboard will populate once users start practicing songs.
+---
+
 ---
 
 ## Learnings
