@@ -38,13 +38,14 @@
 ---
 
 ## Current Iteration
-## Iteration - Add line learned state tracking to Convex
-- Added lineProgress table to schema with visitorId, songId, lineNumber, learned fields
-- Created toggleLineLearned mutation that toggles learned state for a specific line
-- Created getLineProgressBySong query to retrieve all line progress for a song
-- Added proper indexes for efficient querying by visitor, song, and specific line
+## Iteration - Visual state for lines: not learned / words known / line learned
+- Implemented three visual states for lyric lines: default (no styling), words known (blue left border + star icon), line learned (green background + border)
+- Added efficient batch queries to fetch line progress and word progress data
+- Updated LyricsDisplay component to determine and apply visual states based on learned status and known words
+- Modified song page to pass line progress data and visitor ID to component
+- Updated checkbox functionality to use toggleLineLearned mutation instead of recordLineCompletion
 - All acceptance criteria completed and typecheck passes
-- Learnings: Line progress tracking is separate from practice completion - this tracks mastery/learned state vs practice activity
+- Learnings: Visual states provide clear feedback on learning progress - default shows unlearned lines, blue border indicates familiar words, green styling shows mastered lines
 ---
 
 ---
