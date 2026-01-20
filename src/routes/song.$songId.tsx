@@ -160,7 +160,6 @@ function SongPageContent({ songId }: SongPageContentProps) {
         
         // Log silent time in batches of 60+ seconds (1 minute)
         if (newAccumulatedSilentTime >= 60 && visitorId) {
-          console.log("Logging practice - silent_time:", Math.floor(newAccumulatedSilentTime));
           logPracticeMutation({
             visitorId,
             eventType: "silent_time",
@@ -177,20 +176,15 @@ function SongPageContent({ songId }: SongPageContentProps) {
   
   // Handle audio snippet completion - track practice time and log if needed
   const handleAudioEnded = useCallback((lineNumber: number) => {
-    console.log("handleAudioEnded called with lineNumber:", lineNumber);
-    
     if (audioStartTimeRef.current) {
       const audioDuration = (Date.now() - audioStartTimeRef.current) / 1000;
       const newAccumulatedTime = accumulatedTime + audioDuration;
-      
-      console.log("Audio duration:", audioDuration, "New accumulated time:", newAccumulatedTime);
       
       setAccumulatedTime(newAccumulatedTime);
       lastActivityRef.current = Date.now();
       
       // Log practice in batches of 30+ seconds
       if (newAccumulatedTime >= 30 && visitorId) {
-        console.log("Logging practice - audio_time:", Math.floor(newAccumulatedTime));
         logPracticeMutation({
           visitorId,
           eventType: "audio_time",
@@ -203,7 +197,6 @@ function SongPageContent({ songId }: SongPageContentProps) {
     // Record line completion using the lineNumber from the audio hook
     if (visitorId && songId) {
       if (!sessionCompletedLines.has(lineNumber)) {
-        console.log("Recording line completion for line:", lineNumber);
         recordLineCompletionMutation({
           visitorId,
           songId: songId as Id<"songs">,

@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TestDashboardRouteImport } from './routes/test-dashboard'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
@@ -18,11 +17,6 @@ import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
-const TestDashboardRoute = TestDashboardRouteImport.update({
-  id: '/test-dashboard',
-  path: '/test-dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -61,7 +55,6 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/test-dashboard': typeof TestDashboardRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/song/$songId': typeof SongSongIdRoute
@@ -70,7 +63,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/test-dashboard': typeof TestDashboardRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/song/$songId': typeof SongSongIdRoute
@@ -81,7 +73,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
   '/login': typeof LoginRoute
-  '/test-dashboard': typeof TestDashboardRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/song/$songId': typeof SongSongIdRoute
@@ -92,7 +83,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
-    | '/test-dashboard'
     | '/dashboard'
     | '/auth/verify'
     | '/song/$songId'
@@ -101,7 +91,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
-    | '/test-dashboard'
     | '/dashboard'
     | '/auth/verify'
     | '/song/$songId'
@@ -111,7 +100,6 @@ export interface FileRouteTypes {
     | '/'
     | '/_authed'
     | '/login'
-    | '/test-dashboard'
     | '/_authed/dashboard'
     | '/auth/verify'
     | '/song/$songId'
@@ -122,7 +110,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthedRoute: typeof AuthedRouteWithChildren
   LoginRoute: typeof LoginRoute
-  TestDashboardRoute: typeof TestDashboardRoute
   AuthVerifyRoute: typeof AuthVerifyRoute
   SongSongIdRoute: typeof SongSongIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -130,13 +117,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/test-dashboard': {
-      id: '/test-dashboard'
-      path: '/test-dashboard'
-      fullPath: '/test-dashboard'
-      preLoaderRoute: typeof TestDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -204,7 +184,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
   LoginRoute: LoginRoute,
-  TestDashboardRoute: TestDashboardRoute,
   AuthVerifyRoute: AuthVerifyRoute,
   SongSongIdRoute: SongSongIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
