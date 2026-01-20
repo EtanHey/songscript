@@ -1,0 +1,16 @@
+{
+  "id": "US-009",
+  "title": "Persist user preferences from song page",
+  "description": "Save playback speed, language filter, playback mode, and video muted/collapsed state to database when changed.",
+  "acceptanceCriteria": [
+    { "text": "Playback speed persisted on change", "checked": false },
+    { "text": "Language filter persisted on change", "checked": false },
+    { "text": "Playback mode (single/loop/fluid) persisted on change", "checked": false },
+    { "text": "Video muted/collapsed state persisted", "checked": false },
+    { "text": "Preferences loaded on page mount", "checked": false },
+    { "text": "Typecheck passes", "checked": false },
+    { "text": "Verify in browser: settings persist across page refresh", "checked": false }
+  ],
+  "passes": false,
+  "blockedBy": "US-002"
+}

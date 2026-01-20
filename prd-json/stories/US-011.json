@@ -1,0 +1,14 @@
+{
+  "id": "US-011",
+  "title": "Populate My Songs section in dashboard",
+  "description": "The My Songs section shows 'No songs yet' even when user has practiced songs. Wire up to show songs with progress.",
+  "acceptanceCriteria": [
+    { "text": "My Songs shows songs where user has linesCompleted > 0", "checked": false },
+    { "text": "Each song shows progress percentage", "checked": false },
+    { "text": "Songs sorted by lastPracticed descending", "checked": false },
+    { "text": "Typecheck passes", "checked": false },
+    { "text": "Verify in browser: practiced songs appear in My Songs", "checked": false }
+  ],
+  "passes": false,
+  "blockedBy": "US-005"
+}

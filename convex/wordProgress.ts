@@ -330,6 +330,7 @@ export const deduplicateWordProgress = mutation({
 });
 
 // Get vocabulary for dashboard - grouped by language with mastery levels
+// Only returns words that are explicitly marked as LEARNED (checkmark)
 // Mastery levels: new (1-2 practices), learning (3-9), mastered (10+)
 export const getVocabularyByLanguage = query({
   args: { visitorId: v.string() },
@@ -340,13 +341,16 @@ export const getVocabularyByLanguage = query({
       .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
       .collect();
 
-    if (progressRecords.length === 0) {
+    // Filter to only LEARNED words (marked with checkmark)
+    const learnedRecords = progressRecords.filter((p) => p.learned);
+
+    if (learnedRecords.length === 0) {
       return [];
     }
 
-    // For each progress record, get the word details and song language
+    // For each learned word, get the word details and song language
     const wordsWithProgress = await Promise.all(
-      progressRecords.map(async (progress) => {
+      learnedRecords.map(async (progress) => {
         // Get the word to find its song
         const word = await ctx.db.get(progress.wordId);
         if (!word) return null;

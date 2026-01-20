@@ -30,13 +30,34 @@ function formatRelativeTime(timestamp: number): string {
   return `${Math.floor(diffDays / 30)}mo ago`;
 }
 
-// Helper to get language flag emoji
-function getLanguageFlag(sourceLanguage: string): string {
+// Twemoji Sun & Lion flag for Persian (historical Iranian flag)
+// See: https://github.com/twitter/twemoji/commit/1c8cbe4759046657da043e897b0ab8105b443c80
+const PERSIAN_FLAG_URL = "https://raw.githubusercontent.com/jdecked/twemoji/main/assets/svg/1f1ee-1f1f7.svg";
+
+// Helper to check if language is Persian
+function isPersian(lang: string): boolean {
+  const l = lang.toLowerCase();
+  return l === "fa" || l === "persian" || l === "farsi";
+}
+
+// Flag component - uses Twemoji image for Persian to show Sun & Lion
+function LanguageFlag({ language, size = "1.25em" }: { language: string; size?: string }) {
+  if (isPersian(language)) {
+    return (
+      <img
+        src={PERSIAN_FLAG_URL}
+        alt="🦁"
+        className="inline-block"
+        style={{ width: size, height: size, verticalAlign: "middle" }}
+      />
+    );
+  }
+  return <span>{getLanguageFlagEmoji(language)}</span>;
+}
+
+// Helper to get language flag emoji (for non-Persian languages)
+function getLanguageFlagEmoji(sourceLanguage: string): string {
   switch (sourceLanguage.toLowerCase()) {
-    case "fa":
-    case "persian":
-    case "farsi":
-      return "🇮🇷";
     case "ko":
     case "korean":
       return "🇰🇷";
@@ -55,6 +76,12 @@ function getLanguageFlag(sourceLanguage: string): string {
     default:
       return "🌍";
   }
+}
+
+// Legacy helper for string contexts - returns emoji or lion for Persian
+function getLanguageFlag(sourceLanguage: string): string {
+  if (isPersian(sourceLanguage)) return "🦁";
+  return getLanguageFlagEmoji(sourceLanguage);
 }
 
 // Skeleton Loading Card Component
@@ -643,8 +670,6 @@ function ContinueLearningCard({
   item: RecentSong;
   className?: string;
 }) {
-  const flag = getLanguageFlag(item.song.sourceLanguage);
-
   return (
     <Link
       to="/song/$songId"
@@ -672,9 +697,9 @@ function ContinueLearningCard({
           {item.progressPercent}%
         </div>
 
-        {/* Language flag */}
-        <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-full text-sm">
-          {flag}
+        {/* Language flag - uses Twemoji Sun & Lion for Persian */}
+        <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-full text-sm flex items-center justify-center">
+          <LanguageFlag language={item.song.sourceLanguage} size="1.1em" />
         </div>
 
         {/* Content overlay at bottom */}

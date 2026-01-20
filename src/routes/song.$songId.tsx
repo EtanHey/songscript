@@ -9,6 +9,8 @@ import LocalVideoPlayer, { LocalVideoPlayerHandle } from "../components/LocalVid
 import LyricsDisplay, { LanguageFilter, LyricLine } from "../components/LyricsDisplay";
 import WordInfoModal, { ModalLyricLine } from "../components/WordInfoModal";
 import { useAudioPreloader } from "../hooks/useAudioPreloader";
+// TODO: US-004/US-005 will need visitorId for practice tracking
+// import { useVisitorId } from "../hooks/useVisitorId";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import {
   Select,
@@ -161,6 +163,11 @@ function SongPageContent({ songId }: SongPageContentProps) {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // TODO: US-003/US-004/US-005 will wire up practice tracking:
+  // - US-003: Add onEnded callback to useAudioPreloader
+  // - US-004: Call logPractice mutation when 30+ seconds accumulated
+  // - US-005: Call recordLineCompletion when audio snippet finishes
 
   const handleSpeedChange = useCallback((speed: string) => {
     setPlaybackSpeed(speed);

@@ -1,0 +1,13 @@
+{
+  "id": "V-001",
+  "title": "Verify practice tracking end-to-end",
+  "description": "Verify that practice events are being tracked correctly by playing audio snippets and checking the database/dashboard.",
+  "acceptanceCriteria": [
+    { "text": "Play an audio snippet - verify practice time logged in Convex dashboard", "checked": false },
+    { "text": "Complete a line - verify it appears in userSongProgress.linesCompleted", "checked": false },
+    { "text": "Check dashboard heatmap updates after practice", "checked": false },
+    { "text": "Verify streak increments after first practice of day", "checked": false }
+  ],
+  "passes": false,
+  "blockedBy": "US-012"
+}

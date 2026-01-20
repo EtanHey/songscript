@@ -1,0 +1,13 @@
+{
+  "id": "US-007",
+  "title": "Add line learned state tracking to Convex",
+  "description": "Add lineProgress table and mutations for tracking which lines are explicitly marked as learned by users (separate from linesCompleted which tracks practice).",
+  "acceptanceCriteria": [
+    { "text": "lineProgress table added to schema with visitorId, songId, lineNumber, learned fields", "checked": false },
+    { "text": "toggleLineLearned mutation created", "checked": false },
+    { "text": "getLineProgressBySong query created", "checked": false },
+    { "text": "Typecheck passes", "checked": false }
+  ],
+  "passes": false,
+  "blockedBy": null
+}

@@ -1,0 +1,13 @@
+{
+  "id": "V-002",
+  "title": "Verify line checkboxes and visual states",
+  "description": "Verify that line checkboxes work correctly and visual states render properly.",
+  "acceptanceCriteria": [
+    { "text": "Click line checkbox - verify it toggles and persists across refresh", "checked": false },
+    { "text": "Mark words as learned in one song - verify indicator shows on lines with those words in other songs", "checked": false },
+    { "text": "Verify all three visual states render correctly", "checked": false },
+    { "text": "Test on mobile - verify 44x44 touch targets work", "checked": false }
+  ],
+  "passes": false,
+  "blockedBy": "US-008"
+}

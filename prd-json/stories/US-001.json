@@ -1,0 +1,12 @@
+{
+  "id": "US-001",
+  "title": "Add userPreferences table to Convex schema",
+  "description": "Create a new Convex table for persisting user preferences like playback speed, language filter, and audio settings. Uses visitorId pattern matching existing tables.",
+  "acceptanceCriteria": [
+    { "text": "userPreferences table added to convex/schema.ts with fields: visitorId, playbackSpeed, languageFilter, playbackMode, videoMuted, videoCollapsed", "checked": false },
+    { "text": "Index by_visitor created on visitorId field", "checked": false },
+    { "text": "Typecheck passes", "checked": false }
+  ],
+  "passes": false,
+  "blockedBy": null
+}

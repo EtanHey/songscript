@@ -17,14 +17,14 @@ export const getAggregatedStats = query({
       .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
       .collect();
 
-    // Deduplicate by persian text (count unique words, not word instances)
-    const uniqueWordTexts = new Set<string>();
+    // Count unique words that are marked as LEARNED (not just viewed)
+    const learnedWordTexts = new Set<string>();
     for (const wp of wordProgress) {
-      if (wp.persian) {
-        uniqueWordTexts.add(wp.persian);
+      if (wp.persian && wp.learned) {
+        learnedWordTexts.add(wp.persian);
       }
     }
-    const totalUniqueWords = uniqueWordTexts.size;
+    const totalUniqueWords = learnedWordTexts.size;
 
     // Get song progress for lines practiced
     const songProgress = await ctx.db
@@ -56,36 +56,11 @@ export const getAggregatedStats = query({
       0
     );
 
-    // Calculate language breakdown for words
-    const languageWordCounts: Map<string, number> = new Map();
-
-    // For each word progress, get the word and its song to determine language
-    for (const wp of wordProgress) {
-      if (!wp.persian) continue;
-
-      // Get the word to find its song
-      const word = await ctx.db.get(wp.wordId);
-      if (!word) continue;
-
-      // Get the song to find the language
-      const song = await ctx.db.get(word.songId);
-      if (!song) continue;
-
-      const lang = song.sourceLanguage || "unknown";
-      // Only count unique words per language
-      const key = `${lang}:${wp.persian}`;
-      if (!languageWordCounts.has(key)) {
-        languageWordCounts.set(
-          lang,
-          (languageWordCounts.get(lang) || 0) + 1
-        );
-      }
-    }
-
-    // Actually calculate properly - group by language, track unique persian per language
+    // Calculate language breakdown for LEARNED words only
     const wordsByLanguage: Map<string, Set<string>> = new Map();
     for (const wp of wordProgress) {
-      if (!wp.persian) continue;
+      // Only count words that are explicitly marked as learned
+      if (!wp.persian || !wp.learned) continue;
       const word = await ctx.db.get(wp.wordId);
       if (!word) continue;
       const song = await ctx.db.get(word.songId);
@@ -231,9 +206,10 @@ export const getLanguageProgress = query({
       }
     }
 
-    // Process word progress to count words per language
+    // Process word progress to count LEARNED words per language (only words marked with checkmark)
     for (const wp of wordProgress) {
-      if (!wp.persian) continue;
+      // Only count words that are explicitly marked as learned
+      if (!wp.persian || !wp.learned) continue;
 
       // Get the word to find its song
       const word = await ctx.db.get(wp.wordId);
@@ -266,7 +242,7 @@ export const getLanguageProgress = query({
         });
       }
 
-      // Add unique word
+      // Add unique learned word
       languageData.get(lang)!.wordsLearned.add(wp.persian);
     }
 
