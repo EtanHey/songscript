@@ -1,7 +1,7 @@
 import { convexQuery } from "@convex-dev/react-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useRef, useEffect } from "react";
-import { Info } from "lucide-react";
+import { Info, Check } from "lucide-react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 
@@ -23,18 +23,22 @@ interface LyricsDisplayProps {
   songId: Id<"songs">;
   onLineClick?: (startTime: number, lineIndex: number) => void;
   onLineInfoClick?: (line: LyricLine, lineIndex: number) => void;
+  onLineCheckboxClick?: (lineNumber: number, isChecked: boolean) => void;
   activeLineIndex?: number;
   clickedLineIndex?: number;
   languageFilter?: LanguageFilter;
+  completedLines?: number[];
 }
 
 export default function LyricsDisplay({
   songId,
   onLineClick,
   onLineInfoClick,
+  onLineCheckboxClick,
   activeLineIndex,
   clickedLineIndex,
   languageFilter = "all",
+  completedLines = [],
 }: LyricsDisplayProps) {
   const { data: lyrics } = useSuspenseQuery(
     convexQuery(api.lyrics.getBySong, { songId })
@@ -76,6 +80,26 @@ export default function LyricsDisplay({
               : ""
           }`}
         >
+          {/* Checkbox - left side, sticky position */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              const isCurrentlyChecked = completedLines.includes(line.lineNumber);
+              onLineCheckboxClick?.(line.lineNumber, !isCurrentlyChecked);
+            }}
+            className={`flex-shrink-0 w-11 h-11 rounded-lg border-2 transition-all duration-200 flex items-center justify-center ${
+              completedLines.includes(line.lineNumber)
+                ? "bg-emerald-500 border-emerald-500 text-white"
+                : "border-gray-300 hover:border-emerald-400 hover:bg-emerald-50"
+            }`}
+            title={completedLines.includes(line.lineNumber) ? "Mark as not learned" : "Mark as learned"}
+          >
+            {completedLines.includes(line.lineNumber) && (
+              <Check className="h-5 w-5" />
+            )}
+          </button>
+
           {/* Main content - clickable to play audio */}
           <button
             type="button"

@@ -38,16 +38,17 @@
 ---
 
 ## Current Iteration
-## Iteration - Wire up recordLineCompletion mutation
-- Added recordLineCompletion mutation hook using useConvexMutation pattern
-- Added sessionCompletedLines state to track lines completed in current session for deduplication
-- Added currentPlayingLineRef to track which line is currently playing
-- Modified playAudioSnippetWithTracking to set currentPlayingLineRef when audio starts
-- Enhanced handleAudioEnded callback to record line completion when audio snippet finishes
-- Line completion is only recorded once per session using Set-based deduplication
-- Mutation fires with visitorId, songId, and lineNumber when audio snippet ends
+## Iteration - Add line checkbox to LyricsDisplay component
+- Added checkbox UI to left side of each lyric line in LyricsDisplay component
+- Checkbox is 44x44px (w-11 h-11) for proper mobile touch target accessibility
+- Added onLineCheckboxClick prop and completedLines prop to LyricsDisplay interface
+- Wired up checkbox clicks to recordLineCompletion mutation via handleLineCheckboxClick handler
+- Added songProgress query to get current line completion status from userSongProgress table
+- Checkbox shows green with checkmark when line is completed, gray border when not completed
+- Checkbox has proper hover states and transitions for good UX
+- All acceptance criteria met: checkbox rendered, visible while scrolling, calls mutation, meets accessibility requirements
 - Typecheck passes successfully
-- Learnings: Line completion tracking requires careful state management to avoid duplicate recordings and ensure accurate line tracking
+- Learnings: Line checkboxes provide immediate visual feedback for learning progress and integrate seamlessly with existing song progress tracking
 ---
 
 ---

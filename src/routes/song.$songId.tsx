@@ -79,6 +79,12 @@ function SongPageContent({ songId }: SongPageContentProps) {
     convexQuery(api.lyrics.getBySong, { songId })
   );
 
+  // Get visitor ID and song progress
+  const visitorId = useVisitorId();
+  const { data: songProgress } = useSuspenseQuery(
+    convexQuery(api.songProgress.getByVisitorSong, { visitorId, songId })
+  );
+
   // Sort lyrics by lineNumber for consistent access - memoized to prevent infinite re-renders
   const sortedLyrics = useMemo(
     () => [...(lyrics || [])].sort((a, b) => a.lineNumber - b.lineNumber),
@@ -98,7 +104,6 @@ function SongPageContent({ songId }: SongPageContentProps) {
   );
 
   // Practice tracking state and logic
-  const visitorId = useVisitorId();
   const logPracticeMutation = useConvexMutation(api.practiceLog.logPractice);
   const recordLineCompletionMutation = useConvexMutation(api.songProgress.recordLineCompletion);
   
@@ -449,6 +454,15 @@ function SongPageContent({ songId }: SongPageContentProps) {
     });
     setWordModalOpen(true);
   }, []);
+
+  // Handle checkbox toggle for line completion
+  const handleLineCheckboxClick = useCallback((lineNumber: number, isChecked: boolean) => {
+    if (isChecked) {
+      recordLineCompletionMutation({ visitorId, songId, lineNumber });
+    }
+    // Note: We don't handle unchecking here as the mutation only adds lines
+    // The UI will update when the query refetches
+  }, [recordLineCompletionMutation, visitorId, songId]);
 
   // Sync loop mode to audio preloader (for Single/Loop snippet modes)
   useEffect(() => {
@@ -812,9 +826,11 @@ function SongPageContent({ songId }: SongPageContentProps) {
             songId={songId}
             onLineClick={handleLineClick}
             onLineInfoClick={handleLineInfoClick}
+            onLineCheckboxClick={handleLineCheckboxClick}
             activeLineIndex={activeLineIndex}
             clickedLineIndex={clickedLineIndex}
             languageFilter={languageFilter}
+            completedLines={songProgress?.linesCompleted || []}
           />
         </div>
       </div>

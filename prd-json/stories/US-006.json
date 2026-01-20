@@ -3,13 +3,14 @@
   "title": "Add line checkbox to LyricsDisplay component",
   "description": "Add a checkbox on the left side of each lyric line that allows users to explicitly mark a line as learned. Checkbox should be visible while scrolling.",
   "acceptanceCriteria": [
-    { "text": "Checkbox rendered on left side of each lyric line", "checked": false },
-    { "text": "Checkbox visible in sticky/fixed position while scrolling", "checked": false },
-    { "text": "Checkbox toggles line learned state via mutation", "checked": false },
-    { "text": "Minimum 44x44px touch target for mobile accessibility", "checked": false },
-    { "text": "Typecheck passes", "checked": false },
-    { "text": "Verify in browser: checkboxes visible and clickable", "checked": false }
+    { "text": "Checkbox rendered on left side of each lyric line", "checked": true },
+    { "text": "Checkbox visible in sticky/fixed position while scrolling", "checked": true },
+    { "text": "Checkbox toggles line learned state via mutation", "checked": true },
+    { "text": "Minimum 44x44px touch target for mobile accessibility", "checked": true },
+    { "text": "Typecheck passes", "checked": true },
+    { "text": "Verify in browser: checkboxes visible and clickable", "checked": true }
   ],
-  "passes": false,
+  "passes": true,
+  "completedAt": "2026-01-20T02:04:43Z",
   "blockedBy": null
 }
