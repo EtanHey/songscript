@@ -1,0 +1,17 @@
+{
+  "id": "BUG-013",
+  "title": "CRITICAL: Fix SSR path resolution for convex imports",
+  "description": "Page fails to load with error: 'Failed to load url ../../convex/_generated/api'. This is a Vite SSR issue where relative imports to convex generated files fail during server-side rendering. All other work is blocked until this is fixed.",
+  "acceptanceCriteria": [
+    { "text": "Check if convex dev server is running (npx convex dev)", "checked": false },
+    { "text": "Verify vite.config.ts has proper resolve.alias for convex paths", "checked": false },
+    { "text": "Consider changing relative imports to use path alias (@convex/)", "checked": false },
+    { "text": "Clear .vinxi cache and node_modules/.vite, restart servers", "checked": false },
+    { "text": "Page loads without SSR errors", "checked": false },
+    { "text": "Song page renders with video and lyrics", "checked": false },
+    { "text": "Typecheck passes", "checked": false }
+  ],
+  "passes": false,
+  "blockedBy": null,
+  "priority": "critical"
+}

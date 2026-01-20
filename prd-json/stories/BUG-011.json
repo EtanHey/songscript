@@ -3,12 +3,13 @@
   "title": "Fix loop restart causing brief flash to next line",
   "description": "In Loop mode, when a line finishes and loops back to its start, there's sometimes a brief visual flash showing the next line before it snaps back to the current line. This happens because the time-based line detection briefly shows the wrong line during the seek operation. The existing isLoopSeekingRef and targetLineIndexRef logic isn't fully preventing this.",
   "acceptanceCriteria": [
-    { "text": "Investigate timing of loop restart seek vs time update events", "checked": false },
-    { "text": "Ensure activeLineIndex doesn't change during loop restart seek", "checked": false },
-    { "text": "Test loop mode with multiple lines to verify no visual flash occurs", "checked": false },
-    { "text": "Consider using a longer timeout or different approach to prevent flash", "checked": false },
-    { "text": "Typecheck passes", "checked": false }
+    { "text": "Investigate timing of loop restart seek vs time update events", "checked": true },
+    { "text": "Ensure activeLineIndex doesn't change during loop restart seek", "checked": true },
+    { "text": "Test loop mode with multiple lines to verify no visual flash occurs", "checked": true },
+    { "text": "Consider using a longer timeout or different approach to prevent flash", "checked": true },
+    { "text": "Typecheck passes", "checked": true }
   ],
-  "passes": false,
+  "passes": true,
+  "completedAt": "2026-01-20T10:36:47Z",
   "blockedBy": null
 }

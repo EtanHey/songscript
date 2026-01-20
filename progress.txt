@@ -201,15 +201,14 @@ Key blockers from previous PRD:
 - Typecheck passes - no TypeScript errors
 - Learnings: When tracking user progress, ensure stats reflect the intended user action (explicit learning vs passive practice) and use the correct data source
 ---
-## Iteration - Fix incorrect audio timestamps for lyrics lines (BUG-010)
-- Analyzed lyrics timestamps and found 1 line with suspiciously short duration (< 1 second) and 30 overlapping line pairs
-- Fixed critical timestamp issues for lines 18 and 19 mentioned in bug report:
-  - Line 18 "برای نخبه های زندانی": reduced end time from 84.64s to 84.0s to eliminate overlap
-  - Line 19 "برای کودکان افغانی": extended duration from 0.88s to 3.3s (84.2s-87.5s) for proper audio playback
-  - Line 20: adjusted start time from 84.82s to 87.7s to prevent new overlap with line 19
-- Created debug queries to analyze and fix timestamp issues systematically
-- Documented remaining systematic 0.35s overlaps throughout song (likely intentional for smooth audio transitions)
-- Verified fixes eliminate the specific playback issues mentioned in bug report
-- Typecheck passes - no TypeScript errors in main application code
-- Learnings: Audio timestamp issues can cascade - fixing one line may require adjusting adjacent lines to prevent new overlaps
+## Iteration - Fix loop restart causing brief flash to next line (BUG-011)
+- Fixed critical visual flash bug in Loop mode where line detection briefly showed wrong line during loop restart
+- Root cause: 100ms timeout was too short for video seeking and time update events to stabilize
+- Solution: Increased timeout from 100ms to 200ms in both loop restart and line click seeking operations
+- Added detailed comments explaining the timing requirements for seek stabilization
+- Tested loop mode functionality with automated Playwright test - confirmed no visual flashing occurs
+- The existing isLoopSeekingRef and targetLineIndexRef logic was correct, just needed more time to work properly
+- Loop mode now provides smooth visual experience without line detection interference during seeks
+- Typecheck passes - no TypeScript errors
+- Learnings: Video seeking operations need sufficient time for browser keyframe seeking and time update events to stabilize before resuming normal line detection
 ---

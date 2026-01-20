@@ -480,10 +480,12 @@ function SongPageContent({ songId }: SongPageContentProps) {
       // Seek video to match the line
       playerRef.current?.seekTo(startTime);
 
-      // Clear seeking flag after seek completes (give browser time to process)
+      // Clear seeking flag after seek completes - increased timeout to prevent flash
+      // 200ms gives enough time for video seeking and time update events to stabilize
+      // before allowing normal line detection to resume
       setTimeout(() => {
         isLoopSeekingRef.current = false;
-      }, 100);
+      }, 200);
 
       // Handle differently based on playback mode
       if (playbackMode === "fluid") {
@@ -625,10 +627,12 @@ function SongPageContent({ songId }: SongPageContentProps) {
           // showing the wrong line if video keyframe seeking lands before startTime
           targetLineIndexRef.current = currentLineIndex;
           player.seekTo(currentLine.startTime);
-          // Clear flag after seek completes (give browser time to process)
+          // Clear flag after seek completes - increased timeout to prevent flash
+          // 200ms gives enough time for video seeking and time update events to stabilize
+          // before allowing normal line detection to resume
           setTimeout(() => {
             isLoopSeekingRef.current = false;
-          }, 100);
+          }, 200);
           
           // Track loop completion for scoring
           if (visitorId) {
