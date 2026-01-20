@@ -1,7 +1,7 @@
 import { convexQuery } from "@convex-dev/react-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useRef, useEffect } from "react";
-import { Info, Check } from "lucide-react";
+import { Info, Check, Star } from "lucide-react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 
@@ -21,33 +21,76 @@ export type LanguageFilter = "all" | "persian" | "transliteration" | "hebrew" | 
 
 interface LyricsDisplayProps {
   songId: Id<"songs">;
+  visitorId: string;
   onLineClick?: (startTime: number, lineIndex: number) => void;
   onLineInfoClick?: (line: LyricLine, lineIndex: number) => void;
-  onLineCheckboxClick?: (lineNumber: number, isChecked: boolean) => void;
+  onLineCheckboxClick?: (lineNumber: number) => void;
   activeLineIndex?: number;
   clickedLineIndex?: number;
   languageFilter?: LanguageFilter;
-  completedLines?: number[];
+  lineProgress?: Array<{
+    _id: string;
+    visitorId: string;
+    songId: Id<"songs">;
+    lineNumber: number;
+    learned: boolean;
+  }>;
 }
 
 export default function LyricsDisplay({
   songId,
+  visitorId,
   onLineClick,
   onLineInfoClick,
   onLineCheckboxClick,
   activeLineIndex,
   clickedLineIndex,
   languageFilter = "all",
-  completedLines = [],
+  lineProgress = [],
 }: LyricsDisplayProps) {
   const { data: lyrics } = useSuspenseQuery(
     convexQuery(api.lyrics.getBySong, { songId })
+  );
+
+  // Get word progress to determine "words known" state
+  const { data: wordProgress } = useSuspenseQuery(
+    convexQuery(api.wordProgress.getByVisitor, { visitorId })
   );
 
   // Sort lyrics by lineNumber to ensure correct order
   const sortedLyrics = [...(lyrics || [])].sort(
     (a, b) => a.lineNumber - b.lineNumber
   ) as LyricLine[];
+
+  // Create lookup maps for efficient state checking
+  const lineLearnedMap = new Map(
+    lineProgress.map(lp => [lp.lineNumber, lp.learned])
+  );
+  
+  const learnedWordsSet = new Set(
+    (wordProgress || [])
+      .filter(wp => wp.learned)
+      .map(wp => wp.persian)
+      .filter(Boolean)
+  );
+
+  // Determine visual state for each line
+  const getLineState = (line: LyricLine): 'default' | 'wordsKnown' | 'learned' => {
+    // Check if line is explicitly marked as learned
+    if (lineLearnedMap.get(line.lineNumber)) {
+      return 'learned';
+    }
+    
+    // Check if any words in this line are known from other songs
+    const words = line.original.split(/\s+/);
+    const hasKnownWords = words.some(word => learnedWordsSet.has(word.trim()));
+    
+    if (hasKnownWords) {
+      return 'wordsKnown';
+    }
+    
+    return 'default';
+  };
 
   // Refs for each line to enable auto-scroll
   const lineRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -64,7 +107,11 @@ export default function LyricsDisplay({
 
   return (
     <div className="flex flex-col gap-2">
-      {sortedLyrics.map((line, index) => (
+      {sortedLyrics.map((line, index) => {
+        const lineState = getLineState(line);
+        const isLearned = lineState === 'learned';
+        
+        return (
         <div
           key={line._id}
           ref={(el) => {
@@ -78,6 +125,13 @@ export default function LyricsDisplay({
             clickedLineIndex === index
               ? "scale-[0.98] bg-primary/20"
               : ""
+          } ${
+            // Visual state styling
+            lineState === 'learned' 
+              ? "bg-emerald-50 border border-emerald-200" 
+              : lineState === 'wordsKnown'
+              ? "border-l-2 border-l-blue-300"
+              : ""
           }`}
         >
           {/* Checkbox - left side, sticky position */}
@@ -85,17 +139,16 @@ export default function LyricsDisplay({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              const isCurrentlyChecked = completedLines.includes(line.lineNumber);
-              onLineCheckboxClick?.(line.lineNumber, !isCurrentlyChecked);
+              onLineCheckboxClick?.(line.lineNumber);
             }}
             className={`flex-shrink-0 w-11 h-11 rounded-lg border-2 transition-all duration-200 flex items-center justify-center ${
-              completedLines.includes(line.lineNumber)
+              isLearned
                 ? "bg-emerald-500 border-emerald-500 text-white"
                 : "border-gray-300 hover:border-emerald-400 hover:bg-emerald-50"
             }`}
-            title={completedLines.includes(line.lineNumber) ? "Mark as not learned" : "Mark as learned"}
+            title={isLearned ? "Mark as not learned" : "Mark as learned"}
           >
-            {completedLines.includes(line.lineNumber) && (
+            {isLearned && (
               <Check className="h-5 w-5" />
             )}
           </button>
@@ -148,8 +201,16 @@ export default function LyricsDisplay({
           >
             <Info className="h-4 w-4" />
           </button>
+          
+          {/* Words known indicator */}
+          {lineState === 'wordsKnown' && (
+            <div className="flex-shrink-0 rounded p-1.5 text-blue-500" title="Some words known from other songs">
+              <Star className="h-4 w-4" />
+            </div>
+          )}
         </div>
-      ))}
+        )
+      })}
     </div>
   );
 }

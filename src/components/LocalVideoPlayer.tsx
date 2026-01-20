@@ -18,12 +18,13 @@ interface LocalVideoPlayerProps {
   onReady?: () => void
   onStateChange?: (state: 'playing' | 'paused' | 'ended') => void
   onError?: (error: string) => void
+  onMuteChange?: (muted: boolean) => void
   muted?: boolean
   autoplay?: boolean
 }
 
 const LocalVideoPlayer = forwardRef<LocalVideoPlayerHandle, LocalVideoPlayerProps>(
-  function LocalVideoPlayer({ videoUrl, onTimeUpdate, onReady, onStateChange, onError, muted = true, autoplay = false }, ref) {
+  function LocalVideoPlayer({ videoUrl, onTimeUpdate, onReady, onStateChange, onError, onMuteChange, muted = true, autoplay = false }, ref) {
     const videoRef = useRef<HTMLVideoElement>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -165,10 +166,12 @@ const LocalVideoPlayer = forwardRef<LocalVideoPlayerHandle, LocalVideoPlayerProp
 
     const toggleMute = useCallback(() => {
       if (videoRef.current) {
-        videoRef.current.muted = !videoRef.current.muted
-        setIsMutedState(videoRef.current.muted)
+        const newMuted = !videoRef.current.muted
+        videoRef.current.muted = newMuted
+        setIsMutedState(newMuted)
+        onMuteChange?.(newMuted)
       }
-    }, [])
+    }, [onMuteChange])
 
     // Handle click to play (for when autoplay was blocked)
     const handlePlayButtonClick = useCallback(() => {

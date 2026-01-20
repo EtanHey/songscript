@@ -79,11 +79,17 @@ function SongPageContent({ songId }: SongPageContentProps) {
     convexQuery(api.lyrics.getBySong, { songId })
   );
 
-  // Get visitor ID and song progress
+  // Get visitor ID and line progress for visual states
   const visitorId = useVisitorId();
-  const { data: songProgress } = useSuspenseQuery(
-    convexQuery(api.songProgress.getByVisitorSong, { visitorId, songId })
+  const { data: lineProgress } = useSuspenseQuery(
+    convexQuery(api.songProgress.getLineProgressBySong, { visitorId, songId })
   );
+
+  // Load user preferences
+  const { data: userPreferences } = useSuspenseQuery(
+    convexQuery(api.userPreferences.getByVisitor, { visitorId })
+  );
+  const updatePreferencesMutation = useConvexMutation(api.userPreferences.updatePreferences);
 
   // Sort lyrics by lineNumber for consistent access - memoized to prevent infinite re-renders
   const sortedLyrics = useMemo(
@@ -106,6 +112,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
   // Practice tracking state and logic
   const logPracticeMutation = useConvexMutation(api.practiceLog.logPractice);
   const recordLineCompletionMutation = useConvexMutation(api.songProgress.recordLineCompletion);
+  const toggleLineLearnedMutation = useConvexMutation(api.songProgress.toggleLineLearned);
   
   // Track accumulated practice time (in seconds)
   const [accumulatedTime, setAccumulatedTime] = useState(0);
@@ -204,22 +211,28 @@ function SongPageContent({ songId }: SongPageContentProps) {
   // due to keyframe seeking landing slightly before the requested time
   const targetLineIndexRef = useRef<number | undefined>(undefined);
 
-  // Playback mode state: single, loop, or fluid - default to fluid for auto-play experience
-  const [playbackMode, setPlaybackMode] = useState<PlaybackMode>("fluid");
+  // Playback mode state: single, loop, or fluid - initialize from preferences
+  const [playbackMode, setPlaybackMode] = useState<PlaybackMode>(
+    (userPreferences?.playbackMode as PlaybackMode) || "fluid"
+  );
   const [currentLineIndex, setCurrentLineIndex] = useState<number | undefined>(
     undefined
   );
 
-  // Playback speed state
-  const [playbackSpeed, setPlaybackSpeed] = useState<string>("1");
+  // Playback speed state - initialize from preferences
+  const [playbackSpeed, setPlaybackSpeed] = useState<string>(
+    userPreferences?.playbackSpeed?.toString() || "1"
+  );
 
-  // Language filter state
-  const [languageFilter, setLanguageFilter] = useState<LanguageFilter>("all");
+  // Language filter state - initialize from preferences
+  const [languageFilter, setLanguageFilter] = useState<LanguageFilter>(
+    (userPreferences?.languageFilter as LanguageFilter) || "all"
+  );
 
-  // Video mute state - derived from playback mode (muted in single/loop, unmuted in fluid)
-  // Start MUTED to allow browser autoplay (browsers block autoplay with sound)
-  // User can unmute via the video overlay button after autoplay starts
-  const [isVideoMuted, setIsVideoMuted] = useState(true);
+  // Video mute state - initialize from preferences
+  const [isVideoMuted, setIsVideoMuted] = useState(
+    userPreferences?.videoMuted ?? true
+  );
 
   // Video error state - for fallback handling
   const [videoError, setVideoError] = useState<string | null>(null);
@@ -231,8 +244,10 @@ function SongPageContent({ songId }: SongPageContentProps) {
   const [wordModalOpen, setWordModalOpen] = useState(false);
   const [selectedLine, setSelectedLine] = useState<ModalLyricLine | null>(null);
 
-  // Mobile video collapsed state - starts collapsed for more lyrics space
-  const [isVideoCollapsed, setIsVideoCollapsed] = useState(true);
+  // Mobile video collapsed state - initialize from preferences
+  const [isVideoCollapsed, setIsVideoCollapsed] = useState(
+    userPreferences?.videoCollapsed ?? true
+  );
 
   // Detect if mobile (viewport width < 768px)
   const [isMobile, setIsMobile] = useState(false);
@@ -242,6 +257,53 @@ function SongPageContent({ songId }: SongPageContentProps) {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Sync state with loaded user preferences
+  useEffect(() => {
+    if (userPreferences) {
+      setPlaybackSpeed(userPreferences.playbackSpeed?.toString() || "1");
+      setLanguageFilter((userPreferences.languageFilter as LanguageFilter) || "all");
+      setPlaybackMode((userPreferences.playbackMode as PlaybackMode) || "fluid");
+      setIsVideoMuted(userPreferences.videoMuted ?? true);
+      setIsVideoCollapsed(userPreferences.videoCollapsed ?? true);
+    }
+  }, [userPreferences]);
+
+  // Preference persistence functions
+  const persistPlaybackSpeed = useCallback((speed: string) => {
+    updatePreferencesMutation({
+      visitorId,
+      playbackSpeed: parseFloat(speed)
+    });
+  }, [updatePreferencesMutation, visitorId]);
+
+  const persistLanguageFilter = useCallback((filter: LanguageFilter) => {
+    updatePreferencesMutation({
+      visitorId,
+      languageFilter: filter
+    });
+  }, [updatePreferencesMutation, visitorId]);
+
+  const persistPlaybackMode = useCallback((mode: PlaybackMode) => {
+    updatePreferencesMutation({
+      visitorId,
+      playbackMode: mode
+    });
+  }, [updatePreferencesMutation, visitorId]);
+
+  const persistVideoMuted = useCallback((muted: boolean) => {
+    updatePreferencesMutation({
+      visitorId,
+      videoMuted: muted
+    });
+  }, [updatePreferencesMutation, visitorId]);
+
+  const persistVideoCollapsed = useCallback((collapsed: boolean) => {
+    updatePreferencesMutation({
+      visitorId,
+      videoCollapsed: collapsed
+    });
+  }, [updatePreferencesMutation, visitorId]);
 
   // Wrapper for playAudioSnippet that includes tracking
   const playAudioSnippetWithTracking = useCallback((lineNumber: number) => {
@@ -255,7 +317,9 @@ function SongPageContent({ songId }: SongPageContentProps) {
     // Update both video and audio playback rate
     playerRef.current?.setPlaybackRate(parseFloat(speed));
     setAudioPlaybackRate(parseFloat(speed));
-  }, [setAudioPlaybackRate]);
+    // Persist to database
+    persistPlaybackSpeed(speed);
+  }, [setAudioPlaybackRate, persistPlaybackSpeed]);
 
   // Handle playback mode change
   const handlePlaybackModeChange = useCallback((mode: PlaybackMode) => {
@@ -267,16 +331,19 @@ function SongPageContent({ songId }: SongPageContentProps) {
       // Switching TO Fluid mode: unmute video, continue from current position
       playerRef.current?.unmute();
       setIsVideoMuted(false);
+      persistVideoMuted(false);
       // Continue playing from current position (don't restart)
       playerRef.current?.play();
       // Auto-expand video on mobile when switching to Fluid mode
       if (isMobile) {
         setIsVideoCollapsed(false);
+        persistVideoCollapsed(false);
       }
     } else {
       // Switching TO Single/Loop mode: mute video, audio from snippets
       playerRef.current?.mute();
       setIsVideoMuted(true);
+      persistVideoMuted(true);
 
       // If coming FROM Fluid mode, stay at current line position
       // The activeLineIndex already tracks where we are, so just trigger the snippet
@@ -296,10 +363,29 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
     // Update audio loop based on mode
     setAudioLoop(mode === "loop");
-  }, [playbackMode, setAudioLoop, activeLineIndex, sortedLyrics, audioReady, playAudioSnippetWithTracking, isMobile]);
+    
+    // Persist to database
+    persistPlaybackMode(mode);
+  }, [playbackMode, setAudioLoop, activeLineIndex, sortedLyrics, audioReady, playAudioSnippetWithTracking, isMobile, persistPlaybackMode, persistVideoMuted, persistVideoCollapsed]);
 
-  // REMOVED: playFullVideo function - Fluid mode now replaces "Play Full Video" functionality
-  // When user switches to Fluid mode, video continues from current position instead of restarting
+  // Handle language filter change
+  const handleLanguageFilterChange = useCallback((filter: LanguageFilter) => {
+    setLanguageFilter(filter);
+    persistLanguageFilter(filter);
+  }, [persistLanguageFilter]);
+
+  // Handle video collapsed toggle
+  const handleVideoCollapsedToggle = useCallback(() => {
+    const newCollapsed = !isVideoCollapsed;
+    setIsVideoCollapsed(newCollapsed);
+    persistVideoCollapsed(newCollapsed);
+  }, [isVideoCollapsed, persistVideoCollapsed]);
+
+  // Handle video mute change from player controls
+  const handleVideoMuteChange = useCallback((muted: boolean) => {
+    setIsVideoMuted(muted);
+    persistVideoMuted(muted);
+  }, [persistVideoMuted]);
 
   // Handle video error (for fallback)
   const handleVideoError = useCallback((error: string) => {
@@ -455,14 +541,10 @@ function SongPageContent({ songId }: SongPageContentProps) {
     setWordModalOpen(true);
   }, []);
 
-  // Handle checkbox toggle for line completion
-  const handleLineCheckboxClick = useCallback((lineNumber: number, isChecked: boolean) => {
-    if (isChecked) {
-      recordLineCompletionMutation({ visitorId, songId, lineNumber });
-    }
-    // Note: We don't handle unchecking here as the mutation only adds lines
-    // The UI will update when the query refetches
-  }, [recordLineCompletionMutation, visitorId, songId]);
+  // Handle checkbox toggle for line learned state
+  const handleLineCheckboxClick = useCallback((lineNumber: number) => {
+    toggleLineLearnedMutation({ visitorId, songId, lineNumber });
+  }, [toggleLineLearnedMutation, visitorId, songId]);
 
   // Sync loop mode to audio preloader (for Single/Loop snippet modes)
   useEffect(() => {
@@ -559,7 +641,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
             {/* Mobile: Collapsible Header Bar */}
             {isMobile && (
               <button
-                onClick={() => setIsVideoCollapsed(!isVideoCollapsed)}
+                onClick={handleVideoCollapsedToggle}
                 className="w-full flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700 hover:bg-gray-700/50 transition-colors"
               >
                 <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -637,6 +719,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
                     onTimeUpdate={handleTimeUpdate}
                     onStateChange={handleVideoStateChange}
                     onError={handleVideoError}
+                    onMuteChange={handleVideoMuteChange}
                     muted={isVideoMuted}
                     autoplay={playbackMode === "fluid"}
                   />
@@ -786,7 +869,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
                     <Languages className="h-4 w-4 text-gray-400" />
                     <Select
                       value={languageFilter}
-                      onValueChange={(value) => setLanguageFilter(value as LanguageFilter)}
+                      onValueChange={handleLanguageFilterChange}
                     >
                       <SelectTrigger className="w-36 border-gray-700 bg-gray-900">
                         <SelectValue />
@@ -824,13 +907,14 @@ function SongPageContent({ songId }: SongPageContentProps) {
         <div className="flex-1 lg:w-1/2 overflow-y-auto px-4 py-4">
           <LyricsDisplay
             songId={songId}
+            visitorId={visitorId}
             onLineClick={handleLineClick}
             onLineInfoClick={handleLineInfoClick}
             onLineCheckboxClick={handleLineCheckboxClick}
             activeLineIndex={activeLineIndex}
             clickedLineIndex={clickedLineIndex}
             languageFilter={languageFilter}
-            completedLines={songProgress?.linesCompleted || []}
+            lineProgress={lineProgress || []}
           />
         </div>
       </div>

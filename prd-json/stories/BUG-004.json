@@ -1,0 +1,14 @@
+{
+  "id": "BUG-004",
+  "title": "Fix dashboard heat map showing no data and My Songs empty",
+  "description": "The heat map on the dashboard shows nothing - no activity data displayed. 'My Songs' section also remains empty even after practicing songs. These features appear to not be wired up to actual data.",
+  "acceptanceCriteria": [
+    { "text": "Heat map shows activity for days with practice", "checked": false },
+    { "text": "Heat map intensity reflects amount of practice that day", "checked": false },
+    { "text": "My Songs shows songs user has practiced or wishlisted", "checked": false },
+    { "text": "Verify practiceLog data is being queried correctly", "checked": false },
+    { "text": "Typecheck passes", "checked": false }
+  ],
+  "passes": false,
+  "blockedBy": null
+}
