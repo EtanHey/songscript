@@ -48,6 +48,19 @@
 ---
 
 ## Current Iteration
+## Iteration - Add playback controls inside sentence info modal
+- Added Play/Pause button for line audio snippets inside WordInfoModal
+- Added Loop toggle (RotateCcw icon) to loop just the current line while modal is open
+- Added speed control dropdown (0.5x, 0.75x, 1x) for line audio playback
+- Implemented visual feedback showing when audio is playing/looping with animated pulse dot
+- Added proper cleanup to stop looping audio when modal closes
+- Updated ModalLyricLine interface to include audioSnippetUrl field
+- Modified handleLineInfoClick to pass audioSnippetUrl from full lyric data to modal
+- Used useAudioPreloader hook for line audio management with proper playback rate and loop controls
+- All acceptance criteria met: Play/Pause, Loop toggle, Speed control, Visual feedback, Cleanup on close
+- Typecheck passes - no TypeScript errors
+- Learnings: When adding audio controls to modals, use the existing useAudioPreloader hook for consistency and leverage the audioSnippetUrl from Convex lyrics data
+---
 ## Iteration - Fix user preferences not persisting on reload
 - Fixed critical bug where user preferences (playback speed, language filter, playback mode, video muted/collapsed state) were not persisting between page reloads
 - Root cause: useState was initialized with userPreferences values, but userPreferences was undefined during first render due to Suspense loading

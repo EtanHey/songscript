@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
-import { Volume2, Check, Loader2 } from "lucide-react";
+import { Volume2, Check, Loader2, Play, Pause, RotateCcw } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id, Doc } from "../../convex/_generated/dataModel";
 import { useVisitorId } from "../hooks/useVisitorId";
 import { playWordAudio, stopWordAudio } from "../utils/wordAudio";
+import { useAudioPreloader } from "../hooks/useAudioPreloader";
 import {
   Dialog,
   DialogContent,
@@ -34,6 +35,7 @@ export interface ModalLyricLine {
   transliteration: string;
   hebrew?: string;
   english: string;
+  audioSnippetUrl?: string;
 }
 
 interface WordInfoModalProps {
@@ -42,6 +44,7 @@ interface WordInfoModalProps {
   line: ModalLyricLine | null;
   songId: Id<"songs">;
   isMobile: boolean;
+  lineAudioUrl?: string; // Audio URL for the specific line
 }
 
 // Word table component - for desktop Dialog
@@ -295,6 +298,7 @@ export default function WordInfoModal({
   line,
   songId,
   isMobile,
+  lineAudioUrl,
 }: WordInfoModalProps) {
   const visitorId = useVisitorId();
 
@@ -318,9 +322,28 @@ export default function WordInfoModal({
     Map<string, WordProgressData>
   >(new Map());
 
-  // Audio playback state
+  // Audio playback state for words
   const [playingWord, setPlayingWord] = useState<string | null>(null);
   const [loadingWord, setLoadingWord] = useState<string | null>(null);
+
+  // Line audio playback state
+  const [linePlaybackSpeed, setLinePlaybackSpeed] = useState<number>(1);
+  const [lineLoopEnabled, setLineLoopEnabled] = useState<boolean>(false);
+
+  // Prepare audio snippet for line playback
+  const lineAudioSnippets = lineAudioUrl && line ? [{
+    lineNumber: line.lineNumber,
+    audioUrl: lineAudioUrl
+  }] : [];
+
+  // Audio preloader for line playback
+  const {
+    play: playLineAudio,
+    pause: pauseLineAudio,
+    isPlaying: isLineAudioPlaying,
+    setPlaybackRate: setLineAudioPlaybackRate,
+    setLoop: setLineAudioLoop,
+  } = useAudioPreloader(lineAudioSnippets);
 
   useEffect(() => {
     if (progressData) {
@@ -338,8 +361,20 @@ export default function WordInfoModal({
       stopWordAudio();
       setPlayingWord(null);
       setLoadingWord(null);
+      // Stop line audio and reset loop
+      pauseLineAudio();
+      setLineLoopEnabled(false);
     }
-  }, [isOpen]);
+  }, [isOpen, pauseLineAudio]);
+
+  // Update line audio settings when they change
+  useEffect(() => {
+    setLineAudioPlaybackRate(linePlaybackSpeed);
+  }, [linePlaybackSpeed, setLineAudioPlaybackRate]);
+
+  useEffect(() => {
+    setLineAudioLoop(lineLoopEnabled);
+  }, [lineLoopEnabled, setLineAudioLoop]);
 
   // Mutations for tracking
   const incrementViewCount = useMutation(api.wordProgress.incrementViewCount);
@@ -452,6 +487,75 @@ export default function WordInfoModal({
         <p className="mt-2 text-sm text-gray-400">{line.english}</p>
       </div>
 
+      {/* Line playback controls */}
+      {lineAudioUrl && (
+        <div className="mt-3 rounded-lg bg-gray-800/50 p-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-300">Line Audio</span>
+            <div className="flex items-center gap-2">
+              {/* Speed control */}
+              <select
+                value={linePlaybackSpeed}
+                onChange={(e) => setLinePlaybackSpeed(Number(e.target.value))}
+                className="rounded bg-gray-700 px-2 py-1 text-xs text-white"
+              >
+                <option value={0.5}>0.5x</option>
+                <option value={0.75}>0.75x</option>
+                <option value={1}>1x</option>
+              </select>
+
+              {/* Loop toggle */}
+              <button
+                onClick={() => setLineLoopEnabled(!lineLoopEnabled)}
+                className={`rounded p-1.5 text-xs transition-colors ${
+                  lineLoopEnabled
+                    ? "bg-primary text-white"
+                    : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                }`}
+                title={lineLoopEnabled ? "Disable loop" : "Enable loop"}
+              >
+                <RotateCcw className="h-3 w-3" />
+              </button>
+
+              {/* Play/Pause button */}
+              <button
+                onClick={() => {
+                  if (isLineAudioPlaying) {
+                    pauseLineAudio();
+                  } else {
+                    if (line) {
+                      playLineAudio(line.lineNumber);
+                    }
+                  }
+                }}
+                className={`flex items-center justify-center rounded p-1.5 transition-colors ${
+                  isLineAudioPlaying
+                    ? "bg-primary text-white"
+                    : "bg-gray-700 text-white hover:bg-gray-600"
+                }`}
+                title={isLineAudioPlaying ? "Pause" : "Play line"}
+              >
+                {isLineAudioPlaying ? (
+                  <Pause className="h-4 w-4" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+          </div>
+          
+          {/* Visual feedback when playing/looping */}
+          {isLineAudioPlaying && (
+            <div className="mt-2 flex items-center gap-2 text-xs text-primary">
+              <div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+              <span>
+                {lineLoopEnabled ? "Playing (looping)" : "Playing"}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Progress summary */}
       {totalWords > 0 && (
         <div className="mt-3 flex items-center gap-2 text-sm">
@@ -527,6 +631,75 @@ export default function WordInfoModal({
             </p>
             <p className="mt-1 text-xs text-gray-400">{line.english}</p>
           </div>
+
+          {/* Line playback controls for mobile */}
+          {lineAudioUrl && (
+            <div className="flex-shrink-0 rounded-lg bg-gray-800/50 p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-300">Line Audio</span>
+                <div className="flex items-center gap-3">
+                  {/* Speed control */}
+                  <select
+                    value={linePlaybackSpeed}
+                    onChange={(e) => setLinePlaybackSpeed(Number(e.target.value))}
+                    className="rounded bg-gray-700 px-2 py-1 text-xs text-white"
+                  >
+                    <option value={0.5}>0.5x</option>
+                    <option value={0.75}>0.75x</option>
+                    <option value={1}>1x</option>
+                  </select>
+
+                  {/* Loop toggle - larger for mobile */}
+                  <button
+                    onClick={() => setLineLoopEnabled(!lineLoopEnabled)}
+                    className={`rounded p-2 transition-colors ${
+                      lineLoopEnabled
+                        ? "bg-primary text-white"
+                        : "bg-gray-700 text-gray-300 active:bg-gray-600"
+                    }`}
+                    title={lineLoopEnabled ? "Disable loop" : "Enable loop"}
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                  </button>
+
+                  {/* Play/Pause button - larger for mobile */}
+                  <button
+                    onClick={() => {
+                      if (isLineAudioPlaying) {
+                        pauseLineAudio();
+                      } else {
+                        if (line) {
+                          playLineAudio(line.lineNumber);
+                        }
+                      }
+                    }}
+                    className={`flex items-center justify-center rounded p-2 transition-colors ${
+                      isLineAudioPlaying
+                        ? "bg-primary text-white"
+                        : "bg-gray-700 text-white active:bg-gray-600"
+                    }`}
+                    title={isLineAudioPlaying ? "Pause" : "Play line"}
+                  >
+                    {isLineAudioPlaying ? (
+                      <Pause className="h-5 w-5" />
+                    ) : (
+                      <Play className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+              
+              {/* Visual feedback when playing/looping */}
+              {isLineAudioPlaying && (
+                <div className="mt-2 flex items-center gap-2 text-xs text-primary">
+                  <div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+                  <span>
+                    {lineLoopEnabled ? "Playing (looping)" : "Playing"}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Progress summary */}
           {totalWords > 0 && (

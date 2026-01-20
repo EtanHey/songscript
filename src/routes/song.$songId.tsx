@@ -530,15 +530,19 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
   // Handle opening word info modal
   const handleLineInfoClick = useCallback((line: LyricLine) => {
+    // Find the full lyric data to get audioSnippetUrl
+    const fullLyricData = sortedLyrics.find(l => l.lineNumber === line.lineNumber);
+    
     setSelectedLine({
       lineNumber: line.lineNumber,
       original: line.original,
       transliteration: line.transliteration,
       hebrew: line.hebrew,
       english: line.english,
+      audioSnippetUrl: fullLyricData?.audioSnippetUrl,
     });
     setWordModalOpen(true);
-  }, []);
+  }, [sortedLyrics]);
 
   // Handle checkbox toggle for line learned state
   const handleLineCheckboxClick = useCallback((lineNumber: number) => {
@@ -925,6 +929,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
         line={selectedLine}
         songId={songId}
         isMobile={isMobile}
+        lineAudioUrl={selectedLine?.audioSnippetUrl}
       />
     </div>
   );
