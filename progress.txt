@@ -201,3 +201,13 @@ Key blockers from previous PRD:
 - Typecheck passes - no TypeScript errors
 - Learnings: When tracking user progress, ensure stats reflect the intended user action (explicit learning vs passive practice) and use the correct data source
 ---
+## Iteration - Change learned line indicator from background to border (BUG-008)
+- Changed learned line visual indicator from green background tint to green left border
+- Removed bg-emerald-900/10 background styling from learned lines
+- Added border-l-4 border-l-emerald-500 left border styling instead
+- Learned lines now have same background as unlearned lines, only distinguished by left border
+- Border is clearly visible (4px emerald-500) but not distracting compared to previous background tint
+- Maintains consistency with "words known" lines which also use left border (blue, 2px)
+- Typecheck passes - no TypeScript errors
+- Learnings: Visual indicators should be subtle but clear. Borders are less intrusive than background changes while still providing clear visual feedback.
+---
