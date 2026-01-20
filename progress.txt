@@ -146,3 +146,19 @@ Key blockers from previous PRD:
 - V-DASH-BATCH1/2/3: Magic link auth fails with INVALID_TOKEN
 - US-EMAIL-RESEND: RESEND_API_KEY needs to be added to Convex env vars
 - US-WORD-AUDIO: ElevenLabs API key has 0 credits
+## Iteration - Practice metrics scoring formula (US-012)
+- Implemented weighted practice scoring system with different point values for different activities
+- Word learned events: 10 points each (tracked when users mark words as learned via checkbox)
+- Line loop completions: 3 points each (tracked when loop mode restarts a line)
+- Audio practice time: 2 points per minute (tracked when audio snippets play)
+- Silent time: 1 point per minute, capped at 15 minutes (tracked when users are on page but not playing audio)
+- Updated logPractice mutation to accept eventType and value parameters instead of just durationSeconds
+- Added totalPoints field to userPracticeLog schema to track accumulated points
+- Updated getPracticeHistory query to return totalPoints in response
+- Modified song page to use new logPractice API with different event types
+- Added silent time tracking with 10-second intervals and 60-second batches
+- Connected word learned tracking to WordInfoModal onToggleLearned callback
+- All practice events now contribute to weighted scoring formula as specified
+- Typecheck passes - no TypeScript errors
+- Learnings: Practice tracking systems benefit from weighted scoring to encourage different types of engagement. Silent time tracking helps measure passive learning engagement.
+---

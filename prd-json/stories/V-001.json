@@ -8,6 +8,5 @@
     { "text": "Check dashboard heatmap updates after practice", "checked": false },
     { "text": "Verify streak increments after first practice of day", "checked": false }
   ],
-  "passes": false,
-  "blockedBy": "US-012"
+  "passes": false
 }
