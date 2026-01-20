@@ -1,0 +1,15 @@
+{
+  "id": "BUG-010",
+  "title": "Fix incorrect audio timestamps for lyrics lines",
+  "description": "Some lyrics lines have incorrect startTime/endTime values causing playback issues. Examples: 'برای نخبه های زندانی' (For the imprisoned intellectuals) plays both its snippet AND the next line's snippet. 'برای کودکان افغانی' (For the Afghan children) barely plays anything - timestamp range too short. Need to audit and fix timestamp accuracy in the lyrics data.",
+  "acceptanceCriteria": [
+    { "text": "Query lyrics table to find lines with suspiciously short durations (< 1 second)", "checked": false },
+    { "text": "Query lyrics table to find lines with overlapping timestamps", "checked": false },
+    { "text": "Fix timestamps for 'برای نخبه های زندانی' line", "checked": false },
+    { "text": "Fix timestamps for 'برای کودکان افغانی' line", "checked": false },
+    { "text": "Verify audio snippets play correctly for fixed lines", "checked": false },
+    { "text": "Document any other lines with timestamp issues found during audit", "checked": false }
+  ],
+  "passes": false,
+  "blockedBy": null
+}
