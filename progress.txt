@@ -38,11 +38,13 @@
 ---
 
 ## Current Iteration
-## Iteration - Create userPreferences queries and mutations
-- Created convex/userPreferences.ts with getByVisitor query following existing patterns from wordProgress.ts
-- Added updatePreferences mutation that upserts preferences (creates with defaults if not exists, updates only provided fields if exists)
+## Iteration - Add onEnded callback to useAudioPreloader
+- Added optional onEnded callback parameter to useAudioPreloader hook signature
+- Added 'ended' event listener to each audio element during preload that calls onEnded with lineNumber
+- Callback fires only when audio naturally finishes (not when manually stopped)
+- Added proper cleanup of event listeners in useEffect cleanup function
 - Typecheck passes successfully
-- Learnings: Followed existing Convex patterns with visitorId index, used optional parameters for partial updates, provided sensible defaults for new preferences
+- Learnings: Audio 'ended' event is perfect for tracking when lines complete naturally, separate from manual stop/pause actions
 ---
 
 ---

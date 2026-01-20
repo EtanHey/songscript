@@ -21,7 +21,10 @@ interface UseAudioPreloaderReturn extends PreloadState {
   setLoop: (loop: boolean) => void
 }
 
-export function useAudioPreloader(snippets: AudioSnippet[]): UseAudioPreloaderReturn {
+export function useAudioPreloader(
+  snippets: AudioSnippet[],
+  onEnded?: (lineNumber: number) => void
+): UseAudioPreloaderReturn {
   const [state, setState] = useState<PreloadState>({
     loaded: 0,
     total: snippets.length,
@@ -73,8 +76,16 @@ export function useAudioPreloader(snippets: AudioSnippet[]): UseAudioPreloaderRe
         })
       }
 
+      const handleEnded = () => {
+        setIsPlaying(false)
+        if (onEnded) {
+          onEnded(lineNumber)
+        }
+      }
+
       audio.addEventListener('canplaythrough', handleCanPlay, { once: true })
       audio.addEventListener('error', handleError, { once: true })
+      audio.addEventListener('ended', handleEnded)
       audio.src = audioUrl
     })
 
@@ -82,6 +93,7 @@ export function useAudioPreloader(snippets: AudioSnippet[]): UseAudioPreloaderRe
       // Cleanup all audio elements on unmount
       audioMapRef.current.forEach(audio => {
         audio.pause()
+        audio.removeEventListener('ended', () => {})
         audio.src = ''
       })
       audioMapRef.current.clear()
