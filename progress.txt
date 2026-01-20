@@ -38,13 +38,16 @@
 ---
 
 ## Current Iteration
-## Iteration - Add onEnded callback to useAudioPreloader
-- Added optional onEnded callback parameter to useAudioPreloader hook signature
-- Added 'ended' event listener to each audio element during preload that calls onEnded with lineNumber
-- Callback fires only when audio naturally finishes (not when manually stopped)
-- Added proper cleanup of event listeners in useEffect cleanup function
+## Iteration - Wire up logPractice mutation in song page
+- Added practice tracking state and logic to song page component
+- Implemented handleAudioEnded callback that tracks audio duration and accumulates practice time
+- Added inactivity detection that resets accumulated time after 2 minutes of no audio plays
+- Implemented batched logging that calls logPractice mutation when 30+ seconds accumulated
+- Created playAudioSnippetWithTracking wrapper to track when audio starts playing
+- Wired up onEnded callback to useAudioPreloader hook from US-003
+- Practice time is tracked based on actual audio duration, not wall clock time
 - Typecheck passes successfully
-- Learnings: Audio 'ended' event is perfect for tracking when lines complete naturally, separate from manual stop/pause actions
+- Learnings: Practice tracking requires careful state management to avoid memory leaks and ensure accurate time tracking
 ---
 
 ---

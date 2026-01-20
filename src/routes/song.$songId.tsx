@@ -9,8 +9,8 @@ import LocalVideoPlayer, { LocalVideoPlayerHandle } from "../components/LocalVid
 import LyricsDisplay, { LanguageFilter, LyricLine } from "../components/LyricsDisplay";
 import WordInfoModal, { ModalLyricLine } from "../components/WordInfoModal";
 import { useAudioPreloader } from "../hooks/useAudioPreloader";
-// TODO: US-004/US-005 will need visitorId for practice tracking
-// import { useVisitorId } from "../hooks/useVisitorId";
+import { useVisitorId } from "../hooks/useVisitorId";
+import { useConvexMutation } from "@convex-dev/react-query";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import {
   Select,
@@ -97,6 +97,58 @@ function SongPageContent({ songId }: SongPageContentProps) {
     [sortedLyrics]
   );
 
+  // Practice tracking state and logic
+  const visitorId = useVisitorId();
+  const logPracticeMutation = useConvexMutation(api.practiceLog.logPractice);
+  
+  // Track accumulated practice time (in seconds)
+  const [accumulatedTime, setAccumulatedTime] = useState(0);
+  const lastActivityRef = useRef<number>(Date.now());
+  const audioStartTimeRef = useRef<number | null>(null);
+  
+  // Reset accumulated time after 2 minutes of inactivity
+  useEffect(() => {
+    const checkInactivity = () => {
+      const now = Date.now();
+      const timeSinceLastActivity = now - lastActivityRef.current;
+      const INACTIVITY_TIMEOUT = 2 * 60 * 1000; // 2 minutes
+      
+      if (timeSinceLastActivity > INACTIVITY_TIMEOUT) {
+        setAccumulatedTime(0);
+      }
+    };
+    
+    const interval = setInterval(checkInactivity, 30000); // Check every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
+  
+  // Handle audio snippet completion - track practice time and log if needed
+  const handleAudioEnded = useCallback(() => {
+    if (audioStartTimeRef.current) {
+      const audioDuration = (Date.now() - audioStartTimeRef.current) / 1000;
+      const newAccumulatedTime = accumulatedTime + audioDuration;
+      
+      setAccumulatedTime(newAccumulatedTime);
+      lastActivityRef.current = Date.now();
+      
+      // Log practice in batches of 30+ seconds
+      if (newAccumulatedTime >= 30 && visitorId) {
+        logPracticeMutation({
+          visitorId,
+          durationSeconds: Math.floor(newAccumulatedTime)
+        });
+        setAccumulatedTime(0); // Reset after logging
+      }
+    }
+    audioStartTimeRef.current = null;
+  }, [accumulatedTime, visitorId, logPracticeMutation]);
+  
+  // Track when audio starts playing
+  const trackAudioStart = useCallback(() => {
+    audioStartTimeRef.current = Date.now();
+    lastActivityRef.current = Date.now();
+  }, []);
+
   // Audio preloader hook for instant playback
   const {
     ready: audioReady,
@@ -108,7 +160,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
     isPlaying: isAudioPlaying,
     setPlaybackRate: setAudioPlaybackRate,
     setLoop: setAudioLoop,
-  } = useAudioPreloader(audioSnippets);
+  } = useAudioPreloader(audioSnippets, handleAudioEnded);
 
   const playerRef = useRef<LocalVideoPlayerHandle>(null);
   const [activeLineIndex, setActiveLineIndex] = useState<number | undefined>(
@@ -164,10 +216,11 @@ function SongPageContent({ songId }: SongPageContentProps) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // TODO: US-003/US-004/US-005 will wire up practice tracking:
-  // - US-003: Add onEnded callback to useAudioPreloader
-  // - US-004: Call logPractice mutation when 30+ seconds accumulated
-  // - US-005: Call recordLineCompletion when audio snippet finishes
+  // Wrapper for playAudioSnippet that includes tracking
+  const playAudioSnippetWithTracking = useCallback((lineNumber: number) => {
+    trackAudioStart();
+    playAudioSnippet(lineNumber);
+  }, [trackAudioStart, playAudioSnippet]);
 
   const handleSpeedChange = useCallback((speed: string) => {
     setPlaybackSpeed(speed);
@@ -205,7 +258,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
           setCurrentLineIndex(activeLineIndex);
           // Set target line index to prevent wrong line detection during seek
           targetLineIndexRef.current = activeLineIndex;
-          playAudioSnippet(lineNumber);
+          playAudioSnippetWithTracking(lineNumber);
           // Keep video in sync (muted)
           playerRef.current?.seekTo(sortedLyrics[activeLineIndex].startTime);
           playerRef.current?.play();
@@ -215,7 +268,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
     // Update audio loop based on mode
     setAudioLoop(mode === "loop");
-  }, [playbackMode, setAudioLoop, activeLineIndex, sortedLyrics, audioReady, playAudioSnippet, isMobile]);
+  }, [playbackMode, setAudioLoop, activeLineIndex, sortedLyrics, audioReady, playAudioSnippetWithTracking, isMobile]);
 
   // REMOVED: playFullVideo function - Fluid mode now replaces "Play Full Video" functionality
   // When user switches to Fluid mode, video continues from current position instead of restarting
@@ -297,13 +350,13 @@ function SongPageContent({ songId }: SongPageContentProps) {
         // Single/Loop mode: video muted, audio from snippet
         // Play local audio snippet if available (instant playback)
         if (lineNumber !== undefined && audioReady) {
-          playAudioSnippet(lineNumber);
+          playAudioSnippetWithTracking(lineNumber);
         }
         // Also play video (muted) to keep visual in sync
         playerRef.current?.play();
       }
     },
-    [triggerClickAnimation, sortedLyrics, audioReady, playAudioSnippet, playbackMode]
+    [triggerClickAnimation, sortedLyrics, audioReady, playAudioSnippetWithTracking, playbackMode]
   );
 
   const handleTimeUpdate = useCallback(
