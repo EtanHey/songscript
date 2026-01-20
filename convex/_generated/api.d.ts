@@ -9,6 +9,7 @@
  */
 
 import type * as betterAuth from "../betterAuth.js";
+import type * as debug from "../debug.js";
 import type * as goals from "../goals.js";
 import type * as http from "../http.js";
 import type * as lyrics from "../lyrics.js";
@@ -16,6 +17,7 @@ import type * as practiceLog from "../practiceLog.js";
 import type * as seed from "../seed.js";
 import type * as songProgress from "../songProgress.js";
 import type * as songs from "../songs.js";
+import type * as testData from "../testData.js";
 import type * as userPreferences from "../userPreferences.js";
 import type * as userStats from "../userStats.js";
 import type * as wishlist from "../wishlist.js";
@@ -30,6 +32,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   betterAuth: typeof betterAuth;
+  debug: typeof debug;
   goals: typeof goals;
   http: typeof http;
   lyrics: typeof lyrics;
@@ -37,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   seed: typeof seed;
   songProgress: typeof songProgress;
   songs: typeof songs;
+  testData: typeof testData;
   userPreferences: typeof userPreferences;
   userStats: typeof userStats;
   wishlist: typeof wishlist;

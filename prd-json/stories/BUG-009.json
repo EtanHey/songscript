@@ -1,0 +1,13 @@
+{
+  "id": "BUG-009",
+  "title": "Remove confusing star icon from lyrics lines",
+  "description": "There's a star icon appearing on some lyric lines (the 'wordsKnown' indicator) that shows when words in a line are known from other songs. This is confusing and not useful to users. Remove this star indicator entirely from LyricsDisplay.",
+  "acceptanceCriteria": [
+    { "text": "Remove the star icon from lyric lines", "checked": false },
+    { "text": "Remove the 'wordsKnown' visual state styling (border-l-blue-300)", "checked": false },
+    { "text": "Keep only 'default' and 'learned' states for lines", "checked": false },
+    { "text": "Typecheck passes", "checked": false }
+  ],
+  "passes": false,
+  "blockedBy": null
+}

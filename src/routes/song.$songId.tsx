@@ -113,11 +113,14 @@ function SongPageContent({ songId }: SongPageContentProps) {
   const logPracticeMutation = useConvexMutation(api.practiceLog.logPractice);
   const recordLineCompletionMutation = useConvexMutation(api.songProgress.recordLineCompletion);
   const toggleLineLearnedMutation = useConvexMutation(api.songProgress.toggleLineLearned);
+  const toggleWordLearnedMutation = useConvexMutation(api.wordProgress.toggleLearned);
   
   // Track accumulated practice time (in seconds)
   const [accumulatedTime, setAccumulatedTime] = useState(0);
+  const [accumulatedSilentTime, setAccumulatedSilentTime] = useState(0);
   const lastActivityRef = useRef<number>(Date.now());
   const audioStartTimeRef = useRef<number | null>(null);
+  const silentStartTimeRef = useRef<number>(Date.now());
   
   // Track lines completed in this session (for deduplication)
   const [sessionCompletedLines, setSessionCompletedLines] = useState<Set<number>>(new Set());
@@ -134,12 +137,42 @@ function SongPageContent({ songId }: SongPageContentProps) {
       
       if (timeSinceLastActivity > INACTIVITY_TIMEOUT) {
         setAccumulatedTime(0);
+        setAccumulatedSilentTime(0);
+        silentStartTimeRef.current = now;
       }
     };
     
     const interval = setInterval(checkInactivity, 30000); // Check every 30 seconds
     return () => clearInterval(interval);
   }, []);
+
+  // Track silent time (when not playing audio) and log periodically
+  useEffect(() => {
+    const trackSilentTime = () => {
+      // Only track silent time if no audio is currently playing
+      if (!audioStartTimeRef.current) {
+        const now = Date.now();
+        const silentDuration = (now - silentStartTimeRef.current) / 1000;
+        const newAccumulatedSilentTime = accumulatedSilentTime + silentDuration;
+        
+        setAccumulatedSilentTime(newAccumulatedSilentTime);
+        silentStartTimeRef.current = now;
+        
+        // Log silent time in batches of 60+ seconds (1 minute)
+        if (newAccumulatedSilentTime >= 60 && visitorId) {
+          logPracticeMutation({
+            visitorId,
+            eventType: "silent_time",
+            value: Math.floor(newAccumulatedSilentTime)
+          });
+          setAccumulatedSilentTime(0); // Reset after logging
+        }
+      }
+    };
+    
+    const interval = setInterval(trackSilentTime, 10000); // Check every 10 seconds
+    return () => clearInterval(interval);
+  }, [accumulatedSilentTime, visitorId, logPracticeMutation]);
   
   // Handle audio snippet completion - track practice time and log if needed
   const handleAudioEnded = useCallback((lineNumber: number) => {
@@ -154,7 +187,8 @@ function SongPageContent({ songId }: SongPageContentProps) {
       if (newAccumulatedTime >= 30 && visitorId) {
         logPracticeMutation({
           visitorId,
-          durationSeconds: Math.floor(newAccumulatedTime)
+          eventType: "audio_time",
+          value: Math.floor(newAccumulatedTime)
         });
         setAccumulatedTime(0); // Reset after logging
       }
@@ -180,6 +214,8 @@ function SongPageContent({ songId }: SongPageContentProps) {
   const trackAudioStart = useCallback(() => {
     audioStartTimeRef.current = Date.now();
     lastActivityRef.current = Date.now();
+    // Reset silent time tracking when audio starts
+    silentStartTimeRef.current = Date.now();
   }, []);
 
   // Audio preloader hook for instant playback
@@ -325,35 +361,29 @@ function SongPageContent({ songId }: SongPageContentProps) {
     const previousMode = playbackMode;
     setPlaybackMode(mode);
 
-    // Sync video mute state with mode
+    // Mode changes do NOT affect mute state - user controls mute separately
+    // In Fluid mode: video audio plays (if not muted by user)
+    // In Single/Loop mode: snippet audio plays (video mute doesn't matter)
+
     if (mode === "fluid") {
-      // Switching TO Fluid mode: unmute video, continue from current position
-      playerRef.current?.unmute();
-      setIsVideoMuted(false);
-      persistVideoMuted(false);
-      // Continue playing from current position (don't restart)
+      // Switching TO Fluid mode: continue playing video
       playerRef.current?.play();
       // Auto-expand video on mobile when switching to Fluid mode
       if (isMobile) {
         setIsVideoCollapsed(false);
         persistVideoCollapsed(false);
       }
-    } else {
-      // Switching TO Single/Loop mode: mute video, audio from snippets
-      playerRef.current?.mute();
-      setIsVideoMuted(true);
-      persistVideoMuted(true);
-
-      // If coming FROM Fluid mode, stay at current line position
-      // The activeLineIndex already tracks where we are, so just trigger the snippet
-      if (previousMode === "fluid" && activeLineIndex !== undefined) {
+    } else if (previousMode === "fluid") {
+      // Switching FROM Fluid TO Single/Loop mode
+      // Stay at current line position and trigger the snippet
+      if (activeLineIndex !== undefined) {
         const lineNumber = sortedLyrics[activeLineIndex]?.lineNumber;
         if (lineNumber !== undefined && audioReady) {
           setCurrentLineIndex(activeLineIndex);
           // Set target line index to prevent wrong line detection during seek
           targetLineIndexRef.current = activeLineIndex;
           playAudioSnippetWithTracking(lineNumber);
-          // Keep video in sync (muted)
+          // Keep video in sync
           playerRef.current?.seekTo(sortedLyrics[activeLineIndex].startTime);
           playerRef.current?.play();
         }
@@ -362,10 +392,10 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
     // Update audio loop based on mode
     setAudioLoop(mode === "loop");
-    
+
     // Persist to database
     persistPlaybackMode(mode);
-  }, [playbackMode, setAudioLoop, activeLineIndex, sortedLyrics, audioReady, playAudioSnippetWithTracking, isMobile, persistPlaybackMode, persistVideoMuted, persistVideoCollapsed]);
+  }, [playbackMode, setAudioLoop, activeLineIndex, sortedLyrics, audioReady, playAudioSnippetWithTracking, isMobile, persistPlaybackMode, persistVideoCollapsed]);
 
   // Handle language filter change
   const handleLanguageFilterChange = useCallback((filter: LanguageFilter) => {
@@ -549,6 +579,22 @@ function SongPageContent({ songId }: SongPageContentProps) {
     toggleLineLearnedMutation({ visitorId, songId, lineNumber });
   }, [toggleLineLearnedMutation, visitorId, songId]);
 
+  // Handle word learned toggle and track for scoring
+  const handleToggleWordLearned = useCallback((wordId: Id<"words">, persian: string) => {
+    if (visitorId) {
+      toggleWordLearnedMutation({ visitorId, wordId, persian }).then((newLearnedState) => {
+        // Track word learned event for scoring (only when marking as learned, not unmarking)
+        if (newLearnedState) {
+          logPracticeMutation({
+            visitorId,
+            eventType: "word_learned",
+            value: 1
+          });
+        }
+      });
+    }
+  }, [toggleWordLearnedMutation, logPracticeMutation, visitorId]);
+
   // Sync loop mode to audio preloader (for Single/Loop snippet modes)
   useEffect(() => {
     setAudioLoop(playbackMode === "loop");
@@ -583,6 +629,15 @@ function SongPageContent({ songId }: SongPageContentProps) {
           setTimeout(() => {
             isLoopSeekingRef.current = false;
           }, 100);
+          
+          // Track loop completion for scoring
+          if (visitorId) {
+            logPracticeMutation({
+              visitorId,
+              eventType: "line_loop",
+              value: 1
+            });
+          }
         } else {
           // Single mode: advance to next line and pause
           const nextLineIndex = currentLineIndex + 1;
@@ -930,6 +985,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
         songId={songId}
         isMobile={isMobile}
         lineAudioUrl={selectedLine?.audioSnippetUrl}
+        onToggleLearned={handleToggleWordLearned}
       />
     </div>
   );

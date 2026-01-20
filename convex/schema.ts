@@ -102,6 +102,7 @@ export default defineSchema({
     date: v.string(), // YYYY-MM-DD format
     practiceCount: v.number(), // Number of practice sessions that day
     totalSeconds: v.number(), // Total practice time in seconds
+    totalPoints: v.optional(v.number()), // Total weighted practice points earned
   })
     .index("by_visitor", ["visitorId"])
     .index("by_visitor_date", ["visitorId", "date"]),

@@ -1,0 +1,14 @@
+{
+  "id": "BUG-008",
+  "title": "Change learned line indicator from background to border",
+  "description": "Currently learned lines have a green background tint which changes the look of the line. Instead, use a green left border (or end border for RTL) to indicate learned status. The background should remain unchanged from unlearned lines.",
+  "acceptanceCriteria": [
+    { "text": "Remove green background from learned lines", "checked": false },
+    { "text": "Add green left/start border to learned lines instead", "checked": false },
+    { "text": "Learned lines have same background as unlearned lines", "checked": false },
+    { "text": "Border is clearly visible but not distracting", "checked": false },
+    { "text": "Typecheck passes", "checked": false }
+  ],
+  "passes": false,
+  "blockedBy": null
+}

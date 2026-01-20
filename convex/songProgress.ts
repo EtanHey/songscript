@@ -47,9 +47,9 @@ export const getWithSongDetails = query({
       })
     );
 
-    // Filter out nulls (deleted songs) and sort by lastPracticed descending
+    // Filter out nulls (deleted songs), songs with no progress, and sort by lastPracticed descending
     return withDetails
-      .filter((p): p is NonNullable<typeof p> => p !== null)
+      .filter((p): p is NonNullable<typeof p> => p !== null && p.linesCompleted.length > 0)
       .sort((a, b) => b.lastPracticed - a.lastPracticed);
   },
 });

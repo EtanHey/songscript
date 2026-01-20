@@ -45,6 +45,7 @@ interface WordInfoModalProps {
   songId: Id<"songs">;
   isMobile: boolean;
   lineAudioUrl?: string; // Audio URL for the specific line
+  onToggleLearned?: (wordId: Id<"words">, persian: string) => void;
 }
 
 // Word table component - for desktop Dialog
@@ -299,6 +300,7 @@ export default function WordInfoModal({
   songId,
   isMobile,
   lineAudioUrl,
+  onToggleLearned,
 }: WordInfoModalProps) {
   const visitorId = useVisitorId();
 
@@ -430,7 +432,11 @@ export default function WordInfoModal({
   // Toggle learned status - syncs across all instances of the same word
   const handleToggleLearned = useCallback(
     async (wordId: Id<"words">, persian: string) => {
-      if (visitorId) {
+      if (onToggleLearned) {
+        // Use the provided callback from parent (for practice tracking)
+        onToggleLearned(wordId, persian);
+      } else if (visitorId) {
+        // Fallback to local implementation
         const newLearned = await toggleLearned({ visitorId, wordId, persian });
         // Update local state optimistically - keyed by persian for sync
         setWordProgressMap((prev) => {
@@ -456,7 +462,7 @@ export default function WordInfoModal({
         });
       }
     },
-    [visitorId, toggleLearned]
+    [onToggleLearned, visitorId, toggleLearned]
   );
 
   if (!line) return null;
