@@ -127,8 +127,8 @@ export default function LyricsDisplay({
               : ""
           } ${
             // Visual state styling
-            lineState === 'learned' 
-              ? "bg-emerald-100/50 border border-emerald-300" 
+            lineState === 'learned'
+              ? "bg-emerald-900/10 border border-emerald-700/20"
               : lineState === 'wordsKnown'
               ? "border-l-2 border-l-blue-300"
               : ""
