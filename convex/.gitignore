@@ -1,1 +1,6 @@
+# Ignore compiled JS files (only .ts should be committed)
 *.js
+*.js.map
+
+# Generated files are auto-created by convex dev
+_generated/

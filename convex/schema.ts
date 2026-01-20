@@ -19,6 +19,8 @@ export default defineSchema({
     createdAt: v.number(),
     // Optional local video URL (relative path) for instant seeking without YouTube buffering
     videoUrl: v.optional(v.string()), // e.g., "/video/baraye/baraye.mp4"
+    // Lock timestamps to prevent AI from modifying without explicit unlock
+    timestampsLocked: v.optional(v.boolean()),
   }),
 
   lyrics: defineTable({
