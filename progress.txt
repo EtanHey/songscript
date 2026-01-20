@@ -248,3 +248,14 @@ Key blockers from previous PRD:
 - Typecheck passes - no TypeScript errors
 - Learnings: Song view tracking requires careful threshold monitoring and cooldown logic to provide accurate analytics while preventing gaming of the system
 ---
+## Iteration - Display practice time in seconds with smart formatting (US-035)
+- Enhanced formatPracticeTime function to show more granular time formatting based on duration
+- Times under 1 minute now display as seconds (e.g., "45s") instead of being rounded to minutes
+- Times between 1-59 minutes display as minutes and seconds (e.g., "5m 30s") for better precision
+- Times 1 hour and above display as hours and minutes (e.g., "1h 15m") as before
+- Practice time is already stored internally in seconds in the userPracticeLog table, providing sufficient precision
+- Updated formatting is automatically applied to dashboard stats via existing formatPracticeTime usage in UserStatsSection
+- All acceptance criteria met: granular second display, smart formatting ranges, utility function enhancement
+- Typecheck passes - no TypeScript errors
+- Learnings: Time formatting improvements provide better user feedback for shorter practice sessions while maintaining readability for longer sessions
+---

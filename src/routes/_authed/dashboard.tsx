@@ -1688,13 +1688,33 @@ type UserStatsData = {
 
 // Format time nicely (e.g., "2h 45m", "30m", "45s")
 function formatPracticeTime(seconds: number): string {
-  if (seconds < 60) return `${seconds}s`;
-  const mins = Math.floor(seconds / 60);
-  if (mins < 60) return `${mins}m`;
-  const hours = Math.floor(mins / 60);
-  const remainingMins = mins % 60;
-  if (remainingMins === 0) return `${hours}h`;
-  return `${hours}h ${remainingMins}m`;
+  // Round to nearest second for display
+  const roundedSeconds = Math.round(seconds);
+  
+  // Under 1 minute: show seconds (e.g., "45s")
+  if (roundedSeconds < 60) {
+    return `${roundedSeconds}s`;
+  }
+  
+  const totalMinutes = Math.floor(roundedSeconds / 60);
+  const remainingSeconds = roundedSeconds % 60;
+  
+  // Between 1-59 minutes: show minutes and seconds (e.g., "5m 30s")
+  if (totalMinutes < 60) {
+    if (remainingSeconds === 0) {
+      return `${totalMinutes}m`;
+    }
+    return `${totalMinutes}m ${remainingSeconds}s`;
+  }
+  
+  // 1 hour and above: show hours and minutes (e.g., "1h 15m")
+  const hours = Math.floor(totalMinutes / 60);
+  const remainingMinutes = totalMinutes % 60;
+  
+  if (remainingMinutes === 0) {
+    return `${hours}h`;
+  }
+  return `${hours}h ${remainingMinutes}m`;
 }
 
 // Animated count-up hook
