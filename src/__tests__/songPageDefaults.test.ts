@@ -13,16 +13,16 @@ describe('Song Page Default State', () => {
   const songPagePath = path.join(__dirname, '..', 'routes', 'song.$songId.tsx')
   const songPageContent = fs.readFileSync(songPagePath, 'utf-8')
 
-  it('initializes playback mode to "fluid" by default', () => {
-    // Check that useState for playbackMode has "fluid" as the default value
-    const playbackModeRegex = /useState<PlaybackMode>\s*\(\s*["']fluid["']\s*\)/
+  it('initializes playback mode from user preferences with "fluid" fallback', () => {
+    // Check that useState for playbackMode uses userPreferences with "fluid" fallback
+    const playbackModeRegex = /useState<PlaybackMode>\s*\(\s*\(userPreferences\?\.playbackMode as PlaybackMode\)\s*\|\|\s*["']fluid["']\s*\)/
     expect(songPageContent).toMatch(playbackModeRegex)
   })
 
-  it('initializes video muted state to true (muted) to allow browser autoplay', () => {
-    // Check that isVideoMuted is initialized to true (browsers block autoplay with sound)
-    // User can unmute via the video overlay button after autoplay starts
-    const videoMutedRegex = /const\s+\[isVideoMuted,\s*setIsVideoMuted\]\s*=\s*useState\s*\(\s*true\s*\)/
+  it('initializes video muted state from user preferences with true fallback', () => {
+    // Check that isVideoMuted is initialized from userPreferences with true fallback
+    // (browsers block autoplay with sound, so true is the safe default)
+    const videoMutedRegex = /const\s+\[isVideoMuted,\s*setIsVideoMuted\]\s*=\s*useState\s*\(\s*userPreferences\?\.videoMuted\s*\?\?\s*true\s*\)/
     expect(songPageContent).toMatch(videoMutedRegex)
   })
 

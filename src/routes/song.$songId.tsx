@@ -142,7 +142,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
   }, []);
   
   // Handle audio snippet completion - track practice time and log if needed
-  const handleAudioEnded = useCallback(() => {
+  const handleAudioEnded = useCallback((lineNumber: number) => {
     if (audioStartTimeRef.current) {
       const audioDuration = (Date.now() - audioStartTimeRef.current) / 1000;
       const newAccumulatedTime = accumulatedTime + audioDuration;
@@ -160,9 +160,8 @@ function SongPageContent({ songId }: SongPageContentProps) {
       }
     }
     
-    // Record line completion if we have a line and haven't recorded it this session
-    if (currentPlayingLineRef.current !== null && visitorId && songId) {
-      const lineNumber = currentPlayingLineRef.current;
+    // Record line completion using the lineNumber from the audio hook
+    if (visitorId && songId) {
       if (!sessionCompletedLines.has(lineNumber)) {
         recordLineCompletionMutation({
           visitorId,

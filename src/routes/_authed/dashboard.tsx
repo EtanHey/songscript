@@ -1805,7 +1805,7 @@ function UserStatsSection({ stats }: { stats: UserStatsData }) {
           icon="🎵"
           label="Lines"
           value={stats.totalLinesPracticed}
-          subLabel="lyrics practiced"
+          subLabel="lines learned"
           colorClass="hover:border-purple-500/50"
         />
         <StatCard

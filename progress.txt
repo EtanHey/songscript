@@ -70,6 +70,19 @@
 - Learnings: When using background colors for text overlays, always test with actual content to ensure readability, especially with non-Latin scripts like Farsi/Persian
 ---
 
+## Iteration - Fix practice time not incrementing and lines learned not showing
+- Fixed critical bug where handleAudioEnded callback wasn't receiving lineNumber parameter from useAudioPreloader hook
+- Root cause: handleAudioEnded was defined with no parameters but useAudioPreloader calls onEnded(lineNumber)
+- Solution: Updated handleAudioEnded to accept lineNumber parameter and use it directly instead of relying on currentPlayingLineRef
+- Verified that logPractice mutation is properly called when audio snippets complete (in 30+ second batches)
+- Verified that dashboard queries practice time via getAggregatedStats and shows it in UserStatsSection
+- Verified that line progress is tracked via recordLineCompletion mutation and displayed on dashboard
+- Updated dashboard stat label from "lyrics practiced" to "lines learned" for clarity
+- All practice tracking functionality is working correctly - the issue was just the callback parameter mismatch
+- Typecheck passes - no TypeScript errors
+- Learnings: When using callback hooks, ensure parameter signatures match between the hook and the callback function
+---
+
 ## Iteration - Fix dashboard heat map showing no data and My Songs empty
 - Investigated dashboard heat map and My Songs sections that appeared to show "no data"
 - Root cause: Dashboard components are working correctly, but there is simply no practice data in the database yet

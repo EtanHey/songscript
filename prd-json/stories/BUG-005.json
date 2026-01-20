@@ -3,14 +3,15 @@
   "title": "Fix practice time not incrementing and lines learned not showing",
   "description": "User listened to song for several minutes but practice time shows 0/15min. User marked 2 lines as learned but they don't appear anywhere on dashboard. The logPractice mutation may not be called, or dashboard queries aren't fetching the data.",
   "acceptanceCriteria": [
-    { "text": "Practice time increments while audio is playing", "checked": false },
-    { "text": "Dashboard shows accumulated practice time for today", "checked": false },
-    { "text": "Lines marked as learned appear in dashboard stats", "checked": false },
-    { "text": "Verify logPractice mutation is being called with time data", "checked": false },
-    { "text": "Verify lineProgress data is queried on dashboard", "checked": false },
-    { "text": "Add 'Lines Learned' stat to dashboard if missing", "checked": false },
-    { "text": "Typecheck passes", "checked": false }
+    { "text": "Practice time increments while audio is playing", "checked": true },
+    { "text": "Dashboard shows accumulated practice time for today", "checked": true },
+    { "text": "Lines marked as learned appear in dashboard stats", "checked": true },
+    { "text": "Verify logPractice mutation is being called with time data", "checked": true },
+    { "text": "Verify lineProgress data is queried on dashboard", "checked": true },
+    { "text": "Add 'Lines Learned' stat to dashboard if missing", "checked": true },
+    { "text": "Typecheck passes", "checked": true }
   ],
-  "passes": false,
+  "passes": true,
+  "completedAt": "2026-01-20T09:22:56Z",
   "blockedBy": null
 }
