@@ -201,14 +201,15 @@ Key blockers from previous PRD:
 - Typecheck passes - no TypeScript errors
 - Learnings: When tracking user progress, ensure stats reflect the intended user action (explicit learning vs passive practice) and use the correct data source
 ---
-## Iteration - Fix loop restart causing brief flash to next line (BUG-011)
-- Fixed critical visual flash bug in Loop mode where line detection briefly showed wrong line during loop restart
-- Root cause: 100ms timeout was too short for video seeking and time update events to stabilize
-- Solution: Increased timeout from 100ms to 200ms in both loop restart and line click seeking operations
-- Added detailed comments explaining the timing requirements for seek stabilization
-- Tested loop mode functionality with automated Playwright test - confirmed no visual flashing occurs
-- The existing isLoopSeekingRef and targetLineIndexRef logic was correct, just needed more time to work properly
-- Loop mode now provides smooth visual experience without line detection interference during seeks
-- Typecheck passes - no TypeScript errors
-- Learnings: Video seeking operations need sufficient time for browser keyframe seeking and time update events to stabilize before resuming normal line detection
+## Iteration - Fix SSR path resolution for convex imports (BUG-013)
+- Fixed critical SSR error "Failed to load url ../../convex/_generated/api" that was blocking all page loads
+- Root cause: Relative imports to convex generated files failed during server-side rendering in TanStack Start
+- Solution: Added @convex path alias to both vite.config.ts and tsconfig.json for proper module resolution
+- Updated all relative convex imports (../../convex/_generated/api) to use new alias (@convex/_generated/api)
+- Cleared .vinxi cache and node_modules/.vite to ensure clean build state
+- Started both convex dev server and main dev server successfully
+- Verified both home page and song page load without SSR errors and render properly with video and lyrics
+- All TypeScript checks pass with new path configuration
+- This was a critical infrastructure fix that unblocked all remaining stories
+- Learnings: TanStack Start SSR requires absolute path aliases for generated files to avoid module resolution issues during server-side rendering
 ---

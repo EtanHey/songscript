@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { Volume2, Check, Loader2, Play, Pause, RotateCcw } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { Id, Doc } from "../../convex/_generated/dataModel";
+import { api } from "@convex/_generated/api";
+import { Id, Doc } from "@convex/_generated/dataModel";
 import { useVisitorId } from "../hooks/useVisitorId";
 import { playWordAudio, stopWordAudio } from "../utils/wordAudio";
 import { useAudioPreloader } from "../hooks/useAudioPreloader";

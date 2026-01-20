@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Volume2, Loader2, Music, ExternalLink } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
-import { api } from "../../convex/_generated/api";
+import { api } from "@convex/_generated/api";
 import { useVisitorId } from "../hooks/useVisitorId";
 import { playWordAudio, stopWordAudio } from "../utils/wordAudio";
 import { Link } from "@tanstack/react-router";

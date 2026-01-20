@@ -1,12 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
-import { api } from "../../../convex/_generated/api";
+import { api } from "@convex/_generated/api";
 import { useVisitorId } from "../../hooks/useVisitorId";
 import { authClient } from "../../lib/auth-client";
 import { Button } from "../../components/ui/button";
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
-import type { Id } from "../../../convex/_generated/dataModel";
+import type { Id } from "@convex/_generated/dataModel";
 import WordDetailsModal from "../../components/WordDetailsModal";
 
 export const Route = createFileRoute("/_authed/dashboard")({

@@ -2,8 +2,8 @@ import { convexQuery } from "@convex-dev/react-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useRef, useEffect } from "react";
 import { Info, Check } from "lucide-react";
-import { api } from "../../convex/_generated/api";
-import { Id } from "../../convex/_generated/dataModel";
+import { api } from "@convex/_generated/api";
+import { Id } from "@convex/_generated/dataModel";
 
 export interface LyricLine {
   _id: Id<"lyrics">;

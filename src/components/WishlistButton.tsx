@@ -1,9 +1,9 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useConvexMutation, convexQuery } from "@convex-dev/react-query";
-import { api } from "../../convex/_generated/api";
+import { api } from "@convex/_generated/api";
 import { useVisitorId } from "../hooks/useVisitorId";
 import { useState, useCallback, useEffect } from "react";
-import type { Id } from "../../convex/_generated/dataModel";
+import type { Id } from "@convex/_generated/dataModel";
 
 interface WishlistButtonProps {
   songId: Id<"songs">;

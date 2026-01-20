@@ -3,8 +3,8 @@ import { Suspense, useRef, useState, useCallback, useEffect, useMemo } from "rea
 import { convexQuery } from "@convex-dev/react-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
-import { api } from "../../convex/_generated/api";
-import { Id } from "../../convex/_generated/dataModel";
+import { api } from "@convex/_generated/api";
+import { Id } from "@convex/_generated/dataModel";
 import LocalVideoPlayer, { LocalVideoPlayerHandle } from "../components/LocalVideoPlayer";
 import LyricsDisplay, { LanguageFilter, LyricLine } from "../components/LyricsDisplay";
 import WordInfoModal, { ModalLyricLine } from "../components/WordInfoModal";
