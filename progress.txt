@@ -125,6 +125,15 @@
 - Created test dashboard route to verify queries work without auth - confirmed queries execute but return empty results as expected
 - All TypeScript checks pass - no type errors in dashboard or query implementations
 - Learnings: "No data" is not always a bug - sometimes it's the correct state when users haven't used the features yet. The dashboard will populate once users start practicing songs.
+## Iteration - Fix WordInfoModal infinite re-render crash (BUG-006)
+- Fixed critical infinite re-render bug in WordInfoModal that caused React crashes when clicking info buttons
+- Root cause: lineAudioSnippets array was recreated on every render, triggering useAudioPreloader's useEffect infinitely
+- Solution: Memoized lineAudioSnippets array using useMemo with proper dependencies [lineAudioUrl, line]
+- Added useMemo import to React imports in WordInfoModal.tsx
+- The fix prevents "Maximum update depth exceeded" errors and allows modal to open properly
+- Modal functionality preserved: word breakdown display, line audio playback controls, and all existing features
+- Typecheck passes - no TypeScript errors
+- Learnings: When passing arrays to hooks with useEffect dependencies, always memoize them to prevent infinite re-renders caused by reference equality checks
 ---
 
 ---

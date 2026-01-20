@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { Volume2, Check, Loader2, Play, Pause, RotateCcw } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -332,11 +332,13 @@ export default function WordInfoModal({
   const [linePlaybackSpeed, setLinePlaybackSpeed] = useState<number>(1);
   const [lineLoopEnabled, setLineLoopEnabled] = useState<boolean>(false);
 
-  // Prepare audio snippet for line playback
-  const lineAudioSnippets = lineAudioUrl && line ? [{
-    lineNumber: line.lineNumber,
-    audioUrl: lineAudioUrl
-  }] : [];
+  // Prepare audio snippet for line playback (memoized to prevent infinite re-renders)
+  const lineAudioSnippets = useMemo(() => {
+    return lineAudioUrl && line ? [{
+      lineNumber: line.lineNumber,
+      audioUrl: lineAudioUrl
+    }] : [];
+  }, [lineAudioUrl, line]);
 
   // Audio preloader for line playback
   const {
