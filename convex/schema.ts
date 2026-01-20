@@ -74,6 +74,18 @@ export default defineSchema({
     .index("by_visitor", ["visitorId"])
     .index("by_visitor_song", ["visitorId", "songId"]),
 
+  // Track which lines users have explicitly marked as "learned"
+  // Separate from linesCompleted which tracks practice - this is for mastery
+  lineProgress: defineTable({
+    visitorId: v.string(), // localStorage-generated ID if no auth
+    songId: v.id("songs"),
+    lineNumber: v.number(),
+    learned: v.boolean(), // Whether this line is marked as learned
+  })
+    .index("by_visitor", ["visitorId"])
+    .index("by_visitor_song", ["visitorId", "songId"])
+    .index("by_visitor_song_line", ["visitorId", "songId", "lineNumber"]),
+
   // User's learning queue / wishlist of songs to learn later
   userWishlist: defineTable({
     visitorId: v.string(), // localStorage-generated ID if no auth

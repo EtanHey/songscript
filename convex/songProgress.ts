@@ -208,3 +208,54 @@ export const recordLinesCompletion = mutation({
     }
   },
 });
+
+// Toggle whether a line is marked as "learned" (mastery state)
+export const toggleLineLearned = mutation({
+  args: {
+    visitorId: v.string(),
+    songId: v.id("songs"),
+    lineNumber: v.number()
+  },
+  handler: async (ctx, args) => {
+    if (!args.visitorId) return null;
+
+    const existing = await ctx.db
+      .query("lineProgress")
+      .withIndex("by_visitor_song_line", (q) =>
+        q.eq("visitorId", args.visitorId)
+         .eq("songId", args.songId)
+         .eq("lineNumber", args.lineNumber)
+      )
+      .first();
+
+    if (existing) {
+      // Toggle the learned state
+      await ctx.db.patch(existing._id, {
+        learned: !existing.learned,
+      });
+      return existing._id;
+    } else {
+      // Create new line progress record as learned
+      return await ctx.db.insert("lineProgress", {
+        visitorId: args.visitorId,
+        songId: args.songId,
+        lineNumber: args.lineNumber,
+        learned: true,
+      });
+    }
+  },
+});
+
+// Get line progress for a specific song
+export const getLineProgressBySong = query({
+  args: { visitorId: v.string(), songId: v.id("songs") },
+  handler: async (ctx, args) => {
+    if (!args.visitorId) return [];
+    return await ctx.db
+      .query("lineProgress")
+      .withIndex("by_visitor_song", (q) =>
+        q.eq("visitorId", args.visitorId).eq("songId", args.songId)
+      )
+      .collect();
+  },
+});

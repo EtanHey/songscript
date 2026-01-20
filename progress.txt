@@ -38,17 +38,13 @@
 ---
 
 ## Current Iteration
-## Iteration - Add line checkbox to LyricsDisplay component
-- Added checkbox UI to left side of each lyric line in LyricsDisplay component
-- Checkbox is 44x44px (w-11 h-11) for proper mobile touch target accessibility
-- Added onLineCheckboxClick prop and completedLines prop to LyricsDisplay interface
-- Wired up checkbox clicks to recordLineCompletion mutation via handleLineCheckboxClick handler
-- Added songProgress query to get current line completion status from userSongProgress table
-- Checkbox shows green with checkmark when line is completed, gray border when not completed
-- Checkbox has proper hover states and transitions for good UX
-- All acceptance criteria met: checkbox rendered, visible while scrolling, calls mutation, meets accessibility requirements
-- Typecheck passes successfully
-- Learnings: Line checkboxes provide immediate visual feedback for learning progress and integrate seamlessly with existing song progress tracking
+## Iteration - Add line learned state tracking to Convex
+- Added lineProgress table to schema with visitorId, songId, lineNumber, learned fields
+- Created toggleLineLearned mutation that toggles learned state for a specific line
+- Created getLineProgressBySong query to retrieve all line progress for a song
+- Added proper indexes for efficient querying by visitor, song, and specific line
+- All acceptance criteria completed and typecheck passes
+- Learnings: Line progress tracking is separate from practice completion - this tracks mastery/learned state vs practice activity
 ---
 
 ---
