@@ -38,16 +38,16 @@
 ---
 
 ## Current Iteration
-## Iteration - Wire up logPractice mutation in song page
-- Added practice tracking state and logic to song page component
-- Implemented handleAudioEnded callback that tracks audio duration and accumulates practice time
-- Added inactivity detection that resets accumulated time after 2 minutes of no audio plays
-- Implemented batched logging that calls logPractice mutation when 30+ seconds accumulated
-- Created playAudioSnippetWithTracking wrapper to track when audio starts playing
-- Wired up onEnded callback to useAudioPreloader hook from US-003
-- Practice time is tracked based on actual audio duration, not wall clock time
+## Iteration - Wire up recordLineCompletion mutation
+- Added recordLineCompletion mutation hook using useConvexMutation pattern
+- Added sessionCompletedLines state to track lines completed in current session for deduplication
+- Added currentPlayingLineRef to track which line is currently playing
+- Modified playAudioSnippetWithTracking to set currentPlayingLineRef when audio starts
+- Enhanced handleAudioEnded callback to record line completion when audio snippet finishes
+- Line completion is only recorded once per session using Set-based deduplication
+- Mutation fires with visitorId, songId, and lineNumber when audio snippet ends
 - Typecheck passes successfully
-- Learnings: Practice tracking requires careful state management to avoid memory leaks and ensure accurate time tracking
+- Learnings: Line completion tracking requires careful state management to avoid duplicate recordings and ensure accurate line tracking
 ---
 
 ---

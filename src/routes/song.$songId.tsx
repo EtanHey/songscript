@@ -100,11 +100,18 @@ function SongPageContent({ songId }: SongPageContentProps) {
   // Practice tracking state and logic
   const visitorId = useVisitorId();
   const logPracticeMutation = useConvexMutation(api.practiceLog.logPractice);
+  const recordLineCompletionMutation = useConvexMutation(api.songProgress.recordLineCompletion);
   
   // Track accumulated practice time (in seconds)
   const [accumulatedTime, setAccumulatedTime] = useState(0);
   const lastActivityRef = useRef<number>(Date.now());
   const audioStartTimeRef = useRef<number | null>(null);
+  
+  // Track lines completed in this session (for deduplication)
+  const [sessionCompletedLines, setSessionCompletedLines] = useState<Set<number>>(new Set());
+  
+  // Track which line is currently playing for completion recording
+  const currentPlayingLineRef = useRef<number | null>(null);
   
   // Reset accumulated time after 2 minutes of inactivity
   useEffect(() => {
@@ -140,8 +147,23 @@ function SongPageContent({ songId }: SongPageContentProps) {
         setAccumulatedTime(0); // Reset after logging
       }
     }
+    
+    // Record line completion if we have a line and haven't recorded it this session
+    if (currentPlayingLineRef.current !== null && visitorId && songId) {
+      const lineNumber = currentPlayingLineRef.current;
+      if (!sessionCompletedLines.has(lineNumber)) {
+        recordLineCompletionMutation({
+          visitorId,
+          songId: songId as Id<"songs">,
+          lineNumber
+        });
+        setSessionCompletedLines(prev => new Set(prev).add(lineNumber));
+      }
+    }
+    
     audioStartTimeRef.current = null;
-  }, [accumulatedTime, visitorId, logPracticeMutation]);
+    currentPlayingLineRef.current = null;
+  }, [accumulatedTime, visitorId, logPracticeMutation, songId, sessionCompletedLines, recordLineCompletionMutation]);
   
   // Track when audio starts playing
   const trackAudioStart = useCallback(() => {
@@ -219,6 +241,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
   // Wrapper for playAudioSnippet that includes tracking
   const playAudioSnippetWithTracking = useCallback((lineNumber: number) => {
     trackAudioStart();
+    currentPlayingLineRef.current = lineNumber;
     playAudioSnippet(lineNumber);
   }, [trackAudioStart, playAudioSnippet]);
 
