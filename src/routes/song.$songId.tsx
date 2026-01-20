@@ -361,11 +361,12 @@ function SongPageContent({ songId }: SongPageContentProps) {
     const previousMode = playbackMode;
     setPlaybackMode(mode);
 
-    // Mode changes do NOT affect mute state - user controls mute separately
-    // In Fluid mode: video audio plays (if not muted by user)
-    // In Single/Loop mode: snippet audio plays (video mute doesn't matter)
-
+    // Apply video mute/unmute behavior immediately based on mode
     if (mode === "fluid") {
+      // Fluid mode: unmute video (unless user has manually muted it)
+      if (!isVideoMuted) {
+        playerRef.current?.unmute();
+      }
       // Switching TO Fluid mode: continue playing video
       playerRef.current?.play();
       // Auto-expand video on mobile when switching to Fluid mode
@@ -373,19 +374,24 @@ function SongPageContent({ songId }: SongPageContentProps) {
         setIsVideoCollapsed(false);
         persistVideoCollapsed(false);
       }
-    } else if (previousMode === "fluid") {
-      // Switching FROM Fluid TO Single/Loop mode
-      // Stay at current line position and trigger the snippet
-      if (activeLineIndex !== undefined) {
-        const lineNumber = sortedLyrics[activeLineIndex]?.lineNumber;
-        if (lineNumber !== undefined && audioReady) {
-          setCurrentLineIndex(activeLineIndex);
-          // Set target line index to prevent wrong line detection during seek
-          targetLineIndexRef.current = activeLineIndex;
-          playAudioSnippetWithTracking(lineNumber);
-          // Keep video in sync
-          playerRef.current?.seekTo(sortedLyrics[activeLineIndex].startTime);
-          playerRef.current?.play();
+    } else {
+      // Single/Loop mode: mute video (snippet audio will play instead)
+      playerRef.current?.mute();
+      
+      if (previousMode === "fluid") {
+        // Switching FROM Fluid TO Single/Loop mode
+        // Stay at current line position and trigger the snippet
+        if (activeLineIndex !== undefined) {
+          const lineNumber = sortedLyrics[activeLineIndex]?.lineNumber;
+          if (lineNumber !== undefined && audioReady) {
+            setCurrentLineIndex(activeLineIndex);
+            // Set target line index to prevent wrong line detection during seek
+            targetLineIndexRef.current = activeLineIndex;
+            playAudioSnippetWithTracking(lineNumber);
+            // Keep video in sync
+            playerRef.current?.seekTo(sortedLyrics[activeLineIndex].startTime);
+            playerRef.current?.play();
+          }
         }
       }
     }
@@ -395,7 +401,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
     // Persist to database
     persistPlaybackMode(mode);
-  }, [playbackMode, setAudioLoop, activeLineIndex, sortedLyrics, audioReady, playAudioSnippetWithTracking, isMobile, persistPlaybackMode, persistVideoCollapsed]);
+  }, [playbackMode, setAudioLoop, activeLineIndex, sortedLyrics, audioReady, playAudioSnippetWithTracking, isMobile, isVideoMuted, persistPlaybackMode, persistVideoCollapsed]);
 
   // Handle language filter change
   const handleLanguageFilterChange = useCallback((filter: LanguageFilter) => {

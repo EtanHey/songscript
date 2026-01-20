@@ -213,6 +213,17 @@ Key blockers from previous PRD:
 - This was a critical infrastructure fix that unblocked all remaining stories
 - Learnings: TanStack Start SSR requires absolute path aliases for generated files to avoid module resolution issues during server-side rendering
 ---
+## Iteration - Fix mode switching not applying behavior until line clicked (BUG-014)
+- Fixed critical bug where switching between Fluid/Loop/Single modes didn't apply video mute/unmute behavior until user clicked a line
+- Root cause: Mode switch handler only updated state but didn't call video player mute/unmute methods immediately
+- Solution: Updated handlePlaybackModeChange to call playerRef.current?.mute() or unmute() based on mode immediately when switching
+- In Single/Loop modes: video is now muted immediately when switching (snippet audio plays instead)
+- In Fluid mode: video is unmuted immediately when switching (unless user has manually muted it)
+- Audio loop state is also set immediately via setAudioLoop(mode === "loop")
+- All mode behavior changes now apply instantly without requiring line interaction first
+- Typecheck passes - no TypeScript errors
+- Learnings: When implementing mode-based behavior changes, ensure all related components (video mute state, audio settings) are updated immediately in the mode change handler, not just the UI state
+---
 ## Iteration - Fix playback mode not applied on page load (BUG-012)
 - Fixed critical bug where persisted playback mode wasn't being applied to video muting behavior on page load
 - Root cause: LocalVideoPlayer was only receiving user's manual mute preference, not considering playback mode
