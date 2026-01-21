@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { Volume2, Check, Loader2, Play, Pause, RotateCcw } from "lucide-react";
+import { Volume2, Check, Loader2, Play, Pause, RotateCcw, Repeat } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Id, Doc } from "@convex/_generated/dataModel";
@@ -342,8 +342,10 @@ export default function WordInfoModal({
 
   // Audio preloader for line playback
   const {
+    ready: lineAudioReady,
     play: playLineAudio,
     pause: pauseLineAudio,
+    stop: stopLineAudio,
     isPlaying: isLineAudioPlaying,
     setPlaybackRate: setLineAudioPlaybackRate,
     setLoop: setLineAudioLoop,
@@ -506,6 +508,7 @@ export default function WordInfoModal({
                 value={linePlaybackSpeed}
                 onChange={(e) => setLinePlaybackSpeed(Number(e.target.value))}
                 className="rounded bg-gray-700 px-2 py-1 text-xs text-white"
+                disabled={!lineAudioReady}
               >
                 <option value={0.5}>0.5x</option>
                 <option value={0.75}>0.75x</option>
@@ -515,14 +518,34 @@ export default function WordInfoModal({
               {/* Loop toggle */}
               <button
                 onClick={() => setLineLoopEnabled(!lineLoopEnabled)}
+                disabled={!lineAudioReady}
                 className={`rounded p-1.5 text-xs transition-colors ${
                   lineLoopEnabled
                     ? "bg-primary text-white"
                     : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                }`}
+                } ${!lineAudioReady ? "opacity-50 cursor-not-allowed" : ""}`}
                 title={lineLoopEnabled ? "Disable loop" : "Enable loop"}
               >
-                <RotateCcw className="h-3 w-3" />
+                <Repeat className="h-3 w-3" />
+              </button>
+
+              {/* Rewind button - restart from beginning */}
+              <button
+                onClick={() => {
+                  stopLineAudio();
+                  if (line) {
+                    playLineAudio(line.lineNumber);
+                  }
+                }}
+                disabled={!lineAudioReady || !isLineAudioPlaying}
+                className={`flex items-center justify-center rounded p-1.5 transition-colors ${
+                  !lineAudioReady || !isLineAudioPlaying
+                    ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                    : "bg-gray-700 text-white hover:bg-gray-600"
+                }`}
+                title="Restart from beginning"
+              >
+                <RotateCcw className="h-4 w-4" />
               </button>
 
               {/* Play/Pause button */}
@@ -536,12 +559,15 @@ export default function WordInfoModal({
                     }
                   }
                 }}
+                disabled={!lineAudioReady}
                 className={`flex items-center justify-center rounded p-1.5 transition-colors ${
                   isLineAudioPlaying
                     ? "bg-primary text-white"
-                    : "bg-gray-700 text-white hover:bg-gray-600"
+                    : lineAudioReady
+                      ? "bg-gray-700 text-white hover:bg-gray-600"
+                      : "bg-gray-700 text-gray-500 cursor-not-allowed"
                 }`}
-                title={isLineAudioPlaying ? "Pause" : "Play line"}
+                title={!lineAudioReady ? "Loading audio..." : isLineAudioPlaying ? "Pause" : "Play line"}
               >
                 {isLineAudioPlaying ? (
                   <Pause className="h-4 w-4" />
@@ -551,7 +577,7 @@ export default function WordInfoModal({
               </button>
             </div>
           </div>
-          
+
           {/* Visual feedback when playing/looping */}
           {isLineAudioPlaying && (
             <div className="mt-2 flex items-center gap-2 text-xs text-primary">
@@ -559,6 +585,14 @@ export default function WordInfoModal({
               <span>
                 {lineLoopEnabled ? "Playing (looping)" : "Playing"}
               </span>
+            </div>
+          )}
+
+          {/* Loading indicator */}
+          {!lineAudioReady && (
+            <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              <span>Loading audio...</span>
             </div>
           )}
         </div>
@@ -651,6 +685,7 @@ export default function WordInfoModal({
                     value={linePlaybackSpeed}
                     onChange={(e) => setLinePlaybackSpeed(Number(e.target.value))}
                     className="rounded bg-gray-700 px-2 py-1 text-xs text-white"
+                    disabled={!lineAudioReady}
                   >
                     <option value={0.5}>0.5x</option>
                     <option value={0.75}>0.75x</option>
@@ -660,14 +695,34 @@ export default function WordInfoModal({
                   {/* Loop toggle - larger for mobile */}
                   <button
                     onClick={() => setLineLoopEnabled(!lineLoopEnabled)}
+                    disabled={!lineAudioReady}
                     className={`rounded p-2 transition-colors ${
                       lineLoopEnabled
                         ? "bg-primary text-white"
                         : "bg-gray-700 text-gray-300 active:bg-gray-600"
-                    }`}
+                    } ${!lineAudioReady ? "opacity-50" : ""}`}
                     title={lineLoopEnabled ? "Disable loop" : "Enable loop"}
                   >
-                    <RotateCcw className="h-4 w-4" />
+                    <Repeat className="h-4 w-4" />
+                  </button>
+
+                  {/* Rewind button - restart from beginning */}
+                  <button
+                    onClick={() => {
+                      stopLineAudio();
+                      if (line) {
+                        playLineAudio(line.lineNumber);
+                      }
+                    }}
+                    disabled={!lineAudioReady || !isLineAudioPlaying}
+                    className={`flex items-center justify-center rounded p-2 transition-colors ${
+                      !lineAudioReady || !isLineAudioPlaying
+                        ? "bg-gray-700 text-gray-500"
+                        : "bg-gray-700 text-white active:bg-gray-600"
+                    }`}
+                    title="Restart from beginning"
+                  >
+                    <RotateCcw className="h-5 w-5" />
                   </button>
 
                   {/* Play/Pause button - larger for mobile */}
@@ -681,12 +736,15 @@ export default function WordInfoModal({
                         }
                       }
                     }}
+                    disabled={!lineAudioReady}
                     className={`flex items-center justify-center rounded p-2 transition-colors ${
                       isLineAudioPlaying
                         ? "bg-primary text-white"
-                        : "bg-gray-700 text-white active:bg-gray-600"
+                        : lineAudioReady
+                          ? "bg-gray-700 text-white active:bg-gray-600"
+                          : "bg-gray-700 text-gray-500"
                     }`}
-                    title={isLineAudioPlaying ? "Pause" : "Play line"}
+                    title={!lineAudioReady ? "Loading audio..." : isLineAudioPlaying ? "Pause" : "Play line"}
                   >
                     {isLineAudioPlaying ? (
                       <Pause className="h-5 w-5" />
@@ -696,7 +754,7 @@ export default function WordInfoModal({
                   </button>
                 </div>
               </div>
-              
+
               {/* Visual feedback when playing/looping */}
               {isLineAudioPlaying && (
                 <div className="mt-2 flex items-center gap-2 text-xs text-primary">
@@ -704,6 +762,14 @@ export default function WordInfoModal({
                   <span>
                     {lineLoopEnabled ? "Playing (looping)" : "Playing"}
                   </span>
+                </div>
+              )}
+
+              {/* Loading indicator */}
+              {!lineAudioReady && (
+                <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <span>Loading audio...</span>
                 </div>
               )}
             </div>

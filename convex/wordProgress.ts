@@ -498,6 +498,7 @@ export const getWordDetailsWithSongs = query({
       hebrew: word.hebrew,
       english: word.english,
       grammarType: word.grammarType,
+      forvoAudioUrl: word.forvoAudioUrl,
       songs: validSongs,
       songCount: validSongs.length,
     };

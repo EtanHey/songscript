@@ -54,8 +54,11 @@ export function useAudioPreloader(
 
       const audio = new Audio()
       audio.preload = 'auto'
+      let handled = false // Prevent double counting from canplay + canplaythrough
 
       const handleCanPlay = () => {
+        if (handled) return
+        handled = true
         loadedCount++
         audioMapRef.current.set(lineNumber, audio)
         setState({
@@ -66,6 +69,8 @@ export function useAudioPreloader(
       }
 
       const handleError = () => {
+        if (handled) return
+        handled = true
         // Still increment loaded count to not block ready state
         loadedCount++
         console.warn(`Failed to load audio for line ${lineNumber}: ${audioUrl}`)
@@ -84,9 +89,11 @@ export function useAudioPreloader(
       }
 
       audio.addEventListener('canplaythrough', handleCanPlay, { once: true })
+      audio.addEventListener('canplay', handleCanPlay, { once: true }) // Fallback for cached audio
       audio.addEventListener('error', handleError, { once: true })
       audio.addEventListener('ended', handleEnded)
       audio.src = audioUrl
+      audio.load() // Explicitly trigger loading
     })
 
     return () => {

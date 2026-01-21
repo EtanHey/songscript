@@ -6,6 +6,7 @@ import { api } from "@convex/_generated/api";
 import { useVisitorId } from "../hooks/useVisitorId";
 import { playWordAudio, stopWordAudio } from "../utils/wordAudio";
 import { Link } from "@tanstack/react-router";
+import { LanguageFlag } from "./LanguageFlag";
 import {
   Dialog,
   DialogContent,
@@ -38,32 +39,6 @@ function formatRelativeTime(timestamp: number): string {
   return `${Math.floor(diffDays / 30)}mo ago`;
 }
 
-// Helper to get language flag emoji
-function getLanguageFlag(sourceLanguage: string): string {
-  switch (sourceLanguage.toLowerCase()) {
-    case "fa":
-    case "persian":
-    case "farsi":
-      return "\u{1F1EE}\u{1F1F7}";
-    case "ko":
-    case "korean":
-      return "\u{1F1F0}\u{1F1F7}";
-    case "ar":
-    case "arabic":
-      return "\u{1F1F8}\u{1F1E6}";
-    case "he":
-    case "hebrew":
-      return "\u{1F1EE}\u{1F1F1}";
-    case "ja":
-    case "japanese":
-      return "\u{1F1EF}\u{1F1F5}";
-    case "zh":
-    case "chinese":
-      return "\u{1F1E8}\u{1F1F3}";
-    default:
-      return "\u{1F30D}";
-  }
-}
 
 interface WordDetailsModalProps {
   isOpen: boolean;
@@ -118,7 +93,8 @@ export default function WordDetailsModal({
     setIsPlaying(false);
 
     try {
-      const result = await playWordAudio(persian);
+      // Use Forvo audio URL if available from wordDetails
+      const result = await playWordAudio(persian, wordDetails?.forvoAudioUrl);
       if (result.success) {
         setIsPlaying(true);
         // Clear playing state after audio finishes (typically short)
@@ -131,7 +107,7 @@ export default function WordDetailsModal({
     } finally {
       setIsLoading(false);
     }
-  }, [persian]);
+  }, [persian, wordDetails?.forvoAudioUrl]);
 
   if (!persian) return null;
 
@@ -238,7 +214,7 @@ export default function WordDetailsModal({
                 onClick={onClose}
                 className="flex items-center gap-3 p-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors group min-h-[60px]"
               >
-                <span className="text-xl">{getLanguageFlag(song.sourceLanguage)}</span>
+                <LanguageFlag language={song.sourceLanguage} size="1.25em" />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-white truncate group-hover:text-primary transition-colors">
                     {song.title}

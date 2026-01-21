@@ -97,6 +97,40 @@ songscript/
 
 ---
 
+## 🧪 TESTING REQUIREMENTS
+
+**All new helpers/utilities MUST have tests.**
+
+### Test Location Convention
+- Component tests: `src/components/ComponentName.test.tsx`
+- Hook tests: `src/hooks/hookName.test.ts`
+- Utility tests: `src/lib/utilName.test.ts` or `src/utils/utilName.test.ts`
+- Integration tests: `src/__tests__/featureName.test.ts`
+
+### Pre-commit Hooks
+Tests run automatically on every commit via Husky:
+```bash
+bun run test        # Unit tests (Vitest)
+bun run typecheck   # TypeScript check
+```
+
+If tests fail, the commit is blocked. Fix tests before committing.
+
+### Running Tests Manually
+```bash
+bun run test        # Run all tests once
+bun run test:watch  # Watch mode for development
+bun run test:e2e    # Playwright E2E tests
+```
+
+### When Creating New Code
+1. **New helper/utility** → Create `*.test.ts` file with unit tests
+2. **New component with logic** → Create `*.test.tsx` file
+3. **Bug fix** → Add regression test if possible
+4. **Refactoring** → Ensure existing tests still pass
+
+---
+
 ## CLAUDE_COUNTER SYSTEM
 
 Every response MUST end with: `CLAUDE_COUNTER: N`

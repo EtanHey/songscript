@@ -7,8 +7,8 @@ export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
 
-// Admin email - only this email can sign in
-const ADMIN_EMAIL = "etan@heyman.net";
+// Admin email - only this email can sign in (set in environment variables)
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || "admin@example.com";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -105,7 +105,7 @@ function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              placeholder="etan@heyman.net"
+              placeholder="admin@example.com"
               required
             />
           </div>

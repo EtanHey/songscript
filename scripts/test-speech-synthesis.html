@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Persian Speech Synthesis Test</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #fff;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #4a5568;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+    }
+    button:hover {
+      background: #2d3748;
+    }
+    .result {
+      background: #2d2d2d;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      font-family: monospace;
+    }
+    .word-test {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+      padding: 10px;
+      background: #2d2d2d;
+      border-radius: 6px;
+    }
+    .persian {
+      font-size: 24px;
+      direction: rtl;
+    }
+    .transliteration {
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h1>Persian Speech Synthesis Test</h1>
+
+  <h2>1. Available Voices</h2>
+  <button onclick="listVoices()">List All Voices</button>
+  <button onclick="listPersianVoices()">Find Persian Voices</button>
+  <div id="voices" class="result">Click a button to see voices...</div>
+
+  <h2>2. Test Persian Words</h2>
+  <p>These words are from the Baraye song:</p>
+
+  <div class="word-test">
+    <span class="persian">برای</span>
+    <span class="transliteration">(barâye)</span>
+    <button onclick="speak('برای')">Play</button>
+  </div>
+
+  <div class="word-test">
+    <span class="persian">زن</span>
+    <span class="transliteration">(zan)</span>
+    <button onclick="speak('زن')">Play</button>
+  </div>
+
+  <div class="word-test">
+    <span class="persian">زندگی</span>
+    <span class="transliteration">(zendegi)</span>
+    <button onclick="speak('زندگی')">Play</button>
+  </div>
+
+  <div class="word-test">
+    <span class="persian">آزادی</span>
+    <span class="transliteration">(âzâdi)</span>
+    <button onclick="speak('آزادی')">Play</button>
+  </div>
+
+  <div class="word-test">
+    <span class="persian">رقصیدن</span>
+    <span class="transliteration">(raqsidan)</span>
+    <button onclick="speak('رقصیدن')">Play</button>
+  </div>
+
+  <h2>3. Status</h2>
+  <div id="status" class="result">Ready...</div>
+
+  <script>
+    let voices = [];
+    let persianVoice = null;
+
+    // Load voices
+    function loadVoices() {
+      voices = speechSynthesis.getVoices();
+      console.log('Loaded', voices.length, 'voices');
+
+      // Try to find Persian voice
+      persianVoice = voices.find(v =>
+        v.lang.startsWith('fa') ||
+        v.lang.includes('Persian') ||
+        v.name.toLowerCase().includes('persian') ||
+        v.name.toLowerCase().includes('farsi')
+      );
+
+      if (persianVoice) {
+        document.getElementById('status').textContent =
+          `✅ Persian voice found: ${persianVoice.name} (${persianVoice.lang})`;
+      } else {
+        // Try Arabic as fallback (similar phonetics)
+        const arabicVoice = voices.find(v => v.lang.startsWith('ar'));
+        if (arabicVoice) {
+          persianVoice = arabicVoice;
+          document.getElementById('status').textContent =
+            `⚠️ No Persian voice, using Arabic fallback: ${arabicVoice.name}`;
+        } else {
+          document.getElementById('status').textContent =
+            `❌ No Persian or Arabic voices found. Will use default voice.`;
+        }
+      }
+    }
+
+    // Load voices on page load and when they change
+    speechSynthesis.onvoiceschanged = loadVoices;
+    loadVoices();
+
+    function listVoices() {
+      const voiceList = voices.map(v =>
+        `${v.name} | ${v.lang} | ${v.localService ? 'local' : 'remote'}`
+      ).join('\n');
+      document.getElementById('voices').textContent =
+        `Found ${voices.length} voices:\n\n${voiceList}`;
+    }
+
+    function listPersianVoices() {
+      const persian = voices.filter(v =>
+        v.lang.startsWith('fa') ||
+        v.lang.includes('Persian') ||
+        v.name.toLowerCase().includes('persian') ||
+        v.name.toLowerCase().includes('farsi')
+      );
+
+      const arabic = voices.filter(v => v.lang.startsWith('ar'));
+
+      let result = `Persian voices (${persian.length}):\n`;
+      result += persian.length ? persian.map(v => `  ${v.name} | ${v.lang}`).join('\n') : '  None found';
+
+      result += `\n\nArabic voices (${arabic.length}) - potential fallback:\n`;
+      result += arabic.length ? arabic.map(v => `  ${v.name} | ${v.lang}`).join('\n') : '  None found';
+
+      document.getElementById('voices').textContent = result;
+    }
+
+    function speak(text) {
+      // Cancel any ongoing speech
+      speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+
+      if (persianVoice) {
+        utterance.voice = persianVoice;
+      }
+
+      utterance.rate = 0.8; // Slower for learning
+      utterance.pitch = 1;
+
+      utterance.onstart = () => {
+        document.getElementById('status').textContent = `🔊 Speaking: "${text}"`;
+      };
+
+      utterance.onend = () => {
+        document.getElementById('status').textContent = `✅ Finished: "${text}"`;
+      };
+
+      utterance.onerror = (e) => {
+        document.getElementById('status').textContent = `❌ Error: ${e.error}`;
+      };
+
+      speechSynthesis.speak(utterance);
+    }
+  </script>
+</body>
+</html>
