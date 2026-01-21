@@ -59,6 +59,24 @@ async function calculateCurrentStreak(ctx: any, visitorId: string): Promise<numb
   return currentStreak;
 }
 
+// Get user information by visitorId (email)
+export const getUserInfo = query({
+  args: {
+    visitorId: v.string(),
+  },
+  handler: async (ctx, { visitorId }) => {
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), visitorId))
+      .first();
+
+    return {
+      email: visitorId,
+      displayName: user?.displayName || null,
+    };
+  },
+});
+
 // Get streak leaderboard
 export const getStreakLeaderboard = query({
   args: {
