@@ -78,3 +78,11 @@ See iteration logs above for details.
 - Returns sorted array with rank, displayName, streak, language fields
 - Typecheck passes successfully
 ---
+
+## Iteration - V-003: Schema Verification Complete
+- Verified users table can be queried without errors (typecheck passes)
+- Confirmed displayName field accepts string values (v.optional(v.string()))
+- Confirmed createdAt field accepts number timestamps (v.optional(v.number()))
+- Verified no references to 'role' field exist in schema.ts
+- All schema changes from US-036 are working correctly
+---
