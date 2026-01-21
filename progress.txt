@@ -29,3 +29,14 @@ Learnings for next iteration:
 - Securing the API requires simultaneous updates to frontend callers to avoid type errors and broken functionality. 
 - Using `.filter()` on indexed `userId` queries is a viable first step for security, but composite indexes (`userId`, `persian`) should be considered for better performance as the dataset grows.
 ---
+## Iteration - SEC-004
+- Completed story SEC-004: Secure userSongProgress and lineProgress in Convex.
+- Updated `convex/songProgress.ts` to use `ctx.auth` and removed `visitorId` arguments.
+- Applied `by_user` index for all queries and `requireAuth` for mutations.
+- Updated `dashboard.tsx` and `song.$songId.tsx` to match the new secure API signatures.
+- Updated `LyricsDisplay.tsx` and its tests to remove `visitorId` dependencies.
+- Verified all changes with a full project typecheck.
+
+Learnings for next iteration:
+- Renaming functions (e.g., adding "ByUser" suffix) helps clarify the security model but requires updating all frontend call sites immediately to avoid type errors.
+---

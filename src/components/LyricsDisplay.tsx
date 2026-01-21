@@ -21,7 +21,6 @@ export type LanguageFilter = "all" | "persian" | "transliteration" | "hebrew" | 
 
 interface LyricsDisplayProps {
   songId: Id<"songs">;
-  visitorId: string;
   onLineClick?: (startTime: number, lineIndex: number) => void;
   onLineInfoClick?: (line: LyricLine, lineIndex: number) => void;
   onLineCheckboxClick?: (lineNumber: number) => void;
@@ -39,7 +38,6 @@ interface LyricsDisplayProps {
 
 export default function LyricsDisplay({
   songId,
-  visitorId: _visitorId,
   onLineClick,
   onLineInfoClick,
   onLineCheckboxClick,

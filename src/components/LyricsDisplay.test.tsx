@@ -79,7 +79,7 @@ describe('LyricsDisplay', () => {
   })
 
   it('renders all language versions by default', () => {
-    render(<LyricsDisplay songId={'test-song-id' as never} visitorId="test-visitor" />, {
+    render(<LyricsDisplay songId={'test-song-id' as never}  />, {
       wrapper: createWrapper(),
     })
 
@@ -97,7 +97,7 @@ describe('LyricsDisplay', () => {
   })
 
   it('renders multiple lines sorted by lineNumber', () => {
-    render(<LyricsDisplay songId={'test-song-id' as never} visitorId="test-visitor" />, {
+    render(<LyricsDisplay songId={'test-song-id' as never}  />, {
       wrapper: createWrapper(),
     })
 
@@ -111,7 +111,7 @@ describe('LyricsDisplay', () => {
     const onLineClick = vi.fn()
 
     render(
-      <LyricsDisplay songId={'test-song-id' as never} visitorId="test-visitor" onLineClick={onLineClick} />,
+      <LyricsDisplay songId={'test-song-id' as never}  onLineClick={onLineClick} />,
       { wrapper: createWrapper() }
     )
 
@@ -126,7 +126,7 @@ describe('LyricsDisplay', () => {
 
   it('applies active highlight class to active line', () => {
     render(
-      <LyricsDisplay songId={'test-song-id' as never} visitorId="test-visitor" activeLineIndex={1} />,
+      <LyricsDisplay songId={'test-song-id' as never}  activeLineIndex={1} />,
       { wrapper: createWrapper() }
     )
 
@@ -140,7 +140,7 @@ describe('LyricsDisplay', () => {
 
   it('applies click animation class to clicked line', () => {
     render(
-      <LyricsDisplay songId={'test-song-id' as never} visitorId="test-visitor" clickedLineIndex={0} />,
+      <LyricsDisplay songId={'test-song-id' as never}  clickedLineIndex={0} />,
       { wrapper: createWrapper() }
     )
 
@@ -154,7 +154,7 @@ describe('LyricsDisplay', () => {
   describe('Language Filter', () => {
     it('shows only Persian when filter is "persian"', () => {
       render(
-        <LyricsDisplay songId={'test-song-id' as never} visitorId="test-visitor" languageFilter="persian" />,
+        <LyricsDisplay songId={'test-song-id' as never}  languageFilter="persian" />,
         { wrapper: createWrapper() }
       )
 
@@ -169,7 +169,7 @@ describe('LyricsDisplay', () => {
 
     it('shows only Transliteration when filter is "transliteration"', () => {
       render(
-        <LyricsDisplay songId={'test-song-id' as never} visitorId="test-visitor" languageFilter="transliteration" />,
+        <LyricsDisplay songId={'test-song-id' as never}  languageFilter="transliteration" />,
         { wrapper: createWrapper() }
       )
 
@@ -184,7 +184,7 @@ describe('LyricsDisplay', () => {
 
     it('shows only Hebrew when filter is "hebrew"', () => {
       render(
-        <LyricsDisplay songId={'test-song-id' as never} visitorId="test-visitor" languageFilter="hebrew" />,
+        <LyricsDisplay songId={'test-song-id' as never}  languageFilter="hebrew" />,
         { wrapper: createWrapper() }
       )
 
@@ -199,7 +199,7 @@ describe('LyricsDisplay', () => {
 
     it('shows only English when filter is "english"', () => {
       render(
-        <LyricsDisplay songId={'test-song-id' as never} visitorId="test-visitor" languageFilter="english" />,
+        <LyricsDisplay songId={'test-song-id' as never}  languageFilter="english" />,
         { wrapper: createWrapper() }
       )
 
@@ -214,7 +214,7 @@ describe('LyricsDisplay', () => {
 
     it('shows all languages when filter is "all"', () => {
       render(
-        <LyricsDisplay songId={'test-song-id' as never} visitorId="test-visitor" languageFilter="all" />,
+        <LyricsDisplay songId={'test-song-id' as never}  languageFilter="all" />,
         { wrapper: createWrapper() }
       )
 
@@ -228,7 +228,7 @@ describe('LyricsDisplay', () => {
 
   it('handles lines without Hebrew text gracefully', () => {
     render(
-      <LyricsDisplay songId={'test-song-id' as never} visitorId="test-visitor" languageFilter="all" />,
+      <LyricsDisplay songId={'test-song-id' as never}  languageFilter="all" />,
       { wrapper: createWrapper() }
     )
 
@@ -239,7 +239,7 @@ describe('LyricsDisplay', () => {
   })
 
   it('applies correct RTL direction to Persian text', () => {
-    render(<LyricsDisplay songId={'test-song-id' as never} visitorId="test-visitor" />, {
+    render(<LyricsDisplay songId={'test-song-id' as never}  />, {
       wrapper: createWrapper(),
     })
 
@@ -249,7 +249,7 @@ describe('LyricsDisplay', () => {
   })
 
   it('applies correct RTL direction to Hebrew text', () => {
-    render(<LyricsDisplay songId={'test-song-id' as never} visitorId="test-visitor" />, {
+    render(<LyricsDisplay songId={'test-song-id' as never}  />, {
       wrapper: createWrapper(),
     })
 
@@ -259,7 +259,7 @@ describe('LyricsDisplay', () => {
   })
 
   it('applies italic and green color to transliteration', () => {
-    render(<LyricsDisplay songId={'test-song-id' as never} visitorId="test-visitor" />, {
+    render(<LyricsDisplay songId={'test-song-id' as never}  />, {
       wrapper: createWrapper(),
     })
 
@@ -269,7 +269,7 @@ describe('LyricsDisplay', () => {
   })
 
   it('applies blue color to Hebrew text', () => {
-    render(<LyricsDisplay songId={'test-song-id' as never} visitorId="test-visitor" />, {
+    render(<LyricsDisplay songId={'test-song-id' as never}  />, {
       wrapper: createWrapper(),
     })
 
@@ -278,7 +278,7 @@ describe('LyricsDisplay', () => {
   })
 
   it('applies gray color to English text', () => {
-    render(<LyricsDisplay songId={'test-song-id' as never} visitorId="test-visitor" />, {
+    render(<LyricsDisplay songId={'test-song-id' as never}  />, {
       wrapper: createWrapper(),
     })
 

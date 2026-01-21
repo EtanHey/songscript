@@ -50,9 +50,7 @@ function DashboardPage() {
 
   // Get song progress with details
   const { data: songProgress, isLoading: progressLoading } = useQuery(
-    convexQuery(api.songProgress.getWithSongDetails, {
-      visitorId: visitorId || "",
-    })
+    convexQuery(api.songProgress.getWithSongDetails, {})
   );
 
   // Get vocabulary grouped by language
@@ -77,9 +75,7 @@ function DashboardPage() {
 
   // Get recent songs for "Continue Learning" section
   const { data: recentSongs, isLoading: recentLoading } = useQuery(
-    convexQuery(api.songProgress.getRecentForContinue, {
-      visitorId: visitorId || "",
-    })
+    convexQuery(api.songProgress.getRecentForContinue, {})
   );
 
   // Get aggregated stats

@@ -1,27 +1,31 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { getAuthUserId, requireAuth } from "./authHelpers";
 
-// Get all song progress for a visitor
-export const getByVisitor = query({
-  args: { visitorId: v.string() },
-  handler: async (ctx, args) => {
-    if (!args.visitorId) return [];
+// Get all song progress for the authenticated user
+export const getByUser = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+    
     return await ctx.db
       .query("userSongProgress")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
   },
 });
 
-// Get all song progress with song details for a visitor (for dashboard)
+// Get all song progress with song details for the authenticated user (for dashboard)
 export const getWithSongDetails = query({
-  args: { visitorId: v.string() },
-  handler: async (ctx, args) => {
-    if (!args.visitorId) return [];
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
 
     const progress = await ctx.db
       .query("userSongProgress")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
     // Get song details and line counts for each progress entry
@@ -56,13 +60,14 @@ export const getWithSongDetails = query({
 
 // Get 3 most recently practiced songs with details for "Continue Learning" section
 export const getRecentForContinue = query({
-  args: { visitorId: v.string() },
-  handler: async (ctx, args) => {
-    if (!args.visitorId) return [];
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
 
     const progress = await ctx.db
       .query("userSongProgress")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
     // Sort by lastPracticed descending and take top 3
@@ -109,15 +114,18 @@ export const getRecentForContinue = query({
 });
 
 // Get progress for a specific song
-export const getByVisitorSong = query({
-  args: { visitorId: v.string(), songId: v.id("songs") },
+export const getByUserSong = query({
+  args: { songId: v.id("songs") },
   handler: async (ctx, args) => {
-    if (!args.visitorId) return null;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
     return await ctx.db
       .query("userSongProgress")
-      .withIndex("by_visitor_song", (q) =>
-        q.eq("visitorId", args.visitorId).eq("songId", args.songId)
+      .withIndex("by_user", (q) =>
+        q.eq("userId", userId)
       )
+      .filter((q) => q.eq(q.field("songId"), args.songId))
       .first();
   },
 });
@@ -125,18 +133,18 @@ export const getByVisitorSong = query({
 // Record that a line was practiced/completed
 export const recordLineCompletion = mutation({
   args: {
-    visitorId: v.string(),
     songId: v.id("songs"),
     lineNumber: v.number()
   },
   handler: async (ctx, args) => {
-    if (!args.visitorId) return null;
+    const userId = await requireAuth(ctx);
 
     const existing = await ctx.db
       .query("userSongProgress")
-      .withIndex("by_visitor_song", (q) =>
-        q.eq("visitorId", args.visitorId).eq("songId", args.songId)
+      .withIndex("by_user", (q) =>
+        q.eq("userId", userId)
       )
+      .filter((q) => q.eq(q.field("songId"), args.songId))
       .first();
 
     if (existing) {
@@ -154,7 +162,8 @@ export const recordLineCompletion = mutation({
     } else {
       // Create new progress record
       return await ctx.db.insert("userSongProgress", {
-        visitorId: args.visitorId,
+        userId,
+        visitorId: "authenticated",
         songId: args.songId,
         linesCompleted: [args.lineNumber],
         lastPracticed: Date.now(),
@@ -167,18 +176,19 @@ export const recordLineCompletion = mutation({
 // Record multiple lines as practiced at once
 export const recordLinesCompletion = mutation({
   args: {
-    visitorId: v.string(),
     songId: v.id("songs"),
     lineNumbers: v.array(v.number())
   },
   handler: async (ctx, args) => {
-    if (!args.visitorId || args.lineNumbers.length === 0) return null;
+    const userId = await requireAuth(ctx);
+    if (args.lineNumbers.length === 0) return null;
 
     const existing = await ctx.db
       .query("userSongProgress")
-      .withIndex("by_visitor_song", (q) =>
-        q.eq("visitorId", args.visitorId).eq("songId", args.songId)
+      .withIndex("by_user", (q) =>
+        q.eq("userId", userId)
       )
+      .filter((q) => q.eq(q.field("songId"), args.songId))
       .first();
 
     // Track the highest line number as the "last" position
@@ -199,7 +209,8 @@ export const recordLinesCompletion = mutation({
       // Create new progress record
       const linesCompleted = [...new Set(args.lineNumbers)].sort((a, b) => a - b);
       return await ctx.db.insert("userSongProgress", {
-        visitorId: args.visitorId,
+        userId,
+        visitorId: "authenticated",
         songId: args.songId,
         linesCompleted,
         lastPracticed: Date.now(),
@@ -212,19 +223,20 @@ export const recordLinesCompletion = mutation({
 // Toggle whether a line is marked as "learned" (mastery state)
 export const toggleLineLearned = mutation({
   args: {
-    visitorId: v.string(),
     songId: v.id("songs"),
     lineNumber: v.number()
   },
   handler: async (ctx, args) => {
-    if (!args.visitorId) return null;
+    const userId = await requireAuth(ctx);
 
     const existing = await ctx.db
       .query("lineProgress")
-      .withIndex("by_visitor_song_line", (q) =>
-        q.eq("visitorId", args.visitorId)
-         .eq("songId", args.songId)
-         .eq("lineNumber", args.lineNumber)
+      .withIndex("by_user", (q) =>
+        q.eq("userId", userId)
+      )
+      .filter((q) => 
+        q.eq(q.field("songId"), args.songId) && 
+        q.eq(q.field("lineNumber"), args.lineNumber)
       )
       .first();
 
@@ -237,7 +249,8 @@ export const toggleLineLearned = mutation({
     } else {
       // Create new line progress record as learned
       return await ctx.db.insert("lineProgress", {
-        visitorId: args.visitorId,
+        userId,
+        visitorId: "authenticated",
         songId: args.songId,
         lineNumber: args.lineNumber,
         learned: true,
@@ -247,15 +260,18 @@ export const toggleLineLearned = mutation({
 });
 
 // Get line progress for a specific song
-export const getLineProgressBySong = query({
-  args: { visitorId: v.string(), songId: v.id("songs") },
+export const getLineProgressByUserSong = query({
+  args: { songId: v.id("songs") },
   handler: async (ctx, args) => {
-    if (!args.visitorId) return [];
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+
     return await ctx.db
       .query("lineProgress")
-      .withIndex("by_visitor_song", (q) =>
-        q.eq("visitorId", args.visitorId).eq("songId", args.songId)
+      .withIndex("by_user", (q) =>
+        q.eq("userId", userId)
       )
+      .filter((q) => q.eq(q.field("songId"), args.songId))
       .collect();
   },
 });

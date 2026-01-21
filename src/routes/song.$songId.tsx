@@ -81,7 +81,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
   // Get visitor ID and line progress for visual states
   const visitorId = useVisitorId();
   const { data: lineProgress } = useSuspenseQuery(
-    convexQuery(api.songProgress.getLineProgressBySong, { visitorId, songId })
+    convexQuery(api.songProgress.getLineProgressByUserSong, { songId })
   );
 
   // Load user preferences
@@ -351,7 +351,6 @@ function SongPageContent({ songId }: SongPageContentProps) {
         const previousLineNumber = sortedLyrics[currentLineIndex]?.lineNumber;
         if (previousLineNumber !== undefined && !sessionCompletedLines.has(previousLineNumber)) {
           recordLineCompletionMutation({
-            visitorId,
             songId: songId as Id<"songs">,
             lineNumber: previousLineNumber
           });
@@ -437,7 +436,6 @@ function SongPageContent({ songId }: SongPageContentProps) {
               // Record line completion
               if (visitorId && songId && !sessionCompletedLines.has(currentLine.lineNumber)) {
                 recordLineCompletionMutation({
-                  visitorId,
                   songId: songId as Id<"songs">,
                   lineNumber: currentLine.lineNumber
                 });
@@ -497,8 +495,8 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
   // Handle checkbox toggle for line learned state
   const handleLineCheckboxClick = useCallback((lineNumber: number) => {
-    toggleLineLearnedMutation({ visitorId, songId, lineNumber });
-  }, [toggleLineLearnedMutation, visitorId, songId]);
+    toggleLineLearnedMutation({ songId, lineNumber });
+  }, [toggleLineLearnedMutation, songId]);
 
   // Handle word learned toggle
   const handleToggleWordLearned = useCallback((wordId: Id<"words">, persian: string) => {
@@ -748,7 +746,6 @@ function SongPageContent({ songId }: SongPageContentProps) {
       <div className="flex-1 overflow-y-auto px-4 py-4">
         <LyricsDisplay
           songId={songId}
-          visitorId={visitorId}
           onLineClick={handleLineClick}
           onLineInfoClick={handleLineInfoClick}
           onLineCheckboxClick={handleLineCheckboxClick}
