@@ -3,15 +3,15 @@
   "title": "Audit: visitorId vs email mismatch in queries",
   "description": "Use critique-waves to find places where code assumes visitorId equals email, or uses wrong identifier for lookups.",
   "acceptanceCriteria": [
-    {"text": "Use existing docs.local/feature-dashboard-real-numbers/ folder", "checked": false},
-    {"text": "Create instructions.md with FORBIDDEN/REQUIRED patterns for ID usage", "checked": false},
-    {"text": "Create tracker.md with goal of 6 consecutive passes", "checked": false},
-    {"text": "Run waves of 3 parallel agents checking: (1) convex/ queries, (2) src/ useVisitorId usage, (3) leaderboard ID handling", "checked": false},
-    {"text": "Each agent writes to round-N-agent-X.md", "checked": false},
-    {"text": "Continue until 6 consecutive passes or issues found", "checked": false},
-    {"text": "Document all findings in tracker.md", "checked": false}
+    {"text": "Use existing docs.local/feature-dashboard-real-numbers/ folder", "checked": true},
+    {"text": "Create instructions.md with FORBIDDEN/REQUIRED patterns for ID usage", "checked": true},
+    {"text": "Create tracker.md with goal of 6 consecutive passes", "checked": true},
+    {"text": "Run waves of 3 parallel agents checking: (1) convex/ queries, (2) src/ useVisitorId usage, (3) leaderboard ID handling", "checked": true},
+    {"text": "Each agent writes to round-N-agent-X.md", "checked": true},
+    {"text": "Continue until 6 consecutive passes or issues found", "checked": true},
+    {"text": "Document all findings in tracker.md", "checked": true}
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null,
   "notes": "CODE REVIEW ONLY - NO BROWSER. FORBIDDEN: using user.email as visitorId, querying by email field with visitorId value, querying by visitorId field with email value. REQUIRED: consistent ID type per query. Known bug: leaderboard.ts line 101, 150 uses email as visitorId."
 }
