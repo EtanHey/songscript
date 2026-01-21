@@ -1,0 +1,14 @@
+{
+  "id": "US-049",
+  "title": "Update login page UI for public access",
+  "description": "Change login page from 'SongScript Admin' to regular user-friendly login. Update copy and styling.",
+  "acceptanceCriteria": [
+    {"text": "Change title from 'SongScript Admin' to 'Sign In'", "checked": false},
+    {"text": "Change subtitle from 'Admin access only' to 'Sign in with your email'", "checked": false},
+    {"text": "Remove admin-specific error messages", "checked": false},
+    {"text": "Mobile responsive layout", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "US-048"
+}

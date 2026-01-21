@@ -1,0 +1,13 @@
+{
+  "addToStoryOrder": ["US-048", "US-049", "V-010"],
+  "addToPending": ["US-048", "US-049"],
+  "addToBlocked": ["V-010"],
+  "stats": {
+    "total": 23,
+    "pending": 2,
+    "blocked": 3
+  },
+  "notes": {
+    "V-010": "BROWSER VERIFICATION - blocked for Kiro, only Claude can verify with MCP browser tools"
+  }
+}
