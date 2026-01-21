@@ -113,6 +113,9 @@ function SongPageContent({ songId }: SongPageContentProps) {
   // Loop restart guard - prevents multiple loop triggers
   const isLoopingRef = useRef(false);
 
+  // Practice time tracking
+  const practiceSecondsRef = useRef(0);
+
   // Current line being played (for Loop/Single modes)
   const [currentLineIndex, setCurrentLineIndex] = useState<number | undefined>(undefined);
 
@@ -166,6 +169,66 @@ function SongPageContent({ songId }: SongPageContentProps) {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Activity tracking for practice time
+  const lastActivityRef = useRef<number>(Date.now());
+  const IDLE_THRESHOLD_MS = 5000; // 5 seconds of no activity = idle
+
+  // Track user activity
+  useEffect(() => {
+    const updateActivity = () => {
+      lastActivityRef.current = Date.now();
+    };
+
+    // Track various activity types
+    window.addEventListener('mousemove', updateActivity);
+    window.addEventListener('mousedown', updateActivity);
+    window.addEventListener('keydown', updateActivity);
+    window.addEventListener('touchstart', updateActivity);
+    window.addEventListener('scroll', updateActivity, true);
+
+    return () => {
+      window.removeEventListener('mousemove', updateActivity);
+      window.removeEventListener('mousedown', updateActivity);
+      window.removeEventListener('keydown', updateActivity);
+      window.removeEventListener('touchstart', updateActivity);
+      window.removeEventListener('scroll', updateActivity, true);
+    };
+  }, []);
+
+  // Determine if we should count practice time
+  // Count when: video playing (not fluid+muted) OR modal open
+  const shouldCountTime = useMemo(() => {
+    const isFluidMuted = playbackMode === "fluid" && isVideoMuted;
+    const isActivelyPracticing = isVideoPlaying && !isFluidMuted;
+    const isInModal = wordModalOpen;
+    return isActivelyPracticing || isInModal;
+  }, [playbackMode, isVideoMuted, isVideoPlaying, wordModalOpen]);
+
+  // Practice time tracking - count and log every second, but only when active
+  useEffect(() => {
+    // Tick every second
+    const interval = setInterval(() => {
+      const timeSinceActivity = Date.now() - lastActivityRef.current;
+      const isActive = timeSinceActivity < IDLE_THRESHOLD_MS;
+
+      // Only count if shouldCountTime AND user is active
+      if (shouldCountTime && isActive && visitorId) {
+        practiceSecondsRef.current += 1;
+        // Log every second to DB for real-time header updates
+        logPracticeMutation({
+          visitorId,
+          eventType: "audio_time",
+          value: 1,
+        });
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+      practiceSecondsRef.current = 0;
+    };
+  }, [shouldCountTime, visitorId, logPracticeMutation]);
 
   // Sync state with loaded user preferences
   useEffect(() => {
@@ -461,22 +524,32 @@ function SongPageContent({ songId }: SongPageContentProps) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [togglePlayPause]);
 
+  // On desktop, prevent page scroll - only lyrics should scroll
+  useEffect(() => {
+    if (!isMobile) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = '';
+      };
+    }
+  }, [isMobile]);
+
   if (!song) {
     throw notFound();
   }
 
   return (
-    <div className="flex h-[calc(100vh-65px)] flex-col overflow-hidden bg-gray-900 text-white">
-      {/* Main content */}
-      <div className="flex flex-1 flex-col lg:flex-row overflow-hidden">
-        {/* LEFT: Player section - no scroll on desktop, content is fixed height */}
-        <div className={`flex-shrink-0 lg:w-1/2 lg:h-full lg:border-r lg:border-gray-800`}>
-          <div className="lg:h-full lg:flex lg:flex-col">
-            {/* Mobile: Collapsible Header */}
+    <div className="bg-gray-900 text-white h-[calc(100vh-57px)] sm:h-[calc(100vh-69px)] flex flex-col lg:flex-row">
+      {/* LEFT: Video section */}
+      <div className="lg:w-1/2 lg:border-r lg:border-gray-800 flex-shrink-0">
+          {/* Mobile: Collapsible Header - use div instead of button to allow nested buttons */}
             {isMobile && (
-              <button
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={handleVideoCollapsedToggle}
-                className="w-full flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700 hover:bg-gray-700/50 transition-colors"
+                onKeyDown={(e) => e.key === 'Enter' && handleVideoCollapsedToggle()}
+                className="w-full flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700 hover:bg-gray-700/50 transition-colors cursor-pointer"
               >
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                   <Video className="h-4 w-4 text-primary flex-shrink-0" />
@@ -511,7 +584,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
                   )}
                   {isVideoCollapsed ? <ChevronDown className="h-5 w-5 text-gray-400" /> : <ChevronUp className="h-5 w-5 text-gray-400" />}
                 </div>
-              </button>
+              </div>
             )}
 
             {/* Desktop: Song title */}
@@ -671,23 +744,21 @@ function SongPageContent({ songId }: SongPageContentProps) {
                 </div>
               </div>
             )}
-          </div>
-        </div>
+      </div>
 
-        {/* RIGHT: Scrollable lyrics */}
-        <div className="flex-1 lg:w-1/2 overflow-y-auto px-4 py-4">
-          <LyricsDisplay
-            songId={songId}
-            visitorId={visitorId}
-            onLineClick={handleLineClick}
-            onLineInfoClick={handleLineInfoClick}
-            onLineCheckboxClick={handleLineCheckboxClick}
-            activeLineIndex={activeLineIndex}
-            clickedLineIndex={clickedLineIndex}
-            languageFilter={languageFilter}
-            lineProgress={lineProgress || []}
-          />
-        </div>
+      {/* RIGHT: Lyrics section - scrolls */}
+      <div className="flex-1 overflow-y-auto px-4 py-4">
+        <LyricsDisplay
+          songId={songId}
+          visitorId={visitorId}
+          onLineClick={handleLineClick}
+          onLineInfoClick={handleLineInfoClick}
+          onLineCheckboxClick={handleLineCheckboxClick}
+          activeLineIndex={activeLineIndex}
+          clickedLineIndex={clickedLineIndex}
+          languageFilter={languageFilter}
+          lineProgress={lineProgress || []}
+        />
       </div>
 
       {/* Word Info Modal */}
