@@ -86,3 +86,14 @@ See iteration logs above for details.
 - Verified no references to 'role' field exist in schema.ts
 - All schema changes from US-036 are working correctly
 ---
+
+## Iteration - US-039: Progress Leaderboard Query Complete
+- Created getProgressLeaderboard query in convex/leaderboard.ts
+- Query accepts period, limit, offset args (period not used yet but ready for future filtering)
+- Score calculation: (words_learned × multiplier) + (lines_completed × multiplier × 0.5)
+- Uses language difficulty multipliers from languageDifficulty.ts
+- Only returns users with displayName set
+- Users sorted by progressScore descending
+- Returns array with rank, displayName, score, topLanguage fields
+- Typecheck passes successfully
+---
