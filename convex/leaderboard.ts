@@ -1,4 +1,4 @@
-import { query } from "./_generated/server";
+import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { getLanguageMultiplier } from "./languageDifficulty";
 
@@ -370,5 +370,61 @@ export const getUserRank = query({
         hasDisplayName,
       };
     }
+  },
+});
+
+// Set or update user's display name
+export const setDisplayName = mutation({
+  args: {
+    visitorId: v.string(),
+    displayName: v.string(),
+  },
+  handler: async (ctx, { visitorId, displayName }) => {
+    // Validate display name length
+    if (displayName.length < 3 || displayName.length > 20) {
+      return { success: false, error: "Display name must be 3-20 characters" };
+    }
+
+    // Validate display name contains valid characters (alphanumeric + spaces)
+    const validPattern = /^[a-zA-Z0-9\s]+$/;
+    if (!validPattern.test(displayName)) {
+      return { success: false, error: "Display name can only contain letters, numbers, and spaces" };
+    }
+
+    // Reject names with only spaces
+    if (displayName.trim().length === 0) {
+      return { success: false, error: "Display name cannot be only spaces" };
+    }
+
+    // Basic offensive word filter (simple list)
+    const offensiveWords = ["fuck", "shit", "damn", "bitch", "ass", "hell"];
+    const lowerDisplayName = displayName.toLowerCase();
+    for (const word of offensiveWords) {
+      if (lowerDisplayName.includes(word)) {
+        return { success: false, error: "Display name contains inappropriate content" };
+      }
+    }
+
+    // Find existing user by visitorId (email)
+    const existingUser = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), visitorId))
+      .first();
+
+    if (existingUser) {
+      // Update existing user
+      await ctx.db.patch(existingUser._id, {
+        displayName: displayName.trim(),
+      });
+    } else {
+      // Create new user record
+      await ctx.db.insert("users", {
+        email: visitorId,
+        displayName: displayName.trim(),
+        createdAt: Date.now(),
+      });
+    }
+
+    return { success: true };
   },
 });
