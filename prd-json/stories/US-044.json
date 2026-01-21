@@ -1,0 +1,15 @@
+{
+  "id": "US-044",
+  "title": "Add LeaderboardMiniSection to dashboard",
+  "description": "Integrate the mini leaderboard into the dashboard page. Place it in the main content area, likely after the stats section or in the right column.",
+  "acceptanceCriteria": [
+    {"text": "LeaderboardMiniSection imported in dashboard.tsx", "checked": false},
+    {"text": "Section has 'Leaderboard' heading like other sections", "checked": false},
+    {"text": "Positioned appropriately in dashboard layout", "checked": false},
+    {"text": "Loading state shown while fetching data", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "Verify in browser: leaderboard section visible on dashboard", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "US-043"
+}

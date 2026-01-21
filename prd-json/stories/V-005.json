@@ -1,0 +1,16 @@
+{
+  "id": "V-005",
+  "title": "Verify: Leaderboard queries work correctly",
+  "description": "Test the leaderboard queries with sample data to ensure rankings are calculated correctly with difficulty multipliers.",
+  "acceptanceCriteria": [
+    {"text": "getStreakLeaderboard returns users sorted by streak", "checked": false},
+    {"text": "getProgressLeaderboard applies difficulty multipliers correctly", "checked": false},
+    {"text": "getUserRank returns correct position", "checked": false},
+    {"text": "Users without displayName excluded from public boards", "checked": false},
+    {"text": "Period filters work (weekly/monthly/all-time)", "checked": false},
+    {"text": "Pagination works (limit/offset)", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "US-040"
+}

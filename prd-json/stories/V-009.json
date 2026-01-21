@@ -1,0 +1,18 @@
+{
+  "id": "V-009",
+  "title": "Verify: Full end-to-end leaderboard flow",
+  "description": "Complete end-to-end test of the leaderboard feature from signup to appearing on leaderboard.",
+  "acceptanceCriteria": [
+    {"text": "New user signs up via magic link", "checked": false},
+    {"text": "Display name prompt appears after first login", "checked": false},
+    {"text": "User sets display name", "checked": false},
+    {"text": "User practices (completes lines, learns words)", "checked": false},
+    {"text": "User appears on leaderboard with correct rank", "checked": false},
+    {"text": "User can view full leaderboard page", "checked": false},
+    {"text": "User can change display name in settings", "checked": false},
+    {"text": "Change reflects on leaderboard", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": ["US-047", "V-008"]
+}

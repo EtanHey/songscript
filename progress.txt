@@ -1,140 +1,51 @@
 # Progress Log
 
-## New PRD: Practice Tracking Overhaul
+## New PRD: Leaderboard Feature
 
-**Generated:** 2026-01-20
-**Stories:** 14 (12 implementation + 2 verification)
+**Generated:** 2026-01-21
+**Stories:** 19 (12 US + 7 V verification stories)
+**Design Doc:** docs/plans/2026-01-21-leaderboard-design.md
 
-### Key Findings from Exploration
-1. **recordLineCompletion mutation exists but NEVER called**
-2. **logPractice mutation exists but NEVER called**
-3. **NO onEnded callback in useAudioPreloader**
-4. **NO userPreferences table exists**
-5. **LyricsDisplay has no line checkboxes**
+### Feature Overview
+Adding leaderboard system for motivation/gamification:
+- Streak leaderboard (consecutive days practiced)
+- Progress leaderboard (weighted by language difficulty)
+- Display name required to appear on leaderboard
+- Mini widget on dashboard + full /leaderboard page
+- Settings page for profile management
 
-### Practice Metrics Formula
-- Words learned: x10 points
-- Lines looped: x3 points
-- Audio practice time: x2 points/minute
-- Silent time: x1 point/minute (capped at 15 min)
-- Inactivity detection: 2 min timeout resets accumulated time
+### Language Difficulty Multipliers (FSI-based)
+- Standard (1.0x): Spanish, French, Italian, Dutch
+- Hard (1.5x): Hebrew, Persian, Russian, Hindi
+- Super-Hard (2.0x): Arabic, Japanese, Korean, Chinese
 
 ### Story Summary
-- US-001: Add userPreferences table to schema
-- US-002: Create userPreferences queries/mutations
-- US-003: Add onEnded callback to useAudioPreloader
-- US-004: Wire up logPractice mutation
-- US-005: Wire up recordLineCompletion mutation
-- US-006: Add line checkbox to LyricsDisplay
-- US-007: Add lineProgress table for learned lines
-- US-008: Visual states for lines (not learned/words known/line learned)
-- US-009: Persist user preferences from song page
-- US-010: Fix pronunciation button in word details modal
-- US-011: Populate My Songs section in dashboard
-- US-012: Practice metrics scoring formula
-- V-001: Verify practice tracking end-to-end
-- V-002: Verify line checkboxes and visual states
+1. US-036: Schema - add displayName, createdAt, remove role
+2. V-003: Verify schema changes
+3. US-037: Language difficulty utility
+4. V-004: Verify difficulty multipliers
+5. US-038: Streak leaderboard query
+6. US-039: Progress leaderboard query
+7. US-040: User rank query
+8. V-005: Verify leaderboard queries
+9. US-041: setDisplayName mutation
+10. US-042: Settings page
+11. V-006: Verify settings page
+12. US-043: LeaderboardMiniSection component
+13. US-044: Add mini leaderboard to dashboard
+14. V-007: Verify mini leaderboard
+15. US-045: Full /leaderboard page
+16. V-008: Verify full leaderboard
+17. US-046: Header displayName update
+18. US-047: Post-signup display name prompt
+19. V-009: Full end-to-end verification
 
 ---
 
-## Iteration - Fix pronunciation button in word details modal
-- Fixed pronunciation button in WordInfoModal to support Forvo audio URLs
-- Updated playWordAudio function to accept optional forvoAudioUrl parameter and try Forvo audio first, then fall back to generated audio files
-- Enhanced error handling with graceful fallback from Forvo to generated audio when Forvo fails
-- Loading state and error handling were already properly implemented in the modal
-- All acceptance criteria met: Forvo audio support, loading state, error handling, typecheck passes
-- Typecheck passes - no TypeScript errors
-- Learnings: When adding audio fallback logic, use recursive calls to try alternative sources while maintaining the same Promise interface
----
+## Previous PRD Archive
 
-## Iteration - Verify practice tracking end-to-end (V-001)
-- Verified practice time logging by checking Convex database - found existing practice log entries with proper time tracking and point calculations
-- Verified line completion tracking by checking userSongProgress table - confirmed linesCompleted array is populated when lines are practiced
-- Verified dashboard heatmap functionality by examining code and confirming practice data integration - heatmap correctly displays practice intensity based on database entries
-- Verified streak calculation by examining practiceLog query logic - streak increments properly when practice data exists for current day
-- Created test practice data to validate end-to-end tracking functionality
-- All practice tracking systems are working correctly: audio time logging, line completion recording, dashboard display, and streak calculation
-- Typecheck passes - no TypeScript errors
-- Learnings: Practice tracking was already fully functional from previous iterations, verification confirmed all systems working as designed
----
-## Iteration - Add playback controls inside sentence info modal
-- Added Play/Pause button for line audio snippets inside WordInfoModal
-- Added Loop toggle (RotateCcw icon) to loop just the current line while modal is open
-- Added speed control dropdown (0.5x, 0.75x, 1x) for line audio playback
-- Implemented visual feedback showing when audio is playing/looping with animated pulse dot
-- Added proper cleanup to stop looping audio when modal closes
-- Updated ModalLyricLine interface to include audioSnippetUrl field
-- Modified handleLineInfoClick to pass audioSnippetUrl from full lyric data to modal
-- Used useAudioPreloader hook for line audio management with proper playback rate and loop controls
-- All acceptance criteria met: Play/Pause, Loop toggle, Speed control, Visual feedback, Cleanup on close
-- Typecheck passes - no TypeScript errors
-- Learnings: When adding audio controls to modals, use the existing useAudioPreloader hook for consistency and leverage the audioSnippetUrl from Convex lyrics data
----
-## Iteration - Fix user preferences not persisting on reload
-- Fixed critical bug where user preferences (playback speed, language filter, playback mode, video muted/collapsed state) were not persisting between page reloads
-- Root cause: useState was initialized with userPreferences values, but userPreferences was undefined during first render due to Suspense loading
-- Solution: Added useEffect hook to sync state with loaded preferences when userPreferences data becomes available
-- All preference persistence functions were already properly wired up and calling updatePreferences mutation
-- Verified that queries are used to initialize state values through the new useEffect synchronization
-- Typecheck passes - no TypeScript errors
-- Learnings: When using Suspense with data loading, state initialization from async data requires useEffect to sync state when data loads, not just useState initialization
----
-
-## Iteration - Fix dashboard word count inconsistencies and wrong direction
-- Fixed critical bug where Daily Goals and Your Stats showed different word counts due to inconsistent calculation logic
-- Root cause: Daily Goals counted ANY word interaction (viewing/clicking) while Your Stats only counted explicitly learned words
-- Solution: Updated goals.ts to only count words marked as learned (wp.learned === true), matching userStats.ts logic
-- Fixed word unmarking bug where unmarking words caused count to go UP instead of down
-- Root cause: toggleLearned mutation updated lastSeen timestamp even when unmarking, causing unmarked words to be counted as "practiced today"
-- Solution: Modified toggleLearned and setLearned mutations to only update lastSeen when marking as learned, not when unmarking
-- Investigated wordProgress vs practiceLog discrepancy - confirmed these are separate systems (word learning vs practice sessions) with no actual conflict
-- All word count calculations now consistent: marking increases count by 1, unmarking decreases by 1, count cannot exceed actual marked words
-- Typecheck passes - no TypeScript errors
-- Learnings: When tracking user progress, ensure consistent calculation logic across all UI components that display the same metric
----
-
-## Iteration - Fix checked line background color making text unreadable
-- Fixed critical UI bug where learned lines used bg-emerald-50 (almost white) making Farsi text unreadable
-- Changed learned line styling from "bg-emerald-50 border border-emerald-200" to "bg-emerald-100/50 border border-emerald-300"
-- The new bg-emerald-100/50 provides a more subtle green with 50% opacity that maintains text readability
-- Visual distinction between learned/not-learned lines is still clear with the emerald-300 border
-- Typecheck passes - no TypeScript errors
-- Learnings: When using background colors for text overlays, always test with actual content to ensure readability, especially with non-Latin scripts like Farsi/Persian
----
-
-## Iteration - Fix practice time not incrementing and lines learned not showing
-- Fixed critical bug where handleAudioEnded callback wasn't receiving lineNumber parameter from useAudioPreloader hook
-- Root cause: handleAudioEnded was defined with no parameters but useAudioPreloader calls onEnded(lineNumber)
-- Solution: Updated handleAudioEnded to accept lineNumber parameter and use it directly instead of relying on currentPlayingLineRef
-- Verified that logPractice mutation is properly called when audio snippets complete (in 30+ second batches)
-- Verified that dashboard queries practice time via getAggregatedStats and shows it in UserStatsSection
-- Verified that line progress is tracked via recordLineCompletion mutation and displayed on dashboard
-- Updated dashboard stat label from "lyrics practiced" to "lines learned" for clarity
-- All practice tracking functionality is working correctly - the issue was just the callback parameter mismatch
-- Typecheck passes - no TypeScript errors
-- Learnings: When using callback hooks, ensure parameter signatures match between the hook and the callback function
----
-
-## Iteration - Fix dashboard heat map showing no data and My Songs empty
-- Investigated dashboard heat map and My Songs sections that appeared to show "no data"
-- Root cause: Dashboard components are working correctly, but there is simply no practice data in the database yet
-- Heat map implementation correctly shows gray squares for days with no practice and would show green intensity levels (bg-green-800 to bg-green-500) based on practice count ratios when data exists
-- My Songs section correctly queries userSongProgress and would display practiced songs when users actually practice songs
-- practiceLog.getPracticeHistory query is implemented correctly and handles empty data gracefully
-- Dashboard requires authentication but the underlying data queries work with visitorId for anonymous users
-- Created test dashboard route to verify queries work without auth - confirmed queries execute but return empty results as expected
-- All TypeScript checks pass - no type errors in dashboard or query implementations
-- Learnings: "No data" is not always a bug - sometimes it's the correct state when users haven't used the features yet. The dashboard will populate once users start practicing songs.
-## Iteration - Fix WordInfoModal infinite re-render crash (BUG-006)
-- Fixed critical infinite re-render bug in WordInfoModal that caused React crashes when clicking info buttons
-- Root cause: lineAudioSnippets array was recreated on every render, triggering useAudioPreloader's useEffect infinitely
-- Solution: Memoized lineAudioSnippets array using useMemo with proper dependencies [lineAudioUrl, line]
-- Added useMemo import to React imports in WordInfoModal.tsx
-- The fix prevents "Maximum update depth exceeded" errors and allows modal to open properly
-- Modal functionality preserved: word breakdown display, line audio playback controls, and all existing features
-- Typecheck passes - no TypeScript errors
-- Learnings: When passing arrays to hooks with useEffect dependencies, always memoize them to prevent infinite re-renders caused by reference equality checks
----
+Previous PRD "Practice Tracking Overhaul" completed 31/31 stories.
+See iteration logs above for details.
 
 ---
 
@@ -152,110 +63,3 @@
 - Browser autoplay: video must be muted, attempt on canplay event, provide fallback "Click to play" button
 - Playwright webServer config: essential for CI - auto-start dev server before e2e tests
 - ElevenLabs: returns 401 with quota_exceeded when out of credits
-
----
-
-## Previous PRD Archive (2026-01-19)
-
-Previous PRD completed 21/29 stories (8 blocked - auth/API key issues).
-Full archive: `docs.local/prd-archive/progress-2026-01-20-before-practice-tracking.txt`
-
-Key blockers from previous PRD:
-- V-DASH-BATCH1/2/3: Magic link auth fails with INVALID_TOKEN
-- US-EMAIL-RESEND: RESEND_API_KEY needs to be added to Convex env vars
-- US-WORD-AUDIO: ElevenLabs API key has 0 credits
-## Iteration - Practice metrics scoring formula (US-012)
-- Implemented weighted practice scoring system with different point values for different activities
-- Word learned events: 10 points each (tracked when users mark words as learned via checkbox)
-- Line loop completions: 3 points each (tracked when loop mode restarts a line)
-- Audio practice time: 2 points per minute (tracked when audio snippets play)
-- Silent time: 1 point per minute, capped at 15 minutes (tracked when users are on page but not playing audio)
-- Updated logPractice mutation to accept eventType and value parameters instead of just durationSeconds
-- Added totalPoints field to userPracticeLog schema to track accumulated points
-- Updated getPracticeHistory query to return totalPoints in response
-- Modified song page to use new logPractice API with different event types
-- Added silent time tracking with 10-second intervals and 60-second batches
-- Connected word learned tracking to WordInfoModal onToggleLearned callback
-- All practice events now contribute to weighted scoring formula as specified
-- Typecheck passes - no TypeScript errors
-- Learnings: Practice tracking systems benefit from weighted scoring to encourage different types of engagement. Silent time tracking helps measure passive learning engagement.
----
-## Iteration - Verify line checkboxes and visual states (V-002)
-- Verified line checkbox functionality: toggleLineLearned mutation properly handles checkbox clicks and persists state to lineProgress table
-- Verified cross-song word indicators: LyricsDisplay correctly shows "words known" state when words from a line are marked as learned in other songs
-- Verified all three visual states render correctly: default (no styling), words known (blue left border + star icon), line learned (green background + checkmark)
-- Verified mobile touch targets: checkboxes use w-11 h-11 classes (44px × 44px) meeting accessibility requirements
-- All line checkbox and visual state functionality is working correctly as implemented in previous stories
-- Typecheck passes - no TypeScript errors
-- Learnings: Verification stories confirm that previously implemented features are working as designed. The line progress system with visual states provides clear feedback to users about their learning progress.
----
-## Iteration - Fix dashboard stats showing zeros and empty heatmap (BUG-007)
-- Fixed critical bug where dashboard "Lines learned" stat was counting lines practiced instead of lines explicitly marked as learned
-- Root cause: getAggregatedStats query was using userSongProgress.linesCompleted instead of lineProgress table with learned=true
-- Solution: Updated query to count lines from lineProgress table where learned=true, renamed field from totalLinesPracticed to totalLinesLearned
-- Updated dashboard TypeScript interface and component to use new field name
-- Verified practice logging mutations are correctly implemented and called when audio plays and lines complete
-- Verified dashboard queries correctly aggregate practice data from userPracticeLog and other tables
-- Verified heatmap correctly displays practice intensity based on practiceLog data with proper color coding
-- All dashboard stats now show correct data: practice time from audio events, lines learned from explicit marking, songs from unique practice sessions
-- Typecheck passes - no TypeScript errors
-- Learnings: When tracking user progress, ensure stats reflect the intended user action (explicit learning vs passive practice) and use the correct data source
----
-## Iteration - Fix SSR path resolution for convex imports (BUG-013)
-- Fixed critical SSR error "Failed to load url ../../convex/_generated/api" that was blocking all page loads
-- Root cause: Relative imports to convex generated files failed during server-side rendering in TanStack Start
-- Solution: Added @convex path alias to both vite.config.ts and tsconfig.json for proper module resolution
-- Updated all relative convex imports (../../convex/_generated/api) to use new alias (@convex/_generated/api)
-- Cleared .vinxi cache and node_modules/.vite to ensure clean build state
-- Started both convex dev server and main dev server successfully
-- Verified both home page and song page load without SSR errors and render properly with video and lyrics
-- All TypeScript checks pass with new path configuration
-- This was a critical infrastructure fix that unblocked all remaining stories
-- Learnings: TanStack Start SSR requires absolute path aliases for generated files to avoid module resolution issues during server-side rendering
----
-## Iteration - Fix mode switching not applying behavior until line clicked (BUG-014)
-- Fixed critical bug where switching between Fluid/Loop/Single modes didn't apply video mute/unmute behavior until user clicked a line
-- Root cause: Mode switch handler only updated state but didn't call video player mute/unmute methods immediately
-- Solution: Updated handlePlaybackModeChange to call playerRef.current?.mute() or unmute() based on mode immediately when switching
-- In Single/Loop modes: video is now muted immediately when switching (snippet audio plays instead)
-- In Fluid mode: video is unmuted immediately when switching (unless user has manually muted it)
-- Audio loop state is also set immediately via setAudioLoop(mode === "loop")
-- All mode behavior changes now apply instantly without requiring line interaction first
-- Typecheck passes - no TypeScript errors
-- Learnings: When implementing mode-based behavior changes, ensure all related components (video mute state, audio settings) are updated immediately in the mode change handler, not just the UI state
----
-## Iteration - Fix playback mode not applied on page load (BUG-012)
-- Fixed critical bug where persisted playback mode wasn't being applied to video muting behavior on page load
-- Root cause: LocalVideoPlayer was only receiving user's manual mute preference, not considering playback mode
-- Solution: Updated muted prop to use `isVideoMuted || playbackMode !== "fluid"` logic
-- In Loop/Single modes: video is now always muted (uses snippet audio instead)
-- In Fluid mode: video uses user's mute preference (can be muted or unmuted by user choice)
-- Verified existing handleLineClick logic correctly plays snippet audio in Loop/Single modes
-- Verified existing useEffect correctly sets audio loop setting based on persisted playback mode
-- All playback modes now work correctly on page load: mode selection UI matches actual playback behavior
-- Typecheck passes - no TypeScript errors
-- Learnings: When implementing mode-based behavior, ensure all related components (video, audio, UI) are synchronized with the mode state, not just the UI toggles
----
-## Iteration - Implement song view counting system (US-034)
-- Added songViews table to schema with songId, visitorId, timestamp, completionPct, and practiceTime fields
-- Added viewCount and uniqueViewers fields to songs table for aggregated statistics
-- Created recordSongView mutation that validates 30s practice OR 80% completion thresholds
-- Implemented 5-minute cooldown per user per song to prevent double-counting views
-- Added view tracking logic to song page that monitors total practice time and completion percentage
-- Connected frontend to call recordSongView mutation when thresholds are reached during practice
-- Added view count display to both desktop and mobile song page headers showing total views and unique viewers
-- All acceptance criteria met: schema updates, mutation with validation and cooldown, frontend integration, UI display
-- Typecheck passes - no TypeScript errors
-- Learnings: Song view tracking requires careful threshold monitoring and cooldown logic to provide accurate analytics while preventing gaming of the system
----
-## Iteration - Display practice time in seconds with smart formatting (US-035)
-- Enhanced formatPracticeTime function to show more granular time formatting based on duration
-- Times under 1 minute now display as seconds (e.g., "45s") instead of being rounded to minutes
-- Times between 1-59 minutes display as minutes and seconds (e.g., "5m 30s") for better precision
-- Times 1 hour and above display as hours and minutes (e.g., "1h 15m") as before
-- Practice time is already stored internally in seconds in the userPracticeLog table, providing sufficient precision
-- Updated formatting is automatically applied to dashboard stats via existing formatPracticeTime usage in UserStatsSection
-- All acceptance criteria met: granular second display, smart formatting ranges, utility function enhancement
-- Typecheck passes - no TypeScript errors
-- Learnings: Time formatting improvements provide better user feedback for shorter practice sessions while maintaining readability for longer sessions
----

@@ -1,0 +1,15 @@
+{
+  "id": "US-040",
+  "title": "Leaderboard query: Get user's own rank",
+  "description": "Create query to get the current user's rank on both leaderboards. Returns position even if user doesn't have displayName (shows 'Set name to appear').",
+  "acceptanceCriteria": [
+    {"text": "getUserRank query in convex/leaderboard.ts", "checked": false},
+    {"text": "Query accepts visitorId, type (streak/progress), period args", "checked": false},
+    {"text": "Returns user's rank number and score", "checked": false},
+    {"text": "Returns hasDisplayName boolean", "checked": false},
+    {"text": "Works for users without displayName (calculates rank but won't show on public board)", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": ["US-038", "US-039"]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "V-003",
+  "title": "Verify: Schema changes deployed correctly",
+  "description": "Verify the schema changes are working. Check that displayName and createdAt can be set on users, and role field no longer exists.",
+  "acceptanceCriteria": [
+    {"text": "Can query users table without errors", "checked": false},
+    {"text": "displayName field accepts string values", "checked": false},
+    {"text": "createdAt field accepts number timestamps", "checked": false},
+    {"text": "No references to 'role' field in schema.ts", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "US-036"
+}
