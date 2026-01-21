@@ -29,6 +29,7 @@ import {
   GoalsEmptyState,
   MyLanguagesSection,
   LanguagesEmptyState,
+  LeaderboardMiniSection,
 } from "../../components/dashboard";
 
 export const Route = createFileRoute("/_authed/dashboard")({
@@ -326,6 +327,16 @@ function DashboardPage() {
             <UserStatsSection stats={userStats} />
           ) : (
             <StatsEmptyState />
+          )}
+        </section>
+
+        {/* === LEADERBOARD: Full Width === */}
+        <section className="mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4">Leaderboard</h2>
+          {!visitorId ? (
+            <SkeletonCard height="h-48" />
+          ) : (
+            <LeaderboardMiniSection />
           )}
         </section>
 
