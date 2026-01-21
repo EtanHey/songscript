@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
-import { Clock, LayoutDashboard, LogOut } from 'lucide-react'
+import { Clock, LayoutDashboard, LogOut, Settings } from 'lucide-react'
 
 // Format seconds into human-readable time (always show seconds)
 function formatTime(totalSeconds: number): string {
@@ -54,6 +54,14 @@ export default function Header() {
   // Get user stats for practice time
   const { data: userStats } = useQuery({
     ...convexQuery(api.userStats.getAggregatedStats, {
+      visitorId: visitorId || '',
+    }),
+    enabled: !!visitorId,
+  })
+
+  // Get user info for display name
+  const { data: userInfo } = useQuery({
+    ...convexQuery(api.leaderboard.getUserInfo, {
       visitorId: visitorId || '',
     }),
     enabled: !!visitorId,
@@ -109,7 +117,16 @@ export default function Header() {
                 <DropdownMenuContent align="end" className="w-56 bg-gray-900 border-gray-700">
                   <DropdownMenuLabel className="text-gray-200">
                     <div className="flex flex-col space-y-1">
-                      {user?.name && <p className="text-sm font-medium">{user.name}</p>}
+                      {userInfo?.displayName ? (
+                        <p className="text-sm font-medium">{userInfo.displayName}</p>
+                      ) : (
+                        <button 
+                          onClick={() => navigate({ to: '/settings' })}
+                          className="text-sm font-medium text-gray-400 hover:text-gray-200 text-left"
+                        >
+                          Set display name
+                        </button>
+                      )}
                       {user?.email && (
                         <p className="text-xs text-gray-400 truncate">{user.email}</p>
                       )}
@@ -134,6 +151,13 @@ export default function Header() {
                   >
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     <span>Dashboard</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => navigate({ to: '/settings' })}
+                    className="text-gray-200 cursor-pointer hover:bg-gray-800 focus:bg-gray-800"
+                  >
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-gray-700" />
                   <DropdownMenuItem

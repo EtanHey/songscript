@@ -196,3 +196,14 @@ See iteration logs above for details.
 - Typecheck passes successfully
 - Full leaderboard page verification complete
 ---
+
+## Iteration - US-046: Header displayName Update Complete
+- Updated Header component to show displayName instead of email when available
+- Added getUserInfo query to fetch user's displayName from Convex
+- Shows "Set display name" clickable prompt when no displayName is set
+- Added Settings link to dropdown menu that navigates to /settings
+- Settings link and "Set display name" both navigate to /settings page
+- Typecheck passes successfully
+- Verified in browser with screenshots (header-test.png and dashboard-header-test.png)
+- Header now properly displays user's display name for better UX
+---
