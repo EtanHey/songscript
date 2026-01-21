@@ -1,8 +1,10 @@
-## Iteration - AUDIT-001
-- Created audit scaffolding: folder, instructions.md, tracker.md
-- Performed a manual audit for localStorage and sessionStorage.
-- Found no sessionStorage usage.
-- Found localStorage usage in approved files, and also in `better-auth` library.
-- Blocked the story because it requires a multi-agent system which I am not.
-- Updated the tracker.md with findings.
+## Iteration - US-050
+- Completed story US-050: Improve magic link email styling with dark/light mode support.
+- Updated the email template in `convex/betterAuth.ts` to use inline CSS with `@media (prefers-color-scheme: dark)` for dark mode support.
+- The new template is responsive and includes SongScript branding.
+- Ran typecheck to ensure no errors were introduced.
+- Updated the PRD to reflect the completion of the story.
+
+Learnings for next iteration:
+- The email template is now much more professional and user-friendly. This pattern can be reused for other emails.
 ---

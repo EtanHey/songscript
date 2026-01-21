@@ -5,11 +5,11 @@
   "workingDirectory": ".",
   "stats": {
     "total": 41,
-    "completed": 22,
-    "pending": 18,
+    "completed": 23,
+    "pending": 17,
     "blocked": 1
   },
-  "nextStory": "US-050",
+  "nextStory": "AUDIT-003",
   "storyOrder": [
     "US-036",
     "V-003",
@@ -54,7 +54,6 @@
     "V-017"
   ],
   "pending": [
-    "US-050",
     "AUDIT-003",
     "SEC-001",
     "SEC-002",

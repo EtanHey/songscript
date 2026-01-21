@@ -3,17 +3,18 @@
   "title": "Improve magic link email styling with dark/light mode support",
   "description": "Make the magic link email visually appealing with proper dark/light mode support. The email should match SongScript branding and look professional.",
   "acceptanceCriteria": [
-    {"text": "Email detects user's color scheme preference (prefers-color-scheme)", "checked": false},
-    {"text": "Light mode: clean white background with dark text", "checked": false},
-    {"text": "Dark mode: dark background with light text", "checked": false},
-    {"text": "SongScript branding (logo or app name) in header", "checked": false},
-    {"text": "Clear, prominent 'Sign In' button with brand colors", "checked": false},
-    {"text": "Fallback link text below button", "checked": false},
-    {"text": "Professional footer with app name", "checked": false},
-    {"text": "Mobile responsive design", "checked": false},
-    {"text": "Typecheck passes", "checked": false}
+    {"text": "Email detects user's color scheme preference (prefers-color-scheme)", "checked": true},
+    {"text": "Light mode: clean white background with dark text", "checked": true},
+    {"text": "Dark mode: dark background with light text", "checked": true},
+    {"text": "SongScript branding (logo or app name) in header", "checked": true},
+    {"text": "Clear, prominent 'Sign In' button with brand colors", "checked": true},
+    {"text": "Fallback link text below button", "checked": true},
+    {"text": "Professional footer with app name", "checked": true},
+    {"text": "Mobile responsive design", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
   ],
-  "passes": false,
+  "passes": true,
+  "completedAt": "2026-01-21T20:48:00Z",
   "blockedBy": null,
   "notes": "Email template is in convex/betterAuth.ts sendMagicLink function. Use inline CSS with @media (prefers-color-scheme: dark) for dark mode support."
 }

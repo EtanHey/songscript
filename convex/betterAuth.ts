@@ -69,15 +69,138 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
                 to: email,
                 subject: "Your SongScript Login Link",
                 html: `
-                  <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h1 style="color: #10b981;">SongScript</h1>
-                    <p>Click the button below to sign in to your account:</p>
-                    <a href="${frontendVerifyUrl}" style="display: inline-block; background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0;">
-                      Sign In
-                    </a>
-                    <p style="color: #666; font-size: 14px;">Or copy this link: ${frontendVerifyUrl}</p>
-                    <p style="color: #999; font-size: 12px;">This link will expire in 1 hour.</p>
-                  </div>
+                  <!DOCTYPE html>
+                  <html lang="en">
+                  <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Your SongScript Login Link</title>
+                    <style>
+                      /* Base styles */
+                      body {
+                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                        background-color: #f9fafb;
+                        margin: 0;
+                        padding: 20px;
+                      }
+                      .container {
+                        max-width: 600px;
+                        margin: 0 auto;
+                        background-color: #ffffff;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 8px;
+                        overflow: hidden;
+                      }
+                      .header {
+                        padding: 24px;
+                        text-align: center;
+                        background-color: #10b981;
+                      }
+                      .header h1 {
+                        color: #ffffff;
+                        margin: 0;
+                        font-size: 28px;
+                      }
+                      .content {
+                        padding: 32px;
+                        text-align: center;
+                      }
+                      .content p {
+                        margin-bottom: 24px;
+                        font-size: 16px;
+                      }
+                      .button {
+                        display: inline-block;
+                        background-color: #10b981;
+                        color: #ffffff;
+                        padding: 14px 28px;
+                        text-decoration: none;
+                        border-radius: 8px;
+                        font-weight: bold;
+                        font-size: 16px;
+                      }
+                      .button:hover {
+                        background-color: #0f9d6a;
+                      }
+                      .fallback {
+                        margin-top: 24px;
+                        font-size: 12px;
+                        color: #6b7280;
+                      }
+                      .fallback a {
+                        color: #10b981;
+                        word-break: break-all;
+                      }
+                      .footer {
+                        padding: 24px;
+                        text-align: center;
+                        font-size: 12px;
+                        color: #9ca3af;
+                        background-color: #f3f4f6;
+                      }
+
+                      /* Dark mode styles */
+                      @media (prefers-color-scheme: dark) {
+                        body {
+                          background-color: #111827;
+                          color: #e5e7eb;
+                        }
+                        .container {
+                          background-color: #1f2937;
+                          border-color: #374151;
+                        }
+                        .header {
+                           background-color: #10b981;
+                        }
+                        .header h1 {
+                           color: #ffffff;
+                        }
+                        .content p {
+                          color: #d1d5db;
+                        }
+                        .button {
+                          background-color: #10b981;
+                          color: #ffffff;
+                        }
+                        .button:hover {
+                          background-color: #0f9d6a;
+                        }
+                        .fallback {
+                          color: #9ca3af;
+                        }
+                        .fallback a {
+                          color: #10b981;
+                        }
+                        .footer {
+                          background-color: #111827;
+                          color: #6b7280;
+                        }
+                      }
+                    </style>
+                  </head>
+                  <body>
+                    <div class="container">
+                      <div class="header">
+                        <h1>SongScript</h1>
+                      </div>
+                      <div class="content">
+                        <p>Click the button below to sign in to your account:</p>
+                        <a href="${frontendVerifyUrl}" class="button">Sign In</a>
+                        <div class="fallback">
+                          <p>Or copy and paste this link into your browser:<br>
+                            <a href="${frontendVerifyUrl}">${frontendVerifyUrl}</a>
+                          </p>
+                          <p>This link will expire in 1 hour.</p>
+                        </div>
+                      </div>
+                      <div class="footer">
+                        &copy; ${new Date().getFullYear()} SongScript. All rights reserved.
+                      </div>
+                    </div>
+                  </body>
+                  </html>
                 `,
               });
 
