@@ -129,13 +129,13 @@ See iteration logs above for details.
 - Typecheck passes successfully
 ---
 
-## Iteration - US-042: Settings Page Complete
-- Created src/routes/_authed/settings.tsx with user profile form
-- Added getUserInfo query to convex/leaderboard.ts to fetch user data
-- Created Input and Label UI components (installed @radix-ui/react-label)
-- Page shows email (read-only) and editable display name input
-- Save button calls setDisplayName mutation with proper error handling
-- Shows success/error feedback after save attempts
-- Styled with bg-gray-900 cards consistent with dashboard design
-- Typecheck passes and page loads correctly in browser
+## Iteration - V-006: Settings Page Verification Complete
+- Verified settings page exists at /settings route and loads correctly
+- Confirmed display name input shows current value from database (getUserInfo query)
+- Verified input allows typing new display name with onChange handler
+- Confirmed save button calls setDisplayName mutation to update database
+- Verified success/error feedback messages appear after save attempts
+- Confirmed display name persists after refresh (fetched from database)
+- Typecheck passes successfully
+- Note: Header dropdown navigation to settings pending US-046 completion
 ---
