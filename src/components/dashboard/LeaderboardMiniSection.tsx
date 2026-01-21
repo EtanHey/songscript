@@ -138,7 +138,7 @@ export function LeaderboardMiniSection() {
 
       <CardFooter>
         <Button asChild variant="link" size="sm" className="w-full">
-          <Link to="/dashboard">View full leaderboard</Link>
+          <Link to="/leaderboard">View full leaderboard</Link>
         </Button>
       </CardFooter>
     </Card>

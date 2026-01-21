@@ -161,3 +161,18 @@ See iteration logs above for details.
 - Typecheck passes successfully
 - Mini leaderboard verification complete, ready for full leaderboard page implementation
 ---
+
+## Iteration - US-045: Full Leaderboard Page Complete
+- Created src/routes/_authed/leaderboard.tsx with full leaderboard functionality
+- Implemented main tabs (Streak | Progress) and sub-tabs (Weekly | Monthly | All-time)
+- Shows top 50 users with pagination (Previous/Next buttons)
+- Added medals (🥇🥈🥉) for top 3 positions
+- User's own row highlighted with star (⭐) when in top 50
+- Shows user's rank below if not in top 50 with separate card
+- Language flags displayed next to each user using getLanguageFlagString
+- Responsive design with proper mobile layout
+- Fixed LeaderboardMiniSection link to point to /leaderboard instead of /dashboard
+- Fixed TypeScript issues by properly handling different data structures from streak vs progress queries
+- Typecheck passes successfully
+- Verified page loads correctly in browser (shows auth loading state as expected for protected route)
+---
