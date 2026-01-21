@@ -245,6 +245,15 @@ npx convex run --mutation "db.delete(args.id)" --args '{"id": "USER_ID_HERE"}'
 This allows re-testing the full signup flow with the same email.
 
 ---
+## Iteration - US-049: Login Page UI Update Complete
+- Changed title from "SongScript" to "Sign In" for clearer user-facing branding
+- Updated subtitle from "Sign in with magic link" to "Sign in with your email" 
+- Verified no admin-specific error messages remain (all errors are generic)
+- Confirmed mobile responsive layout with proper padding, centering, and max-width
+- Removed blockedBy field since US-048 was completed in previous iteration
+- Typecheck passes successfully
+- Login page now has user-friendly copy instead of admin-focused messaging
+---
 ## Iteration - US-048: Remove Admin-Only Login Restriction Complete
 - Removed ADMIN_EMAIL constant and check from src/routes/login.tsx
 - Removed admin email block from convex/betterAuth.ts sendMagicLink function

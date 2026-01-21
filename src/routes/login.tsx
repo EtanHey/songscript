@@ -77,10 +77,10 @@ function LoginPage() {
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
       <div className="bg-slate-900 p-8 rounded-lg shadow-xl w-full max-w-md">
         <h1 className="text-2xl font-bold text-white mb-2 text-center">
-          SongScript
+          Sign In
         </h1>
         <p className="text-gray-400 text-center mb-6 text-sm">
-          Sign in with magic link
+          Sign in with your email
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
