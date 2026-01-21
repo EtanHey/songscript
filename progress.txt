@@ -8,3 +8,4 @@
 Learnings for next iteration:
 - The email template is now much more professional and user-friendly. This pattern can be reused for other emails.
 ---
+SEC-002 BLOCKED: Convex dev command failed with 'Two output files share the same path but have different contents' error.
