@@ -13,6 +13,6 @@
     {"text": "Typecheck passes", "checked": false}
   ],
   "passes": false,
-  "blockedBy": null,
+  "blockedBy": "BUG-022",
   "notes": "This is the critical verification that user data isolation works. Use two different emails to test."
 }

@@ -6,8 +6,8 @@
   "stats": {
     "total": 34,
     "completed": 22,
-    "pending": 11,
-    "blocked": 0
+    "pending": 10,
+    "blocked": 1
   },
   "nextStory": "AUDIT-001",
   "storyOrder": [
@@ -56,10 +56,11 @@
     "BUG-020",
     "BUG-021",
     "BUG-022",
-    "V-011",
     "US-050"
   ],
-  "blocked": [],
+  "blocked": [
+    "V-011"
+  ],
   "browserSetup": {
     "viewport": "desktop 1200px+",
     "homeUrl": "http://localhost:3001",
