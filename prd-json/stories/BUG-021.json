@@ -8,6 +8,6 @@
     {"text": "Typecheck passes", "checked": false}
   ],
   "passes": false,
-  "blockedBy": "BUG-016",
+  "blockedBy": null,
   "notes": "File: src/routes/_authed/leaderboard.tsx"
 }

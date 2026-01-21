@@ -14,6 +14,6 @@
     {"text": "Typecheck passes", "checked": false}
   ],
   "passes": false,
-  "blockedBy": "BUG-016",
+  "blockedBy": null,
   "notes": "Search: grep -r 'useVisitorId' src/ to find all usages. Only non-auth pages should still use it."
 }
