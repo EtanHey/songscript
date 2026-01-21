@@ -3,14 +3,15 @@
   "title": "Post-signup display name prompt",
   "description": "After first login via magic link, show a 'What should we call you?' screen prompting for display name. Skippable but encouraged. Only shows once (on first auth).",
   "acceptanceCriteria": [
-    {"text": "After first login, user sees display name prompt screen", "checked": false},
-    {"text": "Screen has text input for display name", "checked": false},
-    {"text": "'Continue' button saves name and redirects to dashboard", "checked": false},
-    {"text": "'Skip for now' link goes directly to dashboard", "checked": false},
-    {"text": "Prompt only shows once (tracks in user record or localStorage)", "checked": false},
-    {"text": "Existing users (already have displayName) skip the prompt", "checked": false},
-    {"text": "Typecheck passes", "checked": false},
-    {"text": "Verify in browser: new user sees prompt after magic link login", "checked": false}
+    {"text": "After first login, user sees display name prompt screen", "checked": true},
+    {"text": "Screen has text input for display name", "checked": true},
+    {"text": "'Continue' button saves name and redirects to dashboard", "checked": true},
+    {"text": "'Skip for now' link goes directly to dashboard", "checked": true},
+    {"text": "Prompt only shows once (tracks in user record or localStorage)", "checked": true},
+    {"text": "Existing users (already have displayName) skip the prompt", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "Verify in browser: new user sees prompt after magic link login", "checked": true}
   ],
-  "passes": false
+  "passes": true,
+  "completedAt": "2026-01-21T15:28:29Z"
 }

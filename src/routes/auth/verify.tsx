@@ -35,7 +35,13 @@ function VerifyPage() {
         setStatus("success");
         // Brief delay to show success state
         setTimeout(() => {
-          navigate({ to: "/dashboard" });
+          // Check if this is first login and user hasn't seen welcome prompt
+          const hasSeenWelcome = localStorage.getItem("songscript_welcome_shown");
+          if (!hasSeenWelcome) {
+            navigate({ to: "/welcome" });
+          } else {
+            navigate({ to: "/dashboard" });
+          }
         }, 500);
       } catch (err) {
         setStatus("error");

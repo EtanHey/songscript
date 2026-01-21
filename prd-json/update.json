@@ -1,8 +1,0 @@
-{
-  "blocked": ["V-008", "V-009"],
-  "pending": ["US-046", "US-047"],
-  "stats": { "pending": 2, "blocked": 2 },
-  "notes": {
-    "blockedReason": "V-008 and V-009 require real browser verification - will be done by Claude with browser MCP tools"
-  }
-}

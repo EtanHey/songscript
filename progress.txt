@@ -207,3 +207,16 @@ See iteration logs above for details.
 - Verified in browser with screenshots (header-test.png and dashboard-header-test.png)
 - Header now properly displays user's display name for better UX
 ---
+
+## Iteration - US-047: Post-signup Display Name Prompt Complete
+- Created /welcome route with display name prompt for new users
+- Screen shows after first login via magic link (before dashboard redirect)
+- Has text input for display name with validation (3-20 chars, alphanumeric + spaces)
+- 'Continue' button saves name using setDisplayName mutation and redirects to dashboard
+- 'Skip for now' link goes directly to dashboard without saving
+- Uses localStorage to track if user has seen welcome prompt (prevents showing again)
+- Existing users with displayName automatically skip the prompt
+- Modified auth/verify.tsx to redirect to /welcome for first-time users
+- Typecheck passes successfully
+- Post-signup display name prompt implementation complete
+---

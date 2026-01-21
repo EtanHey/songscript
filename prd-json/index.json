@@ -5,11 +5,11 @@
   "workingDirectory": ".",
   "stats": {
     "total": 18,
-    "completed": 18,
-    "pending": 2,
-    "blocked": 0
+    "completed": 19,
+    "pending": 1,
+    "blocked": 2
   },
-  "nextStory": "US-047",
+  "nextStory": "US-046",
   "storyOrder": [
     "US-036",
     "V-003",
@@ -33,10 +33,12 @@
     "BUG-015"
   ],
   "pending": [
-    "US-047",
+    "US-046"
+  ],
+  "blocked": [
+    "V-008",
     "V-009"
   ],
-  "blocked": [],
   "browserSetup": {
     "viewport": "desktop 1200px+",
     "homeUrl": "http://localhost:3001",
@@ -59,6 +61,7 @@
       "Full /leaderboard page with Weekly/Monthly/All-time tabs",
       "Settings page for profile management",
       "Post-signup display name prompt"
-    ]
+    ],
+    "blockedReason": "V-008 and V-009 require real browser verification - will be done by Claude with browser MCP tools"
   }
 }
