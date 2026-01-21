@@ -118,3 +118,13 @@ See iteration logs above for details.
 - All queries pass typecheck without errors
 - Created test-leaderboard.js for future verification
 ---
+
+## Iteration - US-041: setDisplayName Mutation Complete
+- Created setDisplayName mutation in convex/leaderboard.ts
+- Mutation accepts visitorId and displayName arguments
+- Validates displayName is 3-20 characters, alphanumeric + spaces only
+- Rejects names with only spaces and basic offensive word filter
+- Updates existing user record or creates new one if needed
+- Returns success boolean with error messages for validation failures
+- Typecheck passes successfully
+---

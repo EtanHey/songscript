@@ -3,14 +3,15 @@
   "title": "Create setDisplayName mutation",
   "description": "Create mutation to set or update a user's display name. Validates: 3-20 chars, alphanumeric + spaces, basic offensive word filter. Links visitorId to user record.",
   "acceptanceCriteria": [
-    {"text": "setDisplayName mutation in convex/users.ts or convex/leaderboard.ts", "checked": false},
-    {"text": "Mutation accepts visitorId and displayName args", "checked": false},
-    {"text": "Validates displayName is 3-20 characters", "checked": false},
-    {"text": "Rejects names with only spaces or special characters", "checked": false},
-    {"text": "Updates existing user or creates new record if needed", "checked": false},
-    {"text": "Returns success boolean", "checked": false},
-    {"text": "Typecheck passes", "checked": false}
+    {"text": "setDisplayName mutation in convex/users.ts or convex/leaderboard.ts", "checked": true},
+    {"text": "Mutation accepts visitorId and displayName args", "checked": true},
+    {"text": "Validates displayName is 3-20 characters", "checked": true},
+    {"text": "Rejects names with only spaces or special characters", "checked": true},
+    {"text": "Updates existing user or creates new record if needed", "checked": true},
+    {"text": "Returns success boolean", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
   ],
-  "passes": false,
-  "blockedBy": "US-036"
+  "passes": true,
+  "completedAt": "2026-01-21T13:57:01Z",
+  "blockedBy": null
 }
