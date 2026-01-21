@@ -69,3 +69,11 @@ See iteration logs above for details.
 - All schema changes (displayName, createdAt, role removal) were already completed
 - Typecheck passes successfully
 ---
+
+## Iteration - US-037: Language Difficulty Utility Complete
+- Created convex/languageDifficulty.ts with FSI-based difficulty multipliers
+- DIFFICULTY_MULTIPLIERS maps language codes to 1.0x (standard), 1.5x (hard), 2.0x (super-hard)
+- getLanguageMultiplier() function handles case-insensitive lookup with 1.0x default
+- Supports both language names (spanish, persian) and ISO codes (es, fa)
+- Typecheck passes successfully
+---

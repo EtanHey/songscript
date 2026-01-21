@@ -3,13 +3,14 @@
   "title": "Create languageDifficulty.ts utility with FSI multipliers",
   "description": "Create a utility file that maps languages to difficulty multipliers based on FSI rankings. Standard (1.0x): Spanish, French, Italian, Dutch. Hard (1.5x): Hebrew, Persian/fa, Russian, Hindi. Super-Hard (2.0x): Arabic, Japanese, Korean, Chinese/Mandarin.",
   "acceptanceCriteria": [
-    {"text": "convex/languageDifficulty.ts file exists", "checked": false},
-    {"text": "DIFFICULTY_MULTIPLIERS constant maps language codes to multipliers", "checked": false},
-    {"text": "getLanguageMultiplier(language) function returns correct multiplier", "checked": false},
-    {"text": "Unknown languages default to 1.0x", "checked": false},
-    {"text": "Handles case-insensitive language codes (persian, Persian, fa all work)", "checked": false},
-    {"text": "Typecheck passes", "checked": false}
+    {"text": "convex/languageDifficulty.ts file exists", "checked": true},
+    {"text": "DIFFICULTY_MULTIPLIERS constant maps language codes to multipliers", "checked": true},
+    {"text": "getLanguageMultiplier(language) function returns correct multiplier", "checked": true},
+    {"text": "Unknown languages default to 1.0x", "checked": true},
+    {"text": "Handles case-insensitive language codes (persian, Persian, fa all work)", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
   ],
-  "passes": false,
+  "passes": true,
+  "completedAt": "2026-01-21T13:37:03Z",
   "blockedBy": null
 }
