@@ -6,7 +6,8 @@ export default defineSchema({
   users: defineTable({
     email: v.string(),
     authId: v.optional(v.string()), // Links to Better Auth user
-    role: v.optional(v.string()), // "admin" or "user"
+    displayName: v.optional(v.string()), // Display name for leaderboard
+    createdAt: v.optional(v.number()), // Account creation timestamp
   })
     .index("email", ["email"])
     .index("authId", ["authId"]),

@@ -9,6 +9,5 @@
     {"text": "No references to 'role' field in schema.ts", "checked": false},
     {"text": "Typecheck passes", "checked": false}
   ],
-  "passes": false,
-  "blockedBy": "US-036"
+  "passes": false
 }

@@ -70,10 +70,11 @@ See iteration logs above for details.
 - Typecheck passes successfully
 ---
 
-## Iteration - V-004: Language Difficulty Tests Complete
-- Created comprehensive test suite for language difficulty multipliers
-- Tests verify Hebrew (1.5x), Persian/fa (1.5x), Arabic (2.0x), Japanese (2.0x), Spanish (1.0x)
-- Tests verify unknown languages default to 1.0x multiplier
-- All 6 tests pass with 18 expect() calls
+## Iteration - US-038: Streak Leaderboard Query Complete
+- Created convex/leaderboard.ts with getStreakLeaderboard query
+- Fixed schema.ts to add displayName and createdAt fields, removed role field
+- Query accepts period, limit, offset args and filters users with displayName
+- Calculates current streak using practice log data
+- Returns sorted array with rank, displayName, streak, language fields
 - Typecheck passes successfully
 ---
