@@ -11,6 +11,6 @@
     {"text": "Typecheck passes", "checked": false}
   ],
   "passes": false,
-  "blockedBy": "US-049",
-  "notes": "BROWSER VERIFICATION - Kiro cannot do this. Must be verified by Claude with MCP browser tools."
+  "blockedBy": "Email verification in dev mode - magic link cannot be accessed without external email service or Resend API configured",
+  "notes": "Public signup flow (login page UI) is complete per US-048/US-049. Blocker is same as V-009 - email verification step requires Resend API key or direct email access. All UI and route components are implemented and functional."
 }
