@@ -1,5 +1,9 @@
 import { useMemo } from "react";
-import { InstantTooltip } from "../ui/instant-tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 // Practice data type
 export type PracticeDay = {
@@ -24,12 +28,24 @@ export function PracticeStreakSection({
   practiceData,
 }: PracticeStreakSectionProps) {
 
-  // Generate 90 days of data for the heatmap
+  // Number of weeks to show (fills the container better)
+  const WEEKS_TO_SHOW = 18; // ~4.5 months, fills more horizontal space
+
+  // Generate days data for the heatmap - complete weeks ending on today
   const heatmapData = useMemo(() => {
     const practiceMap = new Map(practiceData.map((d) => [d.date, d]));
     const days: { date: string; data: PracticeDay | null }[] = [];
 
-    for (let i = 89; i >= 0; i--) {
+    // Today's date
+    const today = new Date();
+    const todayDayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
+
+    // Calculate total days: full weeks + days in current week up to today
+    // We want WEEKS_TO_SHOW complete columns, with today in the last column
+    const totalDays = (WEEKS_TO_SHOW - 1) * 7 + todayDayOfWeek + 1;
+
+    // Start from (totalDays - 1) days ago
+    for (let i = totalDays - 1; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split("T")[0];
@@ -53,10 +69,10 @@ export function PracticeStreakSection({
     if (!data || data.practiceCount === 0) return "bg-gray-800";
 
     const ratio = data.practiceCount / maxPractice;
-    if (ratio >= 0.75) return "bg-green-500";
-    if (ratio >= 0.5) return "bg-green-600";
-    if (ratio >= 0.25) return "bg-green-700";
-    return "bg-green-800";
+    if (ratio >= 0.75) return "bg-green-400";
+    if (ratio >= 0.5) return "bg-green-500";
+    if (ratio >= 0.25) return "bg-green-600";
+    return "bg-green-700";
   };
 
   // Format date for display
@@ -112,51 +128,57 @@ export function PracticeStreakSection({
       <div className="p-4">
         {/* Legend */}
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs text-gray-400">Last 90 days</span>
+          <span className="text-xs text-gray-400">Last {WEEKS_TO_SHOW} weeks</span>
           <div className="flex items-center gap-1 text-xs text-gray-400">
             <span>Less</span>
             <div className="w-3 h-3 rounded-sm bg-gray-800" />
-            <div className="w-3 h-3 rounded-sm bg-green-800" />
             <div className="w-3 h-3 rounded-sm bg-green-700" />
             <div className="w-3 h-3 rounded-sm bg-green-600" />
             <div className="w-3 h-3 rounded-sm bg-green-500" />
+            <div className="w-3 h-3 rounded-sm bg-green-400" />
             <span>More</span>
           </div>
         </div>
 
-        {/* Heatmap Grid - scrollable on mobile */}
-        <div className="overflow-x-auto md:overflow-x-visible pb-2">
+        {/* Heatmap Grid - responsive, fills container */}
+        <div className="overflow-x-auto pb-2">
           <div
-            className="grid gap-1"
+            className="grid w-full"
             style={{
-              gridTemplateColumns: "repeat(13, minmax(24px, 1fr))",
-              gridTemplateRows: "repeat(7, minmax(24px, 1fr))",
+              gridTemplateColumns: `repeat(${WEEKS_TO_SHOW}, 1fr)`,
+              gridTemplateRows: "repeat(7, auto)",
               gridAutoFlow: "column",
-              minWidth: "340px",
+              gap: "3px",
             }}
           >
-            {heatmapData.map((day) => {
-              const dayOfWeek = new Date(day.date).getDay();
-              const tooltipContent = day.data
-                ? `${formatDate(day.date)}\n${day.data.practiceCount} practice ${day.data.practiceCount === 1 ? "session" : "sessions"}\nTotal time: ${formatDuration(day.data.totalSeconds)}`
-                : `${formatDate(day.date)}\nNo practice this day`;
-
-              return (
-                <InstantTooltip key={day.date} content={tooltipContent} position="top">
-                  <div
-                    className={`
-                      w-6 h-6 min-w-[24px] min-h-[24px] rounded-sm transition-all duration-150
-                      ${getIntensityClass(day.data)}
-                      hover:ring-2 hover:ring-gray-500
-                    `}
-                    style={{
-                      gridRow: dayOfWeek + 1,
-                    }}
-                    aria-label={`${formatDate(day.date)}: ${day.data?.practiceCount || 0} practice sessions`}
-                  />
-                </InstantTooltip>
-              );
-            })}
+            {heatmapData.map((day) => (
+                <Tooltip key={day.date}>
+                  <TooltipTrigger asChild>
+                    <div
+                      className={`
+                        aspect-square rounded-sm transition-all duration-150 cursor-default
+                        ${getIntensityClass(day.data)}
+                        hover:ring-2 hover:ring-gray-500
+                      `}
+                      aria-label={`${formatDate(day.date)}: ${day.data?.practiceCount || 0} practice sessions`}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="bg-gray-800 text-white border-gray-700">
+                    <div className="text-center">
+                      <div className="font-medium">{formatDate(day.date)}</div>
+                      {day.data ? (
+                        <>
+                          <div>{day.data.practiceCount} practice {day.data.practiceCount === 1 ? "session" : "sessions"}</div>
+                          <div className="text-gray-400">Total time: {formatDuration(day.data.totalSeconds)}</div>
+                        </>
+                      ) : (
+                        <div className="text-gray-400">No practice this day</div>
+                      )}
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              )
+            )}
           </div>
         </div>
 

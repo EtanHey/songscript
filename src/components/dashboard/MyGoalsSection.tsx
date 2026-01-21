@@ -17,18 +17,22 @@ export function MyGoalsSection({
   const dailyGoals = goals.filter((g) => g.period === "daily");
   const weeklyGoals = goals.filter((g) => g.period === "weekly");
 
+  // Only show period labels if we have both daily AND weekly goals
+  const showPeriodLabels = dailyGoals.length > 0 && weeklyGoals.length > 0;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Daily Goals */}
       {dailyGoals.length > 0 && (
         <div>
-          <h3 className="text-sm font-medium text-gray-400 mb-3 uppercase tracking-wide">
-            Daily Goals
-          </h3>
+          {showPeriodLabels && (
+            <h3 className="text-xs font-medium text-gray-400 mb-3 uppercase tracking-wide">
+              Daily Goals
+            </h3>
+          )}
           <div className={`grid gap-4 ${
             dailyGoals.length === 1 ? "grid-cols-1" :
-            dailyGoals.length === 2 ? "grid-cols-1 sm:grid-cols-2" :
-            "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+            "grid-cols-1 sm:grid-cols-2"
           }`}>
             {dailyGoals.map((goal) => (
               <GoalCard
@@ -44,13 +48,14 @@ export function MyGoalsSection({
       {/* Weekly Goals */}
       {weeklyGoals.length > 0 && (
         <div>
-          <h3 className="text-sm font-medium text-gray-400 mb-3 uppercase tracking-wide">
-            Weekly Goals
-          </h3>
+          {showPeriodLabels && (
+            <h3 className="text-xs font-medium text-gray-400 mb-3 uppercase tracking-wide">
+              Weekly Goals
+            </h3>
+          )}
           <div className={`grid gap-4 ${
             weeklyGoals.length === 1 ? "grid-cols-1" :
-            weeklyGoals.length === 2 ? "grid-cols-1 sm:grid-cols-2" :
-            "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+            "grid-cols-1 sm:grid-cols-2"
           }`}>
             {weeklyGoals.map((goal) => (
               <GoalCard
