@@ -9,8 +9,7 @@ import type { GenericCtx } from "@convex-dev/better-auth";
 import type { DataModel } from "./_generated/dataModel";
 import { Resend } from "resend";
 
-// Admin email - only this email can sign up/in
-const ADMIN_EMAIL = "etan@heyman.net";
+
 
 const siteUrl = process.env.SITE_URL!;
 const resendApiKey = process.env.RESEND_API_KEY;
@@ -38,10 +37,6 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
       // Magic link passwordless authentication
       magicLink({
         sendMagicLink: async ({ email, url, token }) => {
-          // Block non-admin emails
-          if (email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
-            throw new Error("Only admin email is allowed to sign in");
-          }
 
           // Extract frontend origin from the callbackURL in the original URL
           // The URL looks like: .../verify?token=xxx&callbackURL=http://localhost:3001/dashboard
@@ -111,12 +106,4 @@ export const getCurrentUser = query({
   },
 });
 
-// Check if the current user is an admin
-export const isAdmin = query({
-  args: {},
-  handler: async (ctx) => {
-    const user = await authComponent.getAuthUser(ctx);
-    if (!user) return false;
-    return user.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-  },
-});
+

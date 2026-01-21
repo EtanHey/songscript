@@ -245,3 +245,12 @@ npx convex run --mutation "db.delete(args.id)" --args '{"id": "USER_ID_HERE"}'
 This allows re-testing the full signup flow with the same email.
 
 ---
+## Iteration - US-048: Remove Admin-Only Login Restriction Complete
+- Removed ADMIN_EMAIL constant and check from src/routes/login.tsx
+- Removed admin email block from convex/betterAuth.ts sendMagicLink function
+- Removed isAdmin query that referenced ADMIN_EMAIL
+- Updated login page UI to remove "Admin" branding and use generic messaging
+- Any email can now request magic link and sign up/login
+- Typecheck passes successfully
+- Login system now open to all users, no longer restricted to admin email
+---

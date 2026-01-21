@@ -7,8 +7,7 @@ export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
 
-// Admin email - only this email can sign in (set in environment variables)
-const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || "admin@example.com";
+
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -52,13 +51,6 @@ function LoginPage() {
     setSuccess(null);
     setLoading(true);
 
-    // Check if email is admin email (client-side check)
-    if (email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
-      setError("Only admin email is allowed to sign in");
-      setLoading(false);
-      return;
-    }
-
     try {
       // Use absolute URL so redirect goes back to same origin (localhost or production)
       const callbackURL = `${window.location.origin}/dashboard`;
@@ -85,10 +77,10 @@ function LoginPage() {
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
       <div className="bg-slate-900 p-8 rounded-lg shadow-xl w-full max-w-md">
         <h1 className="text-2xl font-bold text-white mb-2 text-center">
-          SongScript Admin
+          SongScript
         </h1>
         <p className="text-gray-400 text-center mb-6 text-sm">
-          Admin access only (passwordless)
+          Sign in with magic link
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -105,7 +97,7 @@ function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              placeholder="admin@example.com"
+              placeholder="your@email.com"
               required
             />
           </div>

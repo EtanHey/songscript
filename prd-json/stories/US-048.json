@@ -3,11 +3,12 @@
   "title": "Remove admin-only login restriction",
   "description": "Allow any email to sign up/login, not just admin emails. Remove the ADMIN_EMAIL check from login.tsx and betterAuth.ts.",
   "acceptanceCriteria": [
-    {"text": "Remove ADMIN_EMAIL check from src/routes/login.tsx", "checked": false},
-    {"text": "Remove admin email block from convex/betterAuth.ts", "checked": false},
-    {"text": "Any email can request magic link", "checked": false},
-    {"text": "Typecheck passes", "checked": false}
+    {"text": "Remove ADMIN_EMAIL check from src/routes/login.tsx", "checked": true},
+    {"text": "Remove admin email block from convex/betterAuth.ts", "checked": true},
+    {"text": "Any email can request magic link", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
   ],
-  "passes": false,
+  "passes": true,
+  "completedAt": "2026-01-21T16:59:57Z",
   "blockedBy": null
 }
