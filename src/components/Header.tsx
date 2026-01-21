@@ -61,10 +61,8 @@ export default function Header() {
 
   // Get user info for display name
   const { data: userInfo } = useQuery({
-    ...convexQuery(api.leaderboard.getUserInfo, {
-      visitorId: visitorId || '',
-    }),
-    enabled: !!visitorId,
+    ...convexQuery(api.leaderboard.getUserInfo, {}),
+    enabled: isLoggedIn,
   })
 
   const handleSignOut = async () => {

@@ -6,13 +6,11 @@ import { api } from "../../../convex/_generated/api";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../ui/card";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import { Button } from "../ui/button";
-import { useVisitorId } from "../../hooks/useVisitorId";
 
 type LeaderboardType = "streak" | "progress";
 
 export function LeaderboardMiniSection() {
   const [selectedType, setSelectedType] = useState<LeaderboardType>("streak");
-  const visitorId = useVisitorId();
 
   // Get top 5 users for streak leaderboard
   const { data: streakData = [] } = useQuery(
@@ -27,14 +25,13 @@ export function LeaderboardMiniSection() {
   // Get current user's rank
   const { data: userRank } = useQuery(
     convexQuery(api.leaderboard.getUserRank, {
-      visitorId,
       type: selectedType,
     })
   );
 
   // Get user info to check display name
   const { data: userInfo } = useQuery(
-    convexQuery(api.leaderboard.getUserInfo, { visitorId })
+    convexQuery(api.leaderboard.getUserInfo, {})
   );
 
   const hasDisplayName = userInfo?.displayName !== null;

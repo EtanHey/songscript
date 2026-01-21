@@ -6,7 +6,6 @@ import { api } from "../../../convex/_generated/api";
 import { Card, CardHeader, CardTitle, CardContent } from "../../components/ui/card";
 import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
 import { Button } from "../../components/ui/button";
-import { useVisitorId } from "../../hooks/useVisitorId";
 import { getLanguageFlagString } from "../../components/LanguageFlag";
 
 export const Route = createFileRoute("/_authed/leaderboard")({
@@ -20,7 +19,6 @@ function LeaderboardPage() {
   const [selectedType, setSelectedType] = useState<LeaderboardType>("streak");
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>("all-time");
   const [currentPage, setCurrentPage] = useState(0);
-  const visitorId = useVisitorId();
 
   const limit = 50;
   const offset = currentPage * limit;
@@ -45,7 +43,6 @@ function LeaderboardPage() {
   // Get current user's rank
   const { data: userRank } = useQuery(
     convexQuery(api.leaderboard.getUserRank, {
-      visitorId,
       type: selectedType,
       period: selectedPeriod,
     })

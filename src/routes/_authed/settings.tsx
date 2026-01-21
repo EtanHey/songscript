@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
 import { api } from "@convex/_generated/api";
-import { useVisitorId } from "../../hooks/useVisitorId";
 import { authClient } from "../../lib/auth-client";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -15,7 +14,6 @@ export const Route = createFileRoute("/_authed/settings")({
 
 function SettingsPage() {
   const navigate = useNavigate();
-  const visitorId = useVisitorId();
   const { data: session, isPending: sessionPending } = authClient.useSession();
   
   const [displayName, setDisplayName] = useState("");
@@ -30,7 +28,7 @@ function SettingsPage() {
 
   // Get user info
   const { data: userInfo, isPending: userInfoPending } = useQuery(
-    convexQuery(api.leaderboard.getUserInfo, { visitorId })
+    convexQuery(api.leaderboard.getUserInfo, {})
   );
 
   // Update display name when user info loads
@@ -50,7 +48,6 @@ function SettingsPage() {
       setFeedback(null);
       setDisplayNameMutate(
         {
-          visitorId,
           displayName: displayName.trim(),
         },
         {

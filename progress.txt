@@ -65,3 +65,17 @@ Learnings for next iteration:
 - Renaming API functions (like 'getByVisitor' to 'getUserPreferences') is cleaner for the new auth model but requires careful search-and-replace in the frontend.
 - Public routes like the song page need careful handling to only call secured mutations when 'isAuthenticated' is true to avoid unnecessary errors.
 ---
+
+## Iteration - SEC-007
+- Completed story SEC-007: Secure leaderboard.ts - fix userId lookups.
+- Updated 'convex/leaderboard.ts' to use 'ctx.auth' for all user-specific queries and mutations.
+- Removed 'visitorId' as an argument from 'getUserInfo', 'getUserRank', and 'setDisplayName'.
+- Refactored 'calculateCurrentStreak' to use 'userId' and 'by_user' index.
+- Updated leaderboard queries to correctly use 'user._id' for data lookups instead of 'user.email'.
+- Updated frontend callers in 'welcome.tsx', 'leaderboard.tsx', 'settings.tsx', 'Header.tsx', and 'LeaderboardMiniSection.tsx' to remove 'visitorId' dependencies.
+- Verified changes with 'npm run typecheck'.
+
+Learnings for next iteration:
+- Securing the leaderboard is critical as it's the main place where users see each other's data. Ensuring 'userId' is used for all internal lookups prevents data leakage between users with similar emails or visitor IDs.
+- Removing 'visitorId' from the frontend simplifies the code and reduces the risk of accidental spoofing.
+---

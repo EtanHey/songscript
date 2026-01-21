@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useConvexMutation, convexQuery } from "@convex-dev/react-query";
 import { api } from "@convex/_generated/api";
-import { useVisitorId } from "../../hooks/useVisitorId";
 import { Button } from "../../components/ui/button";
 
 export const Route = createFileRoute("/_authed/welcome")({
@@ -12,7 +11,6 @@ export const Route = createFileRoute("/_authed/welcome")({
 
 function WelcomePage() {
   const navigate = useNavigate();
-  const visitorId = useVisitorId();
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -21,7 +19,7 @@ function WelcomePage() {
 
   // Check if user already has a display name
   const { data: userInfo } = useQuery(
-    convexQuery(api.leaderboard.getUserInfo, { visitorId })
+    convexQuery(api.leaderboard.getUserInfo, {})
   );
 
   // If user already has displayName, redirect to dashboard
@@ -43,7 +41,6 @@ function WelcomePage() {
 
     try {
       const result = await setDisplayNameMutation({
-        visitorId,
         displayName: displayName.trim(),
       });
 

@@ -1,6 +1,8 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { getLanguageMultiplier } from "./languageDifficulty";
+import { getAuthUserId, requireAuth } from "./authHelpers";
+import { Id } from "./_generated/dataModel";
 
 // Get today's date in YYYY-MM-DD format
 function getTodayDateString(): string {
@@ -16,10 +18,10 @@ function getDateDaysAgo(days: number): string {
 }
 
 // Calculate current streak for a user
-async function calculateCurrentStreak(ctx: any, visitorId: string): Promise<number> {
+async function calculateCurrentStreak(ctx: any, userId: string): Promise<number> {
   const practiceLogs = await ctx.db
     .query("userPracticeLog")
-    .withIndex("by_visitor", (q: any) => q.eq("visitorId", visitorId))
+    .withIndex("by_user", (q: any) => q.eq("userId", userId))
     .collect();
 
   if (practiceLogs.length === 0) {
@@ -59,19 +61,17 @@ async function calculateCurrentStreak(ctx: any, visitorId: string): Promise<numb
   return currentStreak;
 }
 
-// Get user information by visitorId (email)
+// Get user information for the authenticated user
 export const getUserInfo = query({
-  args: {
-    visitorId: v.string(),
-  },
-  handler: async (ctx, { visitorId }) => {
-    const user = await ctx.db
-      .query("users")
-      .filter((q) => q.eq(q.field("email"), visitorId))
-      .first();
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
+    const user = await ctx.db.get(userId as Id<"users">);
 
     return {
-      email: visitorId,
+      email: user?.email,
       displayName: user?.displayName || null,
     };
   },
@@ -95,10 +95,8 @@ export const getStreakLeaderboard = query({
     const userStreaks = [];
     
     for (const user of users) {
-      // For users, we need to find their visitorId from practice logs
-      // Since users table doesn't have visitorId, we'll use email as the key
-      // This assumes visitorId matches email for authenticated users
-      const streak = await calculateCurrentStreak(ctx, user.email);
+      // Use user's ID for practice data lookup
+      const streak = await calculateCurrentStreak(ctx, user._id);
       
       // Get user's primary language from their practice data
       // For now, we'll use a placeholder language since we don't have language-specific practice tracking
@@ -108,7 +106,7 @@ export const getStreakLeaderboard = query({
         displayName: user.displayName!,
         streak,
         language,
-        email: user.email, // For internal use, not returned
+        userId: user._id, // For internal use, not returned
       });
     }
 
@@ -146,20 +144,19 @@ export const getProgressLeaderboard = query({
     const userScores = [];
     
     for (const user of users) {
-      // Use email as visitorId for authenticated users
-      const visitorId = user.email;
+      const userId = user._id;
       
       // Get word progress data
       const wordProgress = await ctx.db
         .query("wordProgress")
-        .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+        .withIndex("by_user", (q) => q.eq("userId", userId))
         .filter((q) => q.eq(q.field("learned"), true))
         .collect();
 
       // Get line progress data
       const lineProgress = await ctx.db
         .query("lineProgress")
-        .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+        .withIndex("by_user", (q) => q.eq("userId", userId))
         .filter((q) => q.eq(q.field("learned"), true))
         .collect();
 
@@ -213,7 +210,7 @@ export const getProgressLeaderboard = query({
         displayName: user.displayName!,
         progressScore: Math.round(totalScore * 10) / 10, // Round to 1 decimal place
         topLanguage,
-        email: user.email, // For internal use, not returned
+        userId: user._id, // For internal use, not returned
       });
     }
 
@@ -236,22 +233,19 @@ export const getProgressLeaderboard = query({
 // Get user's own rank on leaderboard
 export const getUserRank = query({
   args: {
-    visitorId: v.string(),
     type: v.union(v.literal("streak"), v.literal("progress")),
     period: v.optional(v.union(v.literal("weekly"), v.literal("monthly"), v.literal("all-time"))),
   },
-  handler: async (ctx, { visitorId, type, period: _period = "all-time" }) => {
-    // Get user info to check if they have displayName
-    const user = await ctx.db
-      .query("users")
-      .filter((q) => q.eq(q.field("email"), visitorId))
-      .first();
+  handler: async (ctx, { type, period: _period = "all-time" }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
 
+    const user = await ctx.db.get(userId as Id<"users">);
     const hasDisplayName = user?.displayName !== undefined;
 
     if (type === "streak") {
       // Calculate user's streak
-      const userStreak = await calculateCurrentStreak(ctx, visitorId);
+      const userStreak = await calculateCurrentStreak(ctx, userId);
 
       // Get all users with better streaks to determine rank
       const allUsers = await ctx.db
@@ -261,7 +255,7 @@ export const getUserRank = query({
 
       let betterCount = 0;
       for (const otherUser of allUsers) {
-        const otherStreak = await calculateCurrentStreak(ctx, otherUser.email);
+        const otherStreak = await calculateCurrentStreak(ctx, otherUser._id);
         if (otherStreak > userStreak) {
           betterCount++;
         }
@@ -276,13 +270,13 @@ export const getUserRank = query({
       // Calculate user's progress score
       const wordProgress = await ctx.db
         .query("wordProgress")
-        .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+        .withIndex("by_user", (q) => q.eq("userId", userId))
         .filter((q) => q.eq(q.field("learned"), true))
         .collect();
 
       const lineProgress = await ctx.db
         .query("lineProgress")
-        .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+        .withIndex("by_user", (q) => q.eq("userId", userId))
         .filter((q) => q.eq(q.field("learned"), true))
         .collect();
 
@@ -332,16 +326,16 @@ export const getUserRank = query({
 
       let betterCount = 0;
       for (const otherUser of allUsers) {
-        // Calculate other user's score (similar logic as above)
+        // Calculate other user's score
         const otherWordProgress = await ctx.db
           .query("wordProgress")
-          .withIndex("by_visitor", (q) => q.eq("visitorId", otherUser.email))
+          .withIndex("by_user", (q) => q.eq("userId", otherUser._id))
           .filter((q) => q.eq(q.field("learned"), true))
           .collect();
 
         const otherLineProgress = await ctx.db
           .query("lineProgress")
-          .withIndex("by_visitor", (q) => q.eq("visitorId", otherUser.email))
+          .withIndex("by_user", (q) => q.eq("userId", otherUser._id))
           .filter((q) => q.eq(q.field("learned"), true))
           .collect();
 
@@ -394,10 +388,11 @@ export const getUserRank = query({
 // Set or update user's display name
 export const setDisplayName = mutation({
   args: {
-    visitorId: v.string(),
     displayName: v.string(),
   },
-  handler: async (ctx, { visitorId, displayName }) => {
+  handler: async (ctx, { displayName }) => {
+    const userId = await requireAuth(ctx);
+
     // Validate display name length
     if (displayName.length < 3 || displayName.length > 20) {
       return { success: false, error: "Display name must be 3-20 characters" };
@@ -423,25 +418,10 @@ export const setDisplayName = mutation({
       }
     }
 
-    // Find existing user by visitorId (email)
-    const existingUser = await ctx.db
-      .query("users")
-      .filter((q) => q.eq(q.field("email"), visitorId))
-      .first();
-
-    if (existingUser) {
-      // Update existing user
-      await ctx.db.patch(existingUser._id, {
-        displayName: displayName.trim(),
-      });
-    } else {
-      // Create new user record
-      await ctx.db.insert("users", {
-        email: visitorId,
-        displayName: displayName.trim(),
-        createdAt: Date.now(),
-      });
-    }
+    // Update existing user
+    await ctx.db.patch(userId as Id<"users">, {
+      displayName: displayName.trim(),
+    });
 
     return { success: true };
   },
