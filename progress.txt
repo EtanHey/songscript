@@ -97,3 +97,12 @@ See iteration logs above for details.
 - Returns array with rank, displayName, score, topLanguage fields
 - Typecheck passes successfully
 ---
+
+## Iteration - US-040: User Rank Query Complete
+- Created getUserRank query in convex/leaderboard.ts
+- Query accepts visitorId, type (streak/progress), and period arguments
+- Returns user's rank number, score, and hasDisplayName boolean
+- Works for users without displayName (calculates rank but won't show on public board)
+- Fixed TypeScript warning by prefixing unused period parameter with underscore
+- Typecheck passes successfully
+---

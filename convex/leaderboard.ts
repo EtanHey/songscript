@@ -214,3 +214,161 @@ export const getProgressLeaderboard = query({
     }));
   },
 });
+
+// Get user's own rank on leaderboard
+export const getUserRank = query({
+  args: {
+    visitorId: v.string(),
+    type: v.union(v.literal("streak"), v.literal("progress")),
+    period: v.optional(v.union(v.literal("weekly"), v.literal("monthly"), v.literal("all-time"))),
+  },
+  handler: async (ctx, { visitorId, type, period: _period = "all-time" }) => {
+    // Get user info to check if they have displayName
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), visitorId))
+      .first();
+
+    const hasDisplayName = user?.displayName !== undefined;
+
+    if (type === "streak") {
+      // Calculate user's streak
+      const userStreak = await calculateCurrentStreak(ctx, visitorId);
+
+      // Get all users with better streaks to determine rank
+      const allUsers = await ctx.db
+        .query("users")
+        .filter((q) => q.neq(q.field("displayName"), undefined))
+        .collect();
+
+      let betterCount = 0;
+      for (const otherUser of allUsers) {
+        const otherStreak = await calculateCurrentStreak(ctx, otherUser.email);
+        if (otherStreak > userStreak) {
+          betterCount++;
+        }
+      }
+
+      return {
+        rank: betterCount + 1,
+        score: userStreak,
+        hasDisplayName,
+      };
+    } else {
+      // Calculate user's progress score
+      const wordProgress = await ctx.db
+        .query("wordProgress")
+        .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+        .filter((q) => q.eq(q.field("learned"), true))
+        .collect();
+
+      const lineProgress = await ctx.db
+        .query("lineProgress")
+        .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+        .filter((q) => q.eq(q.field("learned"), true))
+        .collect();
+
+      // Get songs to determine languages
+      const songs = await Promise.all(
+        lineProgress.map(async (line) => {
+          return await ctx.db.get(line.songId);
+        })
+      );
+
+      // Calculate weighted scores by language
+      const languageScores = new Map<string, { wordsLearned: number, linesCompleted: number }>();
+      
+      // Count words learned
+      const defaultLanguage = "mixed";
+      if (!languageScores.has(defaultLanguage)) {
+        languageScores.set(defaultLanguage, { wordsLearned: 0, linesCompleted: 0 });
+      }
+      languageScores.get(defaultLanguage)!.wordsLearned = wordProgress.length;
+
+      // Count lines completed by language
+      for (let i = 0; i < lineProgress.length; i++) {
+        const song = songs[i];
+        if (song) {
+          const language = song.sourceLanguage;
+          if (!languageScores.has(language)) {
+            languageScores.set(language, { wordsLearned: 0, linesCompleted: 0 });
+          }
+          languageScores.get(language)!.linesCompleted++;
+        }
+      }
+
+      // Calculate total weighted score
+      let userScore = 0;
+      for (const [language, scores] of languageScores.entries()) {
+        const multiplier = getLanguageMultiplier(language);
+        const languageScore = (scores.wordsLearned * multiplier) + (scores.linesCompleted * multiplier * 0.5);
+        userScore += languageScore;
+      }
+      userScore = Math.round(userScore * 10) / 10;
+
+      // Get all users with better scores to determine rank
+      const allUsers = await ctx.db
+        .query("users")
+        .filter((q) => q.neq(q.field("displayName"), undefined))
+        .collect();
+
+      let betterCount = 0;
+      for (const otherUser of allUsers) {
+        // Calculate other user's score (similar logic as above)
+        const otherWordProgress = await ctx.db
+          .query("wordProgress")
+          .withIndex("by_visitor", (q) => q.eq("visitorId", otherUser.email))
+          .filter((q) => q.eq(q.field("learned"), true))
+          .collect();
+
+        const otherLineProgress = await ctx.db
+          .query("lineProgress")
+          .withIndex("by_visitor", (q) => q.eq("visitorId", otherUser.email))
+          .filter((q) => q.eq(q.field("learned"), true))
+          .collect();
+
+        const otherSongs = await Promise.all(
+          otherLineProgress.map(async (line) => {
+            return await ctx.db.get(line.songId);
+          })
+        );
+
+        const otherLanguageScores = new Map<string, { wordsLearned: number, linesCompleted: number }>();
+        
+        if (!otherLanguageScores.has(defaultLanguage)) {
+          otherLanguageScores.set(defaultLanguage, { wordsLearned: 0, linesCompleted: 0 });
+        }
+        otherLanguageScores.get(defaultLanguage)!.wordsLearned = otherWordProgress.length;
+
+        for (let i = 0; i < otherLineProgress.length; i++) {
+          const song = otherSongs[i];
+          if (song) {
+            const language = song.sourceLanguage;
+            if (!otherLanguageScores.has(language)) {
+              otherLanguageScores.set(language, { wordsLearned: 0, linesCompleted: 0 });
+            }
+            otherLanguageScores.get(language)!.linesCompleted++;
+          }
+        }
+
+        let otherScore = 0;
+        for (const [language, scores] of otherLanguageScores.entries()) {
+          const multiplier = getLanguageMultiplier(language);
+          const languageScore = (scores.wordsLearned * multiplier) + (scores.linesCompleted * multiplier * 0.5);
+          otherScore += languageScore;
+        }
+        otherScore = Math.round(otherScore * 10) / 10;
+
+        if (otherScore > userScore) {
+          betterCount++;
+        }
+      }
+
+      return {
+        rank: betterCount + 1,
+        score: userScore,
+        hasDisplayName,
+      };
+    }
+  },
+});
