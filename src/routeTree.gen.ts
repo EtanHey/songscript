@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
@@ -20,6 +21,11 @@ import { Route as AuthedLeaderboardRouteImport } from './routes/_authed/leaderbo
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -73,6 +79,7 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/leaderboard': typeof AuthedLeaderboardRoute
   '/settings': typeof AuthedSettingsRoute
@@ -84,6 +91,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/leaderboard': typeof AuthedLeaderboardRoute
   '/settings': typeof AuthedSettingsRoute
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
   '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
   '/_authed/leaderboard': typeof AuthedLeaderboardRoute
   '/_authed/settings': typeof AuthedSettingsRoute
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/signup'
     | '/dashboard'
     | '/leaderboard'
     | '/settings'
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/signup'
     | '/dashboard'
     | '/leaderboard'
     | '/settings'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authed'
     | '/login'
+    | '/signup'
     | '/_authed/dashboard'
     | '/_authed/leaderboard'
     | '/_authed/settings'
@@ -146,6 +158,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthedRoute: typeof AuthedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
   AuthVerifyRoute: typeof AuthVerifyRoute
   SongSongIdRoute: typeof SongSongIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -153,6 +166,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -247,6 +267,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
   LoginRoute: LoginRoute,
+  SignupRoute: SignupRoute,
   AuthVerifyRoute: AuthVerifyRoute,
   SongSongIdRoute: SongSongIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

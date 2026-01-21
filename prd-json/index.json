@@ -5,11 +5,11 @@
   "workingDirectory": ".",
   "stats": {
     "total": 41,
-    "completed": 30,
-    "pending": 9,
+    "completed": 31,
+    "pending": 8,
     "blocked": 0
   },
-  "nextStory": "SEC-008",
+  "nextStory": "SEC-009",
   "storyOrder": [
     "US-036",
     "V-003",
@@ -54,7 +54,6 @@
     "V-017"
   ],
   "pending": [
-    "SEC-008",
     "SEC-009",
     "SEC-010",
     "SEC-011",
@@ -63,9 +62,7 @@
     "V-016",
     "V-017"
   ],
-  "blocked": [
-
-  ],
+  "blocked": [],
   "browserSetup": {
     "viewport": "desktop 1200px+",
     "homeUrl": "http://localhost:3001",
@@ -78,8 +75,16 @@
   "notes": {
     "context": "SECURITY FIX: Replace spoofable visitorId with ctx.auth.getUserIdentity(). Anonymous users use localStorage, migrate data on signup.",
     "securityPattern": "NEVER accept user ID as function argument - use ctx.auth server-side",
-    "migrationFlow": "Signup page with 'Bring progress' checkbox → magic link → verify.tsx runs migration → clear localStorage",
-    "tables": ["wordProgress", "userSongProgress", "lineProgress", "userWishlist", "userPracticeLog", "userGoals", "userPreferences"],
+    "migrationFlow": "Signup page with 'Bring progress' checkbox \u2192 magic link \u2192 verify.tsx runs migration \u2192 clear localStorage",
+    "tables": [
+      "wordProgress",
+      "userSongProgress",
+      "lineProgress",
+      "userWishlist",
+      "userPracticeLog",
+      "userGoals",
+      "userPreferences"
+    ],
     "referenceDoc": "docs.local/convex-auth-patterns.md (created by SEC-001)"
   }
 }
