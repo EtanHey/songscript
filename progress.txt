@@ -40,3 +40,15 @@ Learnings for next iteration:
 Learnings for next iteration:
 - Renaming functions (e.g., adding "ByUser" suffix) helps clarify the security model but requires updating all frontend call sites immediately to avoid type errors.
 ---
+## Iteration - SEC-005
+- Completed story SEC-005: Secure wishlist.ts and goals.ts in Convex.
+- Updated `convex/wishlist.ts` and `convex/goals.ts` to use authenticated user identity from `ctx.auth` and removed `visitorId` arguments.
+- Applied `by_user` index for all queries and enforced `requireAuth` for all mutations.
+- Updated `src/routes/_authed/dashboard.tsx` to use the new secure API signatures and removed `visitorId` dependencies.
+- Updated `src/components/WishlistButton.tsx` to check for authentication before calling Convex, disabling it for anonymous users for now (pending localStorage migration).
+- Verified all changes with `npm run typecheck`.
+
+Learnings for next iteration:
+- Securing the backend often requires simultaneous frontend updates to maintain functionality and type safety.
+- For components like `WishlistButton` that are used on public pages, extra care is needed to handle the unauthenticated state gracefully when the backend becomes secure-only.
+---

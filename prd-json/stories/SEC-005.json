@@ -1,18 +1,20 @@
 {
   "id": "SEC-005",
-  "title": "Secure userWishlist.ts and userGoals.ts",
-  "description": "Apply the same ctx.auth pattern to userWishlist.ts and userGoals.ts. Remove all visitorId arguments.",
+  "title": "Secure wishlist.ts and goals.ts",
+  "description": "Apply the same ctx.auth pattern to wishlist.ts and goals.ts. Remove all visitorId arguments.",
   "acceptanceCriteria": [
-    {"text": "Import getAuthUserId, requireAuth from authHelpers in both files", "checked": false},
-    {"text": "userWishlist: Remove visitorId from all args", "checked": false},
-    {"text": "userWishlist: Use by_user index for all queries", "checked": false},
-    {"text": "userWishlist: Use requireAuth for mutations", "checked": false},
-    {"text": "userGoals: Remove visitorId from all args", "checked": false},
-    {"text": "userGoals: Use by_user index for all queries", "checked": false},
-    {"text": "userGoals: Use requireAuth for mutations", "checked": false},
-    {"text": "Typecheck passes", "checked": false}
+    {"text": "Import getAuthUserId, requireAuth from authHelpers in both files", "checked": true},
+    {"text": "userWishlist: Remove visitorId from all args", "checked": true},
+    {"text": "userWishlist: Use by_user index for all queries", "checked": true},
+    {"text": "userWishlist: Use requireAuth for mutations", "checked": true},
+    {"text": "userGoals: Remove visitorId from all args", "checked": true},
+    {"text": "userGoals: Use by_user index for all queries", "checked": true},
+    {"text": "userGoals: Use requireAuth for mutations", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
   ],
-  "passes": false,
-  "blockedBy": "SEC-002",
-  "notes": "Follow the EXACT same pattern as SEC-003 (wordProgress.ts):\n\n1. Import helpers: `import { getAuthUserId, requireAuth } from './authHelpers'`\n2. Remove visitorId from args: `args: {}` or only non-user args\n3. Get userId inside handler: `const userId = await requireAuth(ctx)`\n4. Query by userId: `.withIndex('by_user', q => q.eq('userId', userId))`"
+  "passes": true,
+  "completedAt": "2026-01-22T00:30:00Z",
+  "completedBy": "gemini-3-flash-preview",
+  "blockedBy": null,
+  "notes": "Followed the EXACT same pattern as SEC-003 (wordProgress.ts):\n\n1. Imported helpers: `import { getAuthUserId, requireAuth } from './authHelpers'`\n2. Removed visitorId from args: `args: {}` or only non-user args\n3. Got userId inside handler: `const userId = await requireAuth(ctx)` or `getAuthUserId(ctx)`\n4. Queried by userId: `.withIndex('by_user', q => q.eq('userId', userId))`\n5. Updated frontend callers in dashboard.tsx and WishlistButton.tsx"
 }

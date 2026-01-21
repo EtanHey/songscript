@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useConvexMutation, convexQuery } from "@convex-dev/react-query";
 import { api } from "@convex/_generated/api";
-import { useVisitorId } from "../hooks/useVisitorId";
+import { authClient } from "../lib/auth-client";
 import { useState, useCallback, useEffect } from "react";
 import type { Id } from "@convex/_generated/dataModel";
 
@@ -20,15 +20,16 @@ export function WishlistButton({
   className = "",
   size = "md",
 }: WishlistButtonProps) {
-  const visitorId = useVisitorId();
+  const { data: session } = authClient.useSession();
+  const isAuthenticated = !!session?.user;
 
-  // Query actual wishlist status
-  const { data: isInWishlist, isLoading } = useQuery(
-    convexQuery(api.wishlist.isInWishlist, {
-      visitorId: visitorId || "",
+  // Query actual wishlist status - only if authenticated
+  const { data: isInWishlist, isLoading } = useQuery({
+    ...convexQuery(api.wishlist.isInWishlist, {
       songId,
-    })
-  );
+    }),
+    enabled: isAuthenticated,
+  });
 
   // Local optimistic state
   const [optimisticState, setOptimisticState] = useState<boolean | null>(null);
@@ -62,18 +63,18 @@ export function WishlistButton({
       e.preventDefault(); // Prevent navigation if inside a Link
       e.stopPropagation();
 
-      if (!visitorId || isPending) return;
+      if (!isAuthenticated || isPending) return;
 
       toggleWishlist({
-        visitorId,
         songId,
       });
     },
-    [visitorId, songId, isPending, toggleWishlist]
+    [isAuthenticated, songId, isPending, toggleWishlist]
   );
 
   // Determine display state (optimistic > real > loading)
-  const displayState = optimisticState ?? isInWishlist ?? false;
+  // For unauthenticated users, always false for now (until localStorage migration)
+  const displayState = isAuthenticated ? (optimisticState ?? isInWishlist ?? false) : false;
 
   // Size classes
   const sizeClasses = {
@@ -88,7 +89,7 @@ export function WishlistButton({
     lg: "w-7 h-7",
   };
 
-  if (isLoading && optimisticState === null) {
+  if (isAuthenticated && isLoading && optimisticState === null) {
     return (
       <button
         className={`${sizeClasses[size]} rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center ${className}`}
@@ -102,13 +103,13 @@ export function WishlistButton({
   return (
     <button
       onClick={handleClick}
-      disabled={!visitorId || isPending}
+      disabled={!isAuthenticated || isPending}
       className={`${sizeClasses[size]} rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center
         hover:bg-black/70 transition-all duration-200 active:scale-95
-        ${isPending ? "opacity-50" : ""}
+        ${!isAuthenticated || isPending ? "opacity-50" : ""}
         ${className}`}
       aria-label={displayState ? "Remove from wishlist" : "Add to wishlist"}
-      title={displayState ? "Remove from wishlist" : "Add to wishlist"}
+      title={!isAuthenticated ? "Login to add to wishlist" : (displayState ? "Remove from wishlist" : "Add to wishlist")}
     >
       {displayState ? (
         <HeartFilledIcon

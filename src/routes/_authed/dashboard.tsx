@@ -60,9 +60,7 @@ function DashboardPage() {
 
   // Get wishlist / learning queue
   const { data: wishlist, isLoading: wishlistLoading, refetch: refetchWishlist } = useQuery(
-    convexQuery(api.wishlist.getByVisitor, {
-      visitorId: visitorId || "",
-    })
+    convexQuery(api.wishlist.getWishlist, {})
   );
 
   // Get practice history for streaks
@@ -87,9 +85,7 @@ function DashboardPage() {
 
   // Get goals with progress
   const { data: goalsWithProgress, isLoading: goalsLoading, refetch: refetchGoals } = useQuery(
-    convexQuery(api.goals.getGoalsWithProgress, {
-      visitorId: visitorId || "",
-    })
+    convexQuery(api.goals.getGoalsWithProgress, {})
   );
 
   // Get language progress
@@ -180,10 +176,10 @@ function DashboardPage() {
 
   // Initialize goals on first visit (if no goals exist)
   useEffect(() => {
-    if (visitorId && goalsWithProgress !== undefined && goalsWithProgress.length === 0) {
-      initializeGoals({ visitorId });
+    if (goalsWithProgress !== undefined && goalsWithProgress.length === 0) {
+      initializeGoals({});
     }
-  }, [visitorId, goalsWithProgress, initializeGoals]);
+  }, [goalsWithProgress, initializeGoals]);
 
   // Reorder mutation
   const { mutate: reorderWishlist } = useMutation({
@@ -204,19 +200,17 @@ function DashboardPage() {
   // Handle reorder via drag or buttons
   const handleReorder = useCallback(
     (songIds: Id<"songs">[]) => {
-      if (!visitorId) return;
-      reorderWishlist({ visitorId, songIds });
+      reorderWishlist({ songIds });
     },
-    [visitorId, reorderWishlist]
+    [reorderWishlist]
   );
 
   // Handle remove from wishlist
   const handleRemoveFromWishlist = useCallback(
     (songId: Id<"songs">) => {
-      if (!visitorId) return;
-      removeFromWishlist({ visitorId, songId });
+      removeFromWishlist({ songId });
     },
-    [visitorId, removeFromWishlist]
+    [removeFromWishlist]
   );
 
   // Show loading state briefly
@@ -276,21 +270,19 @@ function DashboardPage() {
           {/* My Goals Section */}
           <section>
             <h2 className="text-lg sm:text-xl font-semibold mb-4">My Goals</h2>
-            {goalsLoading || !visitorId ? (
+            {goalsLoading ? (
               <SkeletonCard height="h-48" />
             ) : goalsWithProgress && goalsWithProgress.length > 0 ? (
               <MyGoalsSection
                 goals={goalsWithProgress}
                 onUpdateGoal={(goalId, targetValue) => updateGoal({ goalId, targetValue })}
                 onSetGoal={(goalType, period, targetValue) => {
-                  if (visitorId) {
-                    setGoal({ visitorId, goalType, period, targetValue });
-                  }
+                  setGoal({ goalType, period, targetValue });
                 }}
               />
             ) : (
               <GoalsEmptyState
-                onInitialize={() => visitorId && initializeGoals({ visitorId })}
+                onInitialize={() => initializeGoals({})}
               />
             )}
           </section>
