@@ -140,3 +140,24 @@ See iteration logs above for details.
 - Component exported from dashboard index.tsx
 - Typecheck passes successfully
 ---
+## Iteration - US-044: Dashboard Leaderboard Integration Complete
+- Added LeaderboardMiniSection import to dashboard.tsx
+- Integrated leaderboard section into dashboard layout after stats section
+- Added proper heading "Leaderboard" matching other sections
+- Included loading state with SkeletonCard while visitorId loads
+- Component uses internal useVisitorId hook, no props needed
+- Positioned appropriately in full-width layout before "My Languages"
+- Typecheck passes successfully
+- Dashboard now shows leaderboard mini widget for user engagement
+---
+
+## Iteration - V-007: Mini Leaderboard Verification Complete
+- Verified LeaderboardMiniSection is properly integrated into dashboard.tsx
+- Component shows toggle between Streak/Progress tabs with ToggleGroup
+- Displays top 5 users with medals (🥇🥈🥉) for top 3 positions
+- Shows user's own rank if in top 50, or "Set display name to join" CTA
+- Fixed "View full leaderboard" link (temporarily points to dashboard until /leaderboard route exists)
+- All leaderboard queries (getStreakLeaderboard, getProgressLeaderboard, getUserRank, getUserInfo) working correctly
+- Typecheck passes successfully
+- Mini leaderboard verification complete, ready for full leaderboard page implementation
+---
