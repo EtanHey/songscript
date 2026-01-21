@@ -1,16 +1,17 @@
 {
   "id": "AUDIT-001",
   "title": "Audit: Find localStorage keys that leak between users",
-  "description": "Search codebase for localStorage/sessionStorage usage that could cause data to persist or leak between different authenticated users on the same browser.",
+  "description": "Use critique-waves technique to audit localStorage/sessionStorage usage for user data leaks.",
   "acceptanceCriteria": [
-    {"text": "Grep for all localStorage.setItem and localStorage.getItem calls", "checked": false},
-    {"text": "Grep for all sessionStorage usage", "checked": false},
-    {"text": "List all localStorage keys used in the app", "checked": false},
-    {"text": "Identify which keys should be cleared on logout", "checked": false},
-    {"text": "Check if logout clears user-specific localStorage", "checked": false},
-    {"text": "Document findings in progress.txt", "checked": false}
+    {"text": "Create docs.local/feature-dashboard-real-numbers/ folder", "checked": false},
+    {"text": "Create instructions.md with FORBIDDEN/REQUIRED patterns for localStorage", "checked": false},
+    {"text": "Create tracker.md with goal of 6 consecutive passes", "checked": false},
+    {"text": "Run waves of 3 parallel agents checking: (1) src/ localStorage, (2) src/ sessionStorage, (3) logout handlers", "checked": false},
+    {"text": "Each agent writes to round-N-agent-X.md", "checked": false},
+    {"text": "Continue until 6 consecutive passes or issues found", "checked": false},
+    {"text": "Document all findings in tracker.md", "checked": false}
   ],
   "passes": false,
   "blockedBy": null,
-  "notes": "CODE REVIEW ONLY - DO NOT USE BROWSER. Spawn 3 parallel Explore subagents using Task tool: (1) search src/ for localStorage, (2) search src/ for sessionStorage, (3) search for logout/signout handlers. Combine findings in progress.txt."
+  "notes": "CODE REVIEW ONLY - NO BROWSER. Use critique-waves technique: 3 agents max parallel, write to separate MD files, track consecutive passes. FORBIDDEN: localStorage keys without user scoping. REQUIRED: logout clears user-specific data. Known keys: songscript_visitor_id, songscript_welcome_shown."
 }
