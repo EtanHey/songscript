@@ -4,9 +4,9 @@
   "projectName": "SongScript Leaderboard Feature",
   "workingDirectory": ".",
   "stats": {
-    "total": 17,
+    "total": 18,
     "completed": 15,
-    "pending": 4,
+    "pending": 5,
     "blocked": 0
   },
   "nextStory": "V-008",
@@ -29,13 +29,15 @@
     "V-008",
     "US-046",
     "US-047",
-    "V-009"
+    "V-009",
+    "BUG-015"
   ],
   "pending": [
     "V-008",
     "US-046",
     "US-047",
-    "V-009"
+    "V-009",
+    "BUG-015"
   ],
   "blocked": [],
   "browserSetup": {
