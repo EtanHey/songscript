@@ -1,13 +1,19 @@
 {
-  "addToStoryOrder": ["US-048", "US-049", "V-010"],
-  "addToPending": ["US-048", "US-049"],
-  "addToBlocked": ["V-010"],
+  "storyOrder": [
+    "US-036", "V-003", "US-037", "V-004", "US-038", "US-039", "US-040", "V-005",
+    "US-041", "US-042", "V-006", "US-043", "US-044", "V-007", "US-045", "V-008",
+    "US-046", "US-047", "V-009", "BUG-015", "US-048", "US-049", "V-010"
+  ],
+  "pending": ["US-048", "US-049"],
+  "blocked": ["V-008", "V-009", "V-010"],
+  "nextStory": "US-048",
   "stats": {
     "total": 23,
+    "completed": 20,
     "pending": 2,
     "blocked": 3
   },
   "notes": {
-    "V-010": "BROWSER VERIFICATION - blocked for Kiro, only Claude can verify with MCP browser tools"
+    "blockedReason": "V-008, V-009, V-010 require browser verification - blocked for Kiro, only Claude can verify"
   }
 }
