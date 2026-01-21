@@ -6,10 +6,10 @@
   "stats": {
     "total": 41,
     "completed": 22,
-    "pending": 19,
-    "blocked": 0
+    "pending": 18,
+    "blocked": 1
   },
-  "nextStory": "AUDIT-001",
+  "nextStory": "US-050",
   "storyOrder": [
     "US-036",
     "V-003",
@@ -55,7 +55,6 @@
   ],
   "pending": [
     "US-050",
-    "AUDIT-001",
     "AUDIT-003",
     "SEC-001",
     "SEC-002",
@@ -73,7 +72,9 @@
     "V-016",
     "V-017"
   ],
-  "blocked": [],
+  "blocked": [
+    "AUDIT-001"
+  ],
   "browserSetup": {
     "viewport": "desktop 1200px+",
     "homeUrl": "http://localhost:3001",
