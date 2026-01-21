@@ -1,6 +1,59 @@
 # Progress Log
 
-## New PRD: Leaderboard Feature
+## 🔒 SECURITY FIX: Auth Overhaul (SEC-001 through SEC-012)
+
+**CRITICAL CONTEXT FOR ALL SEC STORIES:**
+
+### The Problem
+- ALL user data queries accept `visitorId` as argument (SPOOFABLE!)
+- `visitorId` comes from localStorage (browser-specific, not user-specific)
+- Two users on same browser share the same visitorId = SHARED DATA BUG
+
+### The Solution
+- Use `ctx.auth.getUserIdentity()` server-side (cryptographically verified, CANNOT be spoofed)
+- NEVER accept user ID as function argument
+- Add userId field to all tables, query by userId using ctx.auth
+
+### Key Pattern
+```typescript
+// ❌ WRONG (spoofable)
+export const getData = query({
+  args: { visitorId: v.string() },
+  handler: async (ctx, { visitorId }) => { ... }
+});
+
+// ✅ CORRECT (secure)
+import { requireAuth } from './authHelpers';
+export const getData = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await requireAuth(ctx);  // From ctx.auth
+    return ctx.db.query('data').withIndex('by_user', q => q.eq('userId', userId)).collect();
+  }
+});
+```
+
+### Migration Flow
+1. User visits /signup with anonymous progress in localStorage
+2. Enters email, display name, checks "Bring my progress" (default ON)
+3. Magic link sent → clicks link → /auth/verify
+4. verify.tsx: calls migrateAnonymousData(), sets displayName, clears localStorage
+5. User now has all their progress tied to their authenticated account
+
+### Stories
+- SEC-001: Create authHelpers.ts + save docs
+- SEC-002: Add userId field to all 7 tables
+- SEC-003-007: Update all Convex files to use ctx.auth
+- SEC-008: Create /signup page with migration checkbox
+- SEC-009: Create migration mutation
+- SEC-010: Update verify flow to run migration
+- SEC-011: Remove useVisitorId from client
+- SEC-012: Update login page, cleanup
+- V-015-017: Verify security, migration, isolation
+
+---
+
+## Previous PRD: Leaderboard Feature
 
 **Generated:** 2026-01-21
 **Stories:** 19 (12 US + 7 V verification stories)

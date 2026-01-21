@@ -1,0 +1,23 @@
+{
+  "id": "SEC-008",
+  "title": "Create /signup page with migration checkbox",
+  "description": "Create a dedicated signup page at /signup with: email input, display name input, prominent 'Bring my progress to this account' checkbox, and 'Send Magic Link' button.",
+  "acceptanceCriteria": [
+    {"text": "Create src/routes/signup.tsx page", "checked": false},
+    {"text": "Email input field with validation", "checked": false},
+    {"text": "Display name input field (3-20 chars)", "checked": false},
+    {"text": "Prominent checkbox: 'Bring my learning progress to this account'", "checked": false},
+    {"text": "Checkbox is checked by default and visually prominent (large, colored border)", "checked": false},
+    {"text": "Helper text under checkbox explaining what it does", "checked": false},
+    {"text": "'Send Magic Link' button triggers magic link + stores migration preference", "checked": false},
+    {"text": "Store migration preference in localStorage: songscript_migrate_on_signup", "checked": false},
+    {"text": "Store display name in localStorage: songscript_signup_display_name", "checked": false},
+    {"text": "After magic link sent, show 'Check your email' message", "checked": false},
+    {"text": "Link to login page for existing users", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "Verify in browser: form renders correctly", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": null,
+  "notes": "UI Design:\n```\n┌─────────────────────────────────────┐\n│         Create Your Account         │\n├─────────────────────────────────────┤\n│ Email                               │\n│ ┌─────────────────────────────────┐ │\n│ │ your@email.com                  │ │\n│ └─────────────────────────────────┘ │\n│                                     │\n│ Display Name                        │\n│ ┌─────────────────────────────────┐ │\n│ │ Your Name                       │ │\n│ └─────────────────────────────────┘ │\n│                                     │\n│ ┌─────────────────────────────────┐ │\n│ │ ☑️ Bring my learning progress   │ │\n│ │    to this account              │ │\n│ │    ─────────────────────────    │ │\n│ │    Your words learned and       │ │\n│ │    practice history will be     │ │\n│ │    saved to your new account    │ │\n│ └─────────────────────────────────┘ │\n│                                     │\n│ ┌─────────────────────────────────┐ │\n│ │      Send Magic Link            │ │\n│ └─────────────────────────────────┘ │\n│                                     │\n│ Already have an account? Log in     │\n└─────────────────────────────────────┘\n```\n\nThe checkbox should be VERY prominent - large, with a colored border (green when checked), and helper text explaining what happens."
+}

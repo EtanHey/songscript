@@ -1,0 +1,23 @@
+{
+  "id": "SEC-009",
+  "title": "Create migration mutation to copy anonymous data to user account",
+  "description": "Create convex/migration.ts with mutation to copy all data from visitorId to userId. Called after successful signup when user opted in.",
+  "acceptanceCriteria": [
+    {"text": "Create convex/migration.ts file", "checked": false},
+    {"text": "migrateAnonymousData mutation accepts visitorId string", "checked": false},
+    {"text": "Mutation requires auth (uses requireAuth)", "checked": false},
+    {"text": "Copies wordProgress records from visitorId to userId", "checked": false},
+    {"text": "Copies userSongProgress records from visitorId to userId", "checked": false},
+    {"text": "Copies lineProgress records from visitorId to userId", "checked": false},
+    {"text": "Copies userWishlist records from visitorId to userId", "checked": false},
+    {"text": "Copies userPracticeLog records from visitorId to userId", "checked": false},
+    {"text": "Copies userGoals records from visitorId to userId", "checked": false},
+    {"text": "Copies userPreferences records from visitorId to userId", "checked": false},
+    {"text": "Returns count of migrated records per table", "checked": false},
+    {"text": "Does NOT delete original visitorId records (keep as backup)", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "SEC-002",
+  "notes": "Migration mutation pattern:\n\n```typescript\nimport { mutation } from './_generated/server';\nimport { v } from 'convex/values';\nimport { requireAuth } from './authHelpers';\n\nexport const migrateAnonymousData = mutation({\n  args: { visitorId: v.string() },  // This is OK - user provides their own localStorage ID\n  handler: async (ctx, { visitorId }) => {\n    const userId = await requireAuth(ctx);  // Get authenticated user\n    \n    const results = { wordProgress: 0, userSongProgress: 0, ... };\n    \n    // Migrate wordProgress\n    const wordProgressRecords = await ctx.db\n      .query('wordProgress')\n      .withIndex('by_visitor', q => q.eq('visitorId', visitorId))\n      .collect();\n    \n    for (const record of wordProgressRecords) {\n      // Create new record with userId\n      await ctx.db.insert('wordProgress', {\n        ...record,\n        userId,\n        visitorId: undefined,  // Clear old visitorId\n      });\n      results.wordProgress++;\n    }\n    \n    // Repeat for other tables...\n    \n    return results;\n  }\n});\n```\n\nNOTE: It's OK to accept visitorId here because:\n1. User can only migrate their OWN localStorage data (they provide the ID)\n2. Data is copied TO their authenticated account (verified via ctx.auth)\n3. This doesn't expose anyone else's data"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "V-015",
+  "title": "VERIFY: No Convex function accepts spoofable user ID",
+  "description": "Code review verification - ensure NO query or mutation in convex/ accepts a user identifier (visitorId, userId, email) as an argument. All user identification must come from ctx.auth.",
+  "acceptanceCriteria": [
+    {"text": "Grep convex/*.ts for 'visitorId: v.string()' - should find ONLY migration.ts", "checked": false},
+    {"text": "Grep convex/*.ts for 'userId: v.string()' in args - should find NONE", "checked": false},
+    {"text": "Grep convex/*.ts for 'email: v.string()' in args for user lookup - should find NONE", "checked": false},
+    {"text": "Verify wordProgress.ts uses getAuthUserId/requireAuth, not args", "checked": false},
+    {"text": "Verify userSongProgress.ts uses getAuthUserId/requireAuth, not args", "checked": false},
+    {"text": "Verify lineProgress.ts uses getAuthUserId/requireAuth, not args", "checked": false},
+    {"text": "Verify userWishlist.ts uses getAuthUserId/requireAuth, not args", "checked": false},
+    {"text": "Verify userPracticeLog.ts uses getAuthUserId/requireAuth, not args", "checked": false},
+    {"text": "Verify userGoals.ts uses getAuthUserId/requireAuth, not args", "checked": false},
+    {"text": "Verify userPreferences.ts uses getAuthUserId/requireAuth, not args", "checked": false},
+    {"text": "Verify leaderboard.ts uses getAuthUserId/requireAuth, not args", "checked": false},
+    {"text": "Document findings in progress.txt", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "SEC-007",
+  "notes": "CODE REVIEW - NO BROWSER NEEDED.\n\nRun these commands to verify:\n```bash\n# Should return ONLY migration.ts (for migration flow)\ngrep -r 'visitorId: v.string()' convex/\n\n# Should return NOTHING\ngrep -r 'userId: v.string()' convex/ | grep -v 'by_user'\n\n# Check that all user data files import authHelpers\ngrep -l 'from.*authHelpers' convex/*.ts\n```\n\nEXCEPTION: migration.ts is allowed to accept visitorId because:\n1. User provides their OWN localStorage ID\n2. Data is copied TO their authenticated account\n3. ctx.auth still validates the destination user"
+}

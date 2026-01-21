@@ -1,0 +1,20 @@
+{
+  "id": "V-017",
+  "title": "VERIFY: Complete user data isolation between accounts",
+  "description": "Browser verification - test that two different users have completely separate data, even on the same browser.",
+  "acceptanceCriteria": [
+    {"text": "User A signs up and practices songs, marks words learned", "checked": false},
+    {"text": "User A logs out", "checked": false},
+    {"text": "User B signs up on SAME browser (different email)", "checked": false},
+    {"text": "User B sees EMPTY dashboard - no User A data", "checked": false},
+    {"text": "User B practices different songs, marks different words", "checked": false},
+    {"text": "User B logs out", "checked": false},
+    {"text": "User A logs back in", "checked": false},
+    {"text": "User A sees ONLY their own data - not User B's data", "checked": false},
+    {"text": "Leaderboard shows both users with their respective stats", "checked": false},
+    {"text": "Verify in Convex dashboard: data is properly separated by userId", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "SEC-011",
+  "notes": "BROWSER VERIFICATION REQUIRED - THIS IS THE CRITICAL TEST.\n\nThis verifies the security fix is complete:\n1. Before fix: Same browser = same visitorId = shared data (BUG)\n2. After fix: Each user has their own userId = isolated data (SECURE)\n\nTest emails:\n- User A: yosef.from.levant@proton.me\n- User B: another test email or use + addressing (e.g., yosef.from.levant+test2@proton.me)\n\nBefore testing:\n1. Delete both test users from Convex dashboard\n2. Clear localStorage completely\n\nThis is the same test as V-011 but with the new secure implementation."
+}
