@@ -60,3 +60,6 @@ export type { LanguageCardProps } from "./LanguageCard";
 export { AddLanguageChip } from "./AddLanguageChip";
 export { AddLanguageCard } from "./AddLanguageCard";
 export { LanguagesEmptyState } from "./LanguagesEmptyState";
+
+// Leaderboard
+export { LeaderboardMiniSection } from "./LeaderboardMiniSection";

@@ -3,16 +3,17 @@
   "title": "Create LeaderboardMiniSection dashboard component",
   "description": "Create mini leaderboard widget for dashboard. Shows top 5 users with toggle between Streak/Progress. Shows user's own rank. 'Set name to join' CTA if no displayName. Link to full leaderboard.",
   "acceptanceCriteria": [
-    {"text": "src/components/dashboard/LeaderboardMiniSection.tsx exists", "checked": false},
-    {"text": "Component exported from src/components/dashboard/index.ts", "checked": false},
-    {"text": "Shows top 5 users for selected leaderboard type", "checked": false},
-    {"text": "Toggle between Streak and Progress tabs", "checked": false},
-    {"text": "Shows medals for top 3 (gold, silver, bronze)", "checked": false},
-    {"text": "Shows current user's rank highlighted if in top 50", "checked": false},
-    {"text": "Shows 'Set display name to join' if user has no displayName", "checked": false},
-    {"text": "'View full leaderboard' link at bottom", "checked": false},
-    {"text": "Typecheck passes", "checked": false}
+    {"text": "src/components/dashboard/LeaderboardMiniSection.tsx exists", "checked": true},
+    {"text": "Component exported from src/components/dashboard/index.ts", "checked": true},
+    {"text": "Shows top 5 users for selected leaderboard type", "checked": true},
+    {"text": "Toggle between Streak and Progress tabs", "checked": true},
+    {"text": "Shows medals for top 3 (gold, silver, bronze)", "checked": true},
+    {"text": "Shows current user's rank highlighted if in top 50", "checked": true},
+    {"text": "Shows 'Set display name to join' if user has no displayName", "checked": true},
+    {"text": "'View full leaderboard' link at bottom", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
   ],
-  "passes": false,
+  "passes": true,
+  "completedAt": "2026-01-21T14:07:28Z",
   "blockedBy": ["US-040", "US-041"]
 }
