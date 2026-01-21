@@ -8,8 +8,9 @@
     {"text": "role field is removed from users table", "checked": true},
     {"text": "Any references to role field are removed from codebase", "checked": true},
     {"text": "Typecheck passes", "checked": true},
-    {"text": "Convex dev server starts without errors", "checked": false}
+    {"text": "Convex dev server starts without errors", "checked": true}
   ],
-  "passes": false,
+  "passes": true,
+  "completedAt": "2026-01-21T13:35:17Z",
   "blockedBy": null
 }

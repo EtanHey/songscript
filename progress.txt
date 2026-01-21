@@ -63,3 +63,9 @@ See iteration logs above for details.
 - Browser autoplay: video must be muted, attempt on canplay event, provide fallback "Click to play" button
 - Playwright webServer config: essential for CI - auto-start dev server before e2e tests
 - ElevenLabs: returns 401 with quota_exceeded when out of credits
+## Iteration - US-036: Schema Updates Complete
+- Fixed Convex bundler error by deleting .js files from convex/ directory
+- Verified Convex dev server starts without errors
+- All schema changes (displayName, createdAt, role removal) were already completed
+- Typecheck passes successfully
+---
