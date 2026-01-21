@@ -4,12 +4,12 @@
   "projectName": "SongScript Leaderboard Feature",
   "workingDirectory": ".",
   "stats": {
-    "total": 24,
-    "completed": 21,
+    "total": 34,
+    "completed": 22,
     "pending": 2,
-    "blocked": 0
+    "blocked": 9
   },
-  "nextStory": "V-010",
+  "nextStory": "V-012",
   "storyOrder": [
     "US-036",
     "V-003",
@@ -34,12 +34,33 @@
     "US-048",
     "US-049",
     "V-010",
-    "US-050"
+    "US-050",
+    "V-012",
+    "V-013",
+    "BUG-016",
+    "BUG-017",
+    "BUG-018",
+    "BUG-019",
+    "BUG-020",
+    "BUG-021",
+    "BUG-022",
+    "V-011"
   ],
   "pending": [
-    "V-010"
+    "V-012",
+    "V-013"
   ],
-  "blocked": [],
+  "blocked": [
+    "US-050",
+    "BUG-016",
+    "BUG-017",
+    "BUG-018",
+    "BUG-019",
+    "BUG-020",
+    "BUG-021",
+    "BUG-022",
+    "V-011"
+  ],
   "browserSetup": {
     "viewport": "desktop 1200px+",
     "homeUrl": "http://localhost:3001",
