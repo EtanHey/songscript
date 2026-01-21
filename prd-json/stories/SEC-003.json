@@ -14,6 +14,6 @@
     {"text": "Typecheck passes", "checked": false}
   ],
   "passes": false,
-  "blockedBy": "SEC-001",
+  "blockedBy": null,
   "notes": "BEFORE (INSECURE - visitorId can be spoofed):\n```typescript\nexport const getByVisitor = query({\n  args: { visitorId: v.string() },  // ATTACKER CAN SEND ANY VALUE\n  handler: async (ctx, { visitorId }) => {\n    return ctx.db.query('wordProgress')\n      .withIndex('by_visitor', q => q.eq('visitorId', visitorId))\n      .collect();\n  }\n});\n```\n\nAFTER (SECURE - ctx.auth cannot be spoofed):\n```typescript\nimport { getAuthUserId } from './authHelpers';\n\nexport const getByUser = query({\n  args: {},  // NO USER ID ARGUMENT!\n  handler: async (ctx) => {\n    const userId = await getAuthUserId(ctx);\n    if (!userId) return [];  // Not logged in = no data\n    return ctx.db.query('wordProgress')\n      .withIndex('by_user', q => q.eq('userId', userId))\n      .collect();\n  }\n});\n```\n\nFor mutations that REQUIRE auth, use requireAuth() which throws if not authenticated."
 }
