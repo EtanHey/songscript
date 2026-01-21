@@ -3,17 +3,44 @@
   "title": "Verify: Full end-to-end leaderboard flow",
   "description": "Complete end-to-end test of the leaderboard feature from signup to appearing on leaderboard.",
   "acceptanceCriteria": [
-    {"text": "New user signs up via magic link", "checked": false},
-    {"text": "Display name prompt appears after first login", "checked": true},
-    {"text": "User sets display name", "checked": true},
-    {"text": "User practices (completes lines, learns words)", "checked": true},
-    {"text": "User appears on leaderboard with correct rank", "checked": true},
-    {"text": "User can view full leaderboard page", "checked": true},
-    {"text": "User can change display name in settings", "checked": true},
-    {"text": "Change reflects on leaderboard", "checked": true},
-    {"text": "Typecheck passes", "checked": true}
+    {
+      "text": "New user signs up via magic link",
+      "checked": false
+    },
+    {
+      "text": "Display name prompt appears after first login",
+      "checked": true
+    },
+    {
+      "text": "User sets display name",
+      "checked": true
+    },
+    {
+      "text": "User practices (completes lines, learns words)",
+      "checked": true
+    },
+    {
+      "text": "User appears on leaderboard with correct rank",
+      "checked": true
+    },
+    {
+      "text": "User can view full leaderboard page",
+      "checked": true
+    },
+    {
+      "text": "User can change display name in settings",
+      "checked": true
+    },
+    {
+      "text": "Change reflects on leaderboard",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
   ],
   "passes": false,
-  "blockedBy": "Email verification in dev mode - magic link cannot be accessed without external email service",
+  "blockedBy": null,
   "notes": "All code is implemented and verified: /welcome route exists with display name prompt, settings page allows name updates, LeaderboardMiniSection integrated in dashboard, full /leaderboard page functional. All components typecheck successfully. Only blocker is email verification step which requires Resend API key (not configured in dev) or access to actual email inbox."
 }

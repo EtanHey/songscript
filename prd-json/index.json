@@ -7,9 +7,9 @@
     "total": 23,
     "completed": 20,
     "pending": 2,
-    "blocked": 2
+    "blocked": 0
   },
-  "nextStory": null,
+  "nextStory": "V-009",
   "storyOrder": [
     "US-036",
     "V-003",
@@ -39,10 +39,7 @@
     "V-009",
     "V-010"
   ],
-  "blocked": [
-    "V-009",
-    "V-010"
-  ],
+  "blocked": [],
   "browserSetup": {
     "viewport": "desktop 1200px+",
     "homeUrl": "http://localhost:3001",

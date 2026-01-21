@@ -307,3 +307,23 @@ The only remaining work is end-to-end browser verification of the signup flow, w
 
 Both V-009 and V-010 cannot proceed without resolving this email verification blocker.
 ---
+
+---
+
+## BROWSER VERIFICATION CONTEXT
+
+For V-009 and V-010 verification stories:
+- Proton Mail tab is OPEN at: yosef.from.levant@proton.me
+- Use mcp__claude-in-chrome tools to interact with browser
+- Login page is updated (no admin restriction)
+- Email: yosef.from.levant@proton.me for new user signup test
+
+Steps for V-009/V-010:
+1. Go to login page, enter email, click Send Magic Link
+2. Switch to Proton Mail tab, find the magic link email
+3. Click the magic link to complete login
+4. Check if display name prompt appears
+5. Set display name
+6. Verify user appears on leaderboard
+
+---
