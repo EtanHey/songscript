@@ -1,17 +1,17 @@
 {
   "id": "AUDIT-001",
-  "title": "Audit: Find localStorage keys that leak between users",
-  "description": "Use critique-waves technique to audit localStorage/sessionStorage usage for user data leaks.",
+  "title": "Audit: localStorage leaks and unintentional usage",
+  "description": "Use critique-waves to audit ALL localStorage/sessionStorage usage. Ensure nothing saves or reads from localStorage unless intentional and documented.",
   "acceptanceCriteria": [
     {"text": "Create docs.local/feature-dashboard-real-numbers/ folder", "checked": false},
-    {"text": "Create instructions.md with FORBIDDEN/REQUIRED patterns for localStorage", "checked": false},
+    {"text": "Create instructions.md with FORBIDDEN/REQUIRED patterns", "checked": false},
     {"text": "Create tracker.md with goal of 6 consecutive passes", "checked": false},
-    {"text": "Run waves of 3 parallel agents checking: (1) src/ localStorage, (2) src/ sessionStorage, (3) logout handlers", "checked": false},
+    {"text": "Run waves of 3 parallel agents checking: (1) all localStorage usage, (2) all sessionStorage usage, (3) logout/auth handlers", "checked": false},
     {"text": "Each agent writes to round-N-agent-X.md", "checked": false},
     {"text": "Continue until 6 consecutive passes or issues found", "checked": false},
     {"text": "Document all findings in tracker.md", "checked": false}
   ],
   "passes": false,
   "blockedBy": null,
-  "notes": "CODE REVIEW ONLY - NO BROWSER. Use critique-waves technique: 3 agents max parallel, write to separate MD files, track consecutive passes. FORBIDDEN: localStorage keys without user scoping. REQUIRED: logout clears user-specific data. Known keys: songscript_visitor_id, songscript_welcome_shown."
+  "notes": "CODE REVIEW ONLY - NO BROWSER. FORBIDDEN: any localStorage.setItem/getItem not in useVisitorId.ts or explicitly approved list. REQUIRED: all localStorage keys documented, logout clears user data. ALLOWED keys: songscript_visitor_id, songscript_welcome_shown. Any other key = FAIL."
 }
