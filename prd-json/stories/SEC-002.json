@@ -3,18 +3,19 @@
   "title": "Update Convex schema - add userId field to all user data tables",
   "description": "Add userId field (Better Auth user ID) to all 7 user data tables. Keep visitorId temporarily for migration. Add by_user indexes.",
   "acceptanceCriteria": [
-    {"text": "Add optional userId field to wordProgress table", "checked": false},
-    {"text": "Add optional userId field to userSongProgress table", "checked": false},
-    {"text": "Add optional userId field to lineProgress table", "checked": false},
-    {"text": "Add optional userId field to userWishlist table", "checked": false},
-    {"text": "Add optional userId field to userPracticeLog table", "checked": false},
-    {"text": "Add optional userId field to userGoals table", "checked": false},
-    {"text": "Add optional userId field to userPreferences table", "checked": false},
-    {"text": "Add by_user index to each table (userId)", "checked": false},
-    {"text": "Run npx convex dev to push schema", "checked": false},
-    {"text": "Typecheck passes", "checked": false}
+    {"text": "Add optional userId field to wordProgress table", "checked": true},
+    {"text": "Add optional userId field to userSongProgress table", "checked": true},
+    {"text": "Add optional userId field to lineProgress table", "checked": true},
+    {"text": "Add optional userId field to userWishlist table", "checked": true},
+    {"text": "Add optional userId field to userPracticeLog table", "checked": true},
+    {"text": "Add optional userId field to userGoals table", "checked": true},
+    {"text": "Add optional userId field to userPreferences table", "checked": true},
+    {"text": "Add by_user index to each table (userId)", "checked": true},
+    {"text": "Run npx convex dev to push schema", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
   ],
-  "passes": false,
+  "passes": true,
+  "completedAt": "2026-01-21T23:59:30Z",
   "blockedBy": null,
   "notes": "Schema pattern for each table:\n\n```typescript\nwordProgress: defineTable({\n  visitorId: v.string(),  // KEEP for migration\n  userId: v.optional(v.string()),  // ADD - Better Auth user ID\n  // ... other fields\n})\n  .index('by_visitor', ['visitorId'])  // KEEP for migration\n  .index('by_user', ['userId'])  // ADD for secure queries\n```\n\nThe userId field is the _id from Better Auth's user table, obtained via authComponent.safeGetAuthUser(ctx)._id\n\nDO NOT remove visitorId yet - needed for migration in SEC-009.\n\nIMPORTANT: Before running convex dev, delete any .js files: rm -f convex/*.js"
 }

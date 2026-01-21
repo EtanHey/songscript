@@ -8,5 +8,12 @@
 Learnings for next iteration:
 - The email template is now much more professional and user-friendly. This pattern can be reused for other emails.
 ---
-SEC-002 BLOCKED: Convex dev command failed with 'Two output files share the same path but have different contents' error.
-SEC-003 BLOCKED: Depends on SEC-002, which is currently blocked.
+## Iteration - SEC-002
+- Completed story SEC-002: Update Convex schema - add userId field to all user data tables.
+- Added optional `userId` field and `by_user` index to 7 tables: `wordProgress`, `userSongProgress`, `lineProgress`, `userWishlist`, `userPracticeLog`, `userGoals`, and `userPreferences`.
+- Resolved a previous blocker by deleting stray `.js` files in the `convex/` directory before running `npx convex dev`.
+- Successfully pushed the schema changes and verified with `typecheck`.
+- Updated the PRD to reflect the completion of the story.
+
+Learnings for next iteration:
+- Always ensure the `convex/` directory is clean of compiled `.js` files when running `convex dev` if TypeScript is the source of truth, as stray `.js` files can cause conflicts.

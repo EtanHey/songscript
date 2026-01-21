@@ -54,6 +54,7 @@ export default defineSchema({
   // Learning state is keyed by persian text so repeated words (e.g., "برای") sync across all instances
   wordProgress: defineTable({
     visitorId: v.string(), // localStorage-generated ID if no auth
+    userId: v.optional(v.string()), // Better Auth user ID
     wordId: v.id("words"), // Reference to a specific word instance (for view/play counts)
     persian: v.optional(v.string()), // The actual word text - used for syncing learned state across instances
     viewCount: v.number(),
@@ -62,6 +63,7 @@ export default defineSchema({
     lastSeen: v.number(),
   })
     .index("by_visitor", ["visitorId"])
+    .index("by_user", ["userId"])
     .index("by_visitor_word", ["visitorId", "wordId"])
     .index("by_visitor_persian", ["visitorId", "persian"]),
 
@@ -69,50 +71,59 @@ export default defineSchema({
   // Records which lines have been practiced/completed in each song
   userSongProgress: defineTable({
     visitorId: v.string(), // localStorage-generated ID if no auth
+    userId: v.optional(v.string()), // Better Auth user ID
     songId: v.id("songs"),
     linesCompleted: v.array(v.number()), // Array of line numbers that have been practiced
     lastPracticed: v.number(), // Timestamp of last practice
     lastLineIndex: v.optional(v.number()), // Last line index the user was on (for "continue where you left off")
   })
     .index("by_visitor", ["visitorId"])
+    .index("by_user", ["userId"])
     .index("by_visitor_song", ["visitorId", "songId"]),
 
   // Track which lines users have explicitly marked as "learned"
   // Separate from linesCompleted which tracks practice - this is for mastery
   lineProgress: defineTable({
     visitorId: v.string(), // localStorage-generated ID if no auth
+    userId: v.optional(v.string()), // Better Auth user ID
     songId: v.id("songs"),
     lineNumber: v.number(),
     learned: v.boolean(), // Whether this line is marked as learned
   })
     .index("by_visitor", ["visitorId"])
+    .index("by_user", ["userId"])
     .index("by_visitor_song", ["visitorId", "songId"])
     .index("by_visitor_song_line", ["visitorId", "songId", "lineNumber"]),
 
   // User's learning queue / wishlist of songs to learn later
   userWishlist: defineTable({
     visitorId: v.string(), // localStorage-generated ID if no auth
+    userId: v.optional(v.string()), // Better Auth user ID
     songId: v.id("songs"),
     addedAt: v.number(), // Timestamp when added
     sortOrder: v.number(), // User's custom order (lower = higher priority)
   })
     .index("by_visitor", ["visitorId"])
+    .index("by_user", ["userId"])
     .index("by_visitor_song", ["visitorId", "songId"]),
 
   // Daily practice log for streak tracking and heatmap
   userPracticeLog: defineTable({
     visitorId: v.string(), // localStorage-generated ID if no auth
+    userId: v.optional(v.string()), // Better Auth user ID
     date: v.string(), // YYYY-MM-DD format
     practiceCount: v.number(), // Number of practice sessions that day
     totalSeconds: v.number(), // Total practice time in seconds
     totalPoints: v.optional(v.number()), // Total weighted practice points earned
   })
     .index("by_visitor", ["visitorId"])
+    .index("by_user", ["userId"])
     .index("by_visitor_date", ["visitorId", "date"]),
 
   // User learning goals (daily/weekly targets)
   userGoals: defineTable({
     visitorId: v.string(), // localStorage-generated ID if no auth
+    userId: v.optional(v.string()), // Better Auth user ID
     goalType: v.string(), // "words" | "time" | "lines" | "songs"
     period: v.string(), // "daily" | "weekly"
     targetValue: v.number(), // Target number to achieve
@@ -121,18 +132,21 @@ export default defineSchema({
     updatedAt: v.number(), // Timestamp when last updated
   })
     .index("by_visitor", ["visitorId"])
+    .index("by_user", ["userId"])
     .index("by_visitor_type_period", ["visitorId", "goalType", "period"]),
 
   // User preferences for playback and UI settings
   userPreferences: defineTable({
     visitorId: v.string(), // localStorage-generated ID if no auth
+    userId: v.optional(v.string()), // Better Auth user ID
     playbackSpeed: v.number(), // Playback speed multiplier (0.5, 1.0, 1.5, 2.0)
     languageFilter: v.string(), // Language preference for display
     playbackMode: v.string(), // "auto" | "manual" | "loop"
     videoMuted: v.boolean(), // Whether video should be muted by default
     videoCollapsed: v.boolean(), // Whether video should be collapsed by default
   })
-    .index("by_visitor", ["visitorId"]),
+    .index("by_visitor", ["visitorId"])
+    .index("by_user", ["userId"]),
 
   // Transcription jobs for WhisperX pipeline
   transcriptionJobs: defineTable({
