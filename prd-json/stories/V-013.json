@@ -1,0 +1,16 @@
+{
+  "id": "V-013",
+  "title": "Audit: Find mismatches between visitorId and email usage",
+  "description": "Search for places where code assumes visitorId equals email, or where the wrong identifier is used for user lookups.",
+  "acceptanceCriteria": [
+    {"text": "Grep convex/ for queries using visitorId to look up by email field", "checked": false},
+    {"text": "Grep convex/ for queries using email to look up by visitorId field", "checked": false},
+    {"text": "Check all .filter() calls that compare email and visitorId", "checked": false},
+    {"text": "Identify any mutations that create records with wrong ID type", "checked": false},
+    {"text": "Check TanStack Query cache keys for user-specific data", "checked": false},
+    {"text": "Document all mismatches found in progress.txt", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": null,
+  "notes": "Known issue: leaderboard.ts uses user.email as visitorId but practice data uses localStorage UUID. Find similar patterns."
+}

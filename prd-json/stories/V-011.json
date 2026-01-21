@@ -1,0 +1,18 @@
+{
+  "id": "V-011",
+  "title": "Verify: User data isolation works correctly",
+  "description": "Verify that two different authenticated users have completely separate data. REQUIRES BROWSER - only Claude can verify.",
+  "acceptanceCriteria": [
+    {"text": "User A logs in and practices a song - data saved", "checked": false},
+    {"text": "User A logs out", "checked": false},
+    {"text": "User B logs in from same browser", "checked": false},
+    {"text": "User B sees EMPTY dashboard (no User A data)", "checked": false},
+    {"text": "User B practices - their own data saved", "checked": false},
+    {"text": "User A logs back in - sees only their data", "checked": false},
+    {"text": "Leaderboard shows both users with separate stats", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "BUG-022",
+  "notes": "This is the critical verification that user data isolation works. Use two different emails to test."
+}

@@ -1,0 +1,19 @@
+{
+  "id": "BUG-022",
+  "title": "Replace useVisitorId with useAuthenticatedId in all remaining components",
+  "description": "Update all remaining components that use useVisitorId to use useAuthenticatedId.",
+  "acceptanceCriteria": [
+    {"text": "Update Header.tsx if it uses useVisitorId", "checked": false},
+    {"text": "Update LeaderboardMiniSection.tsx", "checked": false},
+    {"text": "Update WordDetailsModal.tsx", "checked": false},
+    {"text": "Update WordInfoModal.tsx", "checked": false},
+    {"text": "Update WishlistButton.tsx", "checked": false},
+    {"text": "Update LyricsDisplay.tsx", "checked": false},
+    {"text": "Update GoalCard.tsx", "checked": false},
+    {"text": "Grep for any remaining useVisitorId imports - should find NONE in _authed routes/components", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "BUG-016",
+  "notes": "Search: grep -r 'useVisitorId' src/ to find all usages. Only non-auth pages should still use it."
+}

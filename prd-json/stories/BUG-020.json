@@ -1,0 +1,13 @@
+{
+  "id": "BUG-020",
+  "title": "Replace useVisitorId with useAuthenticatedId in song page",
+  "description": "Update song practice page to use the new useAuthenticatedId hook so practice data is properly tracked per user.",
+  "acceptanceCriteria": [
+    {"text": "Import useAuthenticatedId instead of useVisitorId", "checked": false},
+    {"text": "Replace all visitorId usages with authenticatedId", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "BUG-016",
+  "notes": "File: src/routes/song.$songId.tsx - this is where practice data is recorded"
+}

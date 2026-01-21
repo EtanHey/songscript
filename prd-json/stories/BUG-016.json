@@ -1,0 +1,16 @@
+{
+  "id": "BUG-016",
+  "title": "Create useAuthenticatedId hook to replace useVisitorId for auth users",
+  "description": "Create a new hook that returns session.user.email when authenticated, falling back to localStorage visitorId only for anonymous users. This is the foundation fix for user data isolation.",
+  "acceptanceCriteria": [
+    {"text": "Create src/hooks/useAuthenticatedId.ts hook", "checked": false},
+    {"text": "Hook returns session.user.email when authenticated", "checked": false},
+    {"text": "Hook returns localStorage visitorId when NOT authenticated", "checked": false},
+    {"text": "Hook handles loading state (returns empty string while loading)", "checked": false},
+    {"text": "Export hook from hooks index if exists", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "V-013",
+  "notes": "Use authClient.useSession() to get auth state. Return session?.user?.email || visitorId. This hook will replace useVisitorId() throughout the app."
+}
