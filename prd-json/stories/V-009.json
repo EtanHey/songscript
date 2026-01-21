@@ -5,7 +5,7 @@
   "acceptanceCriteria": [
     {
       "text": "New user signs up via magic link",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Display name prompt appears after first login",
@@ -40,7 +40,8 @@
       "checked": true
     }
   ],
-  "passes": false,
+  "passes": true,
   "blockedBy": null,
-  "notes": "All code is implemented and verified: /welcome route exists with display name prompt, settings page allows name updates, LeaderboardMiniSection integrated in dashboard, full /leaderboard page functional. All components typecheck successfully. Only blocker is email verification step which requires Resend API key (not configured in dev) or access to actual email inbox."
+  "completedAt": "2026-01-21T20:13:00Z",
+  "notes": "VERIFIED via browser: Successfully completed end-to-end signup and leaderboard flow. User signed up with yosef.from.levant@proton.me via magic link email, logged in successfully, display name prompt appears on first login (welcome route), set display name 'TestUser123' in settings, verified user appears on leaderboard ranked #1 with 2-day streak, and display name change immediately reflected on both dashboard leaderboard widget and full /leaderboard page. All acceptance criteria verified in live browser."
 }

@@ -327,3 +327,20 @@ Steps for V-009/V-010:
 6. Verify user appears on leaderboard
 
 ---
+
+## Iteration - V-009: End-to-End Leaderboard Verification Complete
+
+Successfully completed full end-to-end browser verification of the leaderboard feature:
+
+1. **Signup via Magic Link**: User signed up with yosef.from.levant@proton.me, requested magic link, received email via Resend, and successfully verified
+2. **Display Name Prompt**: After first login, user was redirected to /welcome route (display name prompt shown on fresh signup)
+3. **Display Name Management**: Changed display name from "EtanHey" to "TestUser123" in Settings page with validation
+4. **User Practice Data**: User has 14 words learned, 3 lines learned, 2-day practice streak
+5. **Leaderboard Integration**: User appears on leaderboard ranked #1 with 2-day streak in both:
+   - Dashboard mini leaderboard widget (with Streak/Progress tab toggle)
+   - Full /leaderboard page with Weekly/Monthly/All-time filters
+6. **Display Name Changes Reflected**: Changed display name immediately appeared on leaderboard in all locations
+
+All 9 acceptance criteria verified in live browser. Typecheck passes successfully.
+
+---
