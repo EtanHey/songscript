@@ -93,3 +93,16 @@ Learnings for next iteration:
 - Browser verification requires an unauthenticated state; clearing cookies/localStorage via 'eval' is effective.
 - Maintaining global tools like 'brave-manager.js' might be necessary if they contain bugs.
 ---
+
+## Iteration - SEC-009
+- Completed story SEC-009: Create migration mutation to copy anonymous data to user account.
+- Created 'convex/migration.ts' with 'migrateAnonymousData' mutation.
+- Implemented data copying for 7 tables: wordProgress, userSongProgress, lineProgress, userWishlist, userPracticeLog, userGoals, and userPreferences.
+- Added basic deduplication to avoid overwriting existing data for authenticated users.
+- Returns counts of migrated records per table.
+- Verified with 'npm run typecheck'.
+
+Learnings for next iteration:
+- Migrating multiple tables at once requires careful handling of table-specific logic and indexes for deduplication.
+- Using a placeholder like 'migrated' for 'visitorId' in the new records helps keep the data separate from active anonymous sessions while maintaining schema requirements.
+---
