@@ -1,15 +1,15 @@
 {
   "$schema": "https://ralph.dev/schemas/prd-index.schema.json",
-  "generatedAt": "2026-01-21T20:45:00Z",
+  "generatedAt": "2026-01-21T21:00:00Z",
   "projectName": "SongScript Auth Security Fix",
   "workingDirectory": ".",
   "stats": {
     "total": 41,
-    "completed": 23,
-    "pending": 17,
+    "completed": 25,
+    "pending": 15,
     "blocked": 1
   },
-  "nextStory": "AUDIT-003",
+  "nextStory": "SEC-002",
   "storyOrder": [
     "US-036",
     "V-003",
@@ -54,8 +54,6 @@
     "V-017"
   ],
   "pending": [
-    "AUDIT-003",
-    "SEC-001",
     "SEC-002",
     "SEC-003",
     "SEC-004",
