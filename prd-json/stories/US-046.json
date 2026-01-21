@@ -10,6 +10,5 @@
     {"text": "Typecheck passes", "checked": false},
     {"text": "Verify in browser: header shows correct name and dropdown works", "checked": false}
   ],
-  "passes": false,
-  "blockedBy": "US-042"
+  "passes": false
 }

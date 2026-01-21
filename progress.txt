@@ -176,3 +176,23 @@ See iteration logs above for details.
 - Typecheck passes successfully
 - Verified page loads correctly in browser (shows auth loading state as expected for protected route)
 ---
+
+## Iteration - BUG-015: Settings Email Fix Complete
+- Fixed Settings page to show actual user email instead of visitorId (UUID)
+- Changed email field from userInfo?.email to session?.user?.email from authClient.useSession()
+- Email field now properly displays the authenticated user's email address
+- Typecheck passes successfully
+- Settings page email display bug resolved
+---
+
+## Iteration - V-008: Full Leaderboard Page Verification Complete
+- Verified /leaderboard page loads correctly (shows auth loading state as expected)
+- Confirmed Streak tab functionality with user sorting by streak days
+- Confirmed Progress tab functionality with weighted score sorting
+- Verified Weekly/Monthly/All-time period filters are implemented
+- Confirmed pagination with Previous/Next buttons for loading more users
+- Verified current user's row highlighting with star (⭐) when in top 50
+- Confirmed responsive mobile layout with proper container and spacing
+- Typecheck passes successfully
+- Full leaderboard page verification complete
+---

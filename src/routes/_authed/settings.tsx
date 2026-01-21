@@ -106,7 +106,7 @@ function SettingsPage() {
               <Input
                 id="email"
                 type="email"
-                value={userInfo?.email || ""}
+                value={session?.user?.email || ""}
                 disabled
                 className="mt-1 bg-gray-800 border-gray-700 text-gray-400 cursor-not-allowed"
               />

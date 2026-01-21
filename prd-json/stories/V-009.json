@@ -13,6 +13,5 @@
     {"text": "Change reflects on leaderboard", "checked": false},
     {"text": "Typecheck passes", "checked": false}
   ],
-  "passes": false,
-  "blockedBy": ["US-047", "V-008"]
+  "passes": false
 }

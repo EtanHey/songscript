@@ -12,6 +12,5 @@
     {"text": "Typecheck passes", "checked": false},
     {"text": "Verify in browser: new user sees prompt after magic link login", "checked": false}
   ],
-  "passes": false,
-  "blockedBy": "US-041"
+  "passes": false
 }
