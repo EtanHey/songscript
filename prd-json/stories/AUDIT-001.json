@@ -1,5 +1,5 @@
 {
-  "id": "V-012",
+  "id": "AUDIT-001",
   "title": "Audit: Find localStorage keys that leak between users",
   "description": "Search codebase for localStorage/sessionStorage usage that could cause data to persist or leak between different authenticated users on the same browser.",
   "acceptanceCriteria": [
@@ -12,5 +12,5 @@
   ],
   "passes": false,
   "blockedBy": null,
-  "notes": "CODE REVIEW ONLY - DO NOT USE BROWSER. Use grep/read tools only. Known keys: songscript_visitor_id, songscript_welcome_shown. Look for any others that could leak user data."
+  "notes": "CODE REVIEW ONLY - DO NOT USE BROWSER. Spawn 3 parallel Explore subagents using Task tool: (1) search src/ for localStorage, (2) search src/ for sessionStorage, (3) search for logout/signout handlers. Combine findings in progress.txt."
 }

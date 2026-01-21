@@ -11,6 +11,6 @@
     {"text": "Typecheck passes", "checked": false}
   ],
   "passes": false,
-  "blockedBy": "V-013",
+  "blockedBy": "AUDIT-002",
   "notes": "Use authClient.useSession() to get auth state. Return session?.user?.email || visitorId. This hook will replace useVisitorId() throughout the app."
 }

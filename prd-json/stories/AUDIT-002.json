@@ -1,5 +1,5 @@
 {
-  "id": "V-013",
+  "id": "AUDIT-002",
   "title": "Audit: Find mismatches between visitorId and email usage",
   "description": "Search for places where code assumes visitorId equals email, or where the wrong identifier is used for user lookups.",
   "acceptanceCriteria": [
@@ -12,5 +12,5 @@
   ],
   "passes": false,
   "blockedBy": null,
-  "notes": "CODE REVIEW ONLY - DO NOT USE BROWSER. Use grep/read tools only. Known issue: leaderboard.ts uses user.email as visitorId but practice data uses localStorage UUID. Find similar patterns."
+  "notes": "CODE REVIEW ONLY - DO NOT USE BROWSER. Spawn 3 parallel Explore subagents using Task tool: (1) search convex/ for visitorId+email patterns, (2) search src/ for useVisitorId usage, (3) search for query cache keys. Combine findings in progress.txt."
 }

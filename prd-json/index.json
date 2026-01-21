@@ -6,10 +6,10 @@
   "stats": {
     "total": 34,
     "completed": 22,
-    "pending": 2,
-    "blocked": 9
+    "pending": 3,
+    "blocked": 8
   },
-  "nextStory": "V-012",
+  "nextStory": "AUDIT-001",
   "storyOrder": [
     "US-036",
     "V-003",
@@ -35,8 +35,8 @@
     "US-049",
     "V-010",
     "US-050",
-    "V-012",
-    "V-013",
+    "AUDIT-001",
+    "AUDIT-002",
     "BUG-016",
     "BUG-017",
     "BUG-018",
@@ -47,11 +47,11 @@
     "V-011"
   ],
   "pending": [
-    "V-012",
-    "V-013"
+    "AUDIT-001",
+    "AUDIT-002",
+    "US-050"
   ],
   "blocked": [
-    "US-050",
     "BUG-016",
     "BUG-017",
     "BUG-018",
