@@ -12,5 +12,5 @@
   ],
   "passes": false,
   "blockedBy": null,
-  "notes": "Known issue: leaderboard.ts uses user.email as visitorId but practice data uses localStorage UUID. Find similar patterns."
+  "notes": "CODE REVIEW ONLY - DO NOT USE BROWSER. Use grep/read tools only. Known issue: leaderboard.ts uses user.email as visitorId but practice data uses localStorage UUID. Find similar patterns."
 }

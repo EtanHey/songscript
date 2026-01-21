@@ -12,5 +12,5 @@
   ],
   "passes": false,
   "blockedBy": null,
-  "notes": "Known keys: songscript_visitor_id, songscript_welcome_shown. Look for any others that could leak user data."
+  "notes": "CODE REVIEW ONLY - DO NOT USE BROWSER. Use grep/read tools only. Known keys: songscript_visitor_id, songscript_welcome_shown. Look for any others that could leak user data."
 }
