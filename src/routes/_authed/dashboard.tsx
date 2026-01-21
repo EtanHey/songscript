@@ -57,9 +57,7 @@ function DashboardPage() {
 
   // Get vocabulary grouped by language
   const { data: vocabulary, isLoading: vocabLoading } = useQuery(
-    convexQuery(api.wordProgress.getVocabularyByLanguage, {
-      visitorId: visitorId || "",
-    })
+    convexQuery(api.wordProgress.getVocabularyByLanguage, {})
   );
 
   // Get wishlist / learning queue

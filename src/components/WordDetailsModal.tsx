@@ -3,7 +3,6 @@ import { Volume2, Loader2, Music, ExternalLink } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@convex/_generated/api";
-import { useVisitorId } from "../hooks/useVisitorId";
 import { playWordAudio, stopWordAudio } from "../utils/wordAudio";
 import { Link } from "@tanstack/react-router";
 import { LanguageFlag } from "./LanguageFlag";
@@ -53,8 +52,6 @@ export default function WordDetailsModal({
   persian,
   isMobile,
 }: WordDetailsModalProps) {
-  const visitorId = useVisitorId();
-
   // Audio playback state
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,10 +67,9 @@ export default function WordDetailsModal({
   // Fetch practice history
   const { data: practiceHistory, isLoading: historyLoading } = useQuery({
     ...convexQuery(api.wordProgress.getWordPracticeHistory, {
-      visitorId: visitorId || "",
       persian: persian || "",
     }),
-    enabled: !!persian && !!visitorId && isOpen,
+    enabled: !!persian && isOpen,
   });
 
   // Stop audio when modal closes

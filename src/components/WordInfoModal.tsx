@@ -313,9 +313,9 @@ export default function WordInfoModal({
   // Fetch word progress by persian text (syncs across repeated words)
   const persians = words?.map((w) => w.persian) ?? [];
   const progressData = useQuery(
-    api.wordProgress.getByVisitorPersians,
-    visitorId && persians.length > 0
-      ? { visitorId, persians }
+    api.wordProgress.getByUserPersians,
+    persians.length > 0
+      ? { persians }
       : "skip"
   );
 
@@ -389,13 +389,13 @@ export default function WordInfoModal({
 
   // Track view counts when modal opens
   useEffect(() => {
-    if (isOpen && words && visitorId) {
+    if (isOpen && words) {
       // Increment view count for each word in the line
       words.forEach((word) => {
-        incrementViewCount({ visitorId, wordId: word._id, persian: word.persian });
+        incrementViewCount({ wordId: word._id, persian: word.persian });
       });
     }
-  }, [isOpen, words, visitorId, incrementViewCount]);
+  }, [isOpen, words, incrementViewCount]);
 
   // Play word pronunciation and track play count
   const handlePlayWord = useCallback(
@@ -411,9 +411,8 @@ export default function WordInfoModal({
         if (result.success) {
           setPlayingWord(word.persian);
           // Track play count
-          if (visitorId) {
-            incrementPlayCount({ visitorId, wordId: word._id, persian: word.persian });
-          }
+          incrementPlayCount({ wordId: word._id, persian: word.persian });
+          
           // Clear playing state after a short delay (audio is typically short)
           setTimeout(() => {
             setPlayingWord((current) =>
@@ -439,9 +438,9 @@ export default function WordInfoModal({
       if (onToggleLearned) {
         // Use the provided callback from parent (for practice tracking)
         onToggleLearned(wordId, persian);
-      } else if (visitorId) {
+      } else {
         // Fallback to local implementation
-        const newLearned = await toggleLearned({ visitorId, wordId, persian });
+        const newLearned = await toggleLearned({ wordId, persian });
         // Update local state optimistically - keyed by persian for sync
         setWordProgressMap((prev) => {
           const newMap = new Map(prev);
@@ -453,7 +452,7 @@ export default function WordInfoModal({
             newMap.set(persian, {
               _id: "temp" as Id<"wordProgress">,
               _creationTime: Date.now(),
-              visitorId,
+              visitorId: "authenticated",
               wordId,
               persian,
               viewCount: 0,
@@ -466,7 +465,7 @@ export default function WordInfoModal({
         });
       }
     },
-    [onToggleLearned, visitorId, toggleLearned]
+    [onToggleLearned, toggleLearned]
   );
 
   if (!line) return null;

@@ -17,3 +17,15 @@ Learnings for next iteration:
 
 Learnings for next iteration:
 - Always ensure the `convex/` directory is clean of compiled `.js` files when running `convex dev` if TypeScript is the source of truth, as stray `.js` files can cause conflicts.
+## Iteration - SEC-003
+- Completed story SEC-003: Secure wordProgress.ts - use ctx.auth, no visitorId argument.
+- Rewrote all queries and mutations in `convex/wordProgress.ts` to use authenticated user identity from `ctx.auth`.
+- Removed `visitorId` as an argument from all relevant functions, adhering to the security pattern of not trusting client-provided user IDs.
+- Updated frontend components (`WordDetailsModal`, `WordInfoModal`, `dashboard.tsx`, `song.$songId.tsx`) to use the new secure API and removed unused `visitorId` dependencies.
+- Verified changes with a full project typecheck.
+- Updated the PRD state to reflect completion.
+
+Learnings for next iteration:
+- Securing the API requires simultaneous updates to frontend callers to avoid type errors and broken functionality. 
+- Using `.filter()` on indexed `userId` queries is a viable first step for security, but composite indexes (`userId`, `persian`) should be considered for better performance as the dataset grows.
+---

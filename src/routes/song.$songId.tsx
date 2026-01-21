@@ -502,13 +502,11 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
   // Handle word learned toggle
   const handleToggleWordLearned = useCallback((wordId: Id<"words">, persian: string) => {
-    if (visitorId) {
-      toggleWordLearnedMutation({ visitorId, wordId, persian }).then((newLearnedState) => {
-        if (newLearnedState) {
-          logPracticeMutation({ visitorId, eventType: "word_learned", value: 1 });
-        }
-      });
-    }
+    toggleWordLearnedMutation({ wordId, persian }).then((newLearnedState) => {
+      if (newLearnedState && visitorId) {
+        logPracticeMutation({ visitorId, eventType: "word_learned", value: 1 });
+      }
+    });
   }, [toggleWordLearnedMutation, logPracticeMutation, visitorId]);
 
   // Spacebar for pause/play

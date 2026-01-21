@@ -4,16 +4,18 @@
   "description": "Rewrite wordProgress.ts queries and mutations to use ctx.auth instead of accepting visitorId as argument. This is the template for all other files.",
   "acceptanceCriteria": [
     {"text": "Import getAuthUserId, requireAuth from authHelpers", "checked": true},
-    {"text": "Remove visitorId from ALL query/mutation args", "checked": false},
-    {"text": "getByUser query uses getAuthUserId(ctx) internally", "checked": false},
-    {"text": "incrementViewCount uses requireAuth(ctx)", "checked": false},
-    {"text": "incrementPlayCount uses requireAuth(ctx)", "checked": false},
-    {"text": "toggleLearned uses requireAuth(ctx)", "checked": false},
-    {"text": "setLearned uses requireAuth(ctx)", "checked": false},
-    {"text": "All queries use by_user index, not by_visitor", "checked": false},
-    {"text": "Typecheck passes", "checked": false}
+    {"text": "Remove visitorId from ALL query/mutation args", "checked": true},
+    {"text": "getByUser query uses getAuthUserId(ctx) internally", "checked": true},
+    {"text": "incrementViewCount uses requireAuth(ctx)", "checked": true},
+    {"text": "incrementPlayCount uses requireAuth(ctx)", "checked": true},
+    {"text": "toggleLearned uses requireAuth(ctx)", "checked": true},
+    {"text": "setLearned uses requireAuth(ctx)", "checked": true},
+    {"text": "All queries use by_user index, not by_visitor", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
   ],
-  "passes": false,
-  "blockedBy": "SEC-002",
+  "passes": true,
+  "completedAt": "2026-01-22T00:30:00Z",
+  "completedBy": "gemini-3-flash-preview",
+  "blockedBy": null,
   "notes": "BEFORE (INSECURE - visitorId can be spoofed):\n```typescript\nexport const getByVisitor = query({\n  args: { visitorId: v.string() },  // ATTACKER CAN SEND ANY VALUE\n  handler: async (ctx, { visitorId }) => {\n    return ctx.db.query('wordProgress')\n      .withIndex('by_visitor', q => q.eq('visitorId', visitorId))\n      .collect();\n  }\n});\n```\n\nAFTER (SECURE - ctx.auth cannot be spoofed):\n```typescript\nimport { getAuthUserId } from './authHelpers';\n\nexport const getByUser = query({\n  args: {},  // NO USER ID ARGUMENT!\n  handler: async (ctx) => {\n    const userId = await getAuthUserId(ctx);\n    if (!userId) return [];  // Not logged in = no data\n    return ctx.db.query('wordProgress')\n      .withIndex('by_user', q => q.eq('userId', userId))\n      .collect();\n  }\n});\n```\n\nFor mutations that REQUIRE auth, use requireAuth() which throws if not authenticated."
 }
