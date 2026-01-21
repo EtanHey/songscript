@@ -118,7 +118,8 @@ export default defineSchema({
   })
     .index("by_visitor", ["visitorId"])
     .index("by_user", ["userId"])
-    .index("by_visitor_date", ["visitorId", "date"]),
+    .index("by_visitor_date", ["visitorId", "date"])
+    .index("by_user_date", ["userId", "date"]),
 
   // User learning goals (daily/weekly targets)
   userGoals: defineTable({

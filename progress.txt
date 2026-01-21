@@ -52,3 +52,16 @@ Learnings for next iteration:
 - Securing the backend often requires simultaneous frontend updates to maintain functionality and type safety.
 - For components like `WishlistButton` that are used on public pages, extra care is needed to handle the unauthenticated state gracefully when the backend becomes secure-only.
 ---
+
+## Iteration - SEC-006
+- Completed story SEC-006: Secure practiceLog.ts and userPreferences.ts in Convex.
+- Added 'by_user_date' index to 'userPracticeLog' table in schema.
+- Updated 'convex/practiceLog.ts' and 'convex/userPreferences.ts' to use 'ctx.auth' and removed 'visitorId' arguments.
+- Renamed 'getByVisitor' to 'getUserPreferences' in 'userPreferences.ts'.
+- Updated frontend in 'src/routes/song.$songId.tsx' and 'src/routes/_authed/dashboard.tsx' to use authenticated sessions and the new API signatures.
+- Verified all changes with 'npm run typecheck'.
+
+Learnings for next iteration:
+- Renaming API functions (like 'getByVisitor' to 'getUserPreferences') is cleaner for the new auth model but requires careful search-and-replace in the frontend.
+- Public routes like the song page need careful handling to only call secured mutations when 'isAuthenticated' is true to avoid unnecessary errors.
+---

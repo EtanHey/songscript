@@ -1,13 +1,17 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { getAuthUserId, requireAuth } from "./authHelpers";
 
-// Get user preferences for a visitor
-export const getByVisitor = query({
-  args: { visitorId: v.string() },
-  handler: async (ctx, args) => {
+// Get user preferences for the authenticated user
+export const getUserPreferences = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
     return await ctx.db
       .query("userPreferences")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .first();
   },
 });
@@ -15,7 +19,6 @@ export const getByVisitor = query({
 // Update user preferences (upsert - create if doesn't exist, update if it does)
 export const updatePreferences = mutation({
   args: {
-    visitorId: v.string(),
     playbackSpeed: v.optional(v.number()),
     languageFilter: v.optional(v.string()),
     playbackMode: v.optional(v.string()),
@@ -23,12 +26,13 @@ export const updatePreferences = mutation({
     videoCollapsed: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const { visitorId, ...preferences } = args;
+    const userId = await requireAuth(ctx);
+    const preferences = args;
 
     // Check if preferences already exist
     const existing = await ctx.db
       .query("userPreferences")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .first();
 
     if (existing) {
@@ -47,7 +51,8 @@ export const updatePreferences = mutation({
     } else {
       // Create new preferences with defaults for missing fields
       const newPreferences = {
-        visitorId,
+        userId,
+        visitorId: "authenticated", // Legacy support
         playbackSpeed: preferences.playbackSpeed ?? 1.0,
         languageFilter: preferences.languageFilter ?? "all",
         playbackMode: preferences.playbackMode ?? "auto",

@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { getAuthUserId, requireAuth } from "./authHelpers";
 
 // Get today's date in YYYY-MM-DD format
 function getTodayDateString(): string {
@@ -17,7 +18,6 @@ function getDateDaysAgo(days: number): string {
 // Log a practice session with weighted scoring
 export const logPractice = mutation({
   args: {
-    visitorId: v.string(),
     eventType: v.union(
       v.literal("word_learned"),
       v.literal("line_loop"),
@@ -26,7 +26,8 @@ export const logPractice = mutation({
     ),
     value: v.number(), // seconds for time events, count for discrete events
   },
-  handler: async (ctx, { visitorId, eventType, value }) => {
+  handler: async (ctx, { eventType, value }) => {
+    const userId = await requireAuth(ctx);
     const today = getTodayDateString();
 
     // Calculate points based on event type and weighted formula
@@ -55,8 +56,8 @@ export const logPractice = mutation({
     // Check if there's already a log for today
     const existingLog = await ctx.db
       .query("userPracticeLog")
-      .withIndex("by_visitor_date", (q) =>
-        q.eq("visitorId", visitorId).eq("date", today)
+      .withIndex("by_user_date", (q) =>
+        q.eq("userId", userId).eq("date", today)
       )
       .first();
 
@@ -71,7 +72,8 @@ export const logPractice = mutation({
     } else {
       // Create new log for today
       return await ctx.db.insert("userPracticeLog", {
-        visitorId,
+        userId,
+        visitorId: "authenticated", // Legacy support
         date: today,
         practiceCount: 1,
         totalSeconds: durationSeconds,
@@ -84,14 +86,26 @@ export const logPractice = mutation({
 // Get practice history for last N days (default 90)
 export const getPracticeHistory = query({
   args: {
-    visitorId: v.string(),
     days: v.optional(v.number()),
   },
-  handler: async (ctx, { visitorId, days = 90 }) => {
-    // Get all practice logs for this visitor
+  handler: async (ctx, { days = 90 }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      return {
+        practiceData: [],
+        currentStreak: 0,
+        longestStreak: 0,
+        totalSessions: 0,
+        totalTimeSeconds: 0,
+        totalPoints: 0,
+        daysTracked: days,
+      };
+    }
+
+    // Get all practice logs for this user
     const logs = await ctx.db
       .query("userPracticeLog")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
     // Filter to last N days and create a map

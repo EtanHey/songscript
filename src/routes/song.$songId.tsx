@@ -8,7 +8,7 @@ import { Id } from "@convex/_generated/dataModel";
 import LocalVideoPlayer, { LocalVideoPlayerHandle } from "../components/LocalVideoPlayer";
 import LyricsDisplay, { LanguageFilter, LyricLine } from "../components/LyricsDisplay";
 import WordInfoModal, { ModalLyricLine } from "../components/WordInfoModal";
-import { useVisitorId } from "../hooks/useVisitorId";
+import { authClient } from "../lib/auth-client";
 import { useConvexMutation } from "@convex-dev/react-query";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import {
@@ -78,15 +78,17 @@ function SongPageContent({ songId }: SongPageContentProps) {
     convexQuery(api.lyrics.getBySong, { songId })
   );
 
-  // Get visitor ID and line progress for visual states
-  const visitorId = useVisitorId();
+  // Get session and line progress for visual states
+  const { data: session } = authClient.useSession();
+  const isAuthenticated = !!session?.user;
+
   const { data: lineProgress } = useSuspenseQuery(
     convexQuery(api.songProgress.getLineProgressByUserSong, { songId })
   );
 
   // Load user preferences
   const { data: userPreferences } = useSuspenseQuery(
-    convexQuery(api.userPreferences.getByVisitor, { visitorId })
+    convexQuery(api.userPreferences.getUserPreferences, {})
   );
   const updatePreferencesMutation = useConvexMutation(api.userPreferences.updatePreferences);
 
@@ -212,12 +214,11 @@ function SongPageContent({ songId }: SongPageContentProps) {
       const timeSinceActivity = Date.now() - lastActivityRef.current;
       const isActive = timeSinceActivity < IDLE_THRESHOLD_MS;
 
-      // Only count if shouldCountTime AND user is active
-      if (shouldCountTime && isActive && visitorId) {
+      // Only count if shouldCountTime AND user is active AND authenticated
+      if (shouldCountTime && isActive && isAuthenticated) {
         practiceSecondsRef.current += 1;
         // Log every second to DB for real-time header updates
         logPracticeMutation({
-          visitorId,
           eventType: "audio_time",
           value: 1,
         });
@@ -228,7 +229,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
       clearInterval(interval);
       practiceSecondsRef.current = 0;
     };
-  }, [shouldCountTime, visitorId, logPracticeMutation]);
+  }, [shouldCountTime, isAuthenticated, logPracticeMutation]);
 
   // Sync state with loaded user preferences
   useEffect(() => {
@@ -243,24 +244,29 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
   // Preference persistence functions
   const persistPlaybackSpeed = useCallback((speed: string) => {
-    updatePreferencesMutation({ visitorId, playbackSpeed: parseFloat(speed) });
-  }, [updatePreferencesMutation, visitorId]);
+    if (!isAuthenticated) return;
+    updatePreferencesMutation({ playbackSpeed: parseFloat(speed) });
+  }, [updatePreferencesMutation, isAuthenticated]);
 
   const persistLanguageFilter = useCallback((filter: LanguageFilter) => {
-    updatePreferencesMutation({ visitorId, languageFilter: filter });
-  }, [updatePreferencesMutation, visitorId]);
+    if (!isAuthenticated) return;
+    updatePreferencesMutation({ languageFilter: filter });
+  }, [updatePreferencesMutation, isAuthenticated]);
 
   const persistPlaybackMode = useCallback((mode: PlaybackMode) => {
-    updatePreferencesMutation({ visitorId, playbackMode: mode });
-  }, [updatePreferencesMutation, visitorId]);
+    if (!isAuthenticated) return;
+    updatePreferencesMutation({ playbackMode: mode });
+  }, [updatePreferencesMutation, isAuthenticated]);
 
   const persistVideoMuted = useCallback((muted: boolean) => {
-    updatePreferencesMutation({ visitorId, videoMuted: muted });
-  }, [updatePreferencesMutation, visitorId]);
+    if (!isAuthenticated) return;
+    updatePreferencesMutation({ videoMuted: muted });
+  }, [updatePreferencesMutation, isAuthenticated]);
 
   const persistVideoCollapsed = useCallback((collapsed: boolean) => {
-    updatePreferencesMutation({ visitorId, videoCollapsed: collapsed });
-  }, [updatePreferencesMutation, visitorId]);
+    if (!isAuthenticated) return;
+    updatePreferencesMutation({ videoCollapsed: collapsed });
+  }, [updatePreferencesMutation, isAuthenticated]);
 
   // Handle speed change - applies to video playback rate
   const handleSpeedChange = useCallback((speed: string) => {
@@ -347,7 +353,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
   const handleLineClick = useCallback(
     (startTime: number, lineIndex: number) => {
       // Record completion of previous line in Loop mode
-      if (currentLineIndex !== undefined && currentLineIndex !== lineIndex && visitorId && songId) {
+      if (currentLineIndex !== undefined && currentLineIndex !== lineIndex && isAuthenticated && songId) {
         const previousLineNumber = sortedLyrics[currentLineIndex]?.lineNumber;
         if (previousLineNumber !== undefined && !sessionCompletedLines.has(previousLineNumber)) {
           recordLineCompletionMutation({
@@ -377,7 +383,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
         persistVideoMuted(false);
       }
     },
-    [triggerClickAnimation, sortedLyrics, playbackMode, isVideoMuted, persistVideoMuted, currentLineIndex, visitorId, songId, sessionCompletedLines, recordLineCompletionMutation]
+    [triggerClickAnimation, sortedLyrics, playbackMode, isVideoMuted, persistVideoMuted, currentLineIndex, isAuthenticated, songId, sessionCompletedLines, recordLineCompletionMutation]
   );
 
   // Helper to seek with guard
@@ -420,8 +426,8 @@ function SongPageContent({ songId }: SongPageContentProps) {
               }, 300);
 
               // Track loop completion
-              if (visitorId) {
-                logPracticeMutation({ visitorId, eventType: "line_loop", value: 1 });
+              if (isAuthenticated) {
+                logPracticeMutation({ eventType: "line_loop", value: 1 });
               }
             } else {
               // Single: move to next line and pause
@@ -434,7 +440,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
               playerRef.current?.pause();
 
               // Record line completion
-              if (visitorId && songId && !sessionCompletedLines.has(currentLine.lineNumber)) {
+              if (songId && !sessionCompletedLines.has(currentLine.lineNumber)) {
                 recordLineCompletionMutation({
                   songId: songId as Id<"songs">,
                   lineNumber: currentLine.lineNumber
@@ -455,7 +461,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
         }
       }
     },
-    [sortedLyrics, activeLineIndex, playbackMode, currentLineIndex, visitorId, songId, sessionCompletedLines, logPracticeMutation, recordLineCompletionMutation, seekTo]
+    [sortedLyrics, activeLineIndex, playbackMode, currentLineIndex, isAuthenticated, songId, sessionCompletedLines, logPracticeMutation, recordLineCompletionMutation, seekTo]
   );
 
   // Handle opening word info modal
@@ -501,11 +507,11 @@ function SongPageContent({ songId }: SongPageContentProps) {
   // Handle word learned toggle
   const handleToggleWordLearned = useCallback((wordId: Id<"words">, persian: string) => {
     toggleWordLearnedMutation({ wordId, persian }).then((newLearnedState) => {
-      if (newLearnedState && visitorId) {
-        logPracticeMutation({ visitorId, eventType: "word_learned", value: 1 });
+      if (newLearnedState && isAuthenticated) {
+        logPracticeMutation({ eventType: "word_learned", value: 1 });
       }
     });
-  }, [toggleWordLearnedMutation, logPracticeMutation, visitorId]);
+  }, [toggleWordLearnedMutation, logPracticeMutation, isAuthenticated]);
 
   // Spacebar for pause/play
   useEffect(() => {
