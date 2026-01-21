@@ -132,4 +132,22 @@ export default defineSchema({
     videoCollapsed: v.boolean(), // Whether video should be collapsed by default
   })
     .index("by_visitor", ["visitorId"]),
+
+  // Transcription jobs for WhisperX pipeline
+  transcriptionJobs: defineTable({
+    youtubeUrl: v.string(),
+    videoId: v.string(),
+    language: v.string(), // Source language code (fa, ko, ar)
+    visitorId: v.string(), // Who requested the transcription
+    status: v.string(), // pending, downloading, separating, transcribing, processing, completed, failed
+    progress: v.number(), // 0-100 progress percentage
+    error: v.optional(v.string()), // Error message if failed
+    result: v.optional(v.any()), // Transcription result JSON
+    songId: v.optional(v.id("songs")), // Created song ID after import
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_visitor", ["visitorId"])
+    .index("by_video", ["videoId"])
+    .index("by_status", ["status"]),
 });

@@ -39,6 +39,48 @@ git status  # Check current branch FIRST
 
 ---
 
+## 🔥 CONVEX .JS FILE ERROR (CRITICAL - MEMORIZE THIS)
+
+**Error message:**
+```
+✘ [ERROR] Two output files share the same path but have different contents: out/filename.js
+```
+
+### What Causes It
+Convex bundler finds BOTH `.ts` and `.js` files with the same name in `convex/` folder.
+This happens when:
+1. Git worktrees are created (copies compiled .js files)
+2. Convex crashes mid-compilation
+3. Manual file operations gone wrong
+
+### BEFORE Starting Convex Dev Server - ALWAYS RUN:
+```bash
+rm -f convex/*.js
+npx convex dev
+```
+
+### Fix When Error Occurs:
+```bash
+# Stop convex dev (Ctrl+C)
+rm -f convex/*.js
+npx convex dev
+```
+
+### Prevention Rules:
+1. **NEVER create .js files in convex/** - Only .ts files belong there
+2. **After creating git worktree** - Run `rm -f convex/*.js` before `npx convex dev`
+3. **Add to .gitignore** - Ensure `convex/*.js` is ignored (it should be)
+4. **Check before starting** - Quick `ls convex/*.js 2>/dev/null` to verify clean state
+
+### For Ralph/Automated Workflows:
+Add this to the START of any iteration that uses Convex:
+```bash
+# Clean Convex before starting
+rm -f convex/*.js 2>/dev/null || true
+```
+
+---
+
 ## Project Structure
 
 ```

@@ -1,0 +1,36 @@
+# WhisperX Lyrics Transcription Pipeline
+# Install with: pip install -r requirements.txt
+
+# Core transcription
+whisperx>=3.1.1
+faster-whisper>=1.0.0
+torch>=2.0.0
+torchaudio>=2.0.0
+
+# Audio download
+yt-dlp>=2024.1.0
+pytubefix>=6.0.0
+
+# Vocal separation
+demucs>=4.0.0
+
+# Word segmentation by language
+hazm>=0.10.0  # Persian
+kiwipiepy>=0.18.0  # Korean
+pyarabic>=0.6.15  # Arabic
+
+# Translation
+transformers>=4.36.0  # For NLLB-200
+sentencepiece>=0.2.0
+
+# Language detection
+fast-langdetect>=1.0.0
+
+# Utilities
+python-dotenv>=1.0.0
+pydub>=0.25.0
+tqdm>=4.66.0
+requests>=2.31.0
+
+# Optional: RunPod client for serverless
+runpod>=1.6.0
