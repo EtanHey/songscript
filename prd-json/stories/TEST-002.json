@@ -1,0 +1,22 @@
+{
+  "id": "TEST-002",
+  "title": "E2E: User data isolation (CRITICAL SECURITY TEST)",
+  "description": "Playwright e2e test verifying that two different users on the same browser have completely isolated data. This is THE critical test for the security fix.",
+  "acceptanceCriteria": [
+    {"text": "Create e2e/user-isolation.spec.ts", "checked": false},
+    {"text": "Test setup: Clear all cookies, localStorage, Convex test data", "checked": false},
+    {"text": "Test: User A signs up, practices song, marks words learned", "checked": false},
+    {"text": "Test: User A's dashboard shows their progress (words > 0)", "checked": false},
+    {"text": "Test: User A logs out", "checked": false},
+    {"text": "Test: User B signs up on SAME browser with different email", "checked": false},
+    {"text": "Test: User B's dashboard shows EMPTY progress (words = 0)", "checked": false},
+    {"text": "Test: User B practices different song, marks different words", "checked": false},
+    {"text": "Test: User B logs out, User A logs back in", "checked": false},
+    {"text": "Test: User A sees ONLY their original data, not User B's", "checked": false},
+    {"text": "All tests pass: bun run test:e2e --grep 'user-isolation'", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "SEC-012",
+  "notes": "THIS IS THE MOST IMPORTANT TEST. It verifies the entire security fix works.\n\nBefore the fix: Same browser = same visitorId = SHARED DATA (BUG)\nAfter the fix: Each user has unique userId = ISOLATED DATA (SECURE)\n\nTest requires:\n- Two test email addresses (use Playwright's mailbox or mock)\n- Ability to sign out and sign in as different users\n- Dashboard stats verification\n\nConsider using test.serial to ensure order:\n```typescript\ntest.describe.serial('User Data Isolation', () => {\n  let userAEmail: string;\n  let userBEmail: string;\n\n  test.beforeAll(async () => {\n    // Generate unique test emails\n    userAEmail = `test-a-${Date.now()}@example.com`;\n    userBEmail = `test-b-${Date.now()}@example.com`;\n  });\n\n  test('User A signs up and creates data', async ({ page }) => { ... });\n  test('User A logs out', async ({ page }) => { ... });\n  test('User B signs up and sees empty dashboard', async ({ page }) => { ... });\n  // etc.\n});\n```"
+}

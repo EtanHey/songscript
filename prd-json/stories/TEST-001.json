@@ -1,0 +1,19 @@
+{
+  "id": "TEST-001",
+  "title": "E2E: Signup flow with migration checkbox",
+  "description": "Playwright e2e test for the complete signup flow including migration preference checkbox, magic link sending, and localStorage handling.",
+  "acceptanceCriteria": [
+    {"text": "Create e2e/auth-signup.spec.ts", "checked": false},
+    {"text": "Test: Signup page renders with email, display name, migration checkbox", "checked": false},
+    {"text": "Test: Migration checkbox is checked by default", "checked": false},
+    {"text": "Test: Form validation - email required, display name 3-20 chars", "checked": false},
+    {"text": "Test: Clicking 'Send Magic Link' stores preferences in localStorage", "checked": false},
+    {"text": "Test: localStorage keys set: songscript_migrate_on_signup, songscript_signup_display_name", "checked": false},
+    {"text": "Test: Unchecking migration checkbox stores 'false' in localStorage", "checked": false},
+    {"text": "All tests pass: bun run test:e2e --grep 'auth-signup'", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "SEC-010",
+  "notes": "Use Playwright's page.evaluate() to check localStorage values.\n\nTest structure:\n```typescript\ntest.describe('Signup Flow', () => {\n  test('renders signup form correctly', async ({ page }) => {\n    await page.goto('/signup');\n    await expect(page.getByLabel('Email')).toBeVisible();\n    await expect(page.getByLabel('Display Name')).toBeVisible();\n    await expect(page.getByRole('checkbox')).toBeChecked();\n  });\n\n  test('stores migration preference in localStorage', async ({ page }) => {\n    await page.goto('/signup');\n    await page.fill('[name=email]', 'test@example.com');\n    await page.fill('[name=displayName]', 'TestUser');\n    await page.click('button[type=submit]');\n    const stored = await page.evaluate(() => localStorage.getItem('songscript_migrate_on_signup'));\n    expect(stored).toBe('true');\n  });\n});\n```"
+}

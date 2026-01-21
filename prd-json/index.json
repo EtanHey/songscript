@@ -4,12 +4,12 @@
   "projectName": "SongScript Auth Security Fix",
   "workingDirectory": ".",
   "stats": {
-    "total": 41,
-    "completed": 32,
-    "pending": 7,
+    "total": 47,
+    "completed": 33,
+    "pending": 11,
     "blocked": 0
   },
-  "nextStory": "SEC-010",
+  "nextStory": "SEC-011",
   "storyOrder": [
     "US-036",
     "V-003",
@@ -51,15 +51,26 @@
     "SEC-012",
     "V-015",
     "V-016",
-    "V-017"
+    "V-017",
+    "TEST-001",
+    "TEST-002",
+    "TEST-003",
+    "TEST-004",
+    "TEST-005",
+    "TEST-006"
   ],
   "pending": [
-    "SEC-010",
     "SEC-011",
     "SEC-012",
     "V-015",
     "V-016",
-    "V-017"
+    "V-017",
+    "TEST-001",
+    "TEST-002",
+    "TEST-003",
+    "TEST-004",
+    "TEST-005",
+    "TEST-006"
   ],
   "blocked": [],
   "browserSetup": {
@@ -74,7 +85,7 @@
   "notes": {
     "context": "SECURITY FIX: Replace spoofable visitorId with ctx.auth.getUserIdentity(). Anonymous users use localStorage, migrate data on signup.",
     "securityPattern": "NEVER accept user ID as function argument - use ctx.auth server-side",
-    "migrationFlow": "Signup page with 'Bring progress' checkbox \u2192 magic link \u2192 verify.tsx runs migration \u2192 clear localStorage",
+    "migrationFlow": "Signup page with 'Bring progress' checkbox → magic link → verify.tsx runs migration → clear localStorage",
     "tables": [
       "wordProgress",
       "userSongProgress",

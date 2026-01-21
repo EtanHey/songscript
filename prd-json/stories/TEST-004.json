@@ -1,0 +1,19 @@
+{
+  "id": "TEST-004",
+  "title": "Unit tests: authHelpers.ts functions",
+  "description": "Vitest unit tests for the auth helper functions that are the foundation of the security fix.",
+  "acceptanceCriteria": [
+    {"text": "Create convex/authHelpers.test.ts", "checked": false},
+    {"text": "Test: getAuthUserId returns userId when authenticated", "checked": false},
+    {"text": "Test: getAuthUserId returns null when not authenticated", "checked": false},
+    {"text": "Test: requireAuth returns userId when authenticated", "checked": false},
+    {"text": "Test: requireAuth throws ConvexError when not authenticated", "checked": false},
+    {"text": "Test: Error message is 'Authentication required'", "checked": false},
+    {"text": "Mock ctx.auth.getUserIdentity() for tests", "checked": false},
+    {"text": "All tests pass: bun run test --grep 'authHelpers'", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": null,
+  "notes": "Test structure with Convex mocking:\n\n```typescript\nimport { describe, it, expect, vi } from 'vitest';\n\n// Mock the Convex context\nconst mockCtx = (identity: { subject: string } | null) => ({\n  auth: {\n    getUserIdentity: vi.fn().mockResolvedValue(identity),\n  },\n});\n\ndescribe('authHelpers', () => {\n  describe('getAuthUserId', () => {\n    it('returns userId when authenticated', async () => {\n      const ctx = mockCtx({ subject: 'user-123' });\n      const result = await getAuthUserId(ctx);\n      expect(result).toBe('user-123');\n    });\n\n    it('returns null when not authenticated', async () => {\n      const ctx = mockCtx(null);\n      const result = await getAuthUserId(ctx);\n      expect(result).toBeNull();\n    });\n  });\n\n  describe('requireAuth', () => {\n    it('throws when not authenticated', async () => {\n      const ctx = mockCtx(null);\n      await expect(requireAuth(ctx)).rejects.toThrow('Authentication required');\n    });\n  });\n});\n```"
+}

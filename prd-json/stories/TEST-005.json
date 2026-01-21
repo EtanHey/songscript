@@ -1,0 +1,19 @@
+{
+  "id": "TEST-005",
+  "title": "Integration tests: Secured Convex functions reject spoofed requests",
+  "description": "Integration tests verifying that Convex functions properly reject unauthenticated requests and don't accept spoofed user IDs.",
+  "acceptanceCriteria": [
+    {"text": "Create src/__tests__/convex-security.test.ts", "checked": false},
+    {"text": "Test: wordProgress queries require authentication", "checked": false},
+    {"text": "Test: userSongProgress queries require authentication", "checked": false},
+    {"text": "Test: practiceLog mutations require authentication", "checked": false},
+    {"text": "Test: leaderboard getUserInfo requires authentication", "checked": false},
+    {"text": "Test: Unauthenticated calls return appropriate error", "checked": false},
+    {"text": "Test: No function accepts visitorId as argument (grep verification)", "checked": false},
+    {"text": "All tests pass: bun run test --grep 'convex-security'", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "SEC-007",
+  "notes": "Uses Convex test helpers to verify security.\n\nKey verification:\n1. Functions that previously accepted visitorId now use ctx.auth\n2. Unauthenticated calls throw proper errors\n3. No way to spoof another user's data\n\nTest approach:\n```typescript\nimport { convexTest } from 'convex-test';\nimport { api } from '../convex/_generated/api';\n\ndescribe('Convex Security', () => {\n  const t = convexTest();\n\n  it('wordProgress requires auth', async () => {\n    // Without auth, should throw\n    await expect(\n      t.query(api.wordProgress.getByVisitor)\n    ).rejects.toThrow('Authentication required');\n  });\n\n  it('no functions accept visitorId argument', async () => {\n    // Grep test - verify pattern\n    const files = glob.sync('convex/*.ts');\n    for (const file of files) {\n      const content = fs.readFileSync(file, 'utf-8');\n      // Should not have visitorId in args (except migration)\n      if (!file.includes('migration')) {\n        expect(content).not.toMatch(/args:\\s*\\{[^}]*visitorId/);\n      }\n    }\n  });\n});\n```"
+}
