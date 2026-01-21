@@ -1,5 +1,6 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
+import { getLanguageMultiplier } from "./languageDifficulty";
 
 // Get today's date in YYYY-MM-DD format
 function getTodayDateString(): string {
@@ -105,6 +106,111 @@ export const getStreakLeaderboard = query({
       displayName: user.displayName,
       streak: user.streak,
       language: user.language,
+    }));
+  },
+});
+
+// Get progress leaderboard with difficulty multipliers
+export const getProgressLeaderboard = query({
+  args: {
+    period: v.optional(v.union(v.literal("weekly"), v.literal("monthly"), v.literal("all-time"))),
+    limit: v.optional(v.number()),
+    offset: v.optional(v.number()),
+  },
+  handler: async (ctx, { limit = 10, offset = 0 }) => {
+    // Get all users with displayName set
+    const users = await ctx.db
+      .query("users")
+      .filter((q) => q.neq(q.field("displayName"), undefined))
+      .collect();
+
+    // Calculate progress score for each user
+    const userScores = [];
+    
+    for (const user of users) {
+      // Use email as visitorId for authenticated users
+      const visitorId = user.email;
+      
+      // Get word progress data
+      const wordProgress = await ctx.db
+        .query("wordProgress")
+        .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+        .filter((q) => q.eq(q.field("learned"), true))
+        .collect();
+
+      // Get line progress data
+      const lineProgress = await ctx.db
+        .query("lineProgress")
+        .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+        .filter((q) => q.eq(q.field("learned"), true))
+        .collect();
+
+      // Get songs to determine languages
+      // Get language data from songs
+      const songs = await Promise.all(
+        lineProgress.map(async (line) => {
+          return await ctx.db.get(line.songId);
+        })
+      );
+
+      // Calculate weighted scores by language
+      const languageScores = new Map<string, { wordsLearned: number, linesCompleted: number }>();
+      
+      // Count words learned (we'll use a default language since wordProgress doesn't track language directly)
+      const defaultLanguage = "mixed";
+      if (!languageScores.has(defaultLanguage)) {
+        languageScores.set(defaultLanguage, { wordsLearned: 0, linesCompleted: 0 });
+      }
+      languageScores.get(defaultLanguage)!.wordsLearned = wordProgress.length;
+
+      // Count lines completed by language
+      for (let i = 0; i < lineProgress.length; i++) {
+        const song = songs[i];
+        if (song) {
+          const language = song.sourceLanguage;
+          if (!languageScores.has(language)) {
+            languageScores.set(language, { wordsLearned: 0, linesCompleted: 0 });
+          }
+          languageScores.get(language)!.linesCompleted++;
+        }
+      }
+
+      // Calculate total weighted score
+      let totalScore = 0;
+      let topLanguage = "mixed";
+      let maxLanguageScore = 0;
+
+      for (const [language, scores] of languageScores.entries()) {
+        const multiplier = getLanguageMultiplier(language);
+        const languageScore = (scores.wordsLearned * multiplier) + (scores.linesCompleted * multiplier * 0.5);
+        totalScore += languageScore;
+        
+        if (languageScore > maxLanguageScore) {
+          maxLanguageScore = languageScore;
+          topLanguage = language;
+        }
+      }
+
+      userScores.push({
+        displayName: user.displayName!,
+        progressScore: Math.round(totalScore * 10) / 10, // Round to 1 decimal place
+        topLanguage,
+        email: user.email, // For internal use, not returned
+      });
+    }
+
+    // Sort by progress score descending
+    userScores.sort((a, b) => b.progressScore - a.progressScore);
+
+    // Apply pagination
+    const paginatedResults = userScores.slice(offset, offset + limit);
+
+    // Add rank and format response
+    return paginatedResults.map((user, index) => ({
+      rank: offset + index + 1,
+      displayName: user.displayName,
+      score: user.progressScore,
+      topLanguage: user.topLanguage,
     }));
   },
 });
