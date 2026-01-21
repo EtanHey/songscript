@@ -70,10 +70,10 @@ See iteration logs above for details.
 - Typecheck passes successfully
 ---
 
-## Iteration - US-037: Language Difficulty Utility Complete
-- Created convex/languageDifficulty.ts with FSI-based difficulty multipliers
-- DIFFICULTY_MULTIPLIERS maps language codes to 1.0x (standard), 1.5x (hard), 2.0x (super-hard)
-- getLanguageMultiplier() function handles case-insensitive lookup with 1.0x default
-- Supports both language names (spanish, persian) and ISO codes (es, fa)
+## Iteration - V-004: Language Difficulty Tests Complete
+- Created comprehensive test suite for language difficulty multipliers
+- Tests verify Hebrew (1.5x), Persian/fa (1.5x), Arabic (2.0x), Japanese (2.0x), Spanish (1.0x)
+- Tests verify unknown languages default to 1.0x multiplier
+- All 6 tests pass with 18 expect() calls
 - Typecheck passes successfully
 ---
