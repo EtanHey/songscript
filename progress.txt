@@ -220,3 +220,28 @@ See iteration logs above for details.
 - Typecheck passes successfully
 - Post-signup display name prompt implementation complete
 ---
+
+---
+
+## Learning: Delete User for Testing Signup Flow
+
+When testing signup/login flows and need to reuse an email:
+
+1. Open Convex Dashboard: `npx convex dashboard`
+2. Go to "Data" tab
+3. Find `users` table
+4. Delete the user row with the email you want to reuse
+5. Also check `user` table (Better Auth's table) and delete there too
+
+Or via Convex CLI:
+```bash
+# List users
+npx convex run --query "db.query('users').collect()"
+
+# Delete specific user (get _id from above)
+npx convex run --mutation "db.delete(args.id)" --args '{"id": "USER_ID_HERE"}'
+```
+
+This allows re-testing the full signup flow with the same email.
+
+---
