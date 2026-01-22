@@ -16,7 +16,7 @@ Iteration - TEST-004
 - Learnings for next iteration: Run the tests and update the status of acceptance criteria.
 ## Iteration Summary (REQUIRED)
 
-I have created the test file `convex/authHelpers.test.ts` for story TEST-004. I have marked this step as completed and will now proceed to run the tests.[V-015] BLOCKED: SEC-007
+I have created the test file `convex/authHelpers.test.ts` for story TEST-004. I have marked this step as completed and will now proceed to run the tests.
 V-016 BLOCKED: Browser tabs not available.
 V-016 BLOCKED: Browser tabs not available
 
@@ -30,3 +30,13 @@ V-016 BLOCKED: Browser tabs not available
 - All acceptance criteria completed including browser test verification
 - Learnings: The code already had comprehensive fixes for the race condition, including retry logic, fallback mechanisms, and graceful error handling
 ---
+
+## Iteration - V-016
+- Model: gemini-2.5-flash-lite
+- Blocked due to: Browser tabs not available.
+- Marked V-016 as blocked.
+- Learnings for next iteration: Ensure browser tabs are available before starting browser-dependent tasks.
+---
+## Iteration Summary (REQUIRED)
+
+Story V-016, which involved verifying the signup flow with migration, is blocked because the necessary browser tabs are not available. I have updated the story and index files accordingly. The next story to work on is V-017.
