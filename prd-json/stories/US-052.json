@@ -6,13 +6,13 @@
   "storyPoints": 5,
   "description": "Create a useAnonymousProgress() hook that stores all progress data in localStorage for unauthenticated users. This enables anonymous users to practice and see their progress persist across page refreshes.",
   "acceptanceCriteria": [
-    "Hook generates songscript_visitor_id UUID if not exists",
-    "Hook stores progress in songscript_anonymous_progress key",
-    "Schema mirrors Convex tables: wordProgress, lineProgress, songProgress, practiceLog, wishlist, preferences",
-    "Anonymous user can mark words as learned, data persists on page refresh",
-    "Anonymous user can mark lines as learned, data persists on page refresh",
-    "Corrupted localStorage gracefully resets to empty state",
-    "All data operations are synchronous (no async needed for localStorage)"
+    { "text": "Hook generates songscript_visitor_id UUID if not exists", "checked": true },
+    { "text": "Hook stores progress in songscript_anonymous_progress key", "checked": true },
+    { "text": "Schema mirrors Convex tables: wordProgress, lineProgress, songProgress, practiceLog, wishlist, preferences", "checked": true },
+    { "text": "Anonymous user can mark words as learned, data persists on page refresh", "checked": true },
+    { "text": "Anonymous user can mark lines as learned, data persists on page refresh", "checked": true },
+    { "text": "Corrupted localStorage gracefully resets to empty state", "checked": true },
+    { "text": "All data operations are synchronous (no async needed for localStorage)", "checked": true }
   ],
   "technicalNotes": [
     "Create src/hooks/useAnonymousProgress.ts",
@@ -32,5 +32,7 @@
     "src/hooks/useAnonymousProgress.test.ts"
   ],
   "blockedBy": null,
-  "passes": false
+  "passes": true,
+  "completedAt": "2026-01-22T21:06:00Z",
+  "completedBy": "opus"
 }
