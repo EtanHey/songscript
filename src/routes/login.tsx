@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { authClient } from "../lib/auth-client";
 import { Button } from "../components/ui/button";
@@ -77,10 +77,10 @@ function LoginPage() {
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
       <div className="bg-slate-900 p-8 rounded-lg shadow-xl w-full max-w-md">
         <h1 className="text-2xl font-bold text-white mb-2 text-center">
-          Sign In
+          Welcome Back
         </h1>
         <p className="text-gray-400 text-center mb-6 text-sm">
-          Sign in with your email
+          Sign in to your existing account
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -123,7 +123,22 @@ function LoginPage() {
           </Button>
         </form>
 
-        <div className="mt-6 pt-6 border-t border-slate-700">
+        <div className="mt-6 pt-6 border-t border-slate-700 text-center">
+          <p className="text-gray-500 text-sm mb-4">OR</p>
+          <Link to="/signup">
+            <Button
+              variant="outline"
+              className="w-full border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white"
+            >
+              Create New Account →
+              <span className="block text-xs mt-1 opacity-80">
+                Keep your learning progress
+              </span>
+            </Button>
+          </Link>
+        </div>
+
+        <div className="mt-4">
           <p className="text-gray-500 text-xs text-center">
             A magic link will be sent to your email. Click it to sign in.
           </p>

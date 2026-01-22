@@ -188,3 +188,18 @@ Learnings for next iteration:
 - During migration period, placeholder data needs to include both old and new fields to maintain type compatibility
 - Browser verification confirms the dashboard works correctly with the new auth-based queries
 ---
+## Iteration - SEC-012
+- Model: kiro
+- Completed story SEC-012: Update login page to link to signup, cleanup useVisitorId hook
+- Updated login.tsx to add prominent "Create New Account" link to /signup with "Keep your learning progress" subtitle
+- Changed page title from "Sign In" to "Welcome Back" and updated copy to differentiate login vs signup
+- Kept existing magic link login functionality for returning users
+- Deleted useVisitorId.ts and useVisitorId.test.ts files since they are no longer used anywhere in the codebase
+- Verified typecheck passes and browser test confirms login page shows both login and signup options correctly
+- Navigation between login and signup pages works properly
+
+Learnings for next iteration:
+- The login page now clearly differentiates between existing users (magic link) and new users (signup link)
+- Removing unused hooks like useVisitorId helps clean up the codebase after security refactoring
+- Browser verification confirms the UI matches the design requirements with proper OR separator and prominent signup button
+---
