@@ -6,15 +6,15 @@
   "storyPoints": 3,
   "description": "Refactor the song page (song.$songId.tsx) to use the new useProgress() hook instead of direct Convex calls. This enables anonymous users to see their progress on the song page.",
   "acceptanceCriteria": [
-    {"text": "Song page uses useProgress() hook for all progress operations", "checked": false},
-    {"text": "Anonymous user: marking lines learned shows green checkmark", "checked": false},
-    {"text": "Anonymous user: checkmarks persist after page refresh", "checked": false},
-    {"text": "Anonymous user: word learned state persists in modal", "checked": false},
-    {"text": "Authenticated user: behavior unchanged (still uses Convex)", "checked": false},
-    {"text": "No visual difference between anonymous and authenticated progress display", "checked": false},
-    {"text": "Practice time tracking works for anonymous users (stored in localStorage)", "checked": false},
-    {"text": "Typecheck passes", "checked": false},
-    {"text": "Verify in browser: anonymous checkmarks persist on refresh", "checked": false}
+    {"text": "Song page uses useProgress() hook for all progress operations", "checked": true},
+    {"text": "Anonymous user: marking lines learned shows green checkmark", "checked": true},
+    {"text": "Anonymous user: checkmarks persist after page refresh", "checked": true},
+    {"text": "Anonymous user: word learned state persists in modal", "checked": true},
+    {"text": "Authenticated user: behavior unchanged (still uses Convex)", "checked": true},
+    {"text": "No visual difference between anonymous and authenticated progress display", "checked": true},
+    {"text": "Practice time tracking works for anonymous users (stored in localStorage)", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "Verify in browser: anonymous checkmarks persist on refresh", "checked": true}
   ],
   "technicalNotes": [
     "Replace toggleLineLearnedMutation with useProgress().toggleLineLearned",
@@ -33,5 +33,7 @@
     "src/components/WordInfoModal.tsx",
     "src/components/LyricsDisplay.tsx"
   ],
-  "passes": false
+  "passes": true,
+  "completedAt": "2026-01-22T19:30:00Z",
+  "completedBy": "opus"
 }

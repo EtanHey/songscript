@@ -84,6 +84,23 @@ export function useProgress(): UseProgressReturn {
   // Anonymous progress hook (always available)
   const anonProgress = useAnonymousProgress();
 
+  // Extract stable function references from anonymous progress hook
+  // These functions are memoized inside useAnonymousProgress via useCallback
+  const anonSetWordLearned = anonProgress.setWordLearned;
+  const anonGetWordProgress = anonProgress.getWordProgress;
+  const anonIncrementWordView = anonProgress.incrementWordView;
+  const anonIncrementWordPlay = anonProgress.incrementWordPlay;
+  const anonSetLineLearned = anonProgress.setLineLearned;
+  const anonGetLearnedLinesForSong = anonProgress.getLearnedLinesForSong;
+  const anonUpdateSongProgress = anonProgress.updateSongProgress;
+  const anonIsInWishlist = anonProgress.isInWishlist;
+  const anonAddToWishlist = anonProgress.addToWishlist;
+  const anonRemoveFromWishlist = anonProgress.removeFromWishlist;
+  const anonLogPractice = anonProgress.logPractice;
+  const anonHasProgressToMigrate = anonProgress.hasProgressToMigrate;
+  const anonExportForMigration = anonProgress.exportForMigration;
+  const anonClearProgress = anonProgress.clearProgress;
+
   // Convex mutations for authenticated users
   const toggleWordLearnedMutation = useConvexMutation(api.wordProgress.toggleLearned);
   const setWordLearnedMutation = useConvexMutation(api.wordProgress.setLearned);
@@ -99,41 +116,41 @@ export function useProgress(): UseProgressReturn {
       }
       // For authenticated users, we need to check Convex data
       // This is a sync function, so we use the hook's cached data
-      const wordProgress = anonProgress.getWordProgress(persian);
+      const wordProgress = anonGetWordProgress(persian);
       return wordProgress?.learned ?? false;
     },
-    [isAuthenticated, anonProgress]
+    [isAuthenticated, anonGetWordProgress]
   );
 
   const setWordLearned = useCallback(
     (persian: string, learned: boolean, wordId?: string) => {
       if (!isAuthenticated) {
-        anonProgress.setWordLearned(persian, learned, wordId);
+        anonSetWordLearned(persian, learned, wordId);
       } else if (wordId) {
         // Authenticated: use Convex mutation
         setWordLearnedMutation({ wordId: wordId as Id<"words">, persian, learned });
       }
     },
-    [isAuthenticated, anonProgress, setWordLearnedMutation]
+    [isAuthenticated, anonSetWordLearned, setWordLearnedMutation]
   );
 
   const toggleWordLearned = useCallback(
     (persian: string, wordId?: string) => {
       if (!isAuthenticated) {
         const currentLearned = anonIsWordLearned(persian);
-        anonProgress.setWordLearned(persian, !currentLearned, wordId);
+        anonSetWordLearned(persian, !currentLearned, wordId);
       } else if (wordId) {
         // Authenticated: use Convex mutation
         toggleWordLearnedMutation({ wordId: wordId as Id<"words">, persian });
       }
     },
-    [isAuthenticated, anonProgress, toggleWordLearnedMutation]
+    [isAuthenticated, anonSetWordLearned, toggleWordLearnedMutation]
   );
 
   const getWordProgress = useCallback(
     (persian: string): WordProgress | undefined => {
       if (!isAuthenticated) {
-        const progress = anonProgress.getWordProgress(persian);
+        const progress = anonGetWordProgress(persian);
         if (!progress) return undefined;
         return {
           persian: progress.persian,
@@ -146,29 +163,29 @@ export function useProgress(): UseProgressReturn {
       // The component should use Convex queries directly for real data
       return undefined;
     },
-    [isAuthenticated, anonProgress]
+    [isAuthenticated, anonGetWordProgress]
   );
 
   const incrementWordView = useCallback(
     (persian: string, wordId?: string) => {
       if (!isAuthenticated) {
-        anonProgress.incrementWordView(persian, wordId);
+        anonIncrementWordView(persian, wordId);
       } else if (wordId) {
         incrementViewCountMutation({ wordId: wordId as Id<"words">, persian });
       }
     },
-    [isAuthenticated, anonProgress, incrementViewCountMutation]
+    [isAuthenticated, anonIncrementWordView, incrementViewCountMutation]
   );
 
   const incrementWordPlay = useCallback(
     (persian: string, wordId?: string) => {
       if (!isAuthenticated) {
-        anonProgress.incrementWordPlay(persian, wordId);
+        anonIncrementWordPlay(persian, wordId);
       } else if (wordId) {
         incrementPlayCountMutation({ wordId: wordId as Id<"words">, persian });
       }
     },
-    [isAuthenticated, anonProgress, incrementPlayCountMutation]
+    [isAuthenticated, anonIncrementWordPlay, incrementPlayCountMutation]
   );
 
   const getLearnedWordsCount = useCallback((): number => {
@@ -195,26 +212,26 @@ export function useProgress(): UseProgressReturn {
   const setLineLearned = useCallback(
     (songId: string, lineNumber: number, learned: boolean) => {
       if (!isAuthenticated) {
-        anonProgress.setLineLearned(songId, lineNumber, learned);
+        anonSetLineLearned(songId, lineNumber, learned);
       } else {
         // For authenticated users, toggle will work as set
         // The current Convex mutation only has toggle, so we call it if needed
         toggleLineLearnedMutation({ songId: songId as Id<"songs">, lineNumber });
       }
     },
-    [isAuthenticated, anonProgress, toggleLineLearnedMutation]
+    [isAuthenticated, anonSetLineLearned, toggleLineLearnedMutation]
   );
 
   const toggleLineLearned = useCallback(
     (songId: string, lineNumber: number) => {
       if (!isAuthenticated) {
         const currentLearned = anonIsLineLearned(songId, lineNumber);
-        anonProgress.setLineLearned(songId, lineNumber, !currentLearned);
+        anonSetLineLearned(songId, lineNumber, !currentLearned);
       } else {
         toggleLineLearnedMutation({ songId: songId as Id<"songs">, lineNumber });
       }
     },
-    [isAuthenticated, anonProgress, toggleLineLearnedMutation]
+    [isAuthenticated, anonSetLineLearned, toggleLineLearnedMutation]
   );
 
   const getLearnedLinesForSong = useCallback(
@@ -239,68 +256,68 @@ export function useProgress(): UseProgressReturn {
   const updateSongProgress = useCallback(
     (songId: string, listenTimeSeconds: number) => {
       if (!isAuthenticated) {
-        anonProgress.updateSongProgress(songId, listenTimeSeconds);
+        anonUpdateSongProgress(songId, listenTimeSeconds);
       }
       // For authenticated users, this is handled via practiceLog mutations
     },
-    [isAuthenticated, anonProgress]
+    [isAuthenticated, anonUpdateSongProgress]
   );
 
   // Wishlist operations
   const isInWishlist = useCallback(
     (songId: string): boolean => {
       if (!isAuthenticated) {
-        return anonProgress.isInWishlist(songId);
+        return anonIsInWishlist(songId);
       }
       // For authenticated users, should use Convex query
       return false;
     },
-    [isAuthenticated, anonProgress]
+    [isAuthenticated, anonIsInWishlist]
   );
 
   const addToWishlist = useCallback(
     (songId: string) => {
       if (!isAuthenticated) {
-        anonProgress.addToWishlist(songId);
+        anonAddToWishlist(songId);
       }
       // For authenticated users, use Convex mutation (if available)
     },
-    [isAuthenticated, anonProgress]
+    [isAuthenticated, anonAddToWishlist]
   );
 
   const removeFromWishlist = useCallback(
     (songId: string) => {
       if (!isAuthenticated) {
-        anonProgress.removeFromWishlist(songId);
+        anonRemoveFromWishlist(songId);
       }
       // For authenticated users, use Convex mutation (if available)
     },
-    [isAuthenticated, anonProgress]
+    [isAuthenticated, anonRemoveFromWishlist]
   );
 
   // Practice log
   const logPractice = useCallback(
     (practiceSeconds: number, wordsLearned = 0, linesCompleted = 0) => {
       if (!isAuthenticated) {
-        anonProgress.logPractice(practiceSeconds, wordsLearned, linesCompleted);
+        anonLogPractice(practiceSeconds, wordsLearned, linesCompleted);
       }
       // For authenticated users, this is handled via Convex practiceLog mutations
     },
-    [isAuthenticated, anonProgress]
+    [isAuthenticated, anonLogPractice]
   );
 
   // Migration helpers
   const hasProgressToMigrate = useCallback((): boolean => {
-    return anonProgress.hasProgressToMigrate();
-  }, [anonProgress]);
+    return anonHasProgressToMigrate();
+  }, [anonHasProgressToMigrate]);
 
   const exportForMigration = useCallback((): unknown => {
-    return anonProgress.exportForMigration();
-  }, [anonProgress]);
+    return anonExportForMigration();
+  }, [anonExportForMigration]);
 
   const clearAnonymousProgress = useCallback(() => {
-    anonProgress.clearProgress();
-  }, [anonProgress]);
+    anonClearProgress();
+  }, [anonClearProgress]);
 
   return useMemo(
     () => ({

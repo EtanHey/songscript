@@ -226,7 +226,8 @@ describe("useProgress", () => {
     });
 
     it("routes getLearnedLinesForSong to localStorage", () => {
-      (anonymousProgress.getLearnedLinesForSong as Mock).mockReturnValue([1, 3, 5]);
+      // Mock the function on the hook return value (extracted in useProgress)
+      mockAnonProgress.getLearnedLinesForSong.mockReturnValue([1, 3, 5]);
 
       const { result } = renderHook(() => useProgress());
       const lines = result.current.getLearnedLinesForSong("song-123");

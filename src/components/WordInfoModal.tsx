@@ -5,6 +5,7 @@ import { api } from "@convex/_generated/api";
 import { Id, Doc } from "@convex/_generated/dataModel";
 import { playWordAudio, stopWordAudio } from "../utils/wordAudio";
 import { useAudioPreloader } from "../hooks/useAudioPreloader";
+import { useProgress } from "../hooks/useProgress";
 import {
   Dialog,
   DialogContent,
@@ -301,6 +302,10 @@ export default function WordInfoModal({
   lineAudioUrl,
   onToggleLearned,
 }: WordInfoModalProps) {
+  // Get auth state and anonymous progress functions from unified hook
+  const progress = useProgress();
+  const isAuthenticated = progress.isAuthenticated;
+
   // Fetch words for this line from Convex
   const words = useQuery(
     api.words.getByLine,
@@ -308,10 +313,11 @@ export default function WordInfoModal({
   );
 
   // Fetch word progress by persian text (syncs across repeated words)
+  // Only fetch from Convex when authenticated
   const persians = words?.map((w) => w.persian) ?? [];
   const progressData = useQuery(
     api.wordProgress.getByUserPersians,
-    persians.length > 0
+    isAuthenticated && persians.length > 0
       ? { persians }
       : "skip"
   );
@@ -348,15 +354,41 @@ export default function WordInfoModal({
     setLoop: setLineAudioLoop,
   } = useAudioPreloader(lineAudioSnippets);
 
+  // Extract the stable function from progress hook
+  const getWordProgress = progress.getWordProgress;
+
+  // Build word progress map - use Convex data for authenticated, localStorage for anonymous
   useEffect(() => {
-    if (progressData) {
-      const map = new Map<string, WordProgressData>();
-      progressData.forEach(({ persian, progress }) => {
-        map.set(persian, progress);
+    const map = new Map<string, WordProgressData>();
+
+    if (isAuthenticated && progressData) {
+      // Authenticated: use Convex data
+      progressData.forEach(({ persian, progress: wordProg }) => {
+        map.set(persian, wordProg);
       });
-      setWordProgressMap(map);
+    } else if (!isAuthenticated && words) {
+      // Anonymous: build from localStorage data
+      words.forEach((word) => {
+        const localProgress = getWordProgress(word.persian);
+        if (localProgress) {
+          map.set(word.persian, {
+            _id: `anon-${word.persian}` as Id<"wordProgress">,
+            _creationTime: Date.now(),
+            visitorId: 'anonymous',
+            userId: 'anonymous',
+            wordId: word._id,
+            persian: word.persian,
+            viewCount: localProgress.viewCount,
+            playCount: localProgress.playCount,
+            learned: localProgress.learned,
+            lastSeen: Date.now(),
+          });
+        }
+      });
     }
-  }, [progressData]);
+
+    setWordProgressMap(map);
+  }, [isAuthenticated, progressData, words, getWordProgress]);
 
   // Stop audio when modal closes
   useEffect(() => {
@@ -384,15 +416,26 @@ export default function WordInfoModal({
   const incrementPlayCount = useMutation(api.wordProgress.incrementPlayCount);
   const toggleLearned = useMutation(api.wordProgress.toggleLearned);
 
+  // Extract stable functions from progress hook
+  const incrementWordView = progress.incrementWordView;
+  const incrementWordPlay = progress.incrementWordPlay;
+  const toggleWordLearned = progress.toggleWordLearned;
+
   // Track view counts when modal opens
   useEffect(() => {
     if (isOpen && words) {
       // Increment view count for each word in the line
       words.forEach((word) => {
-        incrementViewCount({ wordId: word._id, persian: word.persian });
+        if (isAuthenticated) {
+          // Authenticated: use Convex mutation
+          incrementViewCount({ wordId: word._id, persian: word.persian });
+        } else {
+          // Anonymous: use localStorage via useProgress hook
+          incrementWordView(word.persian, word._id);
+        }
       });
     }
-  }, [isOpen, words, incrementViewCount]);
+  }, [isOpen, words, isAuthenticated, incrementViewCount, incrementWordView]);
 
   // Play word pronunciation and track play count
   const handlePlayWord = useCallback(
@@ -408,8 +451,13 @@ export default function WordInfoModal({
         if (result.success) {
           setPlayingWord(word.persian);
           // Track play count
-          incrementPlayCount({ wordId: word._id, persian: word.persian });
-          
+          if (isAuthenticated) {
+            incrementPlayCount({ wordId: word._id, persian: word.persian });
+          } else {
+            // Anonymous: use localStorage via useProgress hook
+            incrementWordPlay(word.persian, word._id);
+          }
+
           // Clear playing state after a short delay (audio is typically short)
           setTimeout(() => {
             setPlayingWord((current) =>
@@ -426,7 +474,7 @@ export default function WordInfoModal({
         setLoadingWord(null);
       }
     },
-    [incrementPlayCount]
+    [isAuthenticated, incrementPlayCount, incrementWordPlay]
   );
 
   // Toggle learned status - syncs across all instances of the same word
@@ -435,8 +483,8 @@ export default function WordInfoModal({
       if (onToggleLearned) {
         // Use the provided callback from parent (for practice tracking)
         onToggleLearned(wordId, persian);
-      } else {
-        // Fallback to local implementation
+      } else if (isAuthenticated) {
+        // Fallback for authenticated users - use Convex directly
         const newLearned = await toggleLearned({ wordId, persian });
         // Update local state optimistically - keyed by persian for sync
         setWordProgressMap((prev) => {
@@ -461,9 +509,36 @@ export default function WordInfoModal({
           }
           return newMap;
         });
+      } else {
+        // Fallback for anonymous users - use localStorage
+        toggleWordLearned(persian, wordId);
+        // Update local state
+        setWordProgressMap((prev) => {
+          const newMap = new Map(prev);
+          const existing = newMap.get(persian);
+          const currentLearned = existing?.learned ?? false;
+          const newLearned = !currentLearned;
+          if (existing) {
+            newMap.set(persian, { ...existing, learned: newLearned });
+          } else {
+            newMap.set(persian, {
+              _id: `anon-${persian}` as Id<"wordProgress">,
+              _creationTime: Date.now(),
+              visitorId: "anonymous",
+              userId: "anonymous",
+              wordId,
+              persian,
+              viewCount: 0,
+              playCount: 0,
+              learned: newLearned,
+              lastSeen: Date.now(),
+            });
+          }
+          return newMap;
+        });
       }
     },
-    [onToggleLearned, toggleLearned]
+    [onToggleLearned, isAuthenticated, toggleLearned, toggleWordLearned]
   );
 
   if (!line) return null;

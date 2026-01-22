@@ -8,8 +8,8 @@ import { Id } from "@convex/_generated/dataModel";
 import LocalVideoPlayer, { LocalVideoPlayerHandle } from "../components/LocalVideoPlayer";
 import LyricsDisplay, { LanguageFilter, LyricLine } from "../components/LyricsDisplay";
 import WordInfoModal, { ModalLyricLine } from "../components/WordInfoModal";
-import { authClient } from "../lib/auth-client";
 import { useConvexMutation } from "@convex-dev/react-query";
+import { useProgress } from "../hooks/useProgress";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import {
   Select,
@@ -78,13 +78,39 @@ function SongPageContent({ songId }: SongPageContentProps) {
     convexQuery(api.lyrics.getBySong, { songId })
   );
 
-  // Get session and line progress for visual states
-  const { data: session } = authClient.useSession();
-  const isAuthenticated = !!session?.user;
+  // Unified progress hook - routes to localStorage for anonymous, Convex for authenticated
+  const progress = useProgress();
+  const isAuthenticated = progress.isAuthenticated;
 
-  const { data: lineProgress } = useSuspenseQuery(
+  // Extract stable function references from progress hook to avoid re-renders
+  const getLearnedLinesForSongFn = progress.getLearnedLinesForSong;
+  const toggleLineLearnedFn = progress.toggleLineLearned;
+  const toggleWordLearnedFn = progress.toggleWordLearned;
+  const logPracticeFn = progress.logPractice;
+
+  // For authenticated users, get line progress from Convex
+  // For anonymous users, we'll get it from the useProgress hook
+  const { data: lineProgressFromConvex } = useSuspenseQuery(
     convexQuery(api.songProgress.getLineProgressByUserSong, { songId })
   );
+
+  // Build line progress array for LyricsDisplay - combine Convex data (authenticated) with local data (anonymous)
+  const lineProgress = useMemo(() => {
+    if (isAuthenticated) {
+      // Use Convex data for authenticated users
+      return lineProgressFromConvex || [];
+    } else {
+      // Build from anonymous localStorage data
+      const learnedLines = getLearnedLinesForSongFn(songId);
+      return learnedLines.map(lineNumber => ({
+        _id: `anon-${songId}-${lineNumber}`,
+        visitorId: 'anonymous',
+        songId: songId as Id<"songs">,
+        lineNumber,
+        learned: true,
+      }));
+    }
+  }, [isAuthenticated, lineProgressFromConvex, getLearnedLinesForSongFn, songId]);
 
   // Load user preferences
   const { data: userPreferences } = useSuspenseQuery(
@@ -214,14 +240,20 @@ function SongPageContent({ songId }: SongPageContentProps) {
       const timeSinceActivity = Date.now() - lastActivityRef.current;
       const isActive = timeSinceActivity < IDLE_THRESHOLD_MS;
 
-      // Only count if shouldCountTime AND user is active AND authenticated
-      if (shouldCountTime && isActive && isAuthenticated) {
+      // Only count if shouldCountTime AND user is active
+      if (shouldCountTime && isActive) {
         practiceSecondsRef.current += 1;
-        // Log every second to DB for real-time header updates
-        logPracticeMutation({
-          eventType: "audio_time",
-          value: 1,
-        });
+
+        if (isAuthenticated) {
+          // Authenticated: Log every second to DB for real-time header updates
+          logPracticeMutation({
+            eventType: "audio_time",
+            value: 1,
+          });
+        } else {
+          // Anonymous: Log to localStorage via useProgress hook
+          logPracticeFn(1);
+        }
       }
     }, 1000);
 
@@ -229,7 +261,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
       clearInterval(interval);
       practiceSecondsRef.current = 0;
     };
-  }, [shouldCountTime, isAuthenticated, logPracticeMutation]);
+  }, [shouldCountTime, isAuthenticated, logPracticeMutation, logPracticeFn]);
 
   // Sync state with loaded user preferences
   useEffect(() => {
@@ -501,17 +533,29 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
   // Handle checkbox toggle for line learned state
   const handleLineCheckboxClick = useCallback((lineNumber: number) => {
-    toggleLineLearnedMutation({ songId, lineNumber });
-  }, [toggleLineLearnedMutation, songId]);
+    if (isAuthenticated) {
+      // Authenticated: use Convex mutation
+      toggleLineLearnedMutation({ songId, lineNumber });
+    } else {
+      // Anonymous: use localStorage via useProgress hook
+      toggleLineLearnedFn(songId, lineNumber);
+    }
+  }, [isAuthenticated, toggleLineLearnedMutation, songId, toggleLineLearnedFn]);
 
   // Handle word learned toggle
   const handleToggleWordLearned = useCallback((wordId: Id<"words">, persian: string) => {
-    toggleWordLearnedMutation({ wordId, persian }).then((newLearnedState) => {
-      if (newLearnedState && isAuthenticated) {
-        logPracticeMutation({ eventType: "word_learned", value: 1 });
-      }
-    });
-  }, [toggleWordLearnedMutation, logPracticeMutation, isAuthenticated]);
+    if (isAuthenticated) {
+      // Authenticated: use Convex mutation
+      toggleWordLearnedMutation({ wordId, persian }).then((newLearnedState) => {
+        if (newLearnedState) {
+          logPracticeMutation({ eventType: "word_learned", value: 1 });
+        }
+      });
+    } else {
+      // Anonymous: use localStorage via useProgress hook
+      toggleWordLearnedFn(persian, wordId);
+    }
+  }, [isAuthenticated, toggleWordLearnedMutation, logPracticeMutation, toggleWordLearnedFn]);
 
   // Spacebar for pause/play
   useEffect(() => {
