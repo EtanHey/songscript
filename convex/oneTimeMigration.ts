@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { components } from "./_generated/api";
 
 // One-time migration: Migrate visitorId data to a userId (Better Auth user ID)
 export const migrateVisitorToUser = mutation({
@@ -164,21 +165,56 @@ export const deleteUserRecord = mutation({
   },
 });
 
-// Delete test user by email from app 'users' table
-// Note: Better Auth 'user' table must be deleted manually via Convex dashboard
+// Delete test user by email from BOTH Better Auth 'user' table AND app 'users' table
 export const deleteTestUserByEmail = mutation({
   args: { email: v.string() },
   handler: async (ctx, { email }) => {
-    // Delete from app 'users' table
+    const results = {
+      betterAuth: { deleted: false, message: "" },
+      appUsers: { deleted: false, message: "" },
+    };
+
+    // 1. Delete from Better Auth 'user' table using component adapter
+    try {
+      // Find the user first (findOne takes args at top level)
+      const authUser = await ctx.runQuery(components.betterAuth.adapter.findOne, {
+        model: "user",
+        where: [{ field: "email", value: email }],
+      });
+
+      if (authUser) {
+        // Delete using the user's _id (deleteOne takes { input: { ... } })
+        await ctx.runMutation(components.betterAuth.adapter.deleteOne, {
+          input: {
+            model: "user",
+            where: [{ field: "_id", value: authUser._id }],
+          },
+        });
+        results.betterAuth = { deleted: true, message: "Deleted from Better Auth" };
+      } else {
+        results.betterAuth = { deleted: false, message: "Not found in Better Auth" };
+      }
+    } catch (error) {
+      results.betterAuth = { deleted: false, message: `Error: ${error}` };
+    }
+
+    // 2. Delete from app 'users' table
     const appUser = await ctx.db
       .query("users")
       .withIndex("email", (q) => q.eq("email", email))
       .first();
     if (appUser) {
       await ctx.db.delete(appUser._id);
-      return { success: true, email, deleted: true };
+      results.appUsers = { deleted: true, message: "Deleted from app users" };
+    } else {
+      results.appUsers = { deleted: false, message: "Not found in app users" };
     }
-    return { success: false, email, deleted: false, message: "User not found in app users table" };
+
+    return {
+      success: results.betterAuth.deleted || results.appUsers.deleted,
+      email,
+      results
+    };
   },
 });
 

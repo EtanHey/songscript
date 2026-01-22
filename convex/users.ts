@@ -38,6 +38,12 @@ export const ensureAppUser = mutation({
 
     if (existingByAuthId) {
       console.log("Found user by authId:", existingByAuthId._id);
+      // Sync displayName from Better Auth if app user doesn't have one
+      if (!existingByAuthId.displayName && authUser.displayUsername) {
+        await ctx.db.patch(existingByAuthId._id, {
+          displayName: authUser.displayUsername,
+        });
+      }
       return existingByAuthId._id;
     }
 
@@ -49,18 +55,23 @@ export const ensureAppUser = mutation({
 
     if (existingByEmail) {
       console.log("Found user by email, backfilling authId:", existingByEmail._id);
-      // Backfill the authId
-      await ctx.db.patch(existingByEmail._id, {
+      // Backfill the authId and sync displayName if missing
+      const patchData: { authId: string; displayName?: string } = {
         authId: authUser._id,
-      });
+      };
+      if (!existingByEmail.displayName && authUser.displayUsername) {
+        patchData.displayName = authUser.displayUsername;
+      }
+      await ctx.db.patch(existingByEmail._id, patchData);
       return existingByEmail._id;
     }
 
-    // 3. Create new app user record
+    // 3. Create new app user record with displayName from Better Auth
     console.log("Creating new app user with email:", authUser.email, "authId:", authUser._id);
     const userId = await ctx.db.insert("users", {
       email: authUser.email,
       authId: authUser._id,
+      displayName: authUser.displayUsername || undefined,
       createdAt: Date.now(),
     });
 

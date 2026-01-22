@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { getLanguageMultiplier } from "./languageDifficulty";
 import { getAuthUserId, requireAuth } from "./authHelpers";
 import { Id } from "./_generated/dataModel";
+import { components } from "./_generated/api";
 
 // Get today's date in YYYY-MM-DD format
 function getTodayDateString(): string {
@@ -418,10 +419,28 @@ export const setDisplayName = mutation({
       }
     }
 
-    // Update existing user
+    // Update app user's displayName
+    const trimmedName = displayName.trim();
     await ctx.db.patch(userId as Id<"users">, {
-      displayName: displayName.trim(),
+      displayName: trimmedName,
     });
+
+    // Also sync to Better Auth's displayUsername
+    try {
+      const appUser = await ctx.db.get(userId as Id<"users">);
+      if (appUser?.authId) {
+        await ctx.runMutation(components.betterAuth.adapter.updateOne, {
+          input: {
+            model: "user",
+            where: [{ field: "_id", value: appUser.authId }],
+            update: { displayUsername: trimmedName },
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Failed to sync displayName to Better Auth:", error);
+      // Don't fail the mutation - app user is already updated
+    }
 
     return { success: true };
   },
