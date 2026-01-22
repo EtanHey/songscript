@@ -309,3 +309,26 @@ Updated index.json to reflect final state:
 - This unblocks US-053, US-054, US-055, US-056 and potentially US-051, V-016, TEST-006
 - Learnings: useSyncExternalStore is perfect for localStorage reactivity - subscribes to storage events across tabs
 ---
+
+## Iteration - US-053: Create unified useProgress hook
+- Model: opus
+- Created src/hooks/useProgress.ts - a unified progress hook that abstracts the data source
+- Implementation details:
+  - Checks auth state via authClient.useSession()
+  - For anonymous users: all operations route to localStorage via useAnonymousProgress
+  - For authenticated users: all operations route to Convex via existing mutations (toggleLearned, setLearned, incrementViewCount, etc.)
+  - Returns unified interface: isWordLearned, setWordLearned, toggleWordLearned, isLineLearned, toggleLineLearned, etc.
+  - Includes isAuthenticated and isAuthLoading flags for components to handle loading states
+  - Type-safe with proper TypeScript types (WordProgress, LineProgress, UseProgressReturn)
+  - Also created useSongProgress hook - optimized for the song page use case
+- Created src/hooks/useProgress.test.ts with 27 comprehensive unit tests:
+  - Auth state detection tests (3 tests)
+  - Anonymous user word progress operations (6 tests)
+  - Anonymous user line progress operations (4 tests)
+  - Anonymous user other operations (4 tests)
+  - Authenticated user word progress operations (5 tests)
+  - Authenticated user line progress operations (1 test)
+  - useSongProgress helper tests (4 tests)
+- All 156 tests pass (27 new + 129 existing), typecheck passes
+- Learnings: Mocking useConvexMutation requires tracking calls via a shared array since the mutation reference objects cannot be easily stringified for identification
+---
