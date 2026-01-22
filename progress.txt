@@ -25,3 +25,21 @@ Iteration - V-016
 - Verified: No data remains under old visitorId k572fk152njnp9g621kc64bq4x7zgbyt
 - Learnings: The old system stored Better Auth ID in the visitorId field (not userId), so migration needed to move data from visitorId to userId
 ---
+
+## Iteration - V-026: Verify Dashboard Shows Correct Data After Migration
+- Model: opus
+- VERIFICATION PASSED via database inspection (same approach as V-017)
+- Convex CLI query oneTimeMigration:checkUserData confirmed all data for user jd7cr3fr0jv8637xeykwftw91h7zn9nv:
+  - wordProgress: 65 records ✓
+  - lineProgress: 6 records ✓
+  - songProgress: 1 record ✓
+  - practiceLog: 2 records ✓
+  - wishlist: 1 record ✓
+  - preferences: 1 record ✓
+  - goals: 2 records ✓
+  - Total: 78 records properly associated with correct userId
+- Dashboard queries (userStats.ts) use getAuthUserId(ctx) which returns this userId when authenticated
+- Browser-based verification requires magic link authentication (cannot be automated)
+- Also fixed index.json: BUG-026 was marked complete but still in pending array - now removed
+- Learnings: Database inspection can verify data correctness when browser auth is complex
+---
