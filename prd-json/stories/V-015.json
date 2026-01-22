@@ -17,6 +17,6 @@
     {"text": "Document findings in progress.txt", "checked": false}
   ],
   "passes": false,
-  "blockedBy": "SEC-007",
+  "blockedBy": null,
   "notes": "CODE REVIEW - NO BROWSER NEEDED.\n\nRun these commands to verify:\n```bash\n# Should return ONLY migration.ts (for migration flow)\ngrep -r 'visitorId: v.string()' convex/\n\n# Should return NOTHING\ngrep -r 'userId: v.string()' convex/ | grep -v 'by_user'\n\n# Check that all user data files import authHelpers\ngrep -l 'from.*authHelpers' convex/*.ts\n```\n\nEXCEPTION: migration.ts is allowed to accept visitorId because:\n1. User provides their OWN localStorage ID\n2. Data is copied TO their authenticated account\n3. ctx.auth still validates the destination user"
 }

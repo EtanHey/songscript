@@ -6,8 +6,8 @@
   "stats": {
     "total": 54,
     "completed": 42,
-    "pending": 6,
-    "blocked": 2
+    "pending": 8,
+    "blocked": 0
   },
   "nextStory": "TEST-002",
   "storyOrder": [
@@ -67,6 +67,8 @@
     "V-027"
   ],
   "pending": [
+    "V-015",
+    "V-016",
     "TEST-002",
     "TEST-003",
     "TEST-004",
@@ -74,10 +76,7 @@
     "TEST-006",
     "V-027"
   ],
-  "blocked": [
-    "V-015",
-    "V-016"
-  ],
+  "blocked": [],
   "browserSetup": {
     "viewport": "desktop 1200px+",
     "homeUrl": "http://localhost:3001",

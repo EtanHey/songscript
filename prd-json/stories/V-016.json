@@ -16,6 +16,6 @@
     {"text": "Check Convex dashboard - data has userId, not visitorId", "checked": false}
   ],
   "passes": false,
-  "blockedBy": "Browser tabs not available.",
+  "blockedBy": null,
   "notes": "BROWSER VERIFICATION REQUIRED.\n\nTest emails:\n- Use yosef.from.levant@proton.me (Proton Mail tab should be open)\n- Or use a new test email\n\nBefore testing:\n1. Clear localStorage: localStorage.clear()\n2. Delete test user from Convex if exists: npx convex dashboard → users table\n\nDuring testing, check:\n- Network tab for migration mutation call\n- Console for any errors\n- Convex dashboard for data with userId field populated"
 }
