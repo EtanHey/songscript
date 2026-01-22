@@ -1,0 +1,36 @@
+{
+  "id": "US-052",
+  "title": "Create localStorage progress hook for anonymous users",
+  "type": "feature",
+  "priority": "high",
+  "storyPoints": 5,
+  "description": "Create a useAnonymousProgress() hook that stores all progress data in localStorage for unauthenticated users. This enables anonymous users to practice and see their progress persist across page refreshes.",
+  "acceptanceCriteria": [
+    "Hook generates songscript_visitor_id UUID if not exists",
+    "Hook stores progress in songscript_anonymous_progress key",
+    "Schema mirrors Convex tables: wordProgress, lineProgress, songProgress, practiceLog, wishlist, preferences",
+    "Anonymous user can mark words as learned, data persists on page refresh",
+    "Anonymous user can mark lines as learned, data persists on page refresh",
+    "Corrupted localStorage gracefully resets to empty state",
+    "All data operations are synchronous (no async needed for localStorage)"
+  ],
+  "technicalNotes": [
+    "Create src/hooks/useAnonymousProgress.ts",
+    "Use Zod or manual validation for localStorage reads",
+    "Export types that match Convex schema for easy migration",
+    "Include helper functions: getWordProgress, setWordLearned, getLineProgress, setLineLearned, etc.",
+    "Design doc: docs/plans/2025-01-22-anonymous-progress-design.md"
+  ],
+  "testingNotes": [
+    "Unit test: validates corrupted JSON returns empty state",
+    "Unit test: generates visitorId on first access",
+    "Unit test: persists and retrieves word progress correctly",
+    "Unit test: persists and retrieves line progress correctly"
+  ],
+  "files": [
+    "src/hooks/useAnonymousProgress.ts",
+    "src/hooks/useAnonymousProgress.test.ts"
+  ],
+  "blockedBy": null,
+  "passes": false
+}

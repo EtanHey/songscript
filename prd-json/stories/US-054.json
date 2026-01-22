@@ -1,0 +1,36 @@
+{
+  "id": "US-054",
+  "title": "Update song page to use unified progress hook",
+  "type": "feature",
+  "priority": "high",
+  "storyPoints": 3,
+  "description": "Refactor the song page (song.$songId.tsx) to use the new useProgress() hook instead of direct Convex calls. This enables anonymous users to see their progress on the song page.",
+  "acceptanceCriteria": [
+    "Song page uses useProgress() hook for all progress operations",
+    "Anonymous user: marking lines learned shows green checkmark",
+    "Anonymous user: checkmarks persist after page refresh",
+    "Anonymous user: word learned state persists in modal",
+    "Authenticated user: behavior unchanged (still uses Convex)",
+    "No visual difference between anonymous and authenticated progress display",
+    "Practice time tracking works for anonymous users (stored in localStorage)"
+  ],
+  "technicalNotes": [
+    "Replace toggleLineLearnedMutation with useProgress().toggleLineLearned",
+    "Replace toggleWordLearnedMutation with useProgress().toggleWordLearned",
+    "Replace lineProgress query with useProgress().lineProgress",
+    "Keep logPracticeMutation for authenticated, add localStorage logging for anonymous",
+    "Test with cleared localStorage to verify anonymous flow"
+  ],
+  "testingNotes": [
+    "Manual test: anonymous user marks line learned, refresh, verify checkmark",
+    "Manual test: anonymous user marks word learned in modal, close/reopen, verify state",
+    "Manual test: authenticated user flow still works identically"
+  ],
+  "files": [
+    "src/routes/song.$songId.tsx",
+    "src/components/WordInfoModal.tsx",
+    "src/components/LyricsDisplay.tsx"
+  ],
+  "blockedBy": "US-053",
+  "passes": false
+}

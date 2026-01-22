@@ -1,0 +1,37 @@
+{
+  "id": "US-056",
+  "title": "Add anonymous user CTA banner on song page",
+  "type": "feature",
+  "priority": "medium",
+  "storyPoints": 2,
+  "description": "Show a call-to-action banner on the song page for anonymous users who have progress, encouraging them to sign up to save their progress across devices.",
+  "acceptanceCriteria": [
+    "Banner only shows for anonymous users",
+    "Banner only shows when user has some progress (words/lines learned > 0)",
+    "Banner shows progress summary: 'You've learned X words!'",
+    "Banner has clear CTA: 'Sign up to save progress across devices'",
+    "Banner links to /signup page",
+    "Banner is dismissible (dismiss state persists in localStorage)",
+    "Banner does not obstruct main UI (positioned tastefully)",
+    "Banner does not show for authenticated users"
+  ],
+  "technicalNotes": [
+    "Create src/components/AnonymousProgressBanner.tsx",
+    "Use useProgress() hook to check for progress",
+    "Store dismiss state in localStorage (songscript_banner_dismissed)",
+    "Position at top of lyrics section or bottom of page",
+    "Use existing design system colors (emerald for CTA)"
+  ],
+  "testingNotes": [
+    "Manual test: banner appears after marking first word learned",
+    "Manual test: banner dismisses and stays dismissed",
+    "Manual test: banner does not appear for logged-in users",
+    "Manual test: clicking CTA navigates to signup"
+  ],
+  "files": [
+    "src/components/AnonymousProgressBanner.tsx",
+    "src/routes/song.$songId.tsx"
+  ],
+  "blockedBy": "US-054",
+  "passes": false
+}

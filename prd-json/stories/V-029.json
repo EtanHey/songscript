@@ -1,0 +1,37 @@
+{
+  "id": "V-029",
+  "title": "Verify anonymous to authenticated migration flow",
+  "type": "verification",
+  "priority": "high",
+  "storyPoints": 2,
+  "description": "End-to-end verification that anonymous progress stored in localStorage correctly migrates to Convex when user signs up with 'Bring my progress' checked.",
+  "acceptanceCriteria": [
+    "Anonymous user can practice song and mark words/lines learned",
+    "Progress visible on song page as green checkmarks",
+    "User signs up with 'Bring my progress' checkbox checked",
+    "After magic link verification, user redirected to dashboard",
+    "Dashboard shows migrated word count",
+    "Song page shows same checkmarks as before signup",
+    "localStorage is cleared after successful migration",
+    "User can continue practicing and progress saves to Convex"
+  ],
+  "technicalNotes": [
+    "Use tempmail MCP for signup testing:",
+    "- create_email: Get disposable email address",
+    "- Fill signup form with temp email",
+    "- get_messages: Check inbox for magic link",
+    "- get_message_detail: Read magic link email",
+    "- Extract and navigate to magic link URL",
+    "Use browser console to verify localStorage state before/after",
+    "Check Convex dashboard to verify records created"
+  ],
+  "testingNotes": [
+    "Start with cleared localStorage",
+    "Practice on at least 2 different songs",
+    "Mark at least 5 words and 3 lines as learned",
+    "Verify exact counts match before/after migration"
+  ],
+  "files": [],
+  "blockedBy": "US-055",
+  "passes": false
+}

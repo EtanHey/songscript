@@ -1,15 +1,15 @@
 {
   "$schema": "https://ralph.dev/schemas/prd-index.schema.json",
-  "generatedAt": "2026-01-22T00:56:00Z",
+  "generatedAt": "2026-01-22T21:00:00Z",
   "projectName": "SongScript Auth Security Fix",
   "workingDirectory": ".",
   "stats": {
-    "total": 58,
+    "total": 65,
     "completed": 54,
-    "pending": 0,
-    "blocked": 4
+    "pending": 8,
+    "blocked": 3
   },
-  "nextStory": null,
+  "nextStory": "US-052",
   "storyOrder": [
     "US-036",
     "V-003",
@@ -68,13 +68,28 @@
     "BUG-028",
     "US-051",
     "V-028",
-    "TEST-007"
+    "TEST-007",
+    "US-052",
+    "US-053",
+    "US-054",
+    "US-055",
+    "US-056",
+    "V-029",
+    "TEST-008"
   ],
-  "pending": [],
+  "pending": [
+    "US-052",
+    "US-053",
+    "US-054",
+    "US-055",
+    "US-056",
+    "V-029",
+    "TEST-008",
+    "TEST-002"
+  ],
   "blocked": [
     "US-051",
     "V-016",
-    "TEST-002",
     "TEST-006"
   ],
   "browserSetup": {
@@ -89,7 +104,8 @@
   "notes": {
     "context": "SECURITY FIX: Replace spoofable visitorId with ctx.auth.getUserIdentity(). Anonymous users use localStorage, migrate data on signup.",
     "securityPattern": "NEVER accept user ID as function argument - use ctx.auth server-side",
-    "migrationFlow": "Signup page with 'Bring progress' checkbox → magic link → verify.tsx runs migration → clear localStorage",
+    "migrationFlow": "Anonymous progress stored in localStorage → Signup with 'Bring progress' checkbox → verify.tsx reads localStorage and calls migration → Data inserted to Convex with userId → localStorage cleared",
+    "designDoc": "docs/plans/2025-01-22-anonymous-progress-design.md",
     "tables": [
       "wordProgress",
       "userSongProgress",

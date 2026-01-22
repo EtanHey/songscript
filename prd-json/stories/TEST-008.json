@@ -1,0 +1,37 @@
+{
+  "id": "TEST-008",
+  "title": "E2E test: Anonymous progress persistence and migration",
+  "type": "test",
+  "priority": "high",
+  "storyPoints": 3,
+  "description": "Playwright end-to-end test verifying that anonymous users can save progress to localStorage, progress persists across page refreshes, and progress migrates correctly on signup.",
+  "acceptanceCriteria": [
+    "Test: Anonymous user visits song page",
+    "Test: Marks lines as learned, checkmarks appear",
+    "Test: Page refresh preserves checkmarks",
+    "Test: User navigates to signup page",
+    "Test: Fills form with test email, keeps 'Bring progress' checked",
+    "Test: Submits form, magic link sent",
+    "Test: After verification, dashboard shows migrated progress",
+    "Test: Song page shows same checkmarks post-auth",
+    "Test: localStorage is cleared after migration",
+    "All tests pass in CI environment"
+  ],
+  "technicalNotes": [
+    "Create e2e/anonymous-progress.spec.ts",
+    "Use Playwright's localStorage manipulation for setup/assertions",
+    "For full magic link flow, may need to mock email or use test bypass",
+    "Alternative: test localStorage persistence separately from migration",
+    "Consider using page.evaluate() to inspect localStorage state"
+  ],
+  "testingNotes": [
+    "Run with: bun run test:e2e",
+    "Test should be independent (clear state before/after)",
+    "Consider test timeout for email/magic link flow"
+  ],
+  "files": [
+    "e2e/anonymous-progress.spec.ts"
+  ],
+  "blockedBy": "V-029",
+  "passes": false
+}

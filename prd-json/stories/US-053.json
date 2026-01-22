@@ -1,0 +1,34 @@
+{
+  "id": "US-053",
+  "title": "Create unified useProgress hook",
+  "type": "feature",
+  "priority": "high",
+  "storyPoints": 3,
+  "description": "Create a useProgress() hook that abstracts the data source - using localStorage for anonymous users and Convex for authenticated users. This provides a single interface for all progress operations regardless of auth state.",
+  "acceptanceCriteria": [
+    "Hook checks auth state via authClient.useSession()",
+    "Anonymous users: all operations go to localStorage via useAnonymousProgress",
+    "Authenticated users: all operations go to Convex via existing mutations",
+    "Same return interface for both paths: { wordProgress, lineProgress, toggleWordLearned, toggleLineLearned, ... }",
+    "Type-safe with proper TypeScript types",
+    "No loading flicker when switching between states"
+  ],
+  "technicalNotes": [
+    "Create src/hooks/useProgress.ts",
+    "Import useAnonymousProgress from US-052",
+    "Import existing Convex queries/mutations",
+    "Return unified interface with consistent method signatures",
+    "Handle the auth loading state gracefully"
+  ],
+  "testingNotes": [
+    "Unit test: returns localStorage operations when not authenticated",
+    "Unit test: returns Convex operations when authenticated",
+    "Integration test: switching auth state switches data source"
+  ],
+  "files": [
+    "src/hooks/useProgress.ts",
+    "src/hooks/useProgress.test.ts"
+  ],
+  "blockedBy": "US-052",
+  "passes": false
+}
