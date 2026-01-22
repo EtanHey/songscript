@@ -39,8 +39,23 @@ function VerifyPage() {
           return;
         }
 
-        // Ensure app user record exists
-        await ensureAppUser();
+        // Ensure app user record exists with retry logic
+        let retryCount = 0;
+        const maxRetries = 5;
+        while (retryCount < maxRetries) {
+          try {
+            await ensureAppUser();
+            break; // Success, exit retry loop
+          } catch (error) {
+            retryCount++;
+            if (retryCount >= maxRetries) {
+              throw error; // Re-throw after max retries
+            }
+            // Exponential backoff: 500ms, 1s, 2s, 4s
+            const delay = 500 * Math.pow(2, retryCount - 1);
+            await new Promise(resolve => setTimeout(resolve, delay));
+          }
+        }
 
         // Check localStorage for migration preferences
         const shouldMigrate = localStorage.getItem('songscript_migrate_on_signup') === 'true';

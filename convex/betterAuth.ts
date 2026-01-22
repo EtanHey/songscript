@@ -4,8 +4,8 @@ import { convex, crossDomain } from "@convex-dev/better-auth/plugins";
 import { magicLink } from "better-auth/plugins";
 import authConfig from "./auth.config";
 import { components } from "./_generated/api";
-import { query } from "./_generated/server";
-import type { GenericCtx } from "@convex-dev/better-auth";
+import { ConvexError } from "convex/server"; // Corrected import path for ConvexError
+import type { AuthContextWithDb } from "./authHelpers"; // Import AuthContextWithDb for type safety
 import type { DataModel } from "./_generated/dataModel";
 import { Resend } from "resend";
 
@@ -21,7 +21,7 @@ const resend = resendApiKey ? new Resend(resendApiKey) : null;
 // as well as helper methods for general use.
 export const authComponent = createClient<DataModel>(components.betterAuth);
 
-export const createAuth = (ctx: GenericCtx<DataModel>) => {
+export const createAuth = (ctx: AuthContextWithDb) => { // Changed GenericCtx to AuthContextWithDb
   return betterAuth({
     baseURL: siteUrl,
     trustedOrigins: [
@@ -37,6 +37,12 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
       // Magic link passwordless authentication
       magicLink({
         sendMagicLink: async ({ email, url, token }) => {
+          // Check if user already exists
+          const existingUser = await ctx.db.query("users").withIndex("email", (q) => q.eq("email", email)).first();
+          if (existingUser) {
+            // Throw ConvexError if user already exists
+            throw new ConvexError("This email is already registered. Please sign in instead.");
+          }
 
           // Extract frontend origin from the callbackURL in the original URL
           // The URL looks like: .../verify?token=xxx&callbackURL=http://localhost:3001/dashboard
@@ -222,11 +228,9 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
 };
 
 // Get the current authenticated user
-export const getCurrentUser = query({
-  args: {},
-  handler: async (ctx) => {
-    return await authComponent.getAuthUser(ctx);
-  },
-});
-
-
+// export const getCurrentUser = query({ // Removed this export
+//   args: {},
+//   handler: async (ctx) => {
+//     return await authComponent.getAuthUser(ctx);
+//   },
+// });

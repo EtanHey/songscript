@@ -2,7 +2,7 @@
 import { authComponent } from './betterAuth';
 import { QueryCtx, MutationCtx } from './_generated/server';
 
-type AuthContextWithDb = QueryCtx | MutationCtx;
+export type AuthContextWithDb = QueryCtx | MutationCtx;
 
 /**
  * Retrieves the authenticated user's ID from the Convex context.

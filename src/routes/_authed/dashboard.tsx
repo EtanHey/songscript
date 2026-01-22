@@ -46,6 +46,20 @@ function DashboardPage() {
     }
   }, [session, sessionPending, navigate]);
 
+  // Ensure app user exists (fallback for race condition)
+  const ensureAppUser = useConvexMutation(api.users.ensureAppUser);
+  
+  // Check if session exists but app user is missing, trigger ensureAppUser
+  useEffect(() => {
+    if (session?.user && !sessionPending) {
+      // Try to ensure app user exists as a fallback
+      ensureAppUser({}).catch((error) => {
+        console.warn('Dashboard ensureAppUser fallback failed:', error);
+        // Don't throw - this is a fallback mechanism
+      });
+    }
+  }, [session, sessionPending, ensureAppUser]);
+
   // Get song progress with details
   const { data: songProgress, isLoading: progressLoading } = useQuery(
     convexQuery(api.songProgress.getWithSongDetails, {})
@@ -143,11 +157,20 @@ function DashboardPage() {
     );
   }, [recentSongs, selectedLanguage]);
 
-  // Initialize default goals mutation
+  // Initialize default goals mutation with error handling and retry
   const { mutate: initializeGoals } = useMutation({
     mutationFn: useConvexMutation(api.goals.initializeDefaultGoals),
     onSuccess: () => {
       refetchGoals();
+    },
+    onError: (error) => {
+      console.warn('Initialize goals failed:', error);
+      // Retry after a delay if authentication error
+      if (error.message?.includes('Authentication required')) {
+        setTimeout(() => {
+          initializeGoals({});
+        }, 2000);
+      }
     },
   });
 
@@ -167,12 +190,16 @@ function DashboardPage() {
     },
   });
 
-  // Initialize goals on first visit (if no goals exist)
+  // Initialize goals on first visit (if no goals exist) with retry logic
   useEffect(() => {
-    if (goalsWithProgress !== undefined && goalsWithProgress.length === 0) {
-      initializeGoals({});
+    if (goalsWithProgress !== undefined && goalsWithProgress.length === 0 && session?.user) {
+      // Add a longer delay to ensure session is stable, with retry mechanism
+      const timer = setTimeout(() => {
+        initializeGoals({});
+      }, 2000); // Increased from 1000ms to 2000ms
+      return () => clearTimeout(timer);
     }
-  }, [goalsWithProgress, initializeGoals]);
+  }, [goalsWithProgress, initializeGoals, session]);
 
   // Reorder mutation
   const { mutate: reorderWishlist } = useMutation({
