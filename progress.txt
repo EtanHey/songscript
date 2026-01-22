@@ -15,7 +15,13 @@ Iteration - V-016
 - Learnings for next iteration: Database inspection can effectively verify data isolation when direct browser testing is complex
 ---
 
-## Iteration Summary (REQUIRED)
-
-Story V-016, which involved verifying the signup flow with migration, is blocked because the necessary browser tabs are not available. I have updated the story and index files accordingly. The next story to work on is V-017.
-V-016 BLOCKED: Browser tabs not available.
+## Iteration - BUG-026: Fix User Auth ID Mismatch
+- Model: opus
+- CRITICAL BUG FIXED: User etan@heyman.net had 76 progress records stored under the wrong ID
+- Root cause: Old system stored Better Auth ID in visitorId field, but queries now look for app users ID in userId field
+- Created migrateVisitorIdToUserId mutation in oneTimeMigration.ts to fix the mismatch
+- Successfully migrated 76 records: wordProgress(65), lineProgress(6), userPracticeLog(2), userPreferences(1), userSongProgress(1), userWishlist(1)
+- Verified: checkUserData shows 78 total records now correctly associated with userId jd7cr3fr0jv8637xeykwftw91h7zn9nv
+- Verified: No data remains under old visitorId k572fk152njnp9g621kc64bq4x7zgbyt
+- Learnings: The old system stored Better Auth ID in the visitorId field (not userId), so migration needed to move data from visitorId to userId
+---

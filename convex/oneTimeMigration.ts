@@ -243,6 +243,279 @@ export const fixAppUserRecord = mutation({
   },
 });
 
+// Check what data exists for a userId (in the userId field)
+export const checkUserData = query({
+  args: { userId: v.string() },
+  handler: async (ctx, { userId }) => {
+    const wordProgress = await ctx.db
+      .query("wordProgress")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .collect();
+
+    const songProgress = await ctx.db
+      .query("userSongProgress")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .collect();
+
+    const lineProgress = await ctx.db
+      .query("lineProgress")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .collect();
+
+    const wishlist = await ctx.db
+      .query("userWishlist")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .collect();
+
+    const practiceLog = await ctx.db
+      .query("userPracticeLog")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .collect();
+
+    const goals = await ctx.db
+      .query("userGoals")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .collect();
+
+    const preferences = await ctx.db
+      .query("userPreferences")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .collect();
+
+    return {
+      userId,
+      counts: {
+        wordProgress: wordProgress.length,
+        songProgress: songProgress.length,
+        lineProgress: lineProgress.length,
+        wishlist: wishlist.length,
+        practiceLog: practiceLog.length,
+        goals: goals.length,
+        preferences: preferences.length,
+      },
+      total: wordProgress.length + songProgress.length + lineProgress.length +
+        wishlist.length + practiceLog.length + goals.length + preferences.length,
+    };
+  },
+});
+
+// BUG-026 FIX: Migrate from visitorId=BetterAuthID to userId=AppUsersID
+// The old system stored Better Auth ID in the visitorId field
+// The new system uses app users ID in the userId field
+export const migrateVisitorIdToUserId = mutation({
+  args: {
+    oldVisitorId: v.string(), // Better Auth ID that was stored in visitorId
+    newUserId: v.string(), // App users ID to store in userId
+  },
+  handler: async (ctx, { oldVisitorId, newUserId }) => {
+    const results = {
+      wordProgress: 0,
+      userSongProgress: 0,
+      lineProgress: 0,
+      userWishlist: 0,
+      userPracticeLog: 0,
+      userGoals: 0,
+      userPreferences: 0,
+    };
+
+    // Migrate wordProgress
+    const wordProgressRecords = await ctx.db
+      .query("wordProgress")
+      .withIndex("by_visitor", (q) => q.eq("visitorId", oldVisitorId))
+      .collect();
+    for (const record of wordProgressRecords) {
+      await ctx.db.patch(record._id, {
+        userId: newUserId,
+        visitorId: "migrated-to-user", // Mark as migrated
+      });
+      results.wordProgress++;
+    }
+
+    // Migrate userSongProgress
+    const songProgressRecords = await ctx.db
+      .query("userSongProgress")
+      .withIndex("by_visitor", (q) => q.eq("visitorId", oldVisitorId))
+      .collect();
+    for (const record of songProgressRecords) {
+      await ctx.db.patch(record._id, {
+        userId: newUserId,
+        visitorId: "migrated-to-user",
+      });
+      results.userSongProgress++;
+    }
+
+    // Migrate lineProgress
+    const lineProgressRecords = await ctx.db
+      .query("lineProgress")
+      .withIndex("by_visitor", (q) => q.eq("visitorId", oldVisitorId))
+      .collect();
+    for (const record of lineProgressRecords) {
+      await ctx.db.patch(record._id, {
+        userId: newUserId,
+        visitorId: "migrated-to-user",
+      });
+      results.lineProgress++;
+    }
+
+    // Migrate userWishlist
+    const wishlistRecords = await ctx.db
+      .query("userWishlist")
+      .withIndex("by_visitor", (q) => q.eq("visitorId", oldVisitorId))
+      .collect();
+    for (const record of wishlistRecords) {
+      await ctx.db.patch(record._id, {
+        userId: newUserId,
+        visitorId: "migrated-to-user",
+      });
+      results.userWishlist++;
+    }
+
+    // Migrate userPracticeLog
+    const practiceLogRecords = await ctx.db
+      .query("userPracticeLog")
+      .withIndex("by_visitor", (q) => q.eq("visitorId", oldVisitorId))
+      .collect();
+    for (const record of practiceLogRecords) {
+      await ctx.db.patch(record._id, {
+        userId: newUserId,
+        visitorId: "migrated-to-user",
+      });
+      results.userPracticeLog++;
+    }
+
+    // Migrate userGoals
+    const goalsRecords = await ctx.db
+      .query("userGoals")
+      .withIndex("by_visitor", (q) => q.eq("visitorId", oldVisitorId))
+      .collect();
+    for (const record of goalsRecords) {
+      await ctx.db.patch(record._id, {
+        userId: newUserId,
+        visitorId: "migrated-to-user",
+      });
+      results.userGoals++;
+    }
+
+    // Migrate userPreferences
+    const preferencesRecords = await ctx.db
+      .query("userPreferences")
+      .withIndex("by_visitor", (q) => q.eq("visitorId", oldVisitorId))
+      .collect();
+    for (const record of preferencesRecords) {
+      await ctx.db.patch(record._id, {
+        userId: newUserId,
+        visitorId: "migrated-to-user",
+      });
+      results.userPreferences++;
+    }
+
+    return {
+      success: true,
+      fromVisitorId: oldVisitorId,
+      toUserId: newUserId,
+      migrated: results,
+      total: Object.values(results).reduce((a, b) => a + b, 0),
+    };
+  },
+});
+
+// Migrate userId field from old Better Auth ID to new app users ID
+export const migrateUserId = mutation({
+  args: {
+    oldUserId: v.string(),
+    newUserId: v.string(),
+  },
+  handler: async (ctx, { oldUserId, newUserId }) => {
+    const results = {
+      wordProgress: 0,
+      userSongProgress: 0,
+      lineProgress: 0,
+      userWishlist: 0,
+      userPracticeLog: 0,
+      userGoals: 0,
+      userPreferences: 0,
+    };
+
+    // Migrate wordProgress
+    const wordProgressRecords = await ctx.db
+      .query("wordProgress")
+      .withIndex("by_user", (q) => q.eq("userId", oldUserId))
+      .collect();
+    for (const record of wordProgressRecords) {
+      await ctx.db.patch(record._id, { userId: newUserId });
+      results.wordProgress++;
+    }
+
+    // Migrate userSongProgress
+    const songProgressRecords = await ctx.db
+      .query("userSongProgress")
+      .withIndex("by_user", (q) => q.eq("userId", oldUserId))
+      .collect();
+    for (const record of songProgressRecords) {
+      await ctx.db.patch(record._id, { userId: newUserId });
+      results.userSongProgress++;
+    }
+
+    // Migrate lineProgress
+    const lineProgressRecords = await ctx.db
+      .query("lineProgress")
+      .withIndex("by_user", (q) => q.eq("userId", oldUserId))
+      .collect();
+    for (const record of lineProgressRecords) {
+      await ctx.db.patch(record._id, { userId: newUserId });
+      results.lineProgress++;
+    }
+
+    // Migrate userWishlist
+    const wishlistRecords = await ctx.db
+      .query("userWishlist")
+      .withIndex("by_user", (q) => q.eq("userId", oldUserId))
+      .collect();
+    for (const record of wishlistRecords) {
+      await ctx.db.patch(record._id, { userId: newUserId });
+      results.userWishlist++;
+    }
+
+    // Migrate userPracticeLog
+    const practiceLogRecords = await ctx.db
+      .query("userPracticeLog")
+      .withIndex("by_user", (q) => q.eq("userId", oldUserId))
+      .collect();
+    for (const record of practiceLogRecords) {
+      await ctx.db.patch(record._id, { userId: newUserId });
+      results.userPracticeLog++;
+    }
+
+    // Migrate userGoals
+    const goalsRecords = await ctx.db
+      .query("userGoals")
+      .withIndex("by_user", (q) => q.eq("userId", oldUserId))
+      .collect();
+    for (const record of goalsRecords) {
+      await ctx.db.patch(record._id, { userId: newUserId });
+      results.userGoals++;
+    }
+
+    // Migrate userPreferences
+    const preferencesRecords = await ctx.db
+      .query("userPreferences")
+      .withIndex("by_user", (q) => q.eq("userId", oldUserId))
+      .collect();
+    for (const record of preferencesRecords) {
+      await ctx.db.patch(record._id, { userId: newUserId });
+      results.userPreferences++;
+    }
+
+    return {
+      success: true,
+      fromUserId: oldUserId,
+      toUserId: newUserId,
+      migrated: results,
+      total: Object.values(results).reduce((a, b) => a + b, 0),
+    };
+  },
+});
+
 // List all unique visitorIds in the database
 export const listAllVisitorIds = query({
   args: {},
