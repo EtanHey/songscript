@@ -1,0 +1,33 @@
+{
+  "id": "US-058",
+  "title": "Add reassuring progress note on signup page",
+  "type": "feature",
+  "priority": "medium",
+  "storyPoints": 1,
+  "description": "Add a reassuring note on the signup page telling users their progress is safe and they can import it after signing up. This reduces anxiety about losing progress during signup.",
+  "acceptanceCriteria": [
+    {"text": "Note appears on signup page when localStorage has anonymous progress", "checked": false},
+    {"text": "Note text: 'Your learning progress is saved on this device. After signing up, you'll have the option to import it to your account.'", "checked": false},
+    {"text": "Note styled subtly (not alarming) - info style, not warning", "checked": false},
+    {"text": "Note does NOT appear if no anonymous progress exists", "checked": false},
+    {"text": "Remove or update the 'Bring my progress' checkbox (no longer needed for auto-migration)", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "Verify in browser: note appears with progress, hidden without", "checked": false}
+  ],
+  "technicalNotes": [
+    "Update src/routes/signup.tsx",
+    "Read from songscript_anonymous_progress localStorage",
+    "Use subtle info styling (blue/gray, not warning yellow)",
+    "Consider showing word count: 'You have X words saved on this device...'"
+  ],
+  "testingNotes": [
+    "Test with localStorage progress - note should appear",
+    "Test without localStorage progress - note should NOT appear",
+    "Test note styling is reassuring, not alarming"
+  ],
+  "files": [
+    "src/routes/signup.tsx"
+  ],
+  "blockedBy": "US-052",
+  "passes": false
+}

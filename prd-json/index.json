@@ -6,10 +6,10 @@
   "stats": {
     "total": 65,
     "completed": 59,
-    "pending": 5,
-    "blocked": 1
+    "pending": 6,
+    "blocked": 0
   },
-  "nextStory": "TEST-008",
+  "nextStory": "V-029",
   "storyOrder": [
     "US-036",
     "V-003",
@@ -78,15 +78,14 @@
     "TEST-008"
   ],
   "pending": [
+    "V-029",
     "TEST-008",
     "TEST-002",
     "US-051",
     "V-016",
     "TEST-006"
   ],
-  "blocked": [
-    "V-029"
-  ],
+  "blocked": [],
   "browserSetup": {
     "viewport": "desktop 1200px+",
     "homeUrl": "http://localhost:3001",

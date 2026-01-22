@@ -1,0 +1,41 @@
+{
+  "id": "US-057",
+  "title": "Post-login migration confirmation modal",
+  "type": "feature",
+  "priority": "high",
+  "storyPoints": 4,
+  "description": "Instead of auto-migrating anonymous progress on signup verification, show a confirmation modal after login. This prevents accidental migration to wrong accounts and gives users control over their data.",
+  "acceptanceCriteria": [
+    {"text": "Modal shows after successful login if localStorage has anonymous progress", "checked": false},
+    {"text": "Modal does NOT show if user's ID is in songscript_migration_declined_by array", "checked": false},
+    {"text": "Modal displays progress summary: 'Found X words and Y songs on this device'", "checked": false},
+    {"text": "Modal has 'Import to my account' button (accept)", "checked": false},
+    {"text": "Modal has 'No thanks' button (decline)", "checked": false},
+    {"text": "Accept: calls migration mutation, clears localStorage progress on success", "checked": false},
+    {"text": "Decline: adds userId to songscript_migration_declined_by array in localStorage", "checked": false},
+    {"text": "Modal does not block app usage - can be dismissed", "checked": false},
+    {"text": "Remove auto-migration from verify.tsx (migration now happens via modal)", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "Verify in browser: modal appears after fresh login with localStorage progress", "checked": false}
+  ],
+  "technicalNotes": [
+    "Create src/components/MigrationConfirmModal.tsx",
+    "Hook into auth state change or dashboard load to trigger modal",
+    "Use existing Dialog component from shadcn/ui",
+    "Store declined_by as JSON array in localStorage",
+    "Call migrateAnonymousData mutation from US-055 on accept",
+    "Design doc: docs/plans/2025-01-22-anonymous-progress-design.md"
+  ],
+  "testingNotes": [
+    "Test with fresh localStorage progress + new user login",
+    "Test that declined users don't see modal again",
+    "Test that different user on same device sees modal"
+  ],
+  "files": [
+    "src/components/MigrationConfirmModal.tsx",
+    "src/routes/auth/verify.tsx",
+    "src/routes/_authed/dashboard.tsx"
+  ],
+  "blockedBy": "US-055",
+  "passes": false
+}

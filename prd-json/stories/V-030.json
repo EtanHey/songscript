@@ -1,0 +1,33 @@
+{
+  "id": "V-030",
+  "title": "Verify post-login migration confirmation flow",
+  "type": "verification",
+  "priority": "high",
+  "storyPoints": 2,
+  "description": "Browser verification of the post-login migration confirmation modal - test accept path, decline path, and that declined users don't see the modal again.",
+  "acceptanceCriteria": [
+    {"text": "Clear localStorage, practice as anonymous, mark 3+ words learned", "checked": false},
+    {"text": "Sign up with new account using tempmail MCP", "checked": false},
+    {"text": "After magic link verification, migration modal appears", "checked": false},
+    {"text": "Modal shows correct count of words/songs", "checked": false},
+    {"text": "Test ACCEPT path: click import, verify data appears in dashboard", "checked": false},
+    {"text": "Verify localStorage progress is cleared after accept", "checked": false},
+    {"text": "Test DECLINE path: create new progress, new account, decline modal", "checked": false},
+    {"text": "Verify userId added to songscript_migration_declined_by array", "checked": false},
+    {"text": "Log out and back in - modal should NOT appear for declined user", "checked": false},
+    {"text": "Log in as DIFFERENT user - modal SHOULD appear (not in their declined list)", "checked": false}
+  ],
+  "technicalNotes": [
+    "Use tempmail MCP for signup testing",
+    "Use browser MCP tools to check localStorage state",
+    "May need multiple test accounts to verify declined array behavior",
+    "Check console for any errors during flow"
+  ],
+  "testingNotes": [
+    "This is a comprehensive verification - test both happy and unhappy paths",
+    "Pay attention to localStorage state at each step"
+  ],
+  "files": [],
+  "blockedBy": "US-057",
+  "passes": false
+}
