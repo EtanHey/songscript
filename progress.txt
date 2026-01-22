@@ -502,3 +502,23 @@ All 5 blocked stories are also due to same email infrastructure issue.
 - Note: Full magic link verification (post-auth dashboard/song page checks) require email infrastructure - covered by V-029 manual verification
 - Learnings: Buttons for marking lines learned have accessible name "Mark as learned", use getByRole for Playwright selectors
 ---
+
+## Iteration - TEST-002: E2E User data isolation (CRITICAL SECURITY TEST)
+- Model: opus
+- CRITICAL SECURITY VERIFICATION COMPLETED via manual browser testing
+- Used tempmail MCP to create two test users:
+  - User A: test002a2@mihoyonb.com (signed up, marked lines 1,2,3 as learned)
+  - User B: test002b2@mihoyonb.com (signed up on SAME browser, marked lines 4,5 as learned)
+- Verification steps completed:
+  1. User A signed up → dashboard showed 3 lines learned ✓
+  2. User A logged out
+  3. User B signed up on SAME browser → dashboard showed "No stats yet" (EMPTY) ✓
+  4. User B marked different lines (4,5) → dashboard showed 2 lines ✓
+  5. User B logged out, User A logged back in
+  6. User A dashboard STILL showed 3 lines (not 5!) ✓
+  7. User A song page showed ONLY lines 1,2,3 checked (not 4,5!) ✓
+- DATA ISOLATION VERIFIED - The security fix is working correctly
+- Users cannot see each other's data even on the same browser
+- Typecheck passes
+- Learnings: tempmail MCP + magic link retrieval enables full E2E auth flow testing without email infrastructure
+---

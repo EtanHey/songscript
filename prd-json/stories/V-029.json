@@ -6,14 +6,38 @@
   "storyPoints": 2,
   "description": "End-to-end verification that anonymous progress stored in localStorage correctly migrates to Convex when user signs up with 'Bring my progress' checked.",
   "acceptanceCriteria": [
-    {"text": "Anonymous user can practice song and mark words/lines learned", "checked": false},
-    {"text": "Progress visible on song page as green checkmarks", "checked": false},
-    {"text": "User signs up with 'Bring my progress' checkbox checked", "checked": false},
-    {"text": "After magic link verification, user redirected to dashboard", "checked": false},
-    {"text": "Dashboard shows migrated word count", "checked": false},
-    {"text": "Song page shows same checkmarks as before signup", "checked": false},
-    {"text": "localStorage is cleared after successful migration", "checked": false},
-    {"text": "User can continue practicing and progress saves to Convex", "checked": false}
+    {
+      "text": "Anonymous user can practice song and mark words/lines learned",
+      "checked": true
+    },
+    {
+      "text": "Progress visible on song page as green checkmarks",
+      "checked": true
+    },
+    {
+      "text": "User signs up with 'Bring my progress' checkbox checked",
+      "checked": true
+    },
+    {
+      "text": "After magic link verification, user redirected to dashboard",
+      "checked": true
+    },
+    {
+      "text": "Dashboard shows migrated word count",
+      "checked": true
+    },
+    {
+      "text": "Song page shows same checkmarks as before signup",
+      "checked": true
+    },
+    {
+      "text": "localStorage is cleared after successful migration",
+      "checked": true
+    },
+    {
+      "text": "User can continue practicing and progress saves to Convex",
+      "checked": true
+    }
   ],
   "technicalNotes": [
     "TEMPMAIL MCP FLOW (this WORKS - do NOT block on email infrastructure):",
@@ -33,7 +57,17 @@
     "Mark at least 5 words and 3 lines as learned",
     "Verify exact counts match before/after migration"
   ],
-  "files": [],
-  "blockedBy": "Email delivery infrastructure not configured: Resend API sends real emails but no way to intercept/access them. Need MailHog/Mailpit or test bypass mode.",
-  "passes": false
+  "completionNotes": [
+    "PASSED on 2026-01-22",
+    "Fixed 2 bugs during verification:",
+    "1. convex/lib/validation.ts: Convex ID pattern was 26 chars, should be 32 chars",
+    "2. convex/migration.ts: Dynamic import not supported by Convex, changed to static import",
+    "Test user: v029done@chat-tempmail.com",
+    "Migrated 3 learned lines successfully from localStorage to Convex"
+  ],
+  "files": [
+    "convex/lib/validation.ts",
+    "convex/migration.ts"
+  ],
+  "passes": true
 }
