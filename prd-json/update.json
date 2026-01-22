@@ -1,17 +1,16 @@
 {
   "pending": [
     "US-051",
+    "V-028",
+    "TEST-007",
     "TEST-006",
     "V-027"
   ],
-  "blocked": [
-    "V-028",
-    "TEST-007"
-  ],
+  "blocked": [],
   "stats": {
     "total": 58,
     "completed": 43,
-    "pending": 3,
-    "blocked": 2
+    "pending": 5,
+    "blocked": 0
   }
 }

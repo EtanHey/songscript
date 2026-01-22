@@ -13,6 +13,6 @@
     {"text": "Typecheck passes", "checked": false}
   ],
   "passes": false,
-  "blockedBy": "V-028",
+  "blockedBy": null,
   "notes": "Test structure:\n```typescript\ntest.describe('Signup Checkbox', () => {\n  test('toggles visual state on click', async ({ page }) => {\n    await page.goto('/signup');\n    const checkbox = page.getByRole('checkbox');\n    await expect(checkbox).toBeChecked();\n    await checkbox.click();\n    await expect(checkbox).not.toBeChecked();\n    await checkbox.click();\n    await expect(checkbox).toBeChecked();\n  });\n\n  test('persists preference to localStorage', async ({ page }) => {\n    // ... test localStorage values\n  });\n});\n```"
 }
