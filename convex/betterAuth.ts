@@ -4,8 +4,7 @@ import { convex, crossDomain } from "@convex-dev/better-auth/plugins";
 import { magicLink } from "better-auth/plugins";
 import authConfig from "./auth.config";
 import { components } from "./_generated/api";
-import { ConvexError } from "convex/server"; // Corrected import path for ConvexError
-import type { AuthContextWithDb } from "./authHelpers"; // Import AuthContextWithDb for type safety
+import type { AuthContextWithDb } from "./authHelpers";
 import type { DataModel } from "./_generated/dataModel";
 import { Resend } from "resend";
 
@@ -21,7 +20,7 @@ const resend = resendApiKey ? new Resend(resendApiKey) : null;
 // as well as helper methods for general use.
 export const authComponent = createClient<DataModel>(components.betterAuth);
 
-export const createAuth = (ctx: AuthContextWithDb) => { // Changed GenericCtx to AuthContextWithDb
+export const createAuth = (ctx: AuthContextWithDb) => {
   return betterAuth({
     baseURL: siteUrl,
     trustedOrigins: [
@@ -40,8 +39,8 @@ export const createAuth = (ctx: AuthContextWithDb) => { // Changed GenericCtx to
           // Check if user already exists
           const existingUser = await ctx.db.query("users").withIndex("email", (q) => q.eq("email", email)).first();
           if (existingUser) {
-            // Throw ConvexError if user already exists
-            throw new ConvexError("This email is already registered. Please sign in instead.");
+            // Throw error if user already exists
+            throw new Error("This email is already registered. Please sign in instead.");
           }
 
           // Extract frontend origin from the callbackURL in the original URL
