@@ -20,6 +20,7 @@ import {
 } from "../components/ui/select";
 import { Repeat, Languages, Video, Play, Square, Waves, Pause, ChevronDown, ChevronUp } from "lucide-react";
 import { WishlistButton } from "../components/WishlistButton";
+import { AnonymousProgressBanner } from "../components/AnonymousProgressBanner";
 
 // Playback modes - ALL modes use video as audio source
 type PlaybackMode = "single" | "loop" | "fluid";
@@ -794,6 +795,8 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
       {/* RIGHT: Lyrics section - scrolls */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
+        {/* CTA banner for anonymous users with progress */}
+        <AnonymousProgressBanner />
         <LyricsDisplay
           songId={songId}
           onLineClick={handleLineClick}

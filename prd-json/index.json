@@ -5,11 +5,11 @@
   "workingDirectory": ".",
   "stats": {
     "total": 65,
-    "completed": 58,
-    "pending": 4,
-    "blocked": 3
+    "completed": 59,
+    "pending": 6,
+    "blocked": 0
   },
-  "nextStory": "US-056",
+  "nextStory": "V-029",
   "storyOrder": [
     "US-036",
     "V-003",
@@ -78,16 +78,14 @@
     "TEST-008"
   ],
   "pending": [
-    "US-056",
     "V-029",
     "TEST-008",
-    "TEST-002"
-  ],
-  "blocked": [
+    "TEST-002",
     "US-051",
     "V-016",
     "TEST-006"
   ],
+  "blocked": [],
   "browserSetup": {
     "viewport": "desktop 1200px+",
     "homeUrl": "http://localhost:3001",

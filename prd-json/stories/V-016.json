@@ -16,6 +16,6 @@
     {"text": "Check Convex dashboard - data has userId, not visitorId", "checked": false}
   ],
   "passes": false,
-  "blockedBy": "US-055",
-  "notes": "BROWSER VERIFICATION REQUIRED.\n\nTEMPMAIL MCP - For signup testing:\n- Use `create_email` to get a disposable email address\n- Fill signup form with the temp email\n- Use `get_messages` to check inbox for magic link\n- Use `get_message_detail` to read the magic link email\n- Extract the verify URL and navigate to it\n\nCleanup test users with:\n- npx convex run oneTimeMigration:deleteTestUserByEmail '{\"email\": \"<temp-email>\"}'"\n\nBefore testing:\n1. Clear localStorage: localStorage.clear()\n2. Delete test user from Convex if exists: npx convex dashboard → users table\n\nDuring testing, check:\n- Network tab for migration mutation call\n- Console for any errors\n- Convex dashboard for data with userId field populated"
+  "blockedBy": null,
+  "notes": "BROWSER VERIFICATION REQUIRED.\n\nTEMPMAIL MCP - For signup testing:\n- Use `create_email` to get a disposable email address\n- Fill signup form with the temp email\n- Use `get_messages` to check inbox for magic link\n- Use `get_message_detail` to read the magic link email\n- Extract the verify URL and navigate to it\n\nCleanup test users with:\n- npx convex run oneTimeMigration:deleteTestUserByEmail '{\"email\": \"<temp-email>\"}'\n\nBefore testing:\n1. Clear localStorage: localStorage.clear()\n2. Delete test user from Convex if exists: npx convex dashboard → users table\n\nDuring testing, check:\n- Network tab for migration mutation call\n- Console for any errors\n- Convex dashboard for data with userId field populated"
 }

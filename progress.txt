@@ -360,3 +360,17 @@ Updated index.json to reflect final state:
 - All 11 acceptance criteria met, typecheck passes
 - Learnings: Convex validation is strict - need to provide typed v.object schemas for mutation args
 ---
+
+## Iteration - US-056: Add anonymous user CTA banner on song page
+- Model: opus
+- Created src/components/AnonymousProgressBanner.tsx:
+  - Shows only for anonymous users with progress (words/lines learned > 0)
+  - Displays "You've learned X items!" with CTA "Sign up to save progress across devices"
+  - Links to /signup page via "Sign up free" button
+  - Dismissible via X button, dismiss state persists in localStorage (songscript_banner_dismissed)
+  - Styled with emerald gradient, positioned at top of lyrics section
+- Added banner import and usage to src/routes/song.$songId.tsx
+- Browser verified: banner appears for anonymous user with 1 learned line, dismisses correctly, stays dismissed after refresh
+- All 10 acceptance criteria met, typecheck passes
+- Learnings: The useProgress hook provides isAuthenticated check, and the hasProgressToMigrate function can verify progress exists
+---
