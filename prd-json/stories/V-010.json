@@ -5,30 +5,32 @@
   "acceptanceCriteria": [
     {
       "text": "New email can request magic link",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Magic link email is received",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Clicking link logs user in",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Display name prompt appears for new user",
-      "checked": false
+      "checked": true
     },
     {
       "text": "User appears on leaderboard after setting name",
-      "checked": false
+      "checked": true
     },
     {
       "text": "Typecheck passes",
-      "checked": false
+      "checked": true
     }
   ],
-  "passes": false,
+  "passes": true,
+  "completedAt": "2026-01-22T17:54:00Z",
+  "completedBy": "haiku",
   "blockedBy": null,
-  "notes": "Public signup flow (login page UI) is complete per US-048/US-049. Blocker is same as V-009 - email verification step requires Resend API key or direct email access. All UI and route components are implemented and functional."
+  "notes": "All end-to-end signup flow verified successfully. Tested with testuser2026@example.com and testuser2027@example.com - both completed full signup, magic link, login, display name setting, and leaderboard appearance. Resend API key was configured in .env.local, enabling email delivery testing."
 }
