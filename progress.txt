@@ -94,3 +94,22 @@ Iteration - V-016
 - Full signup form workflow tested with checkbox checked/unchecked states
 - Learnings: When a Radix component has deep internal state issues, sometimes the cleanest fix is to replace it with a simpler custom implementation
 ---
+
+## Iteration - V-015: Verify no Convex function accepts spoofable user ID
+- Model: opus
+- CODE REVIEW VERIFICATION PASSED - Security audit of all Convex functions complete
+- Grep findings:
+  - `visitorId: v.string()` found in: migration.ts (allowed), oneTimeMigration.ts (admin tool), transcription.ts (non-sensitive job tracking), schema.ts (definitions only)
+  - `userId: v.string()` found only in admin migration tools (migration.ts, oneTimeMigration.ts)
+  - `email: v.string()` in users.ts checkEmailExists is for signup validation, not user data lookup
+- User data files verified - ALL use getAuthUserId/requireAuth from authHelpers:
+  - wordProgress.ts ✓
+  - songProgress.ts ✓
+  - wishlist.ts ✓
+  - practiceLog.ts ✓
+  - goals.ts ✓
+  - userPreferences.ts ✓
+  - leaderboard.ts ✓
+- SECURITY CONCLUSION: No user-facing Convex function accepts spoofable user IDs. All user identification comes from ctx.auth server-side.
+- Learnings: transcription.ts uses visitorId for job tracking but this is non-sensitive (just tracks who requested a transcription)
+---
