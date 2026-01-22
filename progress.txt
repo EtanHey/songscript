@@ -484,3 +484,21 @@ All 5 blocked stories are also due to same email infrastructure issue.
 3. Switch to MailHog as email provider in Better Auth configuration
 4. Update Playwright tests to retrieve magic links from captured emails
 ---
+
+## Iteration - TEST-008: E2E test for anonymous progress persistence and migration
+- Model: opus
+- V-029 is COMPLETE (passes: true), so TEST-008 was unblocked
+- Created e2e/anonymous-progress.spec.ts with 8 comprehensive tests:
+  1. Anonymous user can visit song page - verifies "Mark as learned" buttons visible
+  2. Anonymous user can mark lines as learned, checkmarks appear - clicks button and verifies localStorage
+  3. Page refresh preserves checkmarks - sets localStorage, refreshes, verifies persistence
+  4. User can navigate to signup page - preserves progress through navigation
+  5. Fills form with test email, keeps "Bring progress" checked - verifies migration checkbox default and localStorage storage
+  6. Submits form, magic link sent - tests form submission flow
+  7. localStorage is cleared after migration (simulated) - tests clearProgress functionality
+  8. All tests pass in CI environment (localStorage isolation) - tests browser context isolation
+- All 8 tests pass in 13.8s
+- Typecheck passes
+- Note: Full magic link verification (post-auth dashboard/song page checks) require email infrastructure - covered by V-029 manual verification
+- Learnings: Buttons for marking lines learned have accessible name "Mark as learned", use getByRole for Playwright selectors
+---
