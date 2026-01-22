@@ -54,6 +54,16 @@ Iteration - V-016
 - Learnings: When wrapping interactive elements in clickable containers, always stopPropagation on the inner element's click event to prevent double-firing
 ---
 
+## BUG-027 HOTFIX: Checkbox still broken
+- Model: opus (manual fix by Claude)
+- Previous fix didn't work: stopPropagation on onClick doesn't prevent Radix's onCheckedChange from firing
+- Real root cause: Radix Checkbox's onCheckedChange fires independently of DOM click events
+- ACTUAL FIX: Removed both onCheckedChange AND onClick from Checkbox, added pointer-events-none
+- Now only the parent div handles the toggle via its onClick
+- Checkbox is display-only (checked prop) with no internal event handling
+- Learnings: Radix UI components have their own event system separate from DOM events - stopPropagation doesn't affect onCheckedChange
+---
+
 ## Iteration - BUG-023: Prevent duplicate signup with same email
 - Model: opus
 - Added `checkEmailExists` query in convex/users.ts to check if email already registered
