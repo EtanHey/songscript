@@ -218,3 +218,20 @@ Iteration - V-016
 - Learnings: The Task tool with parallel agents can effectively run critique-waves style audits. All localStorage usage follows the songscript_ prefix pattern and is properly documented.
 ---
 
+
+## Iteration - V-028 + TEST-007: Checkbox verification and E2E tests
+- Model: haiku
+- BOTH STORIES COMPLETED
+- V-028: Browser-based manual verification of signup checkbox toggle and localStorage persistence
+  - Verified checkbox is checked by default ✓
+  - Verified toggle off/on/off works visually ✓
+  - Verified localStorage 'true' when submitted checked ✓
+  - Verified localStorage 'false' when submitted unchecked ✓
+  - No console errors during testing ✓
+- TEST-007: Created comprehensive E2E tests for checkbox functionality
+  - Added 7 Playwright tests to e2e/auth-signup.spec.ts
+  - Tests cover: renders form, default checked, form validation, localStorage persistence (true/false), visual toggle, no console errors
+  - All 7 tests pass with custom div-based checkbox selectors
+  - Custom selector logic: nth(3) filter on div containing "Bring my learning progress to this account"
+- Learnings: Custom checkbox implementation requires careful selector targeting in Playwright - used nth() and hasText() filters instead of getByRole()
+---
