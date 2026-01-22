@@ -1,0 +1,41 @@
+{
+  "id": "BUG-025",
+  "title": "Fix Auth Race Condition after Magic Link verification",
+  "description": "Magic link verification succeeds on the client, but immediate subsequent Convex mutations (ensureAppUser, initializeDefaultGoals) fail with 'Authentication required'. This leaves the system in a 'Split-Brain' state: the user exists in the Better Auth 'user' table but is missing from the application 'users' table. The flow must be made resilient so that the app user is ALWAYS created.",
+  "acceptanceCriteria": [
+    {
+      "text": "Investigate race condition in src/routes/auth/verify.tsx",
+      "checked": true
+    },
+    {
+      "text": "Add retry logic or a small delay in verify.tsx before calling ensureAppUser",
+      "checked": true
+    },
+    {
+      "text": "Implement idempotent check in Dashboard: if session exists but app user is missing, trigger ensureAppUser",
+      "checked": true
+    },
+    {
+      "text": "Ensure dashboard-triggered mutations (like initializeDefaultGoals) handle 'Authentication required' gracefully or wait for session stability",
+      "checked": true
+    },
+    {
+      "text": "Verify: Full signup flow (magic link -> dashboard) no longer shows 'Authentication required' or 'Try Again' error",
+      "checked": true
+    },
+    {
+      "text": "Browser test: Sign up with yosef.from.the.levant@proton.me, verify app users record is created with email",
+      "checked": true
+    },
+    {
+      "text": "Verify: User correctly exists in BOTH 'user' and 'users' tables after signup",
+      "checked": true
+    },
+    { "text": "Typecheck passes", "checked": true }
+  ],
+  "passes": true,
+  "completedAt": "2026-01-22T02:02:36Z",
+  "completedBy": "kiro",
+  "blockedBy": null,
+  "notes": "🚨 STRICT BROWSER TEST REQUIREMENTS - READ CAREFULLY 🚨\n\n❌ DO NOT mark this complete if:\n- You only tested with fake/test tokens\n- You only verified the form submits\n- You only verified error handling works\n- User did NOT land on /dashboard\n- You did NOT click the REAL magic link from email\n\n✅ ONLY mark complete when:\n- User is ACTUALLY logged in and on /dashboard\n- The REAL magic link from Proton Mail was clicked\n- Screenshot shows /dashboard with user logged in\n\n🧪 TEST EMAIL: yosef.from.the.levant@proton.me\nThis is a TEST email - if you get errors with the magic link:\n1. Run: npx convex dashboard\n2. Delete from 'user' table (Better Auth) where email = yosef.from.the.levant@proton.me\n3. Delete from 'users' table (app) if exists\n4. Retry the signup flow\n\n📋 REQUIRED STEPS (ALL MUST COMPLETE):\n1. Navigate to http://localhost:3001/signup\n2. Fill email: yosef.from.the.levant@proton.me\n3. Fill display name: TestUser\n4. Click submit - see 'Magic link sent!'\n5. Switch to Proton Mail tab (mail.proton.me)\n6. Find the SongScript magic link email\n7. Click the magic link URL in the email\n8. VERIFY: Browser shows /dashboard\n9. VERIFY: User is logged in (header shows user info)\n10. Take screenshot as PROOF\n\n⚠️ IF BROWSER TEST FAILS:\n- Try deleting test user from Convex (see above)\n- Retry the full signup flow\n- If still fails after retry, report the actual error\n- Do NOT mark as complete, do NOT declare partial success\n\nProton Mail: yosef.from.the.levant@proton.me\nThe email tab should already be open - just switch to it.\nAlso the user reported: [CONVEX M(goals:initializeDefaultGoals)] Server Error Uncaught Error: Authentication required. This happened during the transition from verification to dashboard. The verify.tsx screen also showed 'Try Again' which matches 'Authentication required' being caught during the ensureAppUser() call."
+}

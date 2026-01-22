@@ -4,8 +4,8 @@
   "projectName": "SongScript Auth Security Fix",
   "workingDirectory": ".",
   "stats": {
-    "total": 49,
-    "completed": 35,
+    "total": 50,
+    "completed": 36,
     "pending": 10,
     "blocked": 1
   },
@@ -51,6 +51,7 @@
     "SEC-012",
     "BUG-024",
     "V-015",
+    "BUG-025",
     "V-016",
     "V-017",
     "TEST-001",
