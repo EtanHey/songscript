@@ -175,3 +175,16 @@ Iteration - V-016
 - All 8 tests pass, typecheck passes
 - Learnings: Complex Convex internals (authComponent.safeGetAuthUser using ctx.runQuery) are hard to mock - use file/pattern analysis tests for security verification instead of trying to fully mock the auth chain
 ---
+
+## Iteration - V-027: Final build verification
+- Model: opus
+- Updated TEST-006 blockedBy from stale "SEC-010" to correct reason (anonymous progress tracking not implemented)
+- All verification checks PASSED:
+  - `bun run build` - completed successfully, .output directory created with nitro.json, public/, server/
+  - `bun run typecheck` - passed with no errors
+  - `bun run test` - 89 tests across 10 files, all passing
+- Moved TEST-006 to blocked array (same root cause as V-016 - requireAuth blocks anonymous users)
+- Project is now ready for push to remote (user must do this per CLAUDE.md rules)
+- ALL PENDING STORIES COMPLETE - only 4 blocked stories remain (all blocked on anonymous progress feature)
+- Learnings: TEST-006 had stale blockedBy reference - always validate blocker stories are still incomplete
+---
