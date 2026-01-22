@@ -374,3 +374,61 @@ Updated index.json to reflect final state:
 - All 10 acceptance criteria met, typecheck passes
 - Learnings: The useProgress hook provides isAuthenticated check, and the hasProgressToMigrate function can verify progress exists
 ---
+
+## Iteration - V-029: Verify anonymous to authenticated migration flow (BLOCKED)
+- Model: haiku
+- Successfully completed preliminary tests:
+  ✅ Cleared localStorage and started fresh anonymous session
+  ✅ Marked 5 lines as learned on song page (green checkmarks visible)
+  ✅ Verified anonymous progress stored in localStorage (songscript_anonymous_progress with 5 lineProgress records)
+  ✅ Navigated to signup page
+  ✅ Filled in email (speroni8b05dd@35.moonairse.com) and display name (V-029 Test User)
+  ✅ "Bring my progress" checkbox was checked by default (verified visual state)
+  ✅ Submitted signup form - received "Magic link sent!" success message
+- ❌ INFRASTRUCTURE BLOCKER: Cannot access magic link email
+  - tempmail MCP get_messages failed - service not accessible via API
+  - Resend API access requires curl/fetch (environment issues)
+  - Local tempmail service (moonairse.com) not accessible in browser
+  - No MailHog/Mailpit local email capture configured
+- Root cause: Email delivery testing requires external infrastructure that's not set up (same as TEST-002, V-016)
+- Marked V-029 as blocked
+- Learnings: Need email capture tool (MailHog/Mailpit) to complete email-based E2E tests
+---
+
+## ITERATION COMPLETE - ALL REMAINING STORIES BLOCKED
+
+**Summary:**
+Only 1 story worked on this iteration (V-029), which became BLOCKED on infrastructure issue.
+
+**All Remaining Pending Stories (5):**
+1. **TEST-008** - Blocked by V-029, which requires email infrastructure
+2. **TEST-002** - Blocked: "Requires email delivery infrastructure (MailHog/Mailpit)"
+3. **US-051** - Blocked: Requires email-based signup + migration flow
+4. **V-016** - Blocked: Requires email-based signup + migration flow (TEMPMAIL MCP notes in story)
+5. **TEST-006** - Blocked: Requires email-based signup + migration flow (E2E tests for magic link)
+
+**Root Cause (Infrastructure):**
+- Email delivery system not configured locally
+- Resend API is configured but no way to access sent emails in browser/automation
+- tempmail MCP cannot access foreign temp email services via API
+- No MailHog/Mailpit local email capture tool running
+- Magic link verification requires email access
+
+**What Needs to Be Done to Unblock ALL Stories:**
+1. Set up local email capture infrastructure:
+   - Install and run MailHog or Mailpit
+   - Point Resend API to local mail server OR
+   - Use MailHog SMTP as email provider for development
+   - Access captured emails via web interface (MailHog:1025 SMTP, :8025 web)
+
+2. Update environment for magic link testing:
+   - Ensure captured emails are accessible during tests
+   - Update Playwright tests to retrieve magic links from captured emails
+   - Or use test bypass mode if available in Better Auth
+
+**Progress File:**
+- V-029: Partially completed (localStorage setup confirmed, signup form filled, email sent), then BLOCKED
+- All 5 remaining stories blocked on email infrastructure
+- No other work possible without email delivery capability
+
+---

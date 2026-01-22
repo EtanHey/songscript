@@ -32,6 +32,6 @@
     "Verify exact counts match before/after migration"
   ],
   "files": [],
-  "blockedBy": "US-055",
+  "blockedBy": "Email delivery infrastructure not available - Resend API configured but tempmail MCP cannot access inbox. Magic link testing requires MailHog/Mailpit or equivalent local email capture tool.",
   "passes": false
 }
