@@ -131,3 +131,21 @@ Iteration - V-016
   2. Magic link auth E2E testing needs email interception tooling
   3. Security architecture tests pass - the fix is correct, just can't E2E test full user flows without auth infra
 ---
+
+## Iteration - TEST-003: E2E Protected routes redirect
+- Model: opus
+- Created e2e/auth-routes.spec.ts with 10 comprehensive tests
+- Protected routes tested:
+  - /dashboard redirects to /login ✓
+  - /settings redirects to /login ✓
+  - /leaderboard redirects to /login ✓
+  - /welcome redirects to /login ✓
+- Public routes verified accessible:
+  - / (home) stays accessible ✓
+  - /song/:id stays accessible ✓
+  - /signup stays accessible ✓
+  - /login stays accessible ✓
+- Auth architecture test confirms _authed layout uses authClient.useSession() correctly
+- All 10 tests pass, typecheck passes
+- Learnings: Login page heading changed from "SongScript Admin" to "Welcome Back" - keep tests synced with UI copy changes
+---
