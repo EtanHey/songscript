@@ -250,3 +250,39 @@ Iteration - V-016
 - Marked US-051 as blocked with detailed explanation
 - Learnings: Even though checkboxes toggle visually, the underlying mutations fail silently (error in console but UI doesn't show error to user)
 ---
+
+## ITERATION COMPLETE - ALL PENDING STORIES BLOCKED
+
+**Summary:**
+- Completed 2 stories this iteration: V-028 (browser verification), TEST-007 (E2E tests)
+- Discovered blocker while investigating US-051: Anonymous progress tracking not implemented
+- All 4 remaining pending stories are now blocked on the same infrastructure issues
+
+**Remaining Blocked Stories (4):**
+1. **V-016** - Requires anonymous progress tracking implementation
+2. **US-051** - Requires anonymous progress tracking implementation  
+3. **TEST-006** - Requires anonymous progress tracking implementation
+4. **TEST-002** - Requires email delivery infrastructure (MailHog/Mailpit) to intercept magic links
+
+**Statistics:**
+- Total stories: 58
+- Completed: 54
+- Blocked: 4
+- Pending: 0
+
+**What Needs to Be Done to Unblock:**
+1. Implement anonymous progress tracking (localStorage-based):
+   - Create songscript_visitor_id on first action
+   - Implement anonymous variants of progress mutations (toggleLineLearned, etc.)
+   - Ensure data is properly migrated on signup
+
+2. Set up email testing infrastructure:
+   - Add MailHog or Mailpit for E2E magic link testing
+   - Update Playwright tests to intercept and verify email delivery
+
+**Progress File:**
+Updated index.json to reflect final state:
+- nextStory: null (no more pending)
+- stats: 54 completed, 0 pending, 4 blocked
+- blocked array: [US-051, TEST-006, TEST-002, V-016]
+---
