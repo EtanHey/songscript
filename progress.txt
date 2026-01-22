@@ -235,3 +235,18 @@ Iteration - V-016
   - Custom selector logic: nth(3) filter on div containing "Bring my learning progress to this account"
 - Learnings: Custom checkbox implementation requires careful selector targeting in Playwright - used nth() and hasText() filters instead of getByRole()
 ---
+
+## Iteration - US-051: Test full signup migration flow (BLOCKED)
+- Model: haiku
+- Attempted browser testing of full signup flow with song practice
+- Successfully cleared localStorage and navigated to song page (Baraye by Shervin Hajipour)
+- ✅ Played video (video is playing, music audible)
+- ✅ Clicked lyric to interact (checkbox toggled visually)
+- ❌ BLOCKER FOUND: Attempted to mark word as learned - console error "Authentication required"
+- Root cause: All progress mutations (toggleLineLearned, etc) require authentication via requireAuth(ctx)
+- Anonymous users cannot save any progress - the UI allows clicking but mutations fail server-side
+- This is the SAME blocker as V-016, TEST-006, and TEST-002
+- The entire migration flow depends on anonymous progress tracking being implemented first
+- Marked US-051 as blocked with detailed explanation
+- Learnings: Even though checkboxes toggle visually, the underlying mutations fail silently (error in console but UI doesn't show error to user)
+---
