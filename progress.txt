@@ -53,3 +53,13 @@ Iteration - V-016
 - Typecheck passes
 - Learnings: When wrapping interactive elements in clickable containers, always stopPropagation on the inner element's click event to prevent double-firing
 ---
+
+## Iteration - BUG-023: Prevent duplicate signup with same email
+- Model: opus
+- Added `checkEmailExists` query in convex/users.ts to check if email already registered
+- Updated signup.tsx to call this query before sending magic link
+- When email exists: shows amber warning "This email is already registered" with link to "/login"
+- Form stays on signup page (doesn't redirect) when email exists
+- Browser verified: entered etan@heyman.net, clicked Submit, saw error message, clicked "sign in instead" link → navigated to login page
+- Learnings: Convex dev server needs restart after adding new functions (npx convex dev --once)
+---

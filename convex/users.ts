@@ -1,4 +1,5 @@
 import { mutation, query } from "./_generated/server";
+import { v } from "convex/values";
 import { authComponent } from "./betterAuth";
 
 /**
@@ -9,6 +10,23 @@ export const debugAuthUser = query({
   handler: async (ctx) => {
     const authUser = await authComponent.safeGetAuthUser(ctx);
     return authUser;
+  },
+});
+
+/**
+ * Check if an email is already registered in the app.
+ * Used by signup page to prevent duplicate accounts.
+ * Returns true if email exists, false otherwise.
+ */
+export const checkEmailExists = query({
+  args: { email: v.string() },
+  handler: async (ctx, args) => {
+    const email = args.email.toLowerCase().trim();
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", email))
+      .first();
+    return !!existingUser;
   },
 });
 

@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
+import { useConvex } from "convex/react";
+import { api } from "../../convex/_generated/api";
 import { authClient } from "../lib/auth-client";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -13,12 +15,14 @@ export const Route = createFileRoute("/signup")({
 
 function SignupPage() {
   const navigate = useNavigate();
+  const convex = useConvex();
   const { data: session, isPending } = authClient.useSession();
 
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [migrateProgress, setMigrateProgress] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [emailExists, setEmailExists] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -50,6 +54,7 @@ function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setEmailExists(false);
     setSuccess(null);
 
     // Validation
@@ -61,6 +66,14 @@ function SignupPage() {
     setLoading(true);
 
     try {
+      // Check if email already exists in the app
+      const exists = await convex.query(api.users.checkEmailExists, { email });
+      if (exists) {
+        setEmailExists(true);
+        setLoading(false);
+        return;
+      }
+
       // Store preferences in localStorage for the migration flow
       localStorage.setItem("songscript_migrate_on_signup", String(migrateProgress));
       localStorage.setItem("songscript_signup_display_name", displayName);
@@ -79,7 +92,7 @@ function SignupPage() {
          // However, story says "Send Magic Link button triggers magic link"
          // Let's use magicLink directly as it handles both signup and signin if configured,
          // or just follow the login pattern but with extra metadata.
-         
+
          // Re-reading PRD: "Send Magic Link button triggers magic link + stores migration preference"
          // The migration actually happens in verify.tsx (next stories).
          // So here we just need to send the magic link and store the metadata.
@@ -88,7 +101,7 @@ function SignupPage() {
       // Actually, signIn.magicLink is what we want because it sends the email.
       // signUp.email expects a password and might not send a magic link depending on config.
       // better-auth magic link works for both new and existing users.
-      
+
       const magicResult = await authClient.signIn.magicLink({
         email,
         callbackURL,
@@ -187,6 +200,22 @@ function SignupPage() {
             {error && (
               <div className="text-red-400 text-sm bg-red-900/20 p-3 rounded-md border border-red-900/50">
                 {error}
+              </div>
+            )}
+
+            {emailExists && (
+              <div className="text-amber-400 text-sm bg-amber-900/20 p-4 rounded-md border border-amber-900/50">
+                <p className="font-medium">This email is already registered.</p>
+                <p className="mt-2">
+                  Please{" "}
+                  <Link
+                    to="/login"
+                    className="text-emerald-400 hover:text-emerald-300 underline font-medium"
+                  >
+                    sign in instead
+                  </Link>
+                  .
+                </p>
               </div>
             )}
 
