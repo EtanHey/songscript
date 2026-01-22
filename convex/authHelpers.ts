@@ -1,8 +1,8 @@
 // convex/authHelpers.ts
 import { authComponent } from './betterAuth';
-import { QueryCtx, MutationCtx, ActionCtx } from './_generated/server';
+import { QueryCtx, MutationCtx } from './_generated/server';
 
-type AuthContext = QueryCtx | MutationCtx | ActionCtx;
+type AuthContextWithDb = QueryCtx | MutationCtx;
 
 /**
  * Retrieves the authenticated user's ID from the Convex context.
@@ -14,12 +14,22 @@ type AuthContext = QueryCtx | MutationCtx | ActionCtx;
  * - Always retrieve user identity directly from `ctx.auth` (or a trusted wrapper like `authComponent.safeGetAuthUser`)
  *   as `ctx.auth` is cryptographically verified and cannot be spoofed.
  *
- * @param ctx The Convex context (QueryCtx, MutationCtx, or ActionCtx).
- * @returns The user's ID if authenticated, otherwise null.
+ * @param ctx The Convex context (QueryCtx or MutationCtx).
+ * @returns The app user's ID if authenticated, otherwise null.
  */
-export async function getAuthUserId(ctx: AuthContext): Promise<string | null> {
+export async function getAuthUserId(ctx: AuthContextWithDb): Promise<string | null> {
   const authUser = await authComponent.safeGetAuthUser(ctx);
-  return authUser?._id ?? null;
+  if (!authUser) {
+    return null;
+  }
+
+    // Look up the app user record by authId
+    const appUser = await ctx.db
+      .query("users")
+      .withIndex("authId", (q) => q.eq("authId", authUser._id))
+      .first();
+
+  return appUser?._id ?? null;
 }
 
 /**
@@ -31,11 +41,11 @@ export async function getAuthUserId(ctx: AuthContext): Promise<string | null> {
  * - Prevents unauthorized access by enforcing authentication at the function entry point.
  * - Relies on `getAuthUserId` which adheres to the principle of not trusting client-provided user IDs.
  *
- * @param ctx The Convex context (QueryCtx, MutationCtx, or ActionCtx).
+ * @param ctx The Convex context (QueryCtx or MutationCtx).
  * @returns The user's ID if authenticated.
  * @throws {Error} If the user is not authenticated.
  */
-export async function requireAuth(ctx: AuthContext): Promise<string> {
+export async function requireAuth(ctx: AuthContextWithDb): Promise<string> {
   const userId = await getAuthUserId(ctx);
   if (!userId) {
     throw new Error('Authentication required');

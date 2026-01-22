@@ -20,6 +20,7 @@ function VerifyPage() {
 
   const migrateData = useMutation(api.migration.migrateAnonymousData);
   const setDisplayName = useMutation(api.leaderboard.setDisplayName);
+  const ensureAppUser = useMutation(api.users.ensureAppUser);
 
   useEffect(() => {
     if (!token) {
@@ -37,6 +38,9 @@ function VerifyPage() {
           setError(result.error.message || "Verification failed");
           return;
         }
+
+        // Ensure app user record exists
+        await ensureAppUser();
 
         // Check localStorage for migration preferences
         const shouldMigrate = localStorage.getItem('songscript_migrate_on_signup') === 'true';
