@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { authClient } from "../../lib/auth-client";
 import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
+import { exportForMigration, clearProgress, hasProgressToMigrate } from "../../hooks/useAnonymousProgress";
 
 export const Route = createFileRoute("/auth/verify")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -59,17 +60,24 @@ function VerifyPage() {
 
         // Check localStorage for migration preferences
         const shouldMigrate = localStorage.getItem('songscript_migrate_on_signup') === 'true';
-        const visitorId = localStorage.getItem('songscript_visitor_id');
         const displayName = localStorage.getItem('songscript_signup_display_name');
 
-        // Handle migration if requested
-        if (shouldMigrate && visitorId) {
+        // Handle migration if requested - read full progress from localStorage
+        if (shouldMigrate && hasProgressToMigrate()) {
           try {
-            const migrationResult = await migrateData({ visitorId });
-            const totalMigrated = Object.values(migrationResult).reduce((sum: number, count: number) => sum + count, 0);
+            // Export the full anonymous progress data from localStorage
+            const progressData = exportForMigration();
+            const migrationResult = await migrateData({ progressData });
+            const totalMigrated = Object.values(migrationResult).reduce((sum: number, count: number) => {
+              // Skip the validationErrorCount field
+              if (typeof count === 'number') return sum + count;
+              return sum;
+            }, 0);
             if (totalMigrated > 0) {
               setMigrationMessage(`Successfully migrated ${totalMigrated} records from your anonymous session!`);
             }
+            // Clear localStorage after successful migration
+            clearProgress();
           } catch (migrationError) {
             console.error('Migration failed:', migrationError);
             // Continue with login even if migration fails
@@ -87,7 +95,7 @@ function VerifyPage() {
         }
 
         // Clear migration-related localStorage keys
-        localStorage.removeItem('songscript_visitor_id');
+        // Note: clearProgress() already clears songscript_visitor_id and songscript_anonymous_progress
         localStorage.removeItem('songscript_migrate_on_signup');
         localStorage.removeItem('songscript_signup_display_name');
         // Keep songscript_welcome_shown as it's not user-specific

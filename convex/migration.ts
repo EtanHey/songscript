@@ -1,6 +1,7 @@
 import { mutation, internalMutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { requireAuth } from "./authHelpers";
+import type { Id } from "./_generated/dataModel";
 
 /**
  * BUG-026 Fix: Migrate progress data from old Better Auth ID to new app users ID
@@ -263,10 +264,88 @@ export const verifyUserProgressData = query({
   },
 });
 
+/**
+ * Migrate anonymous progress data from localStorage to Convex
+ *
+ * SECURITY NOTE: This mutation accepts user-submitted data from localStorage.
+ * All data is validated and sanitized before insertion using validation helpers.
+ *
+ * The mutation:
+ * - Requires authentication (user must be logged in)
+ * - Validates all input data types and bounds
+ * - Rejects malformed data gracefully (partial success OK)
+ * - Checks for duplicates to avoid data conflicts
+ * - Returns count of successfully migrated records
+ */
 export const migrateAnonymousData = mutation({
-  args: { visitorId: v.string() },
-  handler: async (ctx, { visitorId }) => {
+  args: {
+    progressData: v.object({
+      visitorId: v.string(),
+      wordProgress: v.array(
+        v.object({
+          persian: v.string(),
+          wordId: v.optional(v.string()),
+          learned: v.boolean(),
+          viewCount: v.number(),
+          playCount: v.number(),
+          lastSeen: v.number(),
+        })
+      ),
+      lineProgress: v.array(
+        v.object({
+          songId: v.string(),
+          lineNumber: v.number(),
+          learned: v.boolean(),
+        })
+      ),
+      songProgress: v.array(
+        v.object({
+          songId: v.string(),
+          lastPlayedAt: v.number(),
+          totalListenTime: v.number(),
+        })
+      ),
+      practiceLog: v.array(
+        v.object({
+          date: v.string(),
+          practiceSeconds: v.number(),
+          wordsLearned: v.number(),
+          linesCompleted: v.number(),
+        })
+      ),
+      wishlist: v.array(
+        v.object({
+          songId: v.string(),
+          addedAt: v.number(),
+        })
+      ),
+      preferences: v.object({
+        playbackSpeed: v.number(),
+        languageFilter: v.string(),
+        playbackMode: v.string(),
+        videoMuted: v.boolean(),
+        videoCollapsed: v.boolean(),
+      }),
+    }),
+  },
+  handler: async (ctx, { progressData }) => {
     const userId = await requireAuth(ctx);
+
+    // Import validation helpers
+    const {
+      validateAnonymousProgress,
+    } = await import("./lib/validation");
+
+    // Validate all input data
+    const validated = validateAnonymousProgress(progressData);
+
+    // Log validation errors for debugging (server-side only)
+    if (validated.errors.length > 0) {
+      console.warn(
+        `[migrateAnonymousData] Validation warnings for user ${userId}:`,
+        validated.errors.slice(0, 10) // Limit log size
+      );
+    }
 
     const results = {
       wordProgress: 0,
@@ -276,186 +355,243 @@ export const migrateAnonymousData = mutation({
       userPracticeLog: 0,
       userGoals: 0,
       userPreferences: 0,
+      validationErrorCount: validated.totalInvalidCount,
     };
 
-    // 1. wordProgress
-    const wordProgressRecords = await ctx.db
-      .query("wordProgress")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
-      .collect();
-
-    for (const record of wordProgressRecords) {
-      // Check if user already has progress for this word to avoid duplicates
+    // 1. Migrate word progress
+    for (const word of validated.wordProgress) {
+      // Check for duplicates by persian text
       const existing = await ctx.db
         .query("wordProgress")
         .withIndex("by_user", (q) => q.eq("userId", userId))
-        .filter((q) => q.eq(q.field("persian"), record.persian))
+        .filter((q) => q.eq(q.field("persian"), word.persian))
         .first();
 
       if (!existing) {
-        const { _id, _creationTime, ...data } = record;
-        await ctx.db.insert("wordProgress", {
-          ...data,
-          userId,
-          visitorId: "migrated", // Use a placeholder to avoid visitorId query conflicts
-        });
-        results.wordProgress++;
+        // We need a wordId for the schema - find a matching word in the database
+        // or skip if we can't find one (wordId is required in schema)
+        let wordId = word.wordId;
+
+        // If no wordId provided, try to find a word with matching persian text
+        if (!wordId) {
+          const matchingWord = await ctx.db
+            .query("words")
+            .filter((q) => q.eq(q.field("persian"), word.persian))
+            .first();
+          if (matchingWord) {
+            wordId = matchingWord._id;
+          }
+        }
+
+        // Only insert if we have a valid wordId (schema requires it)
+        if (wordId) {
+          try {
+            await ctx.db.insert("wordProgress", {
+              userId,
+              visitorId: "migrated",
+              wordId: wordId as Id<"words">,
+              persian: word.persian,
+              learned: word.learned,
+              viewCount: word.viewCount,
+              playCount: word.playCount,
+              lastSeen: word.lastSeen,
+            });
+            results.wordProgress++;
+          } catch (e) {
+            // Log but continue - partial success OK
+            console.warn(`[migrateAnonymousData] Failed to insert word "${word.persian}":`, e);
+          }
+        }
       }
     }
 
-    // 2. userSongProgress
-    const songProgressRecords = await ctx.db
-      .query("userSongProgress")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
-      .collect();
-
-    for (const record of songProgressRecords) {
-      const existing = await ctx.db
-        .query("userSongProgress")
-        .withIndex("by_user", (q) => q.eq("userId", userId))
-        .filter((q) => q.eq(q.field("songId"), record.songId))
-        .first();
-
-      if (!existing) {
-        const { _id, _creationTime, ...data } = record;
-        await ctx.db.insert("userSongProgress", {
-          ...data,
-          userId,
-          visitorId: "migrated",
-        });
-        results.userSongProgress++;
+    // 2. Migrate line progress
+    for (const line of validated.lineProgress) {
+      // Validate songId exists
+      const song = await ctx.db.get(line.songId as Id<"songs">);
+      if (!song) {
+        continue; // Skip invalid song references
       }
-    }
 
-    // 3. lineProgress
-    const lineProgressRecords = await ctx.db
-      .query("lineProgress")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
-      .collect();
-
-    for (const record of lineProgressRecords) {
+      // Check for duplicates
       const existing = await ctx.db
         .query("lineProgress")
         .withIndex("by_user", (q) => q.eq("userId", userId))
-        .filter((q) => 
+        .filter((q) =>
           q.and(
-            q.eq(q.field("songId"), record.songId),
-            q.eq(q.field("lineNumber"), record.lineNumber)
+            q.eq(q.field("songId"), line.songId as Id<"songs">),
+            q.eq(q.field("lineNumber"), line.lineNumber)
           )
         )
         .first();
 
       if (!existing) {
-        const { _id, _creationTime, ...data } = record;
-        await ctx.db.insert("lineProgress", {
-          ...data,
-          userId,
-          visitorId: "migrated",
-        });
-        results.lineProgress++;
+        try {
+          await ctx.db.insert("lineProgress", {
+            userId,
+            visitorId: "migrated",
+            songId: line.songId as Id<"songs">,
+            lineNumber: line.lineNumber,
+            learned: line.learned,
+          });
+          results.lineProgress++;
+        } catch (e) {
+          console.warn(`[migrateAnonymousData] Failed to insert line progress:`, e);
+        }
       }
     }
 
-    // 4. userWishlist
-    const wishlistRecords = await ctx.db
-      .query("userWishlist")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
-      .collect();
+    // 3. Migrate song progress
+    for (const songProg of validated.songProgress) {
+      // Validate songId exists
+      const song = await ctx.db.get(songProg.songId as Id<"songs">);
+      if (!song) {
+        continue;
+      }
 
-    for (const record of wishlistRecords) {
+      // Check for duplicates
+      const existing = await ctx.db
+        .query("userSongProgress")
+        .withIndex("by_user", (q) => q.eq("userId", userId))
+        .filter((q) => q.eq(q.field("songId"), songProg.songId as Id<"songs">))
+        .first();
+
+      if (!existing) {
+        try {
+          await ctx.db.insert("userSongProgress", {
+            userId,
+            visitorId: "migrated",
+            songId: songProg.songId as Id<"songs">,
+            linesCompleted: [],
+            lastPracticed: songProg.lastPlayedAt,
+          });
+          results.userSongProgress++;
+        } catch (e) {
+          console.warn(`[migrateAnonymousData] Failed to insert song progress:`, e);
+        }
+      }
+    }
+
+    // 4. Migrate practice log
+    for (const log of validated.practiceLog) {
+      // Check for duplicates by date
+      const existing = await ctx.db
+        .query("userPracticeLog")
+        .withIndex("by_user_date", (q) => q.eq("userId", userId).eq("date", log.date))
+        .first();
+
+      if (!existing) {
+        try {
+          await ctx.db.insert("userPracticeLog", {
+            userId,
+            visitorId: "migrated",
+            date: log.date,
+            practiceCount: 1, // Default count
+            totalSeconds: log.practiceSeconds,
+          });
+          results.userPracticeLog++;
+        } catch (e) {
+          console.warn(`[migrateAnonymousData] Failed to insert practice log:`, e);
+        }
+      }
+    }
+
+    // 5. Migrate wishlist
+    for (const wish of validated.wishlist) {
+      // Validate songId exists
+      const song = await ctx.db.get(wish.songId as Id<"songs">);
+      if (!song) {
+        continue;
+      }
+
+      // Check for duplicates
       const existing = await ctx.db
         .query("userWishlist")
         .withIndex("by_user", (q) => q.eq("userId", userId))
-        .filter((q) => q.eq(q.field("songId"), record.songId))
+        .filter((q) => q.eq(q.field("songId"), wish.songId as Id<"songs">))
         .first();
 
       if (!existing) {
-        const { _id, _creationTime, ...data } = record;
-        await ctx.db.insert("userWishlist", {
-          ...data,
-          userId,
-          visitorId: "migrated",
-        });
-        results.userWishlist++;
+        // Get max sortOrder for new item
+        const allWishlist = await ctx.db
+          .query("userWishlist")
+          .withIndex("by_user", (q) => q.eq("userId", userId))
+          .collect();
+        const maxOrder = allWishlist.reduce(
+          (max, item) => Math.max(max, item.sortOrder),
+          0
+        );
+
+        try {
+          await ctx.db.insert("userWishlist", {
+            userId,
+            visitorId: "migrated",
+            songId: wish.songId as Id<"songs">,
+            addedAt: wish.addedAt,
+            sortOrder: maxOrder + 1,
+          });
+          results.userWishlist++;
+        } catch (e) {
+          console.warn(`[migrateAnonymousData] Failed to insert wishlist:`, e);
+        }
       }
     }
 
-    // 5. userPracticeLog
-    const practiceLogRecords = await ctx.db
-      .query("userPracticeLog")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
-      .collect();
-
-    for (const record of practiceLogRecords) {
-      const existing = await ctx.db
-        .query("userPracticeLog")
-        .withIndex("by_user_date", (q) => 
-          q.eq("userId", userId).eq("date", record.date)
-        )
-        .first();
-
-      if (!existing) {
-        const { _id, _creationTime, ...data } = record;
-        await ctx.db.insert("userPracticeLog", {
-          ...data,
-          userId,
-          visitorId: "migrated",
-        });
-        results.userPracticeLog++;
-      }
-    }
-
-    // 6. userGoals
-    const goalsRecords = await ctx.db
-      .query("userGoals")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
-      .collect();
-
-    for (const record of goalsRecords) {
+    // 6. Migrate goals
+    for (const goal of validated.goals) {
+      // Check for duplicates by goalType and period
       const existing = await ctx.db
         .query("userGoals")
         .withIndex("by_user", (q) => q.eq("userId", userId))
-        .filter((q) => 
+        .filter((q) =>
           q.and(
-            q.eq(q.field("goalType"), record.goalType),
-            q.eq(q.field("period"), record.period)
+            q.eq(q.field("goalType"), goal.goalType),
+            q.eq(q.field("period"), goal.period)
           )
         )
         .first();
 
       if (!existing) {
-        const { _id, _creationTime, ...data } = record;
-        await ctx.db.insert("userGoals", {
-          ...data,
-          userId,
-          visitorId: "migrated",
-        });
-        results.userGoals++;
+        try {
+          await ctx.db.insert("userGoals", {
+            userId,
+            visitorId: "migrated",
+            goalType: goal.goalType,
+            period: goal.period,
+            targetValue: goal.targetValue,
+            isActive: goal.isActive,
+            createdAt: goal.createdAt,
+            updatedAt: goal.updatedAt,
+          });
+          results.userGoals++;
+        } catch (e) {
+          console.warn(`[migrateAnonymousData] Failed to insert goal:`, e);
+        }
       }
     }
 
-    // 7. userPreferences
-    const preferencesRecords = await ctx.db
-      .query("userPreferences")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
-      .collect();
-
-    // Preferences is usually a single record per user
-    if (preferencesRecords.length > 0) {
+    // 7. Migrate preferences
+    if (validated.preferences) {
       const existing = await ctx.db
         .query("userPreferences")
         .withIndex("by_user", (q) => q.eq("userId", userId))
         .first();
 
       if (!existing) {
-        const record = preferencesRecords[0]; // Take the first one if multiple exist (shouldn't happen)
-        const { _id, _creationTime, ...data } = record;
-        await ctx.db.insert("userPreferences", {
-          ...data,
-          userId,
-          visitorId: "migrated",
-        });
-        results.userPreferences = 1;
+        try {
+          await ctx.db.insert("userPreferences", {
+            userId,
+            visitorId: "migrated",
+            playbackSpeed: validated.preferences.playbackSpeed,
+            languageFilter: validated.preferences.languageFilter,
+            playbackMode: validated.preferences.playbackMode,
+            videoMuted: validated.preferences.videoMuted,
+            videoCollapsed: validated.preferences.videoCollapsed,
+          });
+          results.userPreferences = 1;
+        } catch (e) {
+          console.warn(`[migrateAnonymousData] Failed to insert preferences:`, e);
+        }
       }
     }
 

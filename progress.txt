@@ -332,3 +332,31 @@ Updated index.json to reflect final state:
 - All 156 tests pass (27 new + 129 existing), typecheck passes
 - Learnings: Mocking useConvexMutation requires tracking calls via a shared array since the mutation reference objects cannot be easily stringified for identification
 ---
+
+## Iteration - US-055: Rewrite migration to read from localStorage data
+- Model: opus
+- Created convex/lib/validation.ts with comprehensive validation helpers:
+  - String length limits (500 chars for text fields)
+  - Array size limits (10,000 words, 10,000 lines, 1,000 songs, 365 practice logs, 100 wishlist items, 20 goals)
+  - Numeric bounds validation (timestamps, counts, playback speeds)
+  - Convex ID format validation (26 alphanumeric chars)
+  - Each validation function returns valid items, invalid count, and errors
+  - validateAnonymousProgress aggregates all validations
+- Rewrote migrateAnonymousData mutation in convex/migration.ts:
+  - Now accepts full progressData object instead of visitorId
+  - Uses Convex v.object() schema for type-safe args
+  - Validates input via validation.ts helpers
+  - Checks for duplicates before inserting each record
+  - Validates songId references exist in database before inserting
+  - For wordProgress: looks up wordId from words table if not provided
+  - Logs validation errors server-side, doesn't expose to client
+  - Returns count of successfully migrated records + validationErrorCount
+- Updated src/routes/auth/verify.tsx:
+  - Imports exportForMigration, clearProgress, hasProgressToMigrate from useAnonymousProgress
+  - Calls hasProgressToMigrate() instead of checking visitorId
+  - Calls exportForMigration() to get full progress data
+  - Passes progressData to migrateAnonymousData mutation
+  - Calls clearProgress() after successful migration
+- All 11 acceptance criteria met, typecheck passes
+- Learnings: Convex validation is strict - need to provide typed v.object schemas for mutation args
+---
