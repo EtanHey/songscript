@@ -6,7 +6,7 @@ import { authClient } from "../lib/auth-client";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Checkbox } from "../components/ui/checkbox";
+import { Check } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 
 export const Route = createFileRoute("/signup")({
@@ -175,20 +175,22 @@ function SignupPage() {
               onClick={() => setMigrateProgress(!migrateProgress)}
             >
               <div className="flex items-start space-x-3">
-                <Checkbox
-                  id="migrate"
-                  checked={migrateProgress}
-                  onCheckedChange={(checked) => setMigrateProgress(!!checked)}
-                  onClick={(e) => e.stopPropagation()}
-                  className="mt-1 border-emerald-500 data-[state=checked]:bg-emerald-500"
-                />
+                <div
+                  className={`mt-1 size-4 shrink-0 rounded-[4px] border shadow-xs flex items-center justify-center transition-colors ${
+                    migrateProgress
+                      ? "bg-emerald-500 border-emerald-500"
+                      : "border-emerald-500 bg-transparent"
+                  }`}
+                  aria-hidden="true"
+                >
+                  {migrateProgress && <Check className="size-3.5 text-white" />}
+                </div>
                 <div className="space-y-1">
-                  <Label
-                    htmlFor="migrate"
+                  <span
                     className="text-sm font-bold text-white cursor-pointer"
                   >
                     Bring my learning progress to this account
-                  </Label>
+                  </span>
                   <p className="text-xs text-gray-400 leading-relaxed">
                     Your words learned and practice history will be
                     saved to your new account.

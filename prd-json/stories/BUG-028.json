@@ -3,17 +3,19 @@
   "title": "Signup Checkbox STILL causes infinite loop (BUG-027 fix failed)",
   "description": "BUG-027 was marked complete but the checkbox still causes 'Maximum update depth exceeded'. Previous fixes (stopPropagation, pointer-events-none) did not work. Need fresh investigation.",
   "acceptanceCriteria": [
-    {"text": "Reproduce: Go to /signup, click anywhere on the checkbox card", "checked": false},
-    {"text": "Investigate: The error comes from setRef in Radix internals, not onClick handlers", "checked": false},
-    {"text": "Check: Label htmlFor='migrate' may be triggering checkbox programmatically", "checked": false},
-    {"text": "Check: Radix Checkbox internal state management with controlled checked prop", "checked": false},
-    {"text": "Fix: Checkbox card can be clicked without any console errors", "checked": false},
-    {"text": "Fix: Checkbox toggles state correctly on click", "checked": false},
-    {"text": "Fix: Rapid clicking does not cause errors", "checked": false},
-    {"text": "Verify in browser: Full signup flow works with checkbox checked and unchecked", "checked": false},
-    {"text": "Typecheck passes", "checked": false}
+    {"text": "Reproduce: Go to /signup, click anywhere on the checkbox card", "checked": true},
+    {"text": "Investigate: The error comes from setRef in Radix internals, not onClick handlers", "checked": true},
+    {"text": "Check: Label htmlFor='migrate' may be triggering checkbox programmatically", "checked": true},
+    {"text": "Check: Radix Checkbox internal state management with controlled checked prop", "checked": true},
+    {"text": "Fix: Checkbox card can be clicked without any console errors", "checked": true},
+    {"text": "Fix: Checkbox toggles state correctly on click", "checked": true},
+    {"text": "Fix: Rapid clicking does not cause errors", "checked": true},
+    {"text": "Verify in browser: Full signup flow works with checkbox checked and unchecked", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
   ],
-  "passes": false,
+  "passes": true,
+  "completedAt": "2026-01-22T17:20:30Z",
+  "completedBy": "opus",
   "blockedBy": null,
-  "notes": "FULL ERROR TRACE:\n```\nError: Maximum update depth exceeded.\nat getRootForUpdatedFiber (react-dom_client.js)\nat enqueueConcurrentHookUpdate (react-dom_client.js)\nat dispatchSetStateInternal (react-dom_client.js)\nat dispatchSetState (react-dom_client.js)\nat chunk-NGT4BZXR.js:119:7\nat setRef (chunk-2VUH7NEY.js:12:12)\n```\n\nThe error is in a <span> component (likely CheckboxPrimitive.Indicator).\n\nFAILED FIXES:\n1. BUG-027: Added onClick stopPropagation - didn't work (Radix events separate from DOM)\n2. Hotfix: Removed onCheckedChange, added pointer-events-none - didn't work\n\nPOSSIBLE CAUSES:\n1. Label htmlFor='migrate' clicking the checkbox bypasses pointer-events-none\n2. Radix internal ref handling causing infinite setState\n3. Controlled component with checked prop conflicting with internal state\n\nTRY:\n1. Remove id from Checkbox and htmlFor from Label (break implicit linking)\n2. Use uncontrolled checkbox with defaultChecked + ref to read value\n3. Replace Radix Checkbox with native HTML checkbox\n4. Check Radix version compatibility issues\n\nCRITICAL: CHECK BROWSER CONSOLE LOGS CAREFULLY!\n- Use mcp__claude-in-chrome__read_console_messages to capture errors\n- Use mcp__claude-in-chrome__computer with action='screenshot' to see page state\n- Navigate to /signup, click checkbox, then read console with pattern='Maximum|depth|exceeded'\n- Note the EXACT component and line numbers in the stack trace\n- The error may be in Radix internals, not our code\n- If fix doesn't work, create BUG-029 with new findings via /prd skill"
+  "notes": "FIXED: Replaced Radix Checkbox with a simple custom div + lucide-react Check icon. The root cause was Radix Checkbox's internal ref/state management conflicting with React's controlled component pattern when the checked prop changed rapidly. By using a plain div with conditional rendering of a Check icon, we avoid all of Radix's internal complexity while maintaining the same visual appearance."
 }

@@ -83,3 +83,14 @@ Iteration - V-016
 - Typecheck passes
 - Learnings: When testing React forms with HTML5 validation attributes, use page.evaluate() to remove them to test the JavaScript validation layer
 ---
+
+## Iteration - BUG-028: Fix signup checkbox infinite loop (final fix)
+- Model: opus
+- Root cause: Radix Checkbox's internal ref/state management was conflicting with React's controlled component pattern
+- Previous fixes (stopPropagation, pointer-events-none, removing onCheckedChange) all failed because Radix's internal mechanics still triggered the infinite loop
+- ACTUAL FIX: Replaced Radix Checkbox entirely with a plain div + lucide-react Check icon
+- The custom checkbox is purely visual - parent div onClick handles all toggling
+- Browser verified: Checkbox toggles correctly, rapid clicking works, no console errors
+- Full signup form workflow tested with checkbox checked/unchecked states
+- Learnings: When a Radix component has deep internal state issues, sometimes the cleanest fix is to replace it with a simpler custom implementation
+---
