@@ -173,3 +173,18 @@ Learnings for next iteration:
 - The full auth flow works perfectly: signup → email → magic link → verify → welcome → dashboard
 - Browser automation combined with database inspection provides comprehensive testing coverage
 ---
+## Iteration - SEC-011
+- Model: kiro
+- Completed story SEC-011: Update client pages - remove useVisitorId, require auth for data
+- Removed useVisitorId import and usage from dashboard.tsx, WordInfoModal.tsx, and Header.tsx
+- Updated all query calls to remove visitorId parameters since queries now use ctx.auth server-side
+- Updated userStats.ts to use the new auth pattern with getAuthUserId and by_user indexes
+- Fixed type issues in WordInfoModal.tsx placeholder data to include both visitorId and userId fields
+- Verified typecheck passes and dashboard loads correctly for authenticated users
+- All acceptance criteria completed successfully
+
+Learnings for next iteration:
+- When updating client pages to remove useVisitorId, also need to update the corresponding server-side queries to use ctx.auth
+- During migration period, placeholder data needs to include both old and new fields to maintain type compatibility
+- Browser verification confirms the dashboard works correctly with the new auth-based queries
+---

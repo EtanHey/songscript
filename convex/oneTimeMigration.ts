@@ -164,6 +164,24 @@ export const deleteUserRecord = mutation({
   },
 });
 
+// Delete test user by email from app 'users' table
+// Note: Better Auth 'user' table must be deleted manually via Convex dashboard
+export const deleteTestUserByEmail = mutation({
+  args: { email: v.string() },
+  handler: async (ctx, { email }) => {
+    // Delete from app 'users' table
+    const appUser = await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", email))
+      .first();
+    if (appUser) {
+      await ctx.db.delete(appUser._id);
+      return { success: true, email, deleted: true };
+    }
+    return { success: false, email, deleted: false, message: "User not found in app users table" };
+  },
+});
+
 // List all unique visitorIds in the database
 export const listAllVisitorIds = query({
   args: {},

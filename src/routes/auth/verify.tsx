@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { authClient } from "../../lib/auth-client";
+import { useMutation } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 
 export const Route = createFileRoute("/auth/verify")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -14,6 +16,10 @@ function VerifyPage() {
   const navigate = useNavigate();
   const [status, setStatus] = useState<"verifying" | "success" | "error">("verifying");
   const [error, setError] = useState<string | null>(null);
+  const [migrationMessage, setMigrationMessage] = useState<string | null>(null);
+
+  const migrateData = useMutation(api.migration.migrateAnonymousData);
+  const setDisplayName = useMutation(api.leaderboard.setDisplayName);
 
   useEffect(() => {
     if (!token) {
@@ -32,6 +38,41 @@ function VerifyPage() {
           return;
         }
 
+        // Check localStorage for migration preferences
+        const shouldMigrate = localStorage.getItem('songscript_migrate_on_signup') === 'true';
+        const visitorId = localStorage.getItem('songscript_visitor_id');
+        const displayName = localStorage.getItem('songscript_signup_display_name');
+
+        // Handle migration if requested
+        if (shouldMigrate && visitorId) {
+          try {
+            const migrationResult = await migrateData({ visitorId });
+            const totalMigrated = Object.values(migrationResult).reduce((sum: number, count: number) => sum + count, 0);
+            if (totalMigrated > 0) {
+              setMigrationMessage(`Successfully migrated ${totalMigrated} records from your anonymous session!`);
+            }
+          } catch (migrationError) {
+            console.error('Migration failed:', migrationError);
+            // Continue with login even if migration fails
+          }
+        }
+
+        // Set display name if provided
+        if (displayName) {
+          try {
+            await setDisplayName({ displayName });
+          } catch (displayNameError) {
+            console.error('Setting display name failed:', displayNameError);
+            // Continue with login even if display name setting fails
+          }
+        }
+
+        // Clear migration-related localStorage keys
+        localStorage.removeItem('songscript_visitor_id');
+        localStorage.removeItem('songscript_migrate_on_signup');
+        localStorage.removeItem('songscript_signup_display_name');
+        // Keep songscript_welcome_shown as it's not user-specific
+
         setStatus("success");
         // Brief delay to show success state
         setTimeout(() => {
@@ -42,7 +83,7 @@ function VerifyPage() {
           } else {
             navigate({ to: "/dashboard" });
           }
-        }, 500);
+        }, 1500); // Longer delay to show migration message if present
       } catch (err) {
         setStatus("error");
         setError(err instanceof Error ? err.message : "Verification failed");
@@ -67,6 +108,9 @@ function VerifyPage() {
           <>
             <div className="text-emerald-500 text-5xl mb-4">✓</div>
             <h1 className="text-xl font-semibold text-white">Success!</h1>
+            {migrationMessage && (
+              <p className="text-emerald-400 mt-2 text-sm">{migrationMessage}</p>
+            )}
             <p className="text-gray-400 mt-2">Redirecting to dashboard...</p>
           </>
         )}

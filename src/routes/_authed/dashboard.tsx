@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
 import { api } from "@convex/_generated/api";
-import { useVisitorId } from "../../hooks/useVisitorId";
 import { authClient } from "../../lib/auth-client";
 import { Button } from "../../components/ui/button";
 import { useState, useCallback, useMemo, useEffect } from "react";
@@ -38,7 +37,6 @@ export const Route = createFileRoute("/_authed/dashboard")({
 
 function DashboardPage() {
   const navigate = useNavigate();
-  const visitorId = useVisitorId();
   const { data: session, isPending: sessionPending } = authClient.useSession();
 
   // Redirect to login if not authenticated
@@ -77,9 +75,7 @@ function DashboardPage() {
 
   // Get aggregated stats
   const { data: userStats, isLoading: statsLoading } = useQuery(
-    convexQuery(api.userStats.getAggregatedStats, {
-      visitorId: visitorId || "",
-    })
+    convexQuery(api.userStats.getAggregatedStats, {})
   );
 
   // Get goals with progress
@@ -89,9 +85,7 @@ function DashboardPage() {
 
   // Get language progress
   const { data: languageProgress, isLoading: languageLoading } = useQuery(
-    convexQuery(api.userStats.getLanguageProgress, {
-      visitorId: visitorId || "",
-    })
+    convexQuery(api.userStats.getLanguageProgress, {})
   );
 
   // Language filter state
@@ -289,7 +283,7 @@ function DashboardPage() {
           {/* Practice Streak Section */}
           <section>
             <h2 className="text-lg sm:text-xl font-semibold mb-4">Practice Streak</h2>
-            {practiceLoading || !visitorId ? (
+            {practiceLoading ? (
               <SkeletonCard height="h-48" />
             ) : practiceHistory ? (
               <PracticeStreakSection
@@ -306,7 +300,7 @@ function DashboardPage() {
         {/* === STATS: Full Width === */}
         <section className="mb-6 sm:mb-8">
           <h2 className="text-lg sm:text-xl font-semibold mb-4">Your Stats</h2>
-          {statsLoading || !visitorId ? (
+          {statsLoading ? (
             <SkeletonCard height="h-32" />
           ) : userStats ? (
             <UserStatsSection stats={userStats} />
@@ -318,7 +312,7 @@ function DashboardPage() {
         {/* === LEADERBOARD: Full Width === */}
         <section className="mb-6 sm:mb-8">
           <h2 className="text-lg sm:text-xl font-semibold mb-4">Leaderboard</h2>
-          {!visitorId ? (
+          {!session?.user ? (
             <SkeletonCard height="h-48" />
           ) : (
             <LeaderboardMiniSection />
@@ -328,7 +322,7 @@ function DashboardPage() {
         {/* === LANGUAGES: Full Width === */}
         <section className="mb-6 sm:mb-8">
           <h2 className="text-lg sm:text-xl font-semibold mb-4">My Languages</h2>
-          {languageLoading || !visitorId ? (
+          {languageLoading ? (
             <SkeletonCard height="h-24" />
           ) : languageProgress && languageProgress.length > 0 ? (
             <MyLanguagesSection
@@ -354,7 +348,7 @@ function DashboardPage() {
               filterIndicator={selectedLanguage ? `(${getLanguageFlagString(selectedLanguage)} filtered)` : undefined}
               defaultExpanded={true}
             >
-              {progressLoading || !visitorId ? (
+              {progressLoading ? (
                 <SkeletonCard height="h-48" />
               ) : filteredSongProgress && filteredSongProgress.length > 0 ? (
                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
@@ -391,7 +385,7 @@ function DashboardPage() {
               filterIndicator={selectedLanguage ? `(${getLanguageFlagString(selectedLanguage)} filtered)` : undefined}
               defaultExpanded={false}
             >
-              {vocabLoading || !visitorId ? (
+              {vocabLoading ? (
                 <SkeletonCard height="h-32" />
               ) : filteredVocabulary && filteredVocabulary.length > 0 ? (
                 <div className="space-y-4">
@@ -428,7 +422,7 @@ function DashboardPage() {
               filterIndicator={selectedLanguage ? `(${getLanguageFlagString(selectedLanguage)} filtered)` : undefined}
               defaultExpanded={true}
             >
-              {wishlistLoading || !visitorId ? (
+              {wishlistLoading ? (
                 <SkeletonCard height="h-32" />
               ) : filteredWishlist && filteredWishlist.length > 0 ? (
                 <LearningQueueList

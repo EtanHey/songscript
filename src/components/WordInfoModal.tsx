@@ -3,7 +3,6 @@ import { Volume2, Check, Loader2, Play, Pause, RotateCcw, Repeat } from "lucide-
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Id, Doc } from "@convex/_generated/dataModel";
-import { useVisitorId } from "../hooks/useVisitorId";
 import { playWordAudio, stopWordAudio } from "../utils/wordAudio";
 import { useAudioPreloader } from "../hooks/useAudioPreloader";
 import {
@@ -302,8 +301,6 @@ export default function WordInfoModal({
   lineAudioUrl,
   onToggleLearned,
 }: WordInfoModalProps) {
-  const visitorId = useVisitorId();
-
   // Fetch words for this line from Convex
   const words = useQuery(
     api.words.getByLine,
@@ -429,7 +426,7 @@ export default function WordInfoModal({
         setLoadingWord(null);
       }
     },
-    [visitorId, incrementPlayCount]
+    [incrementPlayCount]
   );
 
   // Toggle learned status - syncs across all instances of the same word
@@ -453,6 +450,7 @@ export default function WordInfoModal({
               _id: "temp" as Id<"wordProgress">,
               _creationTime: Date.now(),
               visitorId: "authenticated",
+              userId: "authenticated",
               wordId,
               persian,
               viewCount: 0,

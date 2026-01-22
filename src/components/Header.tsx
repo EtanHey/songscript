@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query'
 import { convexQuery } from '@convex-dev/react-query'
 import { api } from '@convex/_generated/api'
 import { authClient } from '../lib/auth-client'
-import { useVisitorId } from '../hooks/useVisitorId'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import {
   DropdownMenu,
@@ -48,15 +47,12 @@ function getInitials(name?: string | null, email?: string | null): string {
 export default function Header() {
   const { data: session, isPending } = authClient.useSession()
   const navigate = useNavigate()
-  const visitorId = useVisitorId()
   const isLoggedIn = !!session?.user
 
   // Get user stats for practice time
   const { data: userStats } = useQuery({
-    ...convexQuery(api.userStats.getAggregatedStats, {
-      visitorId: visitorId || '',
-    }),
-    enabled: !!visitorId,
+    ...convexQuery(api.userStats.getAggregatedStats, {}),
+    enabled: isLoggedIn,
   })
 
   // Get user info for display name

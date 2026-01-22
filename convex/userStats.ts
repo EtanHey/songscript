@@ -1,20 +1,21 @@
 import { query } from "./_generated/server";
-import { v } from "convex/values";
 import type { Id, Doc } from "./_generated/dataModel";
+import { getAuthUserId } from "./authHelpers";
 
-// Get aggregated stats for a visitor across all tables
+// Get aggregated stats for the authenticated user across all tables
 // Includes: unique words, lines practiced, practice time, language breakdown, most practiced song
 export const getAggregatedStats = query({
-  args: { visitorId: v.string() },
-  handler: async (ctx, { visitorId }) => {
-    if (!visitorId) {
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
       return null;
     }
 
     // Get word progress for unique words count
     const wordProgress = await ctx.db
       .query("wordProgress")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
     // Count unique words that are marked as LEARNED (not just viewed)
@@ -29,13 +30,13 @@ export const getAggregatedStats = query({
     // Get song progress for lines practiced
     const songProgress = await ctx.db
       .query("userSongProgress")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
     // Get line progress for lines marked as learned
     const lineProgress = await ctx.db
       .query("lineProgress")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
     // Calculate total lines learned (marked as learned=true)
@@ -57,7 +58,7 @@ export const getAggregatedStats = query({
     // Get practice logs for total time
     const practiceLog = await ctx.db
       .query("userPracticeLog")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
     const totalPracticeTimeSeconds = practiceLog.reduce(
@@ -137,22 +138,23 @@ export const getAggregatedStats = query({
 // Get language-specific progress for the "My Languages" dashboard section
 // Returns detailed stats for each language the user has practiced
 export const getLanguageProgress = query({
-  args: { visitorId: v.string() },
-  handler: async (ctx, { visitorId }) => {
-    if (!visitorId) {
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
       return [];
     }
 
-    // Get all song progress for this visitor
+    // Get all song progress for this user
     const songProgress = await ctx.db
       .query("userSongProgress")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
     // Get word progress for word counts
     const wordProgress = await ctx.db
       .query("wordProgress")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
     // Build a map of song ID to song data (and lyrics count)
