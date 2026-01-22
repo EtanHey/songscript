@@ -149,3 +149,12 @@ Iteration - V-016
 - All 10 tests pass, typecheck passes
 - Learnings: Login page heading changed from "SongScript Admin" to "Welcome Back" - keep tests synced with UI copy changes
 ---
+
+## Iteration - TEST-004: Unit tests for authHelpers.ts
+- Model: opus
+- This story was already completed by a previous iteration but remained in the pending array (data inconsistency)
+- Verified all tests pass: `bun run test convex/authHelpers.test.ts` - 6 tests, all passing
+- Verified typecheck passes
+- Fixed inconsistency: Added completedAt/completedBy to TEST-004.json, removed from pending array
+- Learnings: Always verify story state in index.json matches the actual passes field in the story JSON
+---
