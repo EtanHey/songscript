@@ -432,3 +432,30 @@ Only 1 story worked on this iteration (V-029), which became BLOCKED on infrastru
 - No other work possible without email delivery capability
 
 ---
+
+## Iteration - V-029: Verify anonymous to authenticated migration flow (BLOCKED)
+- Model: haiku
+- Successfully completed anonymous progress tracking:
+  ✅ Cleared localStorage and started fresh anonymous session
+  ✅ Navigated to Baraye song page (Persian)
+  ✅ Marked 5 lines as learned - verified "You've learned 3 items!" banner appeared
+  ✅ Verified anonymous progress stored in localStorage (songscript_anonymous_progress with 7 keys)
+  ✅ Navigated to signup page
+  ✅ Filled in email (v029test@chat-tempmail.com) and display name (V-029 Test User)
+  ✅ "Bring my progress" checkbox was checked by default (visual state verified)
+  ✅ Submitted signup form - received "Magic link sent! Check your email to complete your account creation."
+- ❌ INFRASTRUCTURE BLOCKER: Cannot access magic link email
+  - Resend API is configured in .env.local with valid API key
+  - Magic link sent via Resend to tempmail address, but no way to retrieve it
+  - tempmail MCP get_messages returns empty (Resend sends real emails, not to tempmail service)
+  - No MailHog/Mailpit email capture tool configured locally
+  - No Better Auth test/development bypass mode available
+- This is the SAME blocker as previous V-029 iteration attempt
+- All remaining pending stories depend on email delivery infrastructure
+- Marked V-029 as blocked with detailed blocker reason
+- Updated index.json: moved V-029 to blocked array, nextStory=TEST-008, stats updated (pending: 7, blocked: 5)
+- Learnings: Email delivery testing requires either:
+  1. MailHog/Mailpit running locally on port 1025 (SMTP) and 8025 (web UI)
+  2. Better Auth configured with test/development mode that bypasses email
+  3. Direct access to email service that was configured (Resend's email dashboard or forwarding)
+---

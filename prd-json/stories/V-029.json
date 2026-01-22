@@ -34,6 +34,6 @@
     "Verify exact counts match before/after migration"
   ],
   "files": [],
-  "blockedBy": null,
+  "blockedBy": "Email delivery infrastructure not configured: Resend API sends real emails but no way to intercept/access them. Need MailHog/Mailpit or test bypass mode.",
   "passes": false
 }
