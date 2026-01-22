@@ -6,16 +6,17 @@
   "storyPoints": 5,
   "description": "Update the migrateAnonymousData mutation to accept full progress data as an argument (from localStorage) instead of reading from Convex by visitorId. Add thorough validation and sanitization before inserting to database.",
   "acceptanceCriteria": [
-    "Mutation accepts AnonymousProgress object as argument",
-    "Validates all data types before insertion",
-    "Enforces string length limits (e.g., persian/songId max 500 chars)",
-    "Enforces array size limits (e.g., max 10,000 words)",
-    "Enforces numeric bounds (positive integers, reasonable maximums)",
-    "Validates songId format matches Convex ID pattern",
-    "Rejects malformed data gracefully (partial success OK)",
-    "Returns count of successfully migrated records",
-    "verify.tsx updated to read localStorage and pass to mutation",
-    "localStorage cleared after successful migration"
+    {"text": "Mutation accepts AnonymousProgress object as argument", "checked": false},
+    {"text": "Validates all data types before insertion", "checked": false},
+    {"text": "Enforces string length limits (e.g., persian/songId max 500 chars)", "checked": false},
+    {"text": "Enforces array size limits (e.g., max 10,000 words)", "checked": false},
+    {"text": "Enforces numeric bounds (positive integers, reasonable maximums)", "checked": false},
+    {"text": "Validates songId format matches Convex ID pattern", "checked": false},
+    {"text": "Rejects malformed data gracefully (partial success OK)", "checked": false},
+    {"text": "Returns count of successfully migrated records", "checked": false},
+    {"text": "verify.tsx updated to read localStorage and pass to mutation", "checked": false},
+    {"text": "localStorage cleared after successful migration", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
   ],
   "technicalNotes": [
     "Update convex/migration.ts migrateAnonymousData mutation",

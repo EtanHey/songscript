@@ -6,16 +6,17 @@
   "storyPoints": 3,
   "description": "Playwright end-to-end test verifying that anonymous users can save progress to localStorage, progress persists across page refreshes, and progress migrates correctly on signup.",
   "acceptanceCriteria": [
-    "Test: Anonymous user visits song page",
-    "Test: Marks lines as learned, checkmarks appear",
-    "Test: Page refresh preserves checkmarks",
-    "Test: User navigates to signup page",
-    "Test: Fills form with test email, keeps 'Bring progress' checked",
-    "Test: Submits form, magic link sent",
-    "Test: After verification, dashboard shows migrated progress",
-    "Test: Song page shows same checkmarks post-auth",
-    "Test: localStorage is cleared after migration",
-    "All tests pass in CI environment"
+    {"text": "Test: Anonymous user visits song page", "checked": false},
+    {"text": "Test: Marks lines as learned, checkmarks appear", "checked": false},
+    {"text": "Test: Page refresh preserves checkmarks", "checked": false},
+    {"text": "Test: User navigates to signup page", "checked": false},
+    {"text": "Test: Fills form with test email, keeps 'Bring progress' checked", "checked": false},
+    {"text": "Test: Submits form, magic link sent", "checked": false},
+    {"text": "Test: After verification, dashboard shows migrated progress", "checked": false},
+    {"text": "Test: Song page shows same checkmarks post-auth", "checked": false},
+    {"text": "Test: localStorage is cleared after migration", "checked": false},
+    {"text": "All tests pass in CI environment", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
   ],
   "technicalNotes": [
     "Create e2e/anonymous-progress.spec.ts",

@@ -6,14 +6,16 @@
   "storyPoints": 2,
   "description": "Show a call-to-action banner on the song page for anonymous users who have progress, encouraging them to sign up to save their progress across devices.",
   "acceptanceCriteria": [
-    "Banner only shows for anonymous users",
-    "Banner only shows when user has some progress (words/lines learned > 0)",
-    "Banner shows progress summary: 'You've learned X words!'",
-    "Banner has clear CTA: 'Sign up to save progress across devices'",
-    "Banner links to /signup page",
-    "Banner is dismissible (dismiss state persists in localStorage)",
-    "Banner does not obstruct main UI (positioned tastefully)",
-    "Banner does not show for authenticated users"
+    {"text": "Banner only shows for anonymous users", "checked": false},
+    {"text": "Banner only shows when user has some progress (words/lines learned > 0)", "checked": false},
+    {"text": "Banner shows progress summary: 'You've learned X words!'", "checked": false},
+    {"text": "Banner has clear CTA: 'Sign up to save progress across devices'", "checked": false},
+    {"text": "Banner links to /signup page", "checked": false},
+    {"text": "Banner is dismissible (dismiss state persists in localStorage)", "checked": false},
+    {"text": "Banner does not obstruct main UI (positioned tastefully)", "checked": false},
+    {"text": "Banner does not show for authenticated users", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "Verify in browser: banner appears for anonymous with progress", "checked": false}
   ],
   "technicalNotes": [
     "Create src/components/AnonymousProgressBanner.tsx",

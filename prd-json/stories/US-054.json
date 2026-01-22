@@ -6,13 +6,15 @@
   "storyPoints": 3,
   "description": "Refactor the song page (song.$songId.tsx) to use the new useProgress() hook instead of direct Convex calls. This enables anonymous users to see their progress on the song page.",
   "acceptanceCriteria": [
-    "Song page uses useProgress() hook for all progress operations",
-    "Anonymous user: marking lines learned shows green checkmark",
-    "Anonymous user: checkmarks persist after page refresh",
-    "Anonymous user: word learned state persists in modal",
-    "Authenticated user: behavior unchanged (still uses Convex)",
-    "No visual difference between anonymous and authenticated progress display",
-    "Practice time tracking works for anonymous users (stored in localStorage)"
+    {"text": "Song page uses useProgress() hook for all progress operations", "checked": false},
+    {"text": "Anonymous user: marking lines learned shows green checkmark", "checked": false},
+    {"text": "Anonymous user: checkmarks persist after page refresh", "checked": false},
+    {"text": "Anonymous user: word learned state persists in modal", "checked": false},
+    {"text": "Authenticated user: behavior unchanged (still uses Convex)", "checked": false},
+    {"text": "No visual difference between anonymous and authenticated progress display", "checked": false},
+    {"text": "Practice time tracking works for anonymous users (stored in localStorage)", "checked": false},
+    {"text": "Typecheck passes", "checked": false},
+    {"text": "Verify in browser: anonymous checkmarks persist on refresh", "checked": false}
   ],
   "technicalNotes": [
     "Replace toggleLineLearnedMutation with useProgress().toggleLineLearned",
@@ -31,6 +33,5 @@
     "src/components/WordInfoModal.tsx",
     "src/components/LyricsDisplay.tsx"
   ],
-  "blockedBy": "US-053",
   "passes": false
 }
