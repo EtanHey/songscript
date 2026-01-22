@@ -1,12 +1,15 @@
 import { betterAuth } from "better-auth/minimal";
-import { createClient } from "@convex-dev/better-auth";
+import { createClient, type AuthFunctions } from "@convex-dev/better-auth";
 import { convex, crossDomain } from "@convex-dev/better-auth/plugins";
 import { magicLink } from "better-auth/plugins";
 import authConfig from "./auth.config";
-import { components } from "./_generated/api";
+import { components, internal } from "./_generated/api";
 import type { GenericCtx } from "@convex-dev/better-auth";
 import type { DataModel } from "./_generated/dataModel";
 import { Resend } from "resend";
+
+// Auth functions for triggers (must match internal.auth exports)
+const authFunctions: AuthFunctions = internal.auth;
 
 
 
@@ -16,9 +19,91 @@ const resendApiKey = process.env.RESEND_API_KEY;
 // Initialize Resend client (only if API key is present)
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
-// The component client has methods needed for integrating Convex with Better Auth,
-// as well as helper methods for general use.
-export const authComponent = createClient<DataModel>(components.betterAuth);
+/**
+ * Better Auth Component Client
+ *
+ * This client integrates Better Auth with Convex and includes DATABASE TRIGGERS
+ * that automatically sync data between Better Auth's `user` table and our app's `users` table.
+ *
+ * TRIGGERS (automatic sync - no manual code needed):
+ * - onCreate: Creates app user record when Better Auth user is created
+ * - onUpdate: Syncs email and displayUsername changes to app users table
+ * - onDelete: Deletes app user record when Better Auth user is deleted
+ *
+ * DO NOT duplicate this sync logic elsewhere - these triggers handle it automatically!
+ *
+ * The sync fields are:
+ * - Better Auth `email` ↔ App `email`
+ * - Better Auth `displayUsername` ↔ App `displayName`
+ * - Better Auth `_id` → App `authId` (link between tables)
+ */
+export const authComponent = createClient<DataModel>(components.betterAuth, {
+  authFunctions,
+  triggers: {
+    user: {
+      // When a new Better Auth user is created, create the app user record
+      onCreate: async (ctx, authUser) => {
+        // Check if app user already exists (shouldn't, but be safe)
+        const existing = await ctx.db
+          .query("users")
+          .withIndex("authId", (q) => q.eq("authId", authUser._id))
+          .first();
+
+        if (!existing) {
+          const userId = await ctx.db.insert("users", {
+            email: authUser.email,
+            authId: authUser._id,
+            displayName: authUser.displayUsername || undefined,
+            createdAt: Date.now(),
+          });
+          // Link the app user back to Better Auth
+          await authComponent.setUserId(ctx, authUser._id, userId);
+        }
+      },
+
+      // When Better Auth user is updated, sync changes to app user
+      onUpdate: async (ctx, authUser, prevAuthUser) => {
+        const appUser = await ctx.db
+          .query("users")
+          .withIndex("authId", (q) => q.eq("authId", authUser._id))
+          .first();
+
+        if (appUser) {
+          const updates: { email?: string; displayName?: string } = {};
+
+          // Sync email if changed
+          if (authUser.email !== prevAuthUser.email) {
+            updates.email = authUser.email;
+          }
+
+          // Sync displayUsername → displayName if changed
+          if (authUser.displayUsername !== prevAuthUser.displayUsername) {
+            updates.displayName = authUser.displayUsername || undefined;
+          }
+
+          if (Object.keys(updates).length > 0) {
+            await ctx.db.patch(appUser._id, updates);
+          }
+        }
+      },
+
+      // When Better Auth user is deleted, delete the app user
+      onDelete: async (ctx, authUser) => {
+        const appUser = await ctx.db
+          .query("users")
+          .withIndex("authId", (q) => q.eq("authId", authUser._id))
+          .first();
+
+        if (appUser) {
+          await ctx.db.delete(appUser._id);
+        }
+      },
+    },
+  },
+});
+
+// Export trigger API for Convex to wire up
+export const { onCreate, onUpdate, onDelete } = authComponent.triggersApi();
 
 export const createAuth = (ctx: GenericCtx<DataModel>) => {
   return betterAuth({
