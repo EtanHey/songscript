@@ -49,3 +49,4 @@ test-results/
 # Misc
 count.txt
 todos.json
+.claude.json
