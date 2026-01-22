@@ -43,3 +43,13 @@ Iteration - V-016
 - Also fixed index.json: BUG-026 was marked complete but still in pending array - now removed
 - Learnings: Database inspection can verify data correctness when browser auth is complex
 ---
+
+## Iteration - BUG-027: Fix Sign Up Checkbox Infinite Loop
+- Model: opus
+- Root cause: Dual event handler conflict - parent div onClick AND checkbox onCheckedChange both fired when clicking checkbox directly, causing rapid state oscillation
+- Fix: Added `onClick={(e) => e.stopPropagation()}` to the Checkbox component to prevent event bubbling to parent div
+- Browser verified: Checkbox toggles on/off without "Maximum update depth exceeded" error
+- No console errors when clicking checkbox multiple times rapidly
+- Typecheck passes
+- Learnings: When wrapping interactive elements in clickable containers, always stopPropagation on the inner element's click event to prevent double-firing
+---

@@ -153,10 +153,10 @@ function SignupPage() {
               />
             </div>
 
-            <div 
+            <div
               className={`p-4 rounded-lg border-2 transition-colors cursor-pointer ${
-                migrateProgress 
-                  ? "border-emerald-500 bg-emerald-500/10" 
+                migrateProgress
+                  ? "border-emerald-500 bg-emerald-500/10"
                   : "border-slate-700 bg-slate-800/50"
               }`}
               onClick={() => setMigrateProgress(!migrateProgress)}
@@ -166,6 +166,7 @@ function SignupPage() {
                   id="migrate"
                   checked={migrateProgress}
                   onCheckedChange={(checked) => setMigrateProgress(!!checked)}
+                  onClick={(e) => e.stopPropagation()}
                   className="mt-1 border-emerald-500 data-[state=checked]:bg-emerald-500"
                 />
                 <div className="space-y-1">
