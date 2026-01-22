@@ -55,17 +55,19 @@
     "TEST-006",
     "V-027",
     "BUG-028",
+    "US-051",
     "V-028",
     "TEST-007"
   ],
   "blocked": [
+    "US-051",
     "V-028",
     "TEST-007"
   ],
   "stats": {
-    "total": 57,
+    "total": 58,
     "completed": 42,
     "pending": 9,
-    "blocked": 2
+    "blocked": 3
   }
 }

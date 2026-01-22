@@ -14,6 +14,6 @@
     {"text": "No console errors during any of these steps", "checked": false}
   ],
   "passes": false,
-  "blockedBy": "BUG-028",
+  "blockedBy": "US-051",
   "notes": "Use browser MCP tools:\n- mcp__claude-in-chrome__computer action='screenshot' to verify visual state\n- mcp__claude-in-chrome__javascript_tool to check localStorage values\n- mcp__claude-in-chrome__read_console_messages to verify no errors"
 }

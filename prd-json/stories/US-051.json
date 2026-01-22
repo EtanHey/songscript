@@ -1,0 +1,22 @@
+{
+  "id": "US-051",
+  "title": "Test full signup migration flow with actual song practice",
+  "description": "After BUG-028 fix, test the COMPLETE flow: practice a song as anonymous user, then signup with migration checkbox, verify data transfers.",
+  "acceptanceCriteria": [
+    {"text": "Clear localStorage and start fresh anonymous session", "checked": false},
+    {"text": "Navigate to a song page (e.g., /song/baraye)", "checked": false},
+    {"text": "Click play on video - verify audio is ON and playing", "checked": false},
+    {"text": "Click on a lyric line to interact with it", "checked": false},
+    {"text": "Mark at least one word as learned", "checked": false},
+    {"text": "Verify localStorage has songscript_visitor_id with practice data", "checked": false},
+    {"text": "Navigate to /signup", "checked": false},
+    {"text": "Checkbox is checked by default (bring my progress)", "checked": false},
+    {"text": "Toggle checkbox off and on - verify it works visually", "checked": false},
+    {"text": "Fill email and display name, submit with checkbox CHECKED", "checked": false},
+    {"text": "Verify localStorage songscript_migrate_on_signup = 'true'", "checked": false},
+    {"text": "No console errors during entire flow", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "BUG-028",
+  "notes": "This is the REAL end-to-end test of the signup migration flow.\n\nUse browser MCP tools:\n- mcp__claude-in-chrome__computer action='screenshot' for visual verification\n- mcp__claude-in-chrome__computer action='left_click' to interact\n- mcp__claude-in-chrome__javascript_tool to check localStorage\n- mcp__claude-in-chrome__read_console_messages to verify no errors\n\nIMPORTANT: Actually play the video and verify audio works - don't just check UI state."
+}
