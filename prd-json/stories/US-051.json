@@ -17,6 +17,6 @@
     {"text": "No console errors during entire flow", "checked": false}
   ],
   "passes": false,
-  "blockedBy": "BUG-028",
+  "blockedBy": null,
   "notes": "This is the REAL end-to-end test of the signup migration flow.\n\nUse browser MCP tools:\n- mcp__claude-in-chrome__computer action='screenshot' for visual verification\n- mcp__claude-in-chrome__computer action='left_click' to interact\n- mcp__claude-in-chrome__javascript_tool to check localStorage\n- mcp__claude-in-chrome__read_console_messages to verify no errors\n\nIMPORTANT: Actually play the video and verify audio works - don't just check UI state.\n\nCLEANUP - Use Convex oneTimeMigration functions:\n- npx convex run oneTimeMigration:deleteTestUserByEmail '{\"email\": \"test@example.com\"}' - deletes from BOTH Better Auth and app users\n- npx convex run oneTimeMigration:listAllAppUsers - see all users\n- npx convex run oneTimeMigration:checkUserData '{\"userId\": \"xxx\"}' - check user's data\n\nIF SOMETHING DOESN'T WORK:\nCreate a new bug story via prd-json/update.json with detailed findings. Use /prd skill. Don't mark this story as passed if there are unresolved issues - create BUG-029 or similar instead."
 }

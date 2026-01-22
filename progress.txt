@@ -158,3 +158,20 @@ Iteration - V-016
 - Fixed inconsistency: Added completedAt/completedBy to TEST-004.json, removed from pending array
 - Learnings: Always verify story state in index.json matches the actual passes field in the story JSON
 ---
+
+## Iteration - TEST-005: Integration tests for Convex security
+- Model: opus
+- Created src/__tests__/convex-security.test.ts with 8 comprehensive tests
+- Tests verify:
+  1. No user-facing functions accept visitorId as argument (file scan)
+  2. All user data files import from authHelpers
+  3. Query handlers use getAuthUserId pattern
+  4. Mutation handlers use requireAuth pattern
+  5. requireAuth throws "Authentication required" error when unauthenticated
+  6. getAuthUserId returns null when unauthenticated (graceful handling)
+  7. getAuthUserId function exists and is callable
+  8. User data queries use by_user index for secure filtering
+- Allowed exceptions documented: migration.ts, oneTimeMigration.ts, schema.ts, transcription.ts (non-sensitive job tracking)
+- All 8 tests pass, typecheck passes
+- Learnings: Complex Convex internals (authComponent.safeGetAuthUser using ctx.runQuery) are hard to mock - use file/pattern analysis tests for security verification instead of trying to fully mock the auth chain
+---

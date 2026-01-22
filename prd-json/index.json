@@ -4,12 +4,12 @@
   "projectName": "SongScript Auth Security Fix",
   "workingDirectory": ".",
   "stats": {
-    "total": 55,
-    "completed": 46,
-    "pending": 3,
-    "blocked": 2
+    "total": 58,
+    "completed": 43,
+    "pending": 8,
+    "blocked": 3
   },
-  "nextStory": "TEST-005",
+  "nextStory": "TEST-006",
   "storyOrder": [
     "US-036",
     "V-003",
@@ -65,14 +65,20 @@
     "TEST-005",
     "TEST-006",
     "V-027",
-    "BUG-028"
+    "BUG-028",
+    "US-051",
+    "V-028",
+    "TEST-007"
   ],
   "pending": [
-    "TEST-005",
     "TEST-006",
     "V-027"
   ],
-  "blocked": ["V-016", "TEST-002"],
+  "blocked": [
+    "US-051",
+    "V-028",
+    "TEST-007"
+  ],
   "browserSetup": {
     "viewport": "desktop 1200px+",
     "homeUrl": "http://localhost:3001",
