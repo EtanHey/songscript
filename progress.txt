@@ -113,3 +113,21 @@ Iteration - V-016
 - SECURITY CONCLUSION: No user-facing Convex function accepts spoofable user IDs. All user identification comes from ctx.auth server-side.
 - Learnings: transcription.ts uses visitorId for job tracking but this is non-sensitive (just tracks who requested a transcription)
 ---
+
+## Iteration - V-016 + TEST-002: Security verification and E2E tests
+- Model: opus
+- V-016 BLOCKED: Anonymous progress tracking never implemented
+  - Code review: All progress mutations use requireAuth(ctx) - anonymous users cannot save
+  - No code creates songscript_visitor_id in localStorage
+  - Migration flow expects anonymous data that can't be created
+  - Marked V-016 as blocked pending anonymous storage implementation
+- TEST-002 PARTIAL + BLOCKED:
+  - Created e2e/user-isolation.spec.ts with 5 tests that ALL PASS
+  - Tests verify: browser context isolation, server-side auth enforcement, no client ID spoofing
+  - Full user signup/login flow tests require email delivery infrastructure (MailHog, etc.)
+  - Marked TEST-002 as blocked - partial coverage achieved, full auth flow needs email integration
+- Learnings:
+  1. Anonymous progress was designed (migration.ts has by_visitor queries) but never implemented
+  2. Magic link auth E2E testing needs email interception tooling
+  3. Security architecture tests pass - the fix is correct, just can't E2E test full user flows without auth infra
+---
