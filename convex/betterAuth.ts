@@ -4,7 +4,7 @@ import { convex, crossDomain } from "@convex-dev/better-auth/plugins";
 import { magicLink } from "better-auth/plugins";
 import authConfig from "./auth.config";
 import { components } from "./_generated/api";
-import type { AuthContextWithDb } from "./authHelpers";
+import type { GenericCtx } from "@convex-dev/better-auth";
 import type { DataModel } from "./_generated/dataModel";
 import { Resend } from "resend";
 
@@ -20,7 +20,7 @@ const resend = resendApiKey ? new Resend(resendApiKey) : null;
 // as well as helper methods for general use.
 export const authComponent = createClient<DataModel>(components.betterAuth);
 
-export const createAuth = (ctx: AuthContextWithDb) => {
+export const createAuth = (ctx: GenericCtx<DataModel>) => {
   return betterAuth({
     baseURL: siteUrl,
     trustedOrigins: [
@@ -36,11 +36,13 @@ export const createAuth = (ctx: AuthContextWithDb) => {
       // Magic link passwordless authentication
       magicLink({
         sendMagicLink: async ({ email, url, token }) => {
-          // Check if user already exists
-          const existingUser = await ctx.db.query("users").withIndex("email", (q) => q.eq("email", email)).first();
-          if (existingUser) {
-            // Throw error if user already exists
-            throw new Error("This email is already registered. Please sign in instead.");
+          // Check if user already exists (only if db is available in this context)
+          if ("db" in ctx) {
+            const dbCtx = ctx as unknown as { db: { query: (table: string) => { withIndex: (name: string, fn: (q: any) => any) => { first: () => Promise<any> } } } };
+            const existingUser = await dbCtx.db.query("users").withIndex("email", (q) => q.eq("email", email)).first();
+            if (existingUser) {
+              throw new Error("This email is already registered. Please sign in instead.");
+            }
           }
 
           // Extract frontend origin from the callbackURL in the original URL

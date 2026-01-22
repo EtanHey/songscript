@@ -1,0 +1,15 @@
+{
+  "id": "BUG-027",
+  "title": "Sign Up Checkbox Causes Error",
+  "description": "Clicking the 'bring it with you' checkbox during sign up causes an error. The checkbox functionality is broken.",
+  "acceptanceCriteria": [
+    {"text": "Investigate checkbox click handler in signup form", "checked": false},
+    {"text": "Fix: Checkbox can be clicked without errors", "checked": false},
+    {"text": "Checkbox state toggles properly when clicked", "checked": false},
+    {"text": "Sign up process completes successfully with checkbox checked", "checked": false},
+    {"text": "Sign up process completes successfully with checkbox unchecked", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": null,
+  "notes": "Reproduction steps:\n1. Navigate to /signup\n2. Fill out sign up form\n3. Click the 'bring it with you' checkbox\n4. Observe error occurs\n\nLikely cause: Event handler issue or state management bug in checkbox component."
+}
