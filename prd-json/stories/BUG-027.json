@@ -1,15 +1,18 @@
 {
   "id": "BUG-027",
-  "title": "Sign Up Checkbox Causes Error",
-  "description": "Clicking the 'bring it with you' checkbox during sign up causes an error. The checkbox functionality is broken.",
+  "title": "Sign Up Checkbox Causes Infinite Loop Error",
+  "description": "Clicking the 'bring it with you' checkbox during sign up causes 'Maximum update depth exceeded' error in Radix UI Checkbox component.",
   "acceptanceCriteria": [
-    {"text": "Investigate checkbox click handler in signup form", "checked": false},
-    {"text": "Fix: Checkbox can be clicked without errors", "checked": false},
+    {"text": "Find Radix Checkbox usage in signup form", "checked": false},
+    {"text": "Identify state update causing infinite loop", "checked": false},
+    {"text": "Fix: Remove circular state dependency in checkbox", "checked": false},
+    {"text": "Checkbox can be clicked without console errors", "checked": false},
     {"text": "Checkbox state toggles properly when clicked", "checked": false},
     {"text": "Sign up process completes successfully with checkbox checked", "checked": false},
-    {"text": "Sign up process completes successfully with checkbox unchecked", "checked": false}
+    {"text": "Sign up process completes successfully with checkbox unchecked", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
   ],
   "passes": false,
   "blockedBy": null,
-  "notes": "Reproduction steps:\n1. Navigate to /signup\n2. Fill out sign up form\n3. Click the 'bring it with you' checkbox\n4. Observe error occurs\n\nLikely cause: Event handler issue or state management bug in checkbox component."
+  "notes": "Error details:\n- Error: 'Maximum update depth exceeded'\n- Location: @radix-ui_react-checkbox, checkbox.tsx:20\n- Component: SignupPage\n\nReproduction steps:\n1. Navigate to /signup\n2. Click the 'bring it with you' checkbox\n3. Observe console error: 'Maximum update depth exceeded'\n\nRoot cause: Likely a circular state update - checkbox onChange triggers state change that re-renders checkbox with new checked prop, which triggers another onChange, creating infinite loop.\n\nCommon fixes:\n1. Use onCheckedChange instead of onChange\n2. Ensure controlled component doesn't update state inside render\n3. Check if value is being set in both controlled and uncontrolled mode"
 }
