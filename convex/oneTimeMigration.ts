@@ -182,6 +182,31 @@ export const deleteTestUserByEmail = mutation({
   },
 });
 
+// List all app users in the database
+export const listAllAppUsers = query({
+  args: {},
+  handler: async (ctx) => {
+    const users = await ctx.db.query("users").collect();
+    return users;
+  },
+});
+
+// Fix app user record - backfill authId and correct email
+export const fixAppUserRecord = mutation({
+  args: {
+    appUserId: v.id("users"),
+    correctEmail: v.string(),
+    authId: v.string(),
+  },
+  handler: async (ctx, { appUserId, correctEmail, authId }) => {
+    await ctx.db.patch(appUserId, {
+      email: correctEmail,
+      authId: authId,
+    });
+    return { success: true, fixed: appUserId };
+  },
+});
+
 // List all unique visitorIds in the database
 export const listAllVisitorIds = query({
   args: {},

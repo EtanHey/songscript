@@ -14,7 +14,7 @@ export default defineConfig({
     environment: 'happy-dom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
-    include: ['src/**/*.{test,spec}.{js,ts,tsx}'],
+    include: ['src/**/*.{test,spec}.{js,ts,tsx}', 'convex/**/*.{test,spec}.{js,ts,tsx}'],
     exclude: ['node_modules', '.output', 'dist'],
     pool: 'forks',
     poolOptions: {
