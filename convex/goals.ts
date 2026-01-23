@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { getAuthUserId, requireAuth } from "./authHelpers";
 
 // Goal types available
 export const GOAL_TYPES = ["words", "time", "lines"] as const;
@@ -16,25 +17,31 @@ export const DEFAULT_GOALS = {
   lines: { daily: 20, weekly: 100 },
 } as const;
 
-// Get all goals for a visitor
-export const getByVisitor = query({
-  args: { visitorId: v.string() },
-  handler: async (ctx, { visitorId }) => {
+// Get all goals for the authenticated user
+export const getGoals = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+
     return await ctx.db
       .query("userGoals")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
   },
 });
 
 // Get goals with progress calculated
 export const getGoalsWithProgress = query({
-  args: { visitorId: v.string() },
-  handler: async (ctx, { visitorId }) => {
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+
     // Get user's goals
     const goals = await ctx.db
       .query("userGoals")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .filter((q) => q.eq(q.field("isActive"), true))
       .collect();
 
@@ -52,15 +59,14 @@ export const getGoalsWithProgress = query({
     // Get practice log for today
     const todayLog = await ctx.db
       .query("userPracticeLog")
-      .withIndex("by_visitor_date", (q) =>
-        q.eq("visitorId", visitorId).eq("date", todayStr)
-      )
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .filter((q) => q.eq(q.field("date"), todayStr))
       .first();
 
     // Get practice logs for this week
     const weekLogs = await ctx.db
       .query("userPracticeLog")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .filter((q) => q.gte(q.field("date"), mondayStr))
       .collect();
 
@@ -70,26 +76,27 @@ export const getGoalsWithProgress = query({
       0
     );
 
-    // Get word progress for today (unique words learned today)
-    // We'll use lastSeen timestamp to determine if learned today
+    // Get word progress for today (unique words LEARNED today)
+    // Only count words that are marked as learned (consistent with userStats)
     const todayStart = new Date(todayStr).getTime();
     const todayEnd = todayStart + 24 * 60 * 60 * 1000;
 
     const allWordProgress = await ctx.db
       .query("wordProgress")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
-    // Words practiced today (based on lastSeen)
+    // Words learned today (based on lastSeen AND learned=true)
+    // Only count words that are CURRENTLY learned and were interacted with today
     const wordsToday = allWordProgress.filter(
-      (wp) => wp.lastSeen >= todayStart && wp.lastSeen < todayEnd
+      (wp) => wp.learned && wp.lastSeen >= todayStart && wp.lastSeen < todayEnd
     );
     const uniqueWordsToday = new Set(wordsToday.map((wp) => wp.persian)).size;
 
-    // Words practiced this week
+    // Words learned this week
     const weekStart = new Date(mondayStr).getTime();
     const wordsThisWeek = allWordProgress.filter(
-      (wp) => wp.lastSeen >= weekStart
+      (wp) => wp.learned && wp.lastSeen >= weekStart
     );
     const uniqueWordsThisWeek = new Set(wordsThisWeek.map((wp) => wp.persian))
       .size;
@@ -97,7 +104,7 @@ export const getGoalsWithProgress = query({
     // Get lines practiced today
     const songProgress = await ctx.db
       .query("userSongProgress")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .filter((q) => q.gte(q.field("lastPracticed"), todayStart))
       .collect();
 
@@ -109,7 +116,7 @@ export const getGoalsWithProgress = query({
     // Get lines practiced this week
     const weekSongProgress = await ctx.db
       .query("userSongProgress")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .filter((q) => q.gte(q.field("lastPracticed"), weekStart))
       .collect();
 
@@ -168,18 +175,19 @@ export const getGoalsWithProgress = query({
 // Set or update a goal
 export const setGoal = mutation({
   args: {
-    visitorId: v.string(),
     goalType: v.string(),
     period: v.string(),
     targetValue: v.number(),
   },
-  handler: async (ctx, { visitorId, goalType, period, targetValue }) => {
+  handler: async (ctx, { goalType, period, targetValue }) => {
+    const userId = await requireAuth(ctx);
+
     // Check if goal already exists
     const existing = await ctx.db
       .query("userGoals")
-      .withIndex("by_visitor_type_period", (q) =>
-        q.eq("visitorId", visitorId).eq("goalType", goalType).eq("period", period)
-      )
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .filter((q) => q.eq(q.field("goalType"), goalType))
+      .filter((q) => q.eq(q.field("period"), period))
       .first();
 
     const now = Date.now();
@@ -195,7 +203,8 @@ export const setGoal = mutation({
     } else {
       // Create new goal
       return await ctx.db.insert("userGoals", {
-        visitorId,
+        userId,
+        visitorId: "authenticated",
         goalType,
         period,
         targetValue,
@@ -214,6 +223,14 @@ export const updateGoal = mutation({
     targetValue: v.number(),
   },
   handler: async (ctx, { goalId, targetValue }) => {
+    const userId = await requireAuth(ctx);
+
+    // Verify ownership
+    const goal = await ctx.db.get(goalId);
+    if (!goal || goal.userId !== userId) {
+      throw new Error("Unauthorized");
+    }
+
     await ctx.db.patch(goalId, {
       targetValue,
       updatedAt: Date.now(),
@@ -227,6 +244,14 @@ export const deleteGoal = mutation({
     goalId: v.id("userGoals"),
   },
   handler: async (ctx, { goalId }) => {
+    const userId = await requireAuth(ctx);
+
+    // Verify ownership
+    const goal = await ctx.db.get(goalId);
+    if (!goal || goal.userId !== userId) {
+      throw new Error("Unauthorized");
+    }
+
     await ctx.db.patch(goalId, {
       isActive: false,
       updatedAt: Date.now(),
@@ -236,12 +261,14 @@ export const deleteGoal = mutation({
 
 // Initialize default goals for a new user
 export const initializeDefaultGoals = mutation({
-  args: { visitorId: v.string() },
-  handler: async (ctx, { visitorId }) => {
+  args: {},
+  handler: async (ctx) => {
+    const userId = await requireAuth(ctx);
+
     // Check if user already has goals
     const existing = await ctx.db
       .query("userGoals")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .first();
 
     if (existing) {
@@ -252,7 +279,8 @@ export const initializeDefaultGoals = mutation({
 
     // Create default daily goals
     await ctx.db.insert("userGoals", {
-      visitorId,
+      userId,
+      visitorId: "authenticated",
       goalType: "words",
       period: "daily",
       targetValue: DEFAULT_GOALS.words.daily,
@@ -262,7 +290,8 @@ export const initializeDefaultGoals = mutation({
     });
 
     await ctx.db.insert("userGoals", {
-      visitorId,
+      userId,
+      visitorId: "authenticated",
       goalType: "time",
       period: "daily",
       targetValue: DEFAULT_GOALS.time.daily,
@@ -272,3 +301,4 @@ export const initializeDefaultGoals = mutation({
     });
   },
 });
+

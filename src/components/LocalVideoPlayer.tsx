@@ -18,12 +18,14 @@ interface LocalVideoPlayerProps {
   onReady?: () => void
   onStateChange?: (state: 'playing' | 'paused' | 'ended') => void
   onError?: (error: string) => void
+  onMuteChange?: (muted: boolean) => void
   muted?: boolean
   autoplay?: boolean
+  showMuteButton?: boolean // Whether to show the mute/unmute button (default: true)
 }
 
 const LocalVideoPlayer = forwardRef<LocalVideoPlayerHandle, LocalVideoPlayerProps>(
-  function LocalVideoPlayer({ videoUrl, onTimeUpdate, onReady, onStateChange, onError, muted = true, autoplay = false }, ref) {
+  function LocalVideoPlayer({ videoUrl, onTimeUpdate, onReady, onStateChange, onError, onMuteChange, muted = true, autoplay = false, showMuteButton = true }, ref) {
     const videoRef = useRef<HTMLVideoElement>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -145,6 +147,12 @@ const LocalVideoPlayer = forwardRef<LocalVideoPlayerHandle, LocalVideoPlayerProp
       video.addEventListener('ended', handleEnded)
       video.addEventListener('error', handleError)
 
+      // Handle case where video is already loaded from cache (on page refresh)
+      // readyState >= 3 (HAVE_FUTURE_DATA) means video can play
+      if (video.readyState >= 3) {
+        handleCanPlay()
+      }
+
       return () => {
         video.removeEventListener('canplay', handleCanPlay)
         video.removeEventListener('timeupdate', handleTimeUpdate)
@@ -165,10 +173,12 @@ const LocalVideoPlayer = forwardRef<LocalVideoPlayerHandle, LocalVideoPlayerProp
 
     const toggleMute = useCallback(() => {
       if (videoRef.current) {
-        videoRef.current.muted = !videoRef.current.muted
-        setIsMutedState(videoRef.current.muted)
+        const newMuted = !videoRef.current.muted
+        videoRef.current.muted = newMuted
+        setIsMutedState(newMuted)
+        onMuteChange?.(newMuted)
       }
-    }, [])
+    }, [onMuteChange])
 
     // Handle click to play (for when autoplay was blocked)
     const handlePlayButtonClick = useCallback(() => {
@@ -220,18 +230,20 @@ const LocalVideoPlayer = forwardRef<LocalVideoPlayerHandle, LocalVideoPlayerProp
             </div>
           </button>
         )}
-        {/* Mute/Unmute button overlay */}
-        <button
-          onClick={toggleMute}
-          className="absolute bottom-3 right-3 rounded-full bg-black/60 p-2 text-white hover:bg-black/80 transition-colors"
-          title={isMutedState ? 'Unmute video' : 'Mute video'}
-        >
-          {isMutedState ? (
-            <VolumeX className="h-5 w-5" />
-          ) : (
-            <Volume2 className="h-5 w-5" />
-          )}
-        </button>
+        {/* Mute/Unmute button overlay - hidden in Single/Loop modes where video is always muted */}
+        {showMuteButton && (
+          <button
+            onClick={toggleMute}
+            className="absolute bottom-3 right-3 rounded-full bg-black/60 p-2 text-white hover:bg-black/80 transition-colors"
+            title={isMutedState ? 'Unmute video' : 'Mute video'}
+          >
+            {isMutedState ? (
+              <VolumeX className="h-5 w-5" />
+            ) : (
+              <Volume2 className="h-5 w-5" />
+            )}
+          </button>
+        )}
       </div>
     )
   }

@@ -1,0 +1,17 @@
+{
+  "id": "US-013",
+  "title": "Add playback controls inside sentence info modal",
+  "description": "When viewing a line's details in the WordInfoModal, add playback controls so users can practice that specific line without closing the modal. Useful when in Fluid mode but wanting to focus on one line.",
+  "acceptanceCriteria": [
+    { "text": "Add Play/Pause button for the current line's audio snippet inside WordInfoModal", "checked": true },
+    { "text": "Add Loop toggle to loop just this line while modal is open", "checked": true },
+    { "text": "Add speed control (0.5x, 0.75x, 1x) for the line audio", "checked": true },
+    { "text": "When loop is on, audio repeats until user stops or closes modal", "checked": true },
+    { "text": "Visual feedback shows when audio is playing/looping", "checked": true },
+    { "text": "Closing modal stops any looping audio from the modal", "checked": true },
+    { "text": "Typecheck passes", "checked": true }
+  ],
+  "passes": true,
+  "completedAt": "2026-01-20T09:32:55Z",
+  "blockedBy": null
+}

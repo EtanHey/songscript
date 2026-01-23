@@ -55,11 +55,14 @@ export interface PlayWordResult {
 }
 
 /**
- * Play audio for a word
+ * Play audio for a word with Forvo URL support
+ * Tries Forvo audio first, then falls back to generated audio
  * Stops any currently playing audio before starting new one
- * Returns a promise that resolves when audio starts playing or rejects on error
  */
-export async function playWordAudio(persian: string): Promise<PlayWordResult> {
+export async function playWordAudio(
+  persian: string, 
+  forvoAudioUrl?: string
+): Promise<PlayWordResult> {
   // Stop any currently playing audio
   if (currentAudio) {
     currentAudio.pause();
@@ -68,10 +71,11 @@ export async function playWordAudio(persian: string): Promise<PlayWordResult> {
     currentPlayingWord = null;
   }
 
-  const url = getWordAudioUrl(persian);
+  // Try Forvo audio first if available
+  const audioUrl = forvoAudioUrl || getWordAudioUrl(persian);
 
   return new Promise((resolve) => {
-    const audio = new Audio(url);
+    const audio = new Audio(audioUrl);
     currentAudio = audio;
     currentPlayingWord = persian;
 
@@ -88,7 +92,14 @@ export async function playWordAudio(persian: string): Promise<PlayWordResult> {
     audio.onerror = () => {
       currentAudio = null;
       currentPlayingWord = null;
-      resolve({ success: false, error: "Audio file not found or failed to load" });
+      
+      // If Forvo audio failed and we haven't tried generated audio yet, try that
+      if (forvoAudioUrl) {
+        // Recursively try generated audio as fallback
+        playWordAudio(persian).then(resolve);
+      } else {
+        resolve({ success: false, error: "Audio file not found or failed to load" });
+      }
     };
 
     audio.onended = () => {

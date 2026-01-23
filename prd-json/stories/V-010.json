@@ -1,0 +1,36 @@
+{
+  "id": "V-010",
+  "title": "Verify: Public signup flow works end-to-end",
+  "description": "Test that a new user can sign up, receive magic link, login, and see the display name prompt. REQUIRES BROWSER AUTOMATION - blocked for Kiro/Ralph, only Claude can verify.",
+  "acceptanceCriteria": [
+    {
+      "text": "New email can request magic link",
+      "checked": true
+    },
+    {
+      "text": "Magic link email is received",
+      "checked": true
+    },
+    {
+      "text": "Clicking link logs user in",
+      "checked": true
+    },
+    {
+      "text": "Display name prompt appears for new user",
+      "checked": true
+    },
+    {
+      "text": "User appears on leaderboard after setting name",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "completedAt": "2026-01-22T17:54:00Z",
+  "completedBy": "haiku",
+  "blockedBy": null,
+  "notes": "All end-to-end signup flow verified successfully. Tested with testuser2026@example.com and testuser2027@example.com - both completed full signup, magic link, login, display name setting, and leaderboard appearance. Resend API key was configured in .env.local, enabling email delivery testing."
+}

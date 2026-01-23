@@ -1,0 +1,14 @@
+{
+  "id": "US-004",
+  "title": "Wire up logPractice mutation in song page",
+  "description": "Connect the existing logPractice mutation to actual practice events. Track time when audio plays, with inactivity detection (2 min timeout).",
+  "acceptanceCriteria": [
+    { "text": "logPractice called when audio snippet completes (via onEnded from US-003)", "checked": true },
+    { "text": "Practice time tracked based on audio duration, not wall clock", "checked": true },
+    { "text": "Inactivity detection: reset accumulated time after 2 min of no audio plays", "checked": true },
+    { "text": "Accumulated time logged in batches of 30+ seconds", "checked": true },
+    { "text": "Typecheck passes", "checked": true }
+  ],
+  "passes": true,
+  "completedAt": "2026-01-20T01:57:51Z"
+}

@@ -1,57 +1,73 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { getAuthUserId, requireAuth } from "./authHelpers";
 
-// Get all word progress for a visitor
-export const getByVisitor = query({
-  args: { visitorId: v.string() },
-  handler: async (ctx, args) => {
+// Get all word progress for the authenticated user
+export const getByUser = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+    
     return await ctx.db
       .query("wordProgress")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
   },
 });
 
 // Get progress for a specific word
-export const getByVisitorWord = query({
-  args: { visitorId: v.string(), wordId: v.id("words") },
+export const getByUserWord = query({
+  args: { wordId: v.id("words") },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
     return await ctx.db
       .query("wordProgress")
-      .withIndex("by_visitor_word", (q) =>
-        q.eq("visitorId", args.visitorId).eq("wordId", args.wordId)
+      .withIndex("by_user", (q) =>
+        q.eq("userId", userId)
       )
+      .filter((q) => q.eq(q.field("wordId"), args.wordId))
       .first();
   },
 });
 
-// Get progress for a word by its Persian text (for syncing across repeated words)
-export const getByVisitorPersian = query({
-  args: { visitorId: v.string(), persian: v.string() },
+// Get progress for a word by its Persian text
+export const getByUserPersian = query({
+  args: { persian: v.string() },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
     return await ctx.db
       .query("wordProgress")
-      .withIndex("by_visitor_persian", (q) =>
-        q.eq("visitorId", args.visitorId).eq("persian", args.persian)
+      .withIndex("by_user", (q) =>
+        q.eq("userId", userId)
       )
+      .filter((q) => q.eq(q.field("persian"), args.persian))
       .first();
   },
 });
 
 // Get progress for multiple words by their Persian text at once (for a line)
 // Returns the learned state for each unique word text
-export const getByVisitorPersians = query({
-  args: { visitorId: v.string(), persians: v.array(v.string()) },
+export const getByUserPersians = query({
+  args: { persians: v.array(v.string()) },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+
     // Get unique persian words to avoid duplicate lookups
     const uniquePersians = [...new Set(args.persians)];
     const results = await Promise.all(
       uniquePersians.map(async (persian) => {
         const progress = await ctx.db
           .query("wordProgress")
-          .withIndex("by_visitor_persian", (q) =>
-            q.eq("visitorId", args.visitorId).eq("persian", persian)
+          .withIndex("by_user", (q) =>
+            q.eq("userId", userId)
           )
+          .filter((q) => q.eq(q.field("persian"), persian))
           .first();
         return { persian, progress };
       })
@@ -61,16 +77,20 @@ export const getByVisitorPersians = query({
 });
 
 // Get progress for multiple words at once (for a line)
-export const getByVisitorWords = query({
-  args: { visitorId: v.string(), wordIds: v.array(v.id("words")) },
+export const getByUserWords = query({
+  args: { wordIds: v.array(v.id("words")) },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+
     const results = await Promise.all(
       args.wordIds.map(async (wordId) => {
         const progress = await ctx.db
           .query("wordProgress")
-          .withIndex("by_visitor_word", (q) =>
-            q.eq("visitorId", args.visitorId).eq("wordId", wordId)
+          .withIndex("by_user", (q) =>
+            q.eq("userId", userId)
           )
+          .filter((q) => q.eq(q.field("wordId"), wordId))
           .first();
         return { wordId, progress };
       })
@@ -82,14 +102,17 @@ export const getByVisitorWords = query({
 // Increment view count for a word
 // Uses persian text as the unique key - all word instances share one progress record
 export const incrementViewCount = mutation({
-  args: { visitorId: v.string(), wordId: v.id("words"), persian: v.string() },
+  args: { wordId: v.id("words"), persian: v.string() },
   handler: async (ctx, args) => {
+    const userId = await requireAuth(ctx);
+
     // Look up by persian text first - this is the canonical key
     const existingPersian = await ctx.db
       .query("wordProgress")
-      .withIndex("by_visitor_persian", (q) =>
-        q.eq("visitorId", args.visitorId).eq("persian", args.persian)
+      .withIndex("by_user", (q) =>
+        q.eq("userId", userId)
       )
+      .filter((q) => q.eq(q.field("persian"), args.persian))
       .first();
 
     if (existingPersian) {
@@ -102,7 +125,8 @@ export const incrementViewCount = mutation({
     } else {
       // No record exists for this persian word - create one
       return await ctx.db.insert("wordProgress", {
-        visitorId: args.visitorId,
+        userId,
+        visitorId: "authenticated", // Placeholder for required field
         wordId: args.wordId,
         persian: args.persian,
         viewCount: 1,
@@ -117,14 +141,17 @@ export const incrementViewCount = mutation({
 // Increment play count for a word
 // Uses persian text as the unique key - all word instances share one progress record
 export const incrementPlayCount = mutation({
-  args: { visitorId: v.string(), wordId: v.id("words"), persian: v.string() },
+  args: { wordId: v.id("words"), persian: v.string() },
   handler: async (ctx, args) => {
+    const userId = await requireAuth(ctx);
+
     // Look up by persian text first - this is the canonical key
     const existingPersian = await ctx.db
       .query("wordProgress")
-      .withIndex("by_visitor_persian", (q) =>
-        q.eq("visitorId", args.visitorId).eq("persian", args.persian)
+      .withIndex("by_user", (q) =>
+        q.eq("userId", userId)
       )
+      .filter((q) => q.eq(q.field("persian"), args.persian))
       .first();
 
     if (existingPersian) {
@@ -137,7 +164,8 @@ export const incrementPlayCount = mutation({
     } else {
       // No record exists for this persian word - create one
       return await ctx.db.insert("wordProgress", {
-        visitorId: args.visitorId,
+        userId,
+        visitorId: "authenticated", // Placeholder for required field
         wordId: args.wordId,
         persian: args.persian,
         viewCount: 0,
@@ -151,14 +179,17 @@ export const incrementPlayCount = mutation({
 
 // Toggle learned status for a word - syncs across ALL instances with the same persian text
 export const toggleLearned = mutation({
-  args: { visitorId: v.string(), wordId: v.id("words"), persian: v.string() },
+  args: { wordId: v.id("words"), persian: v.string() },
   handler: async (ctx, args) => {
+    const userId = await requireAuth(ctx);
+
     // Find all progress records for this persian word
     const allMatching = await ctx.db
       .query("wordProgress")
-      .withIndex("by_visitor_persian", (q) =>
-        q.eq("visitorId", args.visitorId).eq("persian", args.persian)
+      .withIndex("by_user", (q) =>
+        q.eq("userId", userId)
       )
+      .filter((q) => q.eq(q.field("persian"), args.persian))
       .collect();
 
     // Determine the new learned state (toggle from current)
@@ -166,19 +197,23 @@ export const toggleLearned = mutation({
     const newLearned = !currentLearned;
 
     // Update ALL matching records
+    // Only update lastSeen when marking as learned, not when unmarking
+    const updateData: { learned: boolean; lastSeen?: number } = { learned: newLearned };
+    if (newLearned) {
+      updateData.lastSeen = Date.now();
+    }
+
     await Promise.all(
       allMatching.map((record) =>
-        ctx.db.patch(record._id, {
-          learned: newLearned,
-          lastSeen: Date.now(),
-        })
+        ctx.db.patch(record._id, updateData)
       )
     );
 
     // If no records exist yet, create one for this specific word instance
     if (allMatching.length === 0) {
       await ctx.db.insert("wordProgress", {
-        visitorId: args.visitorId,
+        userId,
+        visitorId: "authenticated",
         wordId: args.wordId,
         persian: args.persian,
         viewCount: 0,
@@ -195,36 +230,43 @@ export const toggleLearned = mutation({
 
 // Set learned status explicitly - syncs across ALL instances with the same persian text
 export const setLearned = mutation({
-  args: { visitorId: v.string(), wordId: v.id("words"), persian: v.string(), learned: v.boolean() },
+  args: { wordId: v.id("words"), persian: v.string(), learned: v.boolean() },
   handler: async (ctx, args) => {
+    const userId = await requireAuth(ctx);
+
     // Find all progress records for this persian word
     const allMatching = await ctx.db
       .query("wordProgress")
-      .withIndex("by_visitor_persian", (q) =>
-        q.eq("visitorId", args.visitorId).eq("persian", args.persian)
+      .withIndex("by_user", (q) =>
+        q.eq("userId", userId)
       )
+      .filter((q) => q.eq(q.field("persian"), args.persian))
       .collect();
 
     // Update ALL matching records
+    // Only update lastSeen when marking as learned, not when unmarking
+    const updateData: { learned: boolean; lastSeen?: number } = { learned: args.learned };
+    if (args.learned) {
+      updateData.lastSeen = Date.now();
+    }
+
     await Promise.all(
       allMatching.map((record) =>
-        ctx.db.patch(record._id, {
-          learned: args.learned,
-          lastSeen: Date.now(),
-        })
+        ctx.db.patch(record._id, updateData)
       )
     );
 
     // If no records exist yet, create one for this specific word instance
     if (allMatching.length === 0) {
       await ctx.db.insert("wordProgress", {
-        visitorId: args.visitorId,
+        userId,
+        visitorId: "authenticated",
         wordId: args.wordId,
         persian: args.persian,
         viewCount: 0,
         playCount: 0,
         learned: args.learned,
-        lastSeen: Date.now(),
+        lastSeen: args.learned ? Date.now() : 0,
       });
     }
 
@@ -330,23 +372,30 @@ export const deduplicateWordProgress = mutation({
 });
 
 // Get vocabulary for dashboard - grouped by language with mastery levels
+// Only returns words that are explicitly marked as LEARNED (checkmark)
 // Mastery levels: new (1-2 practices), learning (3-9), mastered (10+)
 export const getVocabularyByLanguage = query({
-  args: { visitorId: v.string() },
-  handler: async (ctx, args) => {
-    // Get all word progress for this visitor
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+
+    // Get all word progress for this user
     const progressRecords = await ctx.db
       .query("wordProgress")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
-    if (progressRecords.length === 0) {
+    // Filter to only LEARNED words (marked with checkmark)
+    const learnedRecords = progressRecords.filter((p) => p.learned);
+
+    if (learnedRecords.length === 0) {
       return [];
     }
 
-    // For each progress record, get the word details and song language
+    // For each learned word, get the word details and song language
     const wordsWithProgress = await Promise.all(
-      progressRecords.map(async (progress) => {
+      learnedRecords.map(async (progress) => {
         // Get the word to find its song
         const word = await ctx.db.get(progress.wordId);
         if (!word) return null;
@@ -488,6 +537,7 @@ export const getWordDetailsWithSongs = query({
       hebrew: word.hebrew,
       english: word.english,
       grammarType: word.grammarType,
+      forvoAudioUrl: word.forvoAudioUrl,
       songs: validSongs,
       songCount: validSongs.length,
     };
@@ -496,14 +546,26 @@ export const getWordDetailsWithSongs = query({
 
 // Get practice history for a word (by persian text)
 export const getWordPracticeHistory = query({
-  args: { visitorId: v.string(), persian: v.string() },
+  args: { persian: v.string() },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      return {
+        viewCount: 0,
+        playCount: 0,
+        learned: false,
+        lastSeen: null,
+        totalPracticeCount: 0,
+      };
+    }
+
     // Get the progress record for this word
     const progress = await ctx.db
       .query("wordProgress")
-      .withIndex("by_visitor_persian", (q) =>
-        q.eq("visitorId", args.visitorId).eq("persian", args.persian)
+      .withIndex("by_user", (q) =>
+        q.eq("userId", userId)
       )
+      .filter((q) => q.eq(q.field("persian"), args.persian))
       .first();
 
     if (!progress) {

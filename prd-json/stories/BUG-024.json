@@ -1,0 +1,20 @@
+{
+  "id": "BUG-024",
+  "title": "App users table not populated on signup - auth ID mismatch",
+  "description": "After successful magic link verification, the app's 'users' table record is never created. This causes setDisplayName and other mutations to fail because they try to patch using Better Auth's user ID instead of the app's users table ID.",
+  "acceptanceCriteria": [
+    {"text": "Create ensureAppUser mutation in convex/users.ts that creates app user record if missing", "checked": true},
+    {"text": "ensureAppUser gets Better Auth user (email, id), creates app users record with authId link", "checked": true},
+    {"text": "Update verify.tsx to call ensureAppUser immediately after successful magicLink.verify()", "checked": true},
+    {"text": "Update getAuthUserId in authHelpers.ts to lookup app users._id by authId (not return Better Auth ID)", "checked": true},
+    {"text": "Update requireAuth to work with new getAuthUserId pattern", "checked": true},
+    {"text": "setDisplayName works correctly after signup (patches correct users table record)", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "Browser test: Sign up with yosef.from.the.levant@proton.me, verify app users record is created with email", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-22T00:38:54Z",
+  "completedBy": "kiro",
+  "blockedBy": null,
+  "notes": "🚨 CRITICAL BUG - Auth ID Mismatch\n\nCurrent broken flow:\n1. Better Auth creates user in 'user' table with ID like 'abc123'\n2. getAuthUserId() returns 'abc123' (Better Auth ID)\n3. setDisplayName tries ctx.db.patch('abc123' as Id<'users'>) - FAILS!\n4. App 'users' table is EMPTY - record never created\n\nCorrect flow should be:\n1. Better Auth creates user in 'user' table with ID 'abc123'\n2. ensureAppUser creates app 'users' record with authId='abc123', returns users._id='xyz789'\n3. getAuthUserId() looks up users by authId, returns 'xyz789'\n4. setDisplayName patches 'xyz789' in app 'users' table - SUCCESS!\n\nImplementation notes:\n- Create convex/users.ts with ensureAppUser mutation\n- ensureAppUser should be idempotent (safe to call multiple times)\n- Use Better Auth email and ID to populate app users record\n- authHelpers.getAuthUserId needs to query app users table by authId index\n\n⚠️ PROTECT EXISTING USER DATA:\nUserId k572fk152njnp9g621kc64bq4x7zgbyt has migrated data - this fix should CREATE missing records, not modify existing ones."
+}

@@ -1,0 +1,17 @@
+{
+  "id": "US-039",
+  "title": "Leaderboard query: Progress leaderboard with difficulty multipliers",
+  "description": "Create Convex query to fetch progress leaderboard. Score = (words_learned × multiplier) + (lines_completed × multiplier × 0.5). Uses language difficulty multipliers. Supports period filter and pagination.",
+  "acceptanceCriteria": [
+    {"text": "getProgressLeaderboard query in convex/leaderboard.ts", "checked": true},
+    {"text": "Query accepts period (weekly/monthly/all-time), limit, offset args", "checked": true},
+    {"text": "Score calculation uses language difficulty multipliers", "checked": true},
+    {"text": "Only returns users with displayName set", "checked": true},
+    {"text": "Users sorted by progressScore descending", "checked": true},
+    {"text": "Returns array with rank, displayName, score, topLanguage fields", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-21T13:48:15Z",
+  "blockedBy": ["US-036", "US-037"]
+}

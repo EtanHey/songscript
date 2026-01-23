@@ -39,6 +39,48 @@ git status  # Check current branch FIRST
 
 ---
 
+## 🔥 CONVEX .JS FILE ERROR (CRITICAL - MEMORIZE THIS)
+
+**Error message:**
+```
+✘ [ERROR] Two output files share the same path but have different contents: out/filename.js
+```
+
+### What Causes It
+Convex bundler finds BOTH `.ts` and `.js` files with the same name in `convex/` folder.
+This happens when:
+1. Git worktrees are created (copies compiled .js files)
+2. Convex crashes mid-compilation
+3. Manual file operations gone wrong
+
+### BEFORE Starting Convex Dev Server - ALWAYS RUN:
+```bash
+rm -f convex/*.js
+npx convex dev
+```
+
+### Fix When Error Occurs:
+```bash
+# Stop convex dev (Ctrl+C)
+rm -f convex/*.js
+npx convex dev
+```
+
+### Prevention Rules:
+1. **NEVER create .js files in convex/** - Only .ts files belong there
+2. **After creating git worktree** - Run `rm -f convex/*.js` before `npx convex dev`
+3. **Add to .gitignore** - Ensure `convex/*.js` is ignored (it should be)
+4. **Check before starting** - Quick `ls convex/*.js 2>/dev/null` to verify clean state
+
+### For Ralph/Automated Workflows:
+Add this to the START of any iteration that uses Convex:
+```bash
+# Clean Convex before starting
+rm -f convex/*.js 2>/dev/null || true
+```
+
+---
+
 ## Project Structure
 
 ```
@@ -94,6 +136,83 @@ songscript/
 - [TanStack Start + Bun](https://bun.com/docs/guides/ecosystem/tanstack-start)
 - [Convex + TanStack Start](https://docs.convex.dev/quickstart/tanstack-start)
 - [Convex + Better Auth](https://labs.convex.dev/better-auth/framework-guides/tanstack-start)
+
+---
+
+## 🧪 TESTING REQUIREMENTS
+
+**All new helpers/utilities MUST have tests.**
+
+### Test Location Convention
+- Component tests: `src/components/ComponentName.test.tsx`
+- Hook tests: `src/hooks/hookName.test.ts`
+- Utility tests: `src/lib/utilName.test.ts` or `src/utils/utilName.test.ts`
+- Integration tests: `src/__tests__/featureName.test.ts`
+
+### Pre-commit Hooks
+Tests run automatically on every commit via Husky:
+```bash
+bun run test        # Unit tests (Vitest)
+bun run typecheck   # TypeScript check
+```
+
+If tests fail, the commit is blocked. Fix tests before committing.
+
+### Running Tests Manually
+```bash
+bun run test        # Run all tests once
+bun run test:watch  # Watch mode for development
+bun run test:e2e    # Playwright E2E tests
+```
+
+### When Creating New Code
+1. **New helper/utility** → Create `*.test.ts` file with unit tests
+2. **New component with logic** → Create `*.test.tsx` file
+3. **Bug fix** → Add regression test if possible
+4. **Refactoring** → Ensure existing tests still pass
+
+---
+
+## 🎵 WHISPERX PIPELINE (Add New Songs in 30 min)
+
+**Full documentation:** `docs.local/learnings/whisperx-pipeline.md`
+
+### Quick Reference
+```bash
+# 1. Download audio
+cd scripts/whisperx
+yt-dlp -f "bestaudio[ext=m4a]" -o "downloads/SONGNAME.m4a" "YOUTUBE_URL"
+
+# 2. Activate venv & run WhisperX
+source venv/bin/activate
+whisperx downloads/SONGNAME.m4a \
+  --model large-v3 \
+  --language fa \
+  --align_model jonatasgrosman/wav2vec2-large-xlsr-53-persian \
+  --output_dir output/ \
+  --output_format json
+
+# 3. Match words to lines (custom script per song structure)
+python3 final_timestamps.py
+
+# 4. Apply to database
+npx convex run lyrics:updateTimestamps '{"songId": "ID", "unlockCode": "UNLOCK_TIMESTAMPS", "updates": [...]}'
+```
+
+### Language Models
+| Language | Code | Alignment Model |
+|----------|------|-----------------|
+| Persian | fa | `jonatasgrosman/wav2vec2-large-xlsr-53-persian` |
+| Korean | ko | `jonatasgrosman/wav2vec2-large-xlsr-53-korean` |
+| Arabic | ar | `jonatasgrosman/wav2vec2-large-xlsr-53-arabic` |
+| Hebrew | he | `imvladikon/wav2vec2-xls-r-300m-hebrew` |
+
+### Key Insight
+For songs with repeating patterns (e.g., "برای" in Baraye):
+1. Count pattern word occurrences in WhisperX output
+2. Map each occurrence to line numbers
+3. Handle lines with DOUBLE patterns specially
+4. Interpolate for WhisperX gaps
 
 ---
 

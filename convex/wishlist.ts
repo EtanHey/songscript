@@ -1,18 +1,20 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { getAuthUserId, requireAuth } from "./authHelpers";
 
 /**
  * Get user's wishlist ordered by sortOrder
  * Returns wishlist items with full song details
  */
-export const getByVisitor = query({
-  args: { visitorId: v.string() },
-  handler: async (ctx, args) => {
-    if (!args.visitorId) return [];
+export const getWishlist = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
 
     const wishlistItems = await ctx.db
       .query("userWishlist")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
     // Sort by sortOrder (lower = higher priority)
@@ -47,17 +49,16 @@ export const getByVisitor = query({
  */
 export const isInWishlist = query({
   args: {
-    visitorId: v.string(),
     songId: v.id("songs"),
   },
   handler: async (ctx, args) => {
-    if (!args.visitorId) return false;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return false;
 
     const existing = await ctx.db
       .query("userWishlist")
-      .withIndex("by_visitor_song", (q) =>
-        q.eq("visitorId", args.visitorId).eq("songId", args.songId)
-      )
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .filter((q) => q.eq(q.field("songId"), args.songId))
       .first();
 
     return existing !== null;
@@ -69,16 +70,16 @@ export const isInWishlist = query({
  */
 export const addToWishlist = mutation({
   args: {
-    visitorId: v.string(),
     songId: v.id("songs"),
   },
   handler: async (ctx, args) => {
+    const userId = await requireAuth(ctx);
+
     // Check if already in wishlist
     const existing = await ctx.db
       .query("userWishlist")
-      .withIndex("by_visitor_song", (q) =>
-        q.eq("visitorId", args.visitorId).eq("songId", args.songId)
-      )
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .filter((q) => q.eq(q.field("songId"), args.songId))
       .first();
 
     if (existing) {
@@ -88,7 +89,7 @@ export const addToWishlist = mutation({
     // Get current max sortOrder for this user
     const allItems = await ctx.db
       .query("userWishlist")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
     const maxSortOrder =
@@ -98,7 +99,8 @@ export const addToWishlist = mutation({
 
     // Add with sortOrder at the end
     return await ctx.db.insert("userWishlist", {
-      visitorId: args.visitorId,
+      userId,
+      visitorId: "authenticated", // Placeholder for required field
       songId: args.songId,
       addedAt: Date.now(),
       sortOrder: maxSortOrder + 1,
@@ -111,15 +113,15 @@ export const addToWishlist = mutation({
  */
 export const removeFromWishlist = mutation({
   args: {
-    visitorId: v.string(),
     songId: v.id("songs"),
   },
   handler: async (ctx, args) => {
+    const userId = await requireAuth(ctx);
+
     const existing = await ctx.db
       .query("userWishlist")
-      .withIndex("by_visitor_song", (q) =>
-        q.eq("visitorId", args.visitorId).eq("songId", args.songId)
-      )
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .filter((q) => q.eq(q.field("songId"), args.songId))
       .first();
 
     if (existing) {
@@ -136,14 +138,15 @@ export const removeFromWishlist = mutation({
  */
 export const reorderWishlist = mutation({
   args: {
-    visitorId: v.string(),
     songIds: v.array(v.id("songs")),
   },
   handler: async (ctx, args) => {
+    const userId = await requireAuth(ctx);
+
     // Get all wishlist items for this user
     const items = await ctx.db
       .query("userWishlist")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
     // Create a map of songId -> wishlist item
@@ -169,15 +172,15 @@ export const reorderWishlist = mutation({
  */
 export const toggleWishlist = mutation({
   args: {
-    visitorId: v.string(),
     songId: v.id("songs"),
   },
   handler: async (ctx, args) => {
+    const userId = await requireAuth(ctx);
+
     const existing = await ctx.db
       .query("userWishlist")
-      .withIndex("by_visitor_song", (q) =>
-        q.eq("visitorId", args.visitorId).eq("songId", args.songId)
-      )
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .filter((q) => q.eq(q.field("songId"), args.songId))
       .first();
 
     if (existing) {
@@ -188,7 +191,7 @@ export const toggleWishlist = mutation({
     // Get current max sortOrder
     const allItems = await ctx.db
       .query("userWishlist")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
     const maxSortOrder =
@@ -197,7 +200,8 @@ export const toggleWishlist = mutation({
         : 0;
 
     await ctx.db.insert("userWishlist", {
-      visitorId: args.visitorId,
+      userId,
+      visitorId: "authenticated", // Placeholder for required field
       songId: args.songId,
       addedAt: Date.now(),
       sortOrder: maxSortOrder + 1,
@@ -206,3 +210,4 @@ export const toggleWishlist = mutation({
     return true; // Added to wishlist
   },
 });
+

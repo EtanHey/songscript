@@ -1,9 +1,9 @@
 import { convexQuery } from "@convex-dev/react-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useRef, useEffect } from "react";
-import { Info } from "lucide-react";
-import { api } from "../../convex/_generated/api";
-import { Id } from "../../convex/_generated/dataModel";
+import { Info, Check } from "lucide-react";
+import { api } from "@convex/_generated/api";
+import { Id } from "@convex/_generated/dataModel";
 
 export interface LyricLine {
   _id: Id<"lyrics">;
@@ -23,18 +23,28 @@ interface LyricsDisplayProps {
   songId: Id<"songs">;
   onLineClick?: (startTime: number, lineIndex: number) => void;
   onLineInfoClick?: (line: LyricLine, lineIndex: number) => void;
+  onLineCheckboxClick?: (lineNumber: number) => void;
   activeLineIndex?: number;
   clickedLineIndex?: number;
   languageFilter?: LanguageFilter;
+  lineProgress?: Array<{
+    _id: string;
+    visitorId: string;
+    songId: Id<"songs">;
+    lineNumber: number;
+    learned: boolean;
+  }>;
 }
 
 export default function LyricsDisplay({
   songId,
   onLineClick,
   onLineInfoClick,
+  onLineCheckboxClick,
   activeLineIndex,
   clickedLineIndex,
   languageFilter = "all",
+  lineProgress = [],
 }: LyricsDisplayProps) {
   const { data: lyrics } = useSuspenseQuery(
     convexQuery(api.lyrics.getBySong, { songId })
@@ -44,6 +54,21 @@ export default function LyricsDisplay({
   const sortedLyrics = [...(lyrics || [])].sort(
     (a, b) => a.lineNumber - b.lineNumber
   ) as LyricLine[];
+
+  // Create lookup maps for efficient state checking
+  const lineLearnedMap = new Map(
+    lineProgress.map(lp => [lp.lineNumber, lp.learned])
+  );
+
+  // Determine visual state for each line
+  const getLineState = (line: LyricLine): 'default' | 'learned' => {
+    // Check if line is explicitly marked as learned
+    if (lineLearnedMap.get(line.lineNumber)) {
+      return 'learned';
+    }
+    
+    return 'default';
+  };
 
   // Refs for each line to enable auto-scroll
   const lineRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -60,7 +85,11 @@ export default function LyricsDisplay({
 
   return (
     <div className="flex flex-col gap-2">
-      {sortedLyrics.map((line, index) => (
+      {sortedLyrics.map((line, index) => {
+        const lineState = getLineState(line);
+        const isLearned = lineState === 'learned';
+        
+        return (
         <div
           key={line._id}
           ref={(el) => {
@@ -74,8 +103,32 @@ export default function LyricsDisplay({
             clickedLineIndex === index
               ? "scale-[0.98] bg-primary/20"
               : ""
+          } ${
+            // Visual state styling
+            lineState === 'learned'
+              ? "border-l-4 border-l-emerald-500"
+              : ""
           }`}
         >
+          {/* Checkbox - left side, sticky position */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onLineCheckboxClick?.(line.lineNumber);
+            }}
+            className={`flex-shrink-0 w-11 h-11 rounded-lg border-2 transition-all duration-200 flex items-center justify-center ${
+              isLearned
+                ? "bg-emerald-500 border-emerald-500 text-white"
+                : "border-gray-300 hover:border-emerald-400 hover:bg-emerald-50"
+            }`}
+            title={isLearned ? "Mark as not learned" : "Mark as learned"}
+          >
+            {isLearned && (
+              <Check className="h-5 w-5" />
+            )}
+          </button>
+
           {/* Main content - clickable to play audio */}
           <button
             type="button"
@@ -125,7 +178,8 @@ export default function LyricsDisplay({
             <Info className="h-4 w-4" />
           </button>
         </div>
-      ))}
+        )
+      })}
     </div>
   );
 }

@@ -1,0 +1,46 @@
+{
+  "id": "US-059",
+  "title": "Add 'Import device progress' option in Settings",
+  "type": "feature",
+  "priority": "medium",
+  "storyPoints": 2,
+  "description": "Add an option in Settings page for users who previously declined migration to import their device progress later. Acts as an 'undo' for users who declined by mistake or changed their mind.",
+  "acceptanceCriteria": [
+    {"text": "Section appears in Settings only if localStorage has anonymous progress", "checked": true},
+    {"text": "Section appears only if current user's ID is in songscript_migration_declined_by array", "checked": true},
+    {"text": "Shows summary: 'Device progress available: X words, Y songs'", "checked": true},
+    {"text": "Button: 'Import to my account'", "checked": true},
+    {"text": "Clicking button opens same confirmation modal from US-057", "checked": true},
+    {"text": "On successful import: remove userId from declined array, clear localStorage progress", "checked": true},
+    {"text": "Section disappears after successful import", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "Verify in browser: option appears after declining, works correctly", "checked": false, "notes": "Requires email login - code implementation complete"}
+  ],
+  "completionNotes": [
+    "Created Import Device Progress section in settings.tsx",
+    "Section checks both hasProgressToMigrate() AND hasDeclinedMigration(userId)",
+    "Displays summary showing words, lines, songs from localStorage",
+    "Import button opens MigrationConfirmModal (reused from US-057)",
+    "Updated MigrationConfirmModal to remove userId from declined list on successful import",
+    "Section disappears after successful import (state updates when modal closes)",
+    "Typecheck passes",
+    "Browser verification blocked by email infrastructure - needs manual login to test Settings page"
+  ],
+  "technicalNotes": [
+    "Update src/routes/_authed/settings.tsx",
+    "Reuse MigrationConfirmModal from US-057",
+    "Check both conditions: has progress AND user declined",
+    "After import, clean up localStorage properly"
+  ],
+  "testingNotes": [
+    "Decline migration first, then go to Settings",
+    "Verify import button appears",
+    "Click import, accept, verify data migrated",
+    "Verify button disappears after successful import"
+  ],
+  "files": [
+    "src/routes/_authed/settings.tsx"
+  ],
+  "blockedBy": "INFRASTRUCTURE_EMAIL_INACCESSIBLE",
+  "passes": false
+}

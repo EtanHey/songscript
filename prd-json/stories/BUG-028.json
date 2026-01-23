@@ -1,0 +1,21 @@
+{
+  "id": "BUG-028",
+  "title": "Signup Checkbox STILL causes infinite loop (BUG-027 fix failed)",
+  "description": "BUG-027 was marked complete but the checkbox still causes 'Maximum update depth exceeded'. Previous fixes (stopPropagation, pointer-events-none) did not work. Need fresh investigation.",
+  "acceptanceCriteria": [
+    {"text": "Reproduce: Go to /signup, click anywhere on the checkbox card", "checked": true},
+    {"text": "Investigate: The error comes from setRef in Radix internals, not onClick handlers", "checked": true},
+    {"text": "Check: Label htmlFor='migrate' may be triggering checkbox programmatically", "checked": true},
+    {"text": "Check: Radix Checkbox internal state management with controlled checked prop", "checked": true},
+    {"text": "Fix: Checkbox card can be clicked without any console errors", "checked": true},
+    {"text": "Fix: Checkbox toggles state correctly on click", "checked": true},
+    {"text": "Fix: Rapid clicking does not cause errors", "checked": true},
+    {"text": "Verify in browser: Full signup flow works with checkbox checked and unchecked", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-22T17:20:30Z",
+  "completedBy": "opus",
+  "blockedBy": null,
+  "notes": "FIXED: Replaced Radix Checkbox with a simple custom div + lucide-react Check icon. The root cause was Radix Checkbox's internal ref/state management conflicting with React's controlled component pattern when the checked prop changed rapidly. By using a plain div with conditional rendering of a Check icon, we avoid all of Radix's internal complexity while maintaining the same visual appearance."
+}

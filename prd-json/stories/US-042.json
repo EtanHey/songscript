@@ -1,0 +1,17 @@
+{
+  "id": "US-042",
+  "title": "Create Settings page",
+  "description": "Create /settings page where users can view and edit their profile. Shows email (read-only), display name (editable), with save button. Styled consistently with dashboard.",
+  "acceptanceCriteria": [
+    {"text": "src/routes/_authed/settings.tsx file exists", "checked": true},
+    {"text": "Page shows user's email (read-only)", "checked": true},
+    {"text": "Page has editable display name input", "checked": true},
+    {"text": "Save button calls setDisplayName mutation", "checked": true},
+    {"text": "Shows success/error feedback after save", "checked": true},
+    {"text": "Styled with bg-gray-900 cards consistent with dashboard", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "Verify in browser: /settings page loads and form works", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-21T13:59:25Z"
+}

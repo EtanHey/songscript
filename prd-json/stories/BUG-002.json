@@ -1,0 +1,14 @@
+{
+  "id": "BUG-002",
+  "title": "Fix checked line background color making text unreadable",
+  "description": "When a line is checked/learned, the bright green background is almost white and makes the Farsi/main language text unreadable. Need to use a more subtle color that maintains readability.",
+  "acceptanceCriteria": [
+    { "text": "Checked/learned lines use a subtle green that doesn't overpower text", "checked": true },
+    { "text": "Farsi text remains clearly readable on learned line background", "checked": true },
+    { "text": "Visual distinction between learned/not-learned is still clear", "checked": true },
+    { "text": "Typecheck passes", "checked": true }
+  ],
+  "passes": true,
+  "completedAt": "2026-01-20T09:12:59Z",
+  "blockedBy": null
+}

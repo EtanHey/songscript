@@ -1,0 +1,15 @@
+{
+  "id": "US-008",
+  "title": "Visual state for lines: not learned / words known / line learned",
+  "description": "Show different visual states for each line: (1) not learned, (2) some words known from other songs, (3) line explicitly marked as learned.",
+  "acceptanceCriteria": [
+    { "text": "Default state: no special styling", "checked": true },
+    { "text": "Words known state: subtle indicator (e.g., partial border or icon)", "checked": true },
+    { "text": "Line learned state: green checkmark + subtle green tint", "checked": true },
+    { "text": "States fetched efficiently (batch query for all lines)", "checked": true },
+    { "text": "Typecheck passes", "checked": true },
+    { "text": "Verify in browser: all three states render correctly", "checked": true }
+  ],
+  "passes": true,
+  "completedAt": "2026-01-20T02:16:30Z"
+}

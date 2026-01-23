@@ -1,0 +1,20 @@
+{
+  "id": "SEC-012",
+  "title": "Update login page to link to signup, cleanup useVisitorId hook",
+  "description": "Update login page to prominently link to new signup page. Mark useVisitorId hook as deprecated or remove if no longer used.",
+  "acceptanceCriteria": [
+    {"text": "login.tsx: Add prominent 'Create Account' link to /signup", "checked": true},
+    {"text": "login.tsx: Keep existing magic link login for returning users", "checked": true},
+    {"text": "login.tsx: Update copy to differentiate login vs signup", "checked": true},
+    {"text": "useVisitorId.ts: Add @deprecated JSDoc comment if still needed for migration", "checked": true},
+    {"text": "OR delete useVisitorId.ts and useVisitorId.test.ts if no longer used anywhere", "checked": true},
+    {"text": "Update any remaining references to useVisitorId", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "Verify in browser: login page shows both login and signup options", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-22T00:06:45Z",
+  "completedBy": "kiro",
+  "blockedBy": "SEC-011",
+  "notes": "Login page should clearly differentiate:\n\n```\n┌─────────────────────────────────────┐\n│           Welcome Back              │\n├─────────────────────────────────────┤\n│ Email                               │\n│ ┌─────────────────────────────────┐ │\n│ │ your@email.com                  │ │\n│ └─────────────────────────────────┘ │\n│                                     │\n│ ┌─────────────────────────────────┐ │\n│ │      Send Magic Link            │ │\n│ └─────────────────────────────────┘ │\n│                                     │\n│ ─────────── OR ───────────         │\n│                                     │\n│ ┌─────────────────────────────────┐ │\n│ │   Create New Account →          │ │\n│ │   (Keep your learning progress) │ │\n│ └─────────────────────────────────┘ │\n└─────────────────────────────────────┘\n```\n\nThe 'Create New Account' button should be prominent and mention keeping progress."
+}

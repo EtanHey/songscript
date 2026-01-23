@@ -1,10 +1,11 @@
-import { useEffect, useState, useCallback } from "react";
-import { Volume2, Check, Loader2 } from "lucide-react";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { Volume2, Check, Loader2, Play, Pause, RotateCcw, Repeat } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { Id, Doc } from "../../convex/_generated/dataModel";
-import { useVisitorId } from "../hooks/useVisitorId";
+import { api } from "@convex/_generated/api";
+import { Id, Doc } from "@convex/_generated/dataModel";
 import { playWordAudio, stopWordAudio } from "../utils/wordAudio";
+import { useAudioPreloader } from "../hooks/useAudioPreloader";
+import { useProgress } from "../hooks/useProgress";
 import {
   Dialog,
   DialogContent,
@@ -34,6 +35,7 @@ export interface ModalLyricLine {
   transliteration: string;
   hebrew?: string;
   english: string;
+  audioSnippetUrl?: string;
 }
 
 interface WordInfoModalProps {
@@ -42,6 +44,8 @@ interface WordInfoModalProps {
   line: ModalLyricLine | null;
   songId: Id<"songs">;
   isMobile: boolean;
+  lineAudioUrl?: string; // Audio URL for the specific line
+  onToggleLearned?: (wordId: Id<"words">, persian: string) => void;
 }
 
 // Word table component - for desktop Dialog
@@ -295,8 +299,12 @@ export default function WordInfoModal({
   line,
   songId,
   isMobile,
+  lineAudioUrl,
+  onToggleLearned,
 }: WordInfoModalProps) {
-  const visitorId = useVisitorId();
+  // Get auth state and anonymous progress functions from unified hook
+  const progress = useProgress();
+  const isAuthenticated = progress.isAuthenticated;
 
   // Fetch words for this line from Convex
   const words = useQuery(
@@ -305,11 +313,12 @@ export default function WordInfoModal({
   );
 
   // Fetch word progress by persian text (syncs across repeated words)
+  // Only fetch from Convex when authenticated
   const persians = words?.map((w) => w.persian) ?? [];
   const progressData = useQuery(
-    api.wordProgress.getByVisitorPersians,
-    visitorId && persians.length > 0
-      ? { visitorId, persians }
+    api.wordProgress.getByUserPersians,
+    isAuthenticated && persians.length > 0
+      ? { persians }
       : "skip"
   );
 
@@ -318,19 +327,68 @@ export default function WordInfoModal({
     Map<string, WordProgressData>
   >(new Map());
 
-  // Audio playback state
+  // Audio playback state for words
   const [playingWord, setPlayingWord] = useState<string | null>(null);
   const [loadingWord, setLoadingWord] = useState<string | null>(null);
 
+  // Line audio playback state
+  const [linePlaybackSpeed, setLinePlaybackSpeed] = useState<number>(1);
+  const [lineLoopEnabled, setLineLoopEnabled] = useState<boolean>(false);
+
+  // Prepare audio snippet for line playback (memoized to prevent infinite re-renders)
+  const lineAudioSnippets = useMemo(() => {
+    return lineAudioUrl && line ? [{
+      lineNumber: line.lineNumber,
+      audioUrl: lineAudioUrl
+    }] : [];
+  }, [lineAudioUrl, line]);
+
+  // Audio preloader for line playback
+  const {
+    ready: lineAudioReady,
+    play: playLineAudio,
+    pause: pauseLineAudio,
+    stop: stopLineAudio,
+    isPlaying: isLineAudioPlaying,
+    setPlaybackRate: setLineAudioPlaybackRate,
+    setLoop: setLineAudioLoop,
+  } = useAudioPreloader(lineAudioSnippets);
+
+  // Extract the stable function from progress hook
+  const getWordProgress = progress.getWordProgress;
+
+  // Build word progress map - use Convex data for authenticated, localStorage for anonymous
   useEffect(() => {
-    if (progressData) {
-      const map = new Map<string, WordProgressData>();
-      progressData.forEach(({ persian, progress }) => {
-        map.set(persian, progress);
+    const map = new Map<string, WordProgressData>();
+
+    if (isAuthenticated && progressData) {
+      // Authenticated: use Convex data
+      progressData.forEach(({ persian, progress: wordProg }) => {
+        map.set(persian, wordProg);
       });
-      setWordProgressMap(map);
+    } else if (!isAuthenticated && words) {
+      // Anonymous: build from localStorage data
+      words.forEach((word) => {
+        const localProgress = getWordProgress(word.persian);
+        if (localProgress) {
+          map.set(word.persian, {
+            _id: `anon-${word.persian}` as Id<"wordProgress">,
+            _creationTime: Date.now(),
+            visitorId: 'anonymous',
+            userId: 'anonymous',
+            wordId: word._id,
+            persian: word.persian,
+            viewCount: localProgress.viewCount,
+            playCount: localProgress.playCount,
+            learned: localProgress.learned,
+            lastSeen: Date.now(),
+          });
+        }
+      });
     }
-  }, [progressData]);
+
+    setWordProgressMap(map);
+  }, [isAuthenticated, progressData, words, getWordProgress]);
 
   // Stop audio when modal closes
   useEffect(() => {
@@ -338,23 +396,46 @@ export default function WordInfoModal({
       stopWordAudio();
       setPlayingWord(null);
       setLoadingWord(null);
+      // Stop line audio and reset loop
+      pauseLineAudio();
+      setLineLoopEnabled(false);
     }
-  }, [isOpen]);
+  }, [isOpen, pauseLineAudio]);
+
+  // Update line audio settings when they change
+  useEffect(() => {
+    setLineAudioPlaybackRate(linePlaybackSpeed);
+  }, [linePlaybackSpeed, setLineAudioPlaybackRate]);
+
+  useEffect(() => {
+    setLineAudioLoop(lineLoopEnabled);
+  }, [lineLoopEnabled, setLineAudioLoop]);
 
   // Mutations for tracking
   const incrementViewCount = useMutation(api.wordProgress.incrementViewCount);
   const incrementPlayCount = useMutation(api.wordProgress.incrementPlayCount);
   const toggleLearned = useMutation(api.wordProgress.toggleLearned);
 
+  // Extract stable functions from progress hook
+  const incrementWordView = progress.incrementWordView;
+  const incrementWordPlay = progress.incrementWordPlay;
+  const toggleWordLearned = progress.toggleWordLearned;
+
   // Track view counts when modal opens
   useEffect(() => {
-    if (isOpen && words && visitorId) {
+    if (isOpen && words) {
       // Increment view count for each word in the line
       words.forEach((word) => {
-        incrementViewCount({ visitorId, wordId: word._id, persian: word.persian });
+        if (isAuthenticated) {
+          // Authenticated: use Convex mutation
+          incrementViewCount({ wordId: word._id, persian: word.persian });
+        } else {
+          // Anonymous: use localStorage via useProgress hook
+          incrementWordView(word.persian, word._id);
+        }
       });
     }
-  }, [isOpen, words, visitorId, incrementViewCount]);
+  }, [isOpen, words, isAuthenticated, incrementViewCount, incrementWordView]);
 
   // Play word pronunciation and track play count
   const handlePlayWord = useCallback(
@@ -364,15 +445,19 @@ export default function WordInfoModal({
       setPlayingWord(null);
 
       try {
-        // Try to play the audio (from generated file or forvoAudioUrl)
-        const result = await playWordAudio(word.persian);
+        // Try to play the audio (Forvo first, then generated file)
+        const result = await playWordAudio(word.persian, word.forvoAudioUrl);
 
         if (result.success) {
           setPlayingWord(word.persian);
           // Track play count
-          if (visitorId) {
-            incrementPlayCount({ visitorId, wordId: word._id, persian: word.persian });
+          if (isAuthenticated) {
+            incrementPlayCount({ wordId: word._id, persian: word.persian });
+          } else {
+            // Anonymous: use localStorage via useProgress hook
+            incrementWordPlay(word.persian, word._id);
           }
+
           // Clear playing state after a short delay (audio is typically short)
           setTimeout(() => {
             setPlayingWord((current) =>
@@ -389,14 +474,18 @@ export default function WordInfoModal({
         setLoadingWord(null);
       }
     },
-    [visitorId, incrementPlayCount]
+    [isAuthenticated, incrementPlayCount, incrementWordPlay]
   );
 
   // Toggle learned status - syncs across all instances of the same word
   const handleToggleLearned = useCallback(
     async (wordId: Id<"words">, persian: string) => {
-      if (visitorId) {
-        const newLearned = await toggleLearned({ visitorId, wordId, persian });
+      if (onToggleLearned) {
+        // Use the provided callback from parent (for practice tracking)
+        onToggleLearned(wordId, persian);
+      } else if (isAuthenticated) {
+        // Fallback for authenticated users - use Convex directly
+        const newLearned = await toggleLearned({ wordId, persian });
         // Update local state optimistically - keyed by persian for sync
         setWordProgressMap((prev) => {
           const newMap = new Map(prev);
@@ -408,7 +497,35 @@ export default function WordInfoModal({
             newMap.set(persian, {
               _id: "temp" as Id<"wordProgress">,
               _creationTime: Date.now(),
-              visitorId,
+              visitorId: "authenticated",
+              userId: "authenticated",
+              wordId,
+              persian,
+              viewCount: 0,
+              playCount: 0,
+              learned: newLearned,
+              lastSeen: Date.now(),
+            });
+          }
+          return newMap;
+        });
+      } else {
+        // Fallback for anonymous users - use localStorage
+        toggleWordLearned(persian, wordId);
+        // Update local state
+        setWordProgressMap((prev) => {
+          const newMap = new Map(prev);
+          const existing = newMap.get(persian);
+          const currentLearned = existing?.learned ?? false;
+          const newLearned = !currentLearned;
+          if (existing) {
+            newMap.set(persian, { ...existing, learned: newLearned });
+          } else {
+            newMap.set(persian, {
+              _id: `anon-${persian}` as Id<"wordProgress">,
+              _creationTime: Date.now(),
+              visitorId: "anonymous",
+              userId: "anonymous",
               wordId,
               persian,
               viewCount: 0,
@@ -421,7 +538,7 @@ export default function WordInfoModal({
         });
       }
     },
-    [visitorId, toggleLearned]
+    [onToggleLearned, isAuthenticated, toggleLearned, toggleWordLearned]
   );
 
   if (!line) return null;
@@ -451,6 +568,107 @@ export default function WordInfoModal({
         )}
         <p className="mt-2 text-sm text-gray-400">{line.english}</p>
       </div>
+
+      {/* Line playback controls */}
+      {lineAudioUrl && (
+        <div className="mt-3 rounded-lg bg-gray-800/50 p-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-300">Line Audio</span>
+            <div className="flex items-center gap-2">
+              {/* Speed control */}
+              <select
+                value={linePlaybackSpeed}
+                onChange={(e) => setLinePlaybackSpeed(Number(e.target.value))}
+                className="rounded bg-gray-700 px-2 py-1 text-xs text-white"
+                disabled={!lineAudioReady}
+              >
+                <option value={0.5}>0.5x</option>
+                <option value={0.75}>0.75x</option>
+                <option value={1}>1x</option>
+              </select>
+
+              {/* Loop toggle */}
+              <button
+                onClick={() => setLineLoopEnabled(!lineLoopEnabled)}
+                disabled={!lineAudioReady}
+                className={`rounded p-1.5 text-xs transition-colors ${
+                  lineLoopEnabled
+                    ? "bg-primary text-white"
+                    : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                } ${!lineAudioReady ? "opacity-50 cursor-not-allowed" : ""}`}
+                title={lineLoopEnabled ? "Disable loop" : "Enable loop"}
+              >
+                <Repeat className="h-3 w-3" />
+              </button>
+
+              {/* Rewind button - restart from beginning */}
+              <button
+                onClick={() => {
+                  stopLineAudio();
+                  if (line) {
+                    playLineAudio(line.lineNumber);
+                  }
+                }}
+                disabled={!lineAudioReady || !isLineAudioPlaying}
+                className={`flex items-center justify-center rounded p-1.5 transition-colors ${
+                  !lineAudioReady || !isLineAudioPlaying
+                    ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                    : "bg-gray-700 text-white hover:bg-gray-600"
+                }`}
+                title="Restart from beginning"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </button>
+
+              {/* Play/Pause button */}
+              <button
+                onClick={() => {
+                  if (isLineAudioPlaying) {
+                    pauseLineAudio();
+                  } else {
+                    if (line) {
+                      playLineAudio(line.lineNumber);
+                    }
+                  }
+                }}
+                disabled={!lineAudioReady}
+                className={`flex items-center justify-center rounded p-1.5 transition-colors ${
+                  isLineAudioPlaying
+                    ? "bg-primary text-white"
+                    : lineAudioReady
+                      ? "bg-gray-700 text-white hover:bg-gray-600"
+                      : "bg-gray-700 text-gray-500 cursor-not-allowed"
+                }`}
+                title={!lineAudioReady ? "Loading audio..." : isLineAudioPlaying ? "Pause" : "Play line"}
+              >
+                {isLineAudioPlaying ? (
+                  <Pause className="h-4 w-4" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Visual feedback when playing/looping */}
+          {isLineAudioPlaying && (
+            <div className="mt-2 flex items-center gap-2 text-xs text-primary">
+              <div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+              <span>
+                {lineLoopEnabled ? "Playing (looping)" : "Playing"}
+              </span>
+            </div>
+          )}
+
+          {/* Loading indicator */}
+          {!lineAudioReady && (
+            <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              <span>Loading audio...</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Progress summary */}
       {totalWords > 0 && (
@@ -527,6 +745,107 @@ export default function WordInfoModal({
             </p>
             <p className="mt-1 text-xs text-gray-400">{line.english}</p>
           </div>
+
+          {/* Line playback controls for mobile */}
+          {lineAudioUrl && (
+            <div className="flex-shrink-0 rounded-lg bg-gray-800/50 p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-300">Line Audio</span>
+                <div className="flex items-center gap-3">
+                  {/* Speed control */}
+                  <select
+                    value={linePlaybackSpeed}
+                    onChange={(e) => setLinePlaybackSpeed(Number(e.target.value))}
+                    className="rounded bg-gray-700 px-2 py-1 text-xs text-white"
+                    disabled={!lineAudioReady}
+                  >
+                    <option value={0.5}>0.5x</option>
+                    <option value={0.75}>0.75x</option>
+                    <option value={1}>1x</option>
+                  </select>
+
+                  {/* Loop toggle - larger for mobile */}
+                  <button
+                    onClick={() => setLineLoopEnabled(!lineLoopEnabled)}
+                    disabled={!lineAudioReady}
+                    className={`rounded p-2 transition-colors ${
+                      lineLoopEnabled
+                        ? "bg-primary text-white"
+                        : "bg-gray-700 text-gray-300 active:bg-gray-600"
+                    } ${!lineAudioReady ? "opacity-50" : ""}`}
+                    title={lineLoopEnabled ? "Disable loop" : "Enable loop"}
+                  >
+                    <Repeat className="h-4 w-4" />
+                  </button>
+
+                  {/* Rewind button - restart from beginning */}
+                  <button
+                    onClick={() => {
+                      stopLineAudio();
+                      if (line) {
+                        playLineAudio(line.lineNumber);
+                      }
+                    }}
+                    disabled={!lineAudioReady || !isLineAudioPlaying}
+                    className={`flex items-center justify-center rounded p-2 transition-colors ${
+                      !lineAudioReady || !isLineAudioPlaying
+                        ? "bg-gray-700 text-gray-500"
+                        : "bg-gray-700 text-white active:bg-gray-600"
+                    }`}
+                    title="Restart from beginning"
+                  >
+                    <RotateCcw className="h-5 w-5" />
+                  </button>
+
+                  {/* Play/Pause button - larger for mobile */}
+                  <button
+                    onClick={() => {
+                      if (isLineAudioPlaying) {
+                        pauseLineAudio();
+                      } else {
+                        if (line) {
+                          playLineAudio(line.lineNumber);
+                        }
+                      }
+                    }}
+                    disabled={!lineAudioReady}
+                    className={`flex items-center justify-center rounded p-2 transition-colors ${
+                      isLineAudioPlaying
+                        ? "bg-primary text-white"
+                        : lineAudioReady
+                          ? "bg-gray-700 text-white active:bg-gray-600"
+                          : "bg-gray-700 text-gray-500"
+                    }`}
+                    title={!lineAudioReady ? "Loading audio..." : isLineAudioPlaying ? "Pause" : "Play line"}
+                  >
+                    {isLineAudioPlaying ? (
+                      <Pause className="h-5 w-5" />
+                    ) : (
+                      <Play className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Visual feedback when playing/looping */}
+              {isLineAudioPlaying && (
+                <div className="mt-2 flex items-center gap-2 text-xs text-primary">
+                  <div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+                  <span>
+                    {lineLoopEnabled ? "Playing (looping)" : "Playing"}
+                  </span>
+                </div>
+              )}
+
+              {/* Loading indicator */}
+              {!lineAudioReady && (
+                <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <span>Loading audio...</span>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Progress summary */}
           {totalWords > 0 && (

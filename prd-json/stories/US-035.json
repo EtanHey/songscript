@@ -1,0 +1,17 @@
+{
+  "id": "US-035",
+  "title": "Display practice time in seconds with smart formatting",
+  "description": "Dashboard currently shows practice time in minutes but user wants more granular display. Show time in seconds for small amounts, then smart-format as it grows: 0-59s show '45s', 60s-59m show '5m 30s', 1h+ show '1h 15m'. Store time internally in milliseconds for precision, display with appropriate unit.",
+  "acceptanceCriteria": [
+    { "text": "Practice time stored internally in milliseconds (or seconds with decimals)", "checked": true },
+    { "text": "Display '45s' for times under 1 minute", "checked": true },
+    { "text": "Display '5m 30s' for times between 1-59 minutes", "checked": true },
+    { "text": "Display '1h 15m' for times 1 hour and above", "checked": true },
+    { "text": "Create formatPracticeTime utility function", "checked": true },
+    { "text": "Apply formatting to dashboard stats", "checked": true },
+    { "text": "Typecheck passes", "checked": true }
+  ],
+  "passes": true,
+  "completedAt": "2026-01-20T10:52:50Z"
+  "blockedBy": null
+}

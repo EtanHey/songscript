@@ -1,0 +1,13 @@
+{
+  "id": "US-005",
+  "title": "Wire up recordLineCompletion mutation",
+  "description": "Connect the existing recordLineCompletion mutation to track when lines are practiced. Should fire when audio snippet completes for a line.",
+  "acceptanceCriteria": [
+    { "text": "recordLineCompletion called when audio snippet finishes for a line", "checked": true },
+    { "text": "Line recorded only once per session (deduplicated)", "checked": true },
+    { "text": "Works with useConvexMutation pattern for reliable cleanup", "checked": true },
+    { "text": "Typecheck passes", "checked": true }
+  ],
+  "passes": true,
+  "completedAt": "2026-01-20T02:01:42Z"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "TEST-006",
+  "title": "E2E: Migration flow preserves anonymous progress",
+  "description": "Playwright e2e test verifying that anonymous user progress is correctly migrated to authenticated account when 'Bring my progress' is checked.",
+  "acceptanceCriteria": [
+    {"text": "Create e2e/migration-flow.spec.ts", "checked": false},
+    {"text": "Test setup: Start with clean browser, no auth", "checked": false},
+    {"text": "Test: As anonymous user, practice a song and mark 3+ words learned", "checked": false},
+    {"text": "Test: Verify localStorage has songscript_visitor_id with data", "checked": false},
+    {"text": "Test: Navigate to /signup, check 'Bring my progress' is ON", "checked": false},
+    {"text": "Test: Complete signup flow", "checked": false},
+    {"text": "Test: After login, dashboard shows the migrated word count", "checked": false},
+    {"text": "Test: Verify localStorage songscript_visitor_id is CLEARED", "checked": false},
+    {"text": "Test: Verify user can still see their learned words on song page", "checked": false},
+    {"text": "All tests pass: bun run test:e2e --grep 'migration-flow'", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "passes": false,
+  "blockedBy": "INFRASTRUCTURE_EMAIL_INACCESSIBLE",
+  "notes": "Tests the critical migration path from anonymous to authenticated.\n\nTEMPMAIL MCP - For signup testing:\n- Use `create_email` to get a disposable email address\n- Fill signup form with the temp email\n- Use `get_messages` to check inbox for magic link\n- Use `get_message_detail` to read the magic link email\n- Extract the verify URL and navigate to it\n\nCleanup test users with:\n- npx convex run oneTimeMigration:deleteTestUserByEmail '{\"email\": \"<temp-email>\"}'\n\nFlow:\n1. Anonymous user practices (data stored with visitorId)\n2. User signs up with 'Bring progress' checked\n3. verify.tsx calls migrateAnonymousData mutation\n4. Data now associated with userId\n5. localStorage cleared\n6. User sees their progress in authenticated dashboard\n\nTest must verify actual data migration, not just localStorage:\n```typescript\ntest('anonymous progress migrates on signup', async ({ page }) => {\n  // Practice as anonymous\n  await page.goto('/song/baraye');\n  await page.click('[data-word=\"freedom\"]');\n  await page.click('[data-action=\"mark-learned\"]');\n  \n  // Verify localStorage has data\n  const visitorId = await page.evaluate(() => \n    localStorage.getItem('songscript_visitor_id')\n  );\n  expect(visitorId).toBeTruthy();\n  \n  // Signup with migration\n  await page.goto('/signup');\n  await page.fill('[name=email]', testEmail);\n  await page.fill('[name=displayName]', 'MigrationTest');\n  // checkbox should already be checked\n  await page.click('button[type=submit]');\n  \n  // Complete magic link flow...\n  \n  // Verify dashboard shows migrated data\n  await page.goto('/dashboard');\n  await expect(page.getByText('1 word')).toBeVisible();\n  \n  // Verify localStorage cleared\n  const clearedVisitorId = await page.evaluate(() => \n    localStorage.getItem('songscript_visitor_id')\n  );\n  expect(clearedVisitorId).toBeNull();\n});\n```"
+}

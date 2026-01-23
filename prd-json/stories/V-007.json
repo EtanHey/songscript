@@ -1,0 +1,15 @@
+{
+  "id": "V-007",
+  "title": "Verify: Mini leaderboard on dashboard",
+  "description": "Test the mini leaderboard integration on the dashboard page.",
+  "acceptanceCriteria": [
+    {"text": "Mini leaderboard section visible on dashboard", "checked": true},
+    {"text": "Can toggle between Streak and Progress tabs", "checked": true},
+    {"text": "Top 5 users displayed with correct data", "checked": true},
+    {"text": "User's own rank shown (or 'Set name to join')", "checked": true},
+    {"text": "'View full leaderboard' link works", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-21T15:13:36Z"
+}

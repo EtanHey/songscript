@@ -1,0 +1,17 @@
+{
+  "id": "V-008",
+  "title": "Verify: Full leaderboard page",
+  "description": "Test the full leaderboard page functionality including tabs, periods, and pagination.",
+  "acceptanceCriteria": [
+    {"text": "Can navigate to /leaderboard", "checked": true},
+    {"text": "Streak tab shows users sorted by streak", "checked": true},
+    {"text": "Progress tab shows users sorted by weighted score", "checked": true},
+    {"text": "Weekly/Monthly/All-time filters work", "checked": true},
+    {"text": "Pagination loads more users", "checked": true},
+    {"text": "Current user's row is highlighted", "checked": true},
+    {"text": "Mobile layout works (responsive)", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-21T15:22:35Z"
+}

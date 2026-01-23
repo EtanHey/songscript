@@ -1,0 +1,37 @@
+{
+  "id": "TEST-009",
+  "title": "E2E test: Migration confirmation modal flow",
+  "type": "test",
+  "priority": "high",
+  "storyPoints": 3,
+  "description": "Playwright end-to-end test verifying the post-login migration confirmation modal works correctly for accept, decline, and Settings recovery paths.",
+  "acceptanceCriteria": [
+    {"text": "Test: Anonymous user practices, gains progress in localStorage", "checked": false},
+    {"text": "Test: User signs up, verifies magic link", "checked": false},
+    {"text": "Test: Migration modal appears after login", "checked": false},
+    {"text": "Test: ACCEPT path - data migrates, localStorage cleared", "checked": false},
+    {"text": "Test: DECLINE path - userId added to declined array, localStorage kept", "checked": false},
+    {"text": "Test: Declined user doesn't see modal on re-login", "checked": false},
+    {"text": "Test: Different user on same device DOES see modal", "checked": false},
+    {"text": "Test: Settings import option appears for declined users", "checked": false},
+    {"text": "Test: Settings import successfully recovers data", "checked": false},
+    {"text": "All tests pass: bun run test:e2e --grep 'migration-confirm'", "checked": false},
+    {"text": "Typecheck passes", "checked": false}
+  ],
+  "technicalNotes": [
+    "Create e2e/migration-confirm.spec.ts",
+    "Use Playwright's localStorage manipulation",
+    "May need test bypass for magic link or use tempmail integration",
+    "Test serial execution for stateful tests"
+  ],
+  "testingNotes": [
+    "Run with: bun run test:e2e",
+    "Consider test timeouts for email verification steps",
+    "Clean up test users after tests"
+  ],
+  "files": [
+    "e2e/migration-confirm.spec.ts"
+  ],
+  "blockedBy": "V-031",
+  "passes": false
+}

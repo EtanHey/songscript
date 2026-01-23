@@ -1,0 +1,15 @@
+{
+  "id": "US-046",
+  "title": "Update Header to show displayName and Settings link",
+  "description": "Update the header dropdown to show display name instead of email (or 'Set name' if not set). Add Settings link to dropdown menu.",
+  "acceptanceCriteria": [
+    {"text": "Header shows displayName if set, otherwise shows email", "checked": true},
+    {"text": "If no displayName, shows 'Set display name' prompt/link", "checked": true},
+    {"text": "Dropdown menu includes 'Settings' link", "checked": true},
+    {"text": "Settings link navigates to /settings", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "Verify in browser: header shows correct name and dropdown works", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-21T15:27:00Z"
+}

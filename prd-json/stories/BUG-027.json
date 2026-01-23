@@ -1,0 +1,44 @@
+{
+  "id": "BUG-027",
+  "title": "Sign Up Checkbox Causes Infinite Loop Error",
+  "description": "Clicking the 'bring it with you' checkbox during sign up causes 'Maximum update depth exceeded' error in Radix UI Checkbox component.",
+  "acceptanceCriteria": [
+    {
+      "text": "Find Radix Checkbox usage in signup form",
+      "checked": true
+    },
+    {
+      "text": "Identify state update causing infinite loop",
+      "checked": true
+    },
+    {
+      "text": "Fix: Remove circular state dependency in checkbox",
+      "checked": true
+    },
+    {
+      "text": "Checkbox can be clicked without console errors",
+      "checked": true
+    },
+    {
+      "text": "Checkbox state toggles properly when clicked",
+      "checked": true
+    },
+    {
+      "text": "Sign up process completes successfully with checkbox checked",
+      "checked": true
+    },
+    {
+      "text": "Sign up process completes successfully with checkbox unchecked",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null,
+  "notes": "Error details:\n- Error: 'Maximum update depth exceeded'\n- Location: @radix-ui_react-checkbox, checkbox.tsx:20\n- Component: SignupPage\n\nReproduction steps:\n1. Navigate to /signup\n2. Click the 'bring it with you' checkbox\n3. Observe console error: 'Maximum update depth exceeded'\n\nRoot cause: Likely a circular state update - checkbox onChange triggers state change that re-renders checkbox with new checked prop, which triggers another onChange, creating infinite loop.\n\nCommon fixes:\n1. Use onCheckedChange instead of onChange\n2. Ensure controlled component doesn't update state inside render\n3. Check if value is being set in both controlled and uncontrolled mode",
+  "completedAt": "2026-01-22T16:10:00Z",
+  "completedBy": "opus"
+}

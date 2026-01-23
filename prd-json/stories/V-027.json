@@ -1,0 +1,17 @@
+{
+  "id": "V-027",
+  "title": "Verify: Build passes before pushing to remote",
+  "description": "Final verification that the project builds successfully and all checks pass before pushing changes to remote.",
+  "acceptanceCriteria": [
+    {"text": "Run bun run build - must complete without errors", "checked": true},
+    {"text": "Run bun run typecheck - must pass", "checked": true},
+    {"text": "Run bun run test - all tests must pass", "checked": true},
+    {"text": "No TypeScript errors in output", "checked": true},
+    {"text": "Build artifacts created successfully", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-22T17:46:00Z",
+  "completedBy": "opus",
+  "blockedBy": null,
+  "notes": "This is the final gate before pushing to remote. If any check fails, do not push."
+}

@@ -1,0 +1,19 @@
+{
+  "id": "BUG-023",
+  "title": "Prevent duplicate signup with same email",
+  "description": "Users should not be able to sign up with an email that already exists. Show friendly error message instead of creating duplicate accounts.",
+  "acceptanceCriteria": [
+    {"text": "Check if email exists in Better Auth user table before sending magic link", "checked": true},
+    {"text": "If email exists, show message: 'This email is already registered. Please sign in instead.'", "checked": true},
+    {"text": "Add link to /login page from error message", "checked": true},
+    {"text": "Signup form stays on page (doesn't redirect) when email exists", "checked": true},
+    {"text": "NEVER delete or modify existing user data - only prevent new duplicates", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "Verify in browser: try signing up with existing email, see error", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-22T18:16:00Z",
+  "completedBy": "opus",
+  "blockedBy": null,
+  "notes": "⚠️ CRITICAL: PROTECT EXISTING USER DATA\n\nUserId k572fk152njnp9g621kc64bq4x7zgbyt has migrated data - DO NOT:\n- Delete any user records without checking their data first\n- Run any cleanup that could affect existing users\n- Modify the users table structure in ways that lose data\n\nThis fix should ONLY:\n- Block new signups with existing emails\n- Show friendly error message\n- Redirect to login\n\nImplementation options:\n\n1. Client-side check before submit:\n```typescript\nconst { data: existingUser } = await authClient.checkEmail({ email });\nif (existingUser) {\n  setError('This email is already registered');\n  return;\n}\n```\n\n2. Server-side in Convex:\n```typescript\nconst existing = await ctx.db.query('user').withIndex('email', q => q.eq('email', email)).first();\nif (existing) throw new ConvexError('Email already registered');\n```\n\n3. Better Auth might handle this automatically - check their docs first."
+}

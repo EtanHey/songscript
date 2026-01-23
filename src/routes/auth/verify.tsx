@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { authClient } from "../../lib/auth-client";
+import { useMutation } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 
 export const Route = createFileRoute("/auth/verify")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -14,6 +16,9 @@ function VerifyPage() {
   const navigate = useNavigate();
   const [status, setStatus] = useState<"verifying" | "success" | "error">("verifying");
   const [error, setError] = useState<string | null>(null);
+
+  const setDisplayName = useMutation(api.leaderboard.setDisplayName);
+  const ensureAppUser = useMutation(api.users.ensureAppUser);
 
   useEffect(() => {
     if (!token) {
@@ -32,11 +37,52 @@ function VerifyPage() {
           return;
         }
 
+        // Ensure app user record exists with retry logic
+        let retryCount = 0;
+        const maxRetries = 5;
+        while (retryCount < maxRetries) {
+          try {
+            await ensureAppUser();
+            break; // Success, exit retry loop
+          } catch (error) {
+            retryCount++;
+            if (retryCount >= maxRetries) {
+              throw error; // Re-throw after max retries
+            }
+            // Exponential backoff: 500ms, 1s, 2s, 4s
+            const delay = 500 * Math.pow(2, retryCount - 1);
+            await new Promise(resolve => setTimeout(resolve, delay));
+          }
+        }
+
+        // Get display name from signup form (if provided)
+        const displayName = localStorage.getItem('songscript_signup_display_name');
+
+        // Set display name if provided
+        if (displayName) {
+          try {
+            await setDisplayName({ displayName });
+          } catch (displayNameError) {
+            console.error('Setting display name failed:', displayNameError);
+            // Continue with login even if display name setting fails
+          }
+        }
+
+        // Clear signup-related localStorage keys
+        // Note: anonymous progress is preserved - migration happens via modal on dashboard
+        localStorage.removeItem('songscript_signup_display_name');
+
         setStatus("success");
         // Brief delay to show success state
         setTimeout(() => {
-          navigate({ to: "/dashboard" });
-        }, 500);
+          // Check if this is first login and user hasn't seen welcome prompt
+          const hasSeenWelcome = localStorage.getItem("songscript_welcome_shown");
+          if (!hasSeenWelcome) {
+            navigate({ to: "/welcome" });
+          } else {
+            navigate({ to: "/dashboard" });
+          }
+        }, 1000);
       } catch (err) {
         setStatus("error");
         setError(err instanceof Error ? err.message : "Verification failed");

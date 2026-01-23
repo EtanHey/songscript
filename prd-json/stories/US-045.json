@@ -1,0 +1,19 @@
+{
+  "id": "US-045",
+  "title": "Create full /leaderboard page",
+  "description": "Create dedicated leaderboard page with full rankings. Two main tabs (Streak/Progress), sub-tabs for time period (Weekly/Monthly/All-time). Shows top 50 with pagination. User's row pinned/highlighted.",
+  "acceptanceCriteria": [
+    {"text": "src/routes/_authed/leaderboard.tsx file exists", "checked": true},
+    {"text": "Main tabs: Streak | Progress", "checked": true},
+    {"text": "Sub-tabs: Weekly | Monthly | All-time", "checked": true},
+    {"text": "Shows top 50 users with pagination", "checked": true},
+    {"text": "Medals for top 3 (🥇🥈🥉)", "checked": true},
+    {"text": "User's own row highlighted with star", "checked": true},
+    {"text": "Language flag shown next to each user", "checked": true},
+    {"text": "Responsive design (works on mobile)", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "Verify in browser: /leaderboard page loads with data", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-21T15:16:47Z"
+}

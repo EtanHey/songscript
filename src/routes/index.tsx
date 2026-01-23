@@ -3,7 +3,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { useQuery } from '@tanstack/react-query'
 import { convexQuery } from '@convex-dev/react-query'
 import { ConvexHttpClient } from 'convex/browser'
-import { api } from '../../convex/_generated/api'
+import { api } from '@convex/_generated/api'
 import { WishlistButton } from '../components/WishlistButton'
 import type { Doc } from '../../convex/_generated/dataModel'
 

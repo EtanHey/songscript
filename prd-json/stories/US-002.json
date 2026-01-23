@@ -1,0 +1,12 @@
+{
+  "id": "US-002",
+  "title": "Create userPreferences queries and mutations",
+  "description": "Create Convex queries and mutations for getting and updating user preferences. Follows existing patterns from wordProgress.ts.",
+  "acceptanceCriteria": [
+    { "text": "convex/userPreferences.ts created with getByVisitor query", "checked": true },
+    { "text": "updatePreferences mutation created that upserts preferences", "checked": true },
+    { "text": "Typecheck passes", "checked": true }
+  ],
+  "passes": true,
+  "completedAt": "2026-01-20T01:54:50Z"
+}

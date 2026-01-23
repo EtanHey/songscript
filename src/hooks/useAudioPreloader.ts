@@ -21,7 +21,10 @@ interface UseAudioPreloaderReturn extends PreloadState {
   setLoop: (loop: boolean) => void
 }
 
-export function useAudioPreloader(snippets: AudioSnippet[]): UseAudioPreloaderReturn {
+export function useAudioPreloader(
+  snippets: AudioSnippet[],
+  onEnded?: (lineNumber: number) => void
+): UseAudioPreloaderReturn {
   const [state, setState] = useState<PreloadState>({
     loaded: 0,
     total: snippets.length,
@@ -51,8 +54,11 @@ export function useAudioPreloader(snippets: AudioSnippet[]): UseAudioPreloaderRe
 
       const audio = new Audio()
       audio.preload = 'auto'
+      let handled = false // Prevent double counting from canplay + canplaythrough
 
       const handleCanPlay = () => {
+        if (handled) return
+        handled = true
         loadedCount++
         audioMapRef.current.set(lineNumber, audio)
         setState({
@@ -63,6 +69,8 @@ export function useAudioPreloader(snippets: AudioSnippet[]): UseAudioPreloaderRe
       }
 
       const handleError = () => {
+        if (handled) return
+        handled = true
         // Still increment loaded count to not block ready state
         loadedCount++
         console.warn(`Failed to load audio for line ${lineNumber}: ${audioUrl}`)
@@ -73,15 +81,26 @@ export function useAudioPreloader(snippets: AudioSnippet[]): UseAudioPreloaderRe
         })
       }
 
+      const handleEnded = () => {
+        setIsPlaying(false)
+        if (onEnded) {
+          onEnded(lineNumber)
+        }
+      }
+
       audio.addEventListener('canplaythrough', handleCanPlay, { once: true })
+      audio.addEventListener('canplay', handleCanPlay, { once: true }) // Fallback for cached audio
       audio.addEventListener('error', handleError, { once: true })
+      audio.addEventListener('ended', handleEnded)
       audio.src = audioUrl
+      audio.load() // Explicitly trigger loading
     })
 
     return () => {
       // Cleanup all audio elements on unmount
       audioMapRef.current.forEach(audio => {
         audio.pause()
+        audio.removeEventListener('ended', () => {})
         audio.src = ''
       })
       audioMapRef.current.clear()

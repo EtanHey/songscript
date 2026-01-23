@@ -1,0 +1,21 @@
+{
+  "id": "V-028",
+  "title": "Verify: Signup checkbox actually toggles and persists",
+  "description": "After BUG-028 fixes the infinite loop, verify the checkbox actually works - toggles visually and saves the preference to localStorage.",
+  "acceptanceCriteria": [
+    {"text": "Navigate to /signup", "checked": true},
+    {"text": "Checkbox is checked by default", "checked": true},
+    {"text": "Click checkbox - it unchecks (visual change)", "checked": true},
+    {"text": "Click checkbox again - it checks (visual change)", "checked": true},
+    {"text": "Fill form and submit with checkbox CHECKED", "checked": true},
+    {"text": "Verify localStorage songscript_migrate_on_signup = 'true'", "checked": true},
+    {"text": "Refresh page, uncheck checkbox, submit", "checked": true},
+    {"text": "Verify localStorage songscript_migrate_on_signup = 'false'", "checked": true},
+    {"text": "No console errors during any of these steps", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-22T18:15:32Z",
+  "completedBy": "haiku",
+  "blockedBy": null,
+  "notes": "Use browser MCP tools:\n- mcp__claude-in-chrome__computer action='screenshot' to verify visual state\n- mcp__claude-in-chrome__javascript_tool to check localStorage values\n- mcp__claude-in-chrome__read_console_messages to verify no errors"
+}

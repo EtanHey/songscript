@@ -1,0 +1,45 @@
+{
+  "id": "US-055",
+  "title": "Rewrite migration to read from localStorage data",
+  "type": "feature",
+  "priority": "high",
+  "storyPoints": 5,
+  "description": "Update the migrateAnonymousData mutation to accept full progress data as an argument (from localStorage) instead of reading from Convex by visitorId. Add thorough validation and sanitization before inserting to database.",
+  "acceptanceCriteria": [
+    {"text": "Mutation accepts AnonymousProgress object as argument", "checked": true},
+    {"text": "Validates all data types before insertion", "checked": true},
+    {"text": "Enforces string length limits (e.g., persian/songId max 500 chars)", "checked": true},
+    {"text": "Enforces array size limits (e.g., max 10,000 words)", "checked": true},
+    {"text": "Enforces numeric bounds (positive integers, reasonable maximums)", "checked": true},
+    {"text": "Validates songId format matches Convex ID pattern", "checked": true},
+    {"text": "Rejects malformed data gracefully (partial success OK)", "checked": true},
+    {"text": "Returns count of successfully migrated records", "checked": true},
+    {"text": "verify.tsx updated to read localStorage and pass to mutation", "checked": true},
+    {"text": "localStorage cleared after successful migration", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
+  ],
+  "technicalNotes": [
+    "Update convex/migration.ts migrateAnonymousData mutation",
+    "Create validation helpers in convex/lib/validation.ts",
+    "Update src/routes/auth/verify.tsx to read full localStorage and pass as argument",
+    "Use Zod or manual validation for type safety",
+    "Log validation failures for debugging but don't expose to client",
+    "Design doc: docs/plans/2025-01-22-anonymous-progress-design.md"
+  ],
+  "testingNotes": [
+    "Unit test: rejects invalid types",
+    "Unit test: truncates oversized arrays",
+    "Unit test: rejects malicious string content",
+    "Unit test: successfully migrates valid data",
+    "Integration test: full signup flow migrates localStorage to Convex"
+  ],
+  "files": [
+    "convex/migration.ts",
+    "convex/lib/validation.ts",
+    "src/routes/auth/verify.tsx"
+  ],
+  "blockedBy": null,
+  "passes": true,
+  "completedAt": "2026-01-22T22:10:00Z",
+  "completedBy": "opus"
+}

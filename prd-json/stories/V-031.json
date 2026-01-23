@@ -1,0 +1,30 @@
+{
+  "id": "V-031",
+  "title": "Verify Settings import option for declined users",
+  "type": "verification",
+  "priority": "medium",
+  "storyPoints": 1,
+  "description": "Browser verification that users who declined migration can later import their progress from the Settings page.",
+  "acceptanceCriteria": [
+    {"text": "Practice as anonymous, sign up, DECLINE the migration modal", "checked": false},
+    {"text": "Navigate to Settings page", "checked": false},
+    {"text": "Verify 'Import device progress' section appears", "checked": false},
+    {"text": "Section shows correct word/song count", "checked": false},
+    {"text": "Click 'Import to my account' button", "checked": false},
+    {"text": "Confirm in modal, verify data appears in dashboard", "checked": false},
+    {"text": "Return to Settings - import section should be gone", "checked": false},
+    {"text": "Verify localStorage progress is cleared", "checked": false}
+  ],
+  "technicalNotes": [
+    "Use tempmail MCP for signup",
+    "This tests the 'undo decline' flow",
+    "Verify localStorage cleanup happens correctly"
+  ],
+  "testingNotes": [
+    "Must decline migration first to see the Settings option",
+    "Verify the full recovery flow works"
+  ],
+  "files": [],
+  "blockedBy": "US-059",
+  "passes": false
+}

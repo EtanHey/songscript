@@ -3,12 +3,13 @@ import { Suspense, useRef, useState, useCallback, useEffect, useMemo } from "rea
 import { convexQuery } from "@convex-dev/react-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
-import { api } from "../../convex/_generated/api";
-import { Id } from "../../convex/_generated/dataModel";
+import { api } from "@convex/_generated/api";
+import { Id } from "@convex/_generated/dataModel";
 import LocalVideoPlayer, { LocalVideoPlayerHandle } from "../components/LocalVideoPlayer";
 import LyricsDisplay, { LanguageFilter, LyricLine } from "../components/LyricsDisplay";
 import WordInfoModal, { ModalLyricLine } from "../components/WordInfoModal";
-import { useAudioPreloader } from "../hooks/useAudioPreloader";
+import { useConvexMutation } from "@convex-dev/react-query";
+import { useProgress } from "../hooks/useProgress";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import {
   Select,
@@ -17,10 +18,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Repeat, Languages, Volume2, Video, Play, Square, Waves, Pause, ChevronDown, ChevronUp } from "lucide-react";
+import { Repeat, Languages, Video, Play, Square, Waves, Pause, ChevronDown, ChevronUp } from "lucide-react";
 import { WishlistButton } from "../components/WishlistButton";
+import { AnonymousProgressBanner } from "../components/AnonymousProgressBanner";
 
-// Playback modes
+// Playback modes - ALL modes use video as audio source
 type PlaybackMode = "single" | "loop" | "fluid";
 
 export const Route = createFileRoute("/song/$songId")({
@@ -77,83 +79,198 @@ function SongPageContent({ songId }: SongPageContentProps) {
     convexQuery(api.lyrics.getBySong, { songId })
   );
 
-  // Sort lyrics by lineNumber for consistent access - memoized to prevent infinite re-renders
+  // Unified progress hook - routes to localStorage for anonymous, Convex for authenticated
+  const progress = useProgress();
+  const isAuthenticated = progress.isAuthenticated;
+
+  // Extract stable function references from progress hook to avoid re-renders
+  const toggleLineLearnedFn = progress.toggleLineLearned;
+  const toggleWordLearnedFn = progress.toggleWordLearned;
+  const logPracticeFn = progress.logPractice;
+
+  // For authenticated users, get line progress from Convex
+  // For anonymous users, we'll get it from the useProgress hook
+  const { data: lineProgressFromConvex } = useSuspenseQuery(
+    convexQuery(api.songProgress.getLineProgressByUserSong, { songId })
+  );
+
+  // Optimistic toggle state for instant UI feedback
+  // Maps lineNumber -> optimistic learned state (true/false)
+  const [optimisticToggles, setOptimisticToggles] = useState<Map<number, boolean>>(new Map());
+
+  // Build line progress array for LyricsDisplay - combine Convex data (authenticated) with local data (anonymous)
+  // Note: For anonymous users, we include `progress` in deps to trigger recompute when localStorage changes
+  // Type for the simplified line progress used by UI (subset of Convex data)
+  type LineProgressUI = {
+    _id: string;
+    visitorId: string;
+    songId: Id<"songs">;
+    lineNumber: number;
+    learned: boolean;
+  };
+
+  const lineProgress = useMemo((): LineProgressUI[] => {
+    if (isAuthenticated) {
+      // Use Convex data for authenticated users, with optimistic overrides
+      const convexProgress = lineProgressFromConvex || [];
+
+      // Transform Convex data to UI format and apply optimistic updates
+      const progressMap = new Map<number, LineProgressUI>();
+
+      // Add all Convex data
+      for (const p of convexProgress) {
+        progressMap.set(p.lineNumber, {
+          _id: p._id,
+          visitorId: p.visitorId,
+          songId: p.songId,
+          lineNumber: p.lineNumber,
+          learned: p.learned,
+        });
+      }
+
+      // Apply optimistic updates on top
+      for (const [lineNumber, learned] of optimisticToggles) {
+        const existing = progressMap.get(lineNumber);
+        if (existing) {
+          progressMap.set(lineNumber, { ...existing, learned });
+        } else if (learned) {
+          // Add new optimistic entry
+          progressMap.set(lineNumber, {
+            _id: `optimistic-${songId}-${lineNumber}`,
+            visitorId: 'authenticated',
+            songId: songId as Id<"songs">,
+            lineNumber,
+            learned: true,
+          });
+        }
+      }
+
+      return Array.from(progressMap.values());
+    } else {
+      // Build from anonymous localStorage data
+      const learnedLines = progress.getLearnedLinesForSong(songId);
+      return learnedLines.map(lineNumber => ({
+        _id: `anon-${songId}-${lineNumber}`,
+        visitorId: 'anonymous',
+        songId: songId as Id<"songs">,
+        lineNumber,
+        learned: true,
+      }));
+    }
+  }, [isAuthenticated, lineProgressFromConvex, progress, songId, optimisticToggles]);
+
+  // Clear optimistic state only when server confirms our expected state
+  // This prevents flicker when Convex pushes stale data before mutation completes
+  useEffect(() => {
+    if (!lineProgressFromConvex || optimisticToggles.size === 0) return;
+
+    // Only clear optimistic entries where server state matches what we expected
+    const serverStateMap = new Map(
+      lineProgressFromConvex.map(p => [p.lineNumber, p.learned])
+    );
+
+    let hasMatchingEntries = false;
+    for (const [lineNumber, optimisticLearned] of optimisticToggles) {
+      const serverLearned = serverStateMap.get(lineNumber) ?? false;
+      if (serverLearned === optimisticLearned) {
+        hasMatchingEntries = true;
+        break;
+      }
+    }
+
+    // Only clear if at least one optimistic entry matches server state
+    if (hasMatchingEntries) {
+      setOptimisticToggles(prev => {
+        const next = new Map(prev);
+        for (const [lineNumber, optimisticLearned] of prev) {
+          const serverLearned = serverStateMap.get(lineNumber) ?? false;
+          if (serverLearned === optimisticLearned) {
+            next.delete(lineNumber);
+          }
+        }
+        return next;
+      });
+    }
+  }, [lineProgressFromConvex, optimisticToggles]);
+
+  // Load user preferences
+  const { data: userPreferences } = useSuspenseQuery(
+    convexQuery(api.userPreferences.getUserPreferences, {})
+  );
+  const updatePreferencesMutation = useConvexMutation(api.userPreferences.updatePreferences);
+
+  // Sort lyrics by lineNumber
   const sortedLyrics = useMemo(
     () => [...(lyrics || [])].sort((a, b) => a.lineNumber - b.lineNumber),
     [lyrics]
   );
 
-  // Prepare audio snippets for the preloader hook
-  const audioSnippets = useMemo(
-    () =>
-      sortedLyrics
-        .filter((line) => line.audioSnippetUrl)
-        .map((line) => ({
-          lineNumber: line.lineNumber,
-          audioUrl: line.audioSnippetUrl!,
-        })),
-    [sortedLyrics]
-  );
+  // Practice tracking
+  const logPracticeMutation = useConvexMutation(api.practiceLog.logPractice);
+  const recordLineCompletionMutation = useConvexMutation(api.songProgress.recordLineCompletion);
+  const toggleLineLearnedMutation = useConvexMutation(api.songProgress.toggleLineLearned);
+  const toggleWordLearnedMutation = useConvexMutation(api.wordProgress.toggleLearned);
 
-  // Audio preloader hook for instant playback
-  const {
-    ready: audioReady,
-    loaded: audioLoaded,
-    total: audioTotal,
-    play: playAudioSnippet,
-    pause: pauseAudioSnippet,
-    resume: resumeAudioSnippet,
-    isPlaying: isAudioPlaying,
-    setPlaybackRate: setAudioPlaybackRate,
-    setLoop: setAudioLoop,
-  } = useAudioPreloader(audioSnippets);
+  const [sessionCompletedLines, setSessionCompletedLines] = useState<Set<number>>(new Set());
 
+  // Video player ref
   const playerRef = useRef<LocalVideoPlayerHandle>(null);
-  const [activeLineIndex, setActiveLineIndex] = useState<number | undefined>(
-    undefined
-  );
-  const [clickedLineIndex, setClickedLineIndex] = useState<number | undefined>(
-    undefined
-  );
 
-  // Ref to track when we're seeking for a loop restart (prevents line flash during seek)
-  const isLoopSeekingRef = useRef(false);
+  // Seeking guard - ignore time updates while seeking
+  const isSeekingRef = useRef(false);
 
-  // Ref to track the "target" line index during seeking - used to prevent wrong line detection
-  // due to keyframe seeking landing slightly before the requested time
-  const targetLineIndexRef = useRef<number | undefined>(undefined);
+  // Loop restart guard - prevents multiple loop triggers
+  const isLoopingRef = useRef(false);
 
-  // Playback mode state: single, loop, or fluid - default to fluid for auto-play experience
+  // Practice time tracking
+  const practiceSecondsRef = useRef(0);
+
+  // Current line being played (for Loop/Single modes)
+  const [currentLineIndex, setCurrentLineIndex] = useState<number | undefined>(undefined);
+
+  // Active line (highlighted in UI based on video time)
+  const [activeLineIndex, setActiveLineIndex] = useState<number | undefined>(undefined);
+
+  // Click animation
+  const [clickedLineIndex, setClickedLineIndex] = useState<number | undefined>(undefined);
+
+  // Playback mode - always start in fluid mode
   const [playbackMode, setPlaybackMode] = useState<PlaybackMode>("fluid");
-  const [currentLineIndex, setCurrentLineIndex] = useState<number | undefined>(
-    undefined
+
+  // Playback speed
+  const [playbackSpeed, setPlaybackSpeed] = useState<string>(
+    userPreferences?.playbackSpeed?.toString() || "1"
   );
 
-  // Playback speed state
-  const [playbackSpeed, setPlaybackSpeed] = useState<string>("1");
+  // Language filter
+  const [languageFilter, setLanguageFilter] = useState<LanguageFilter>(
+    (userPreferences?.languageFilter as LanguageFilter) || "all"
+  );
 
-  // Language filter state
-  const [languageFilter, setLanguageFilter] = useState<LanguageFilter>("all");
+  // Video mute state
+  const [isVideoMuted, setIsVideoMuted] = useState(
+    userPreferences?.videoMuted ?? true
+  );
 
-  // Video mute state - derived from playback mode (muted in single/loop, unmuted in fluid)
-  // Start MUTED to allow browser autoplay (browsers block autoplay with sound)
-  // User can unmute via the video overlay button after autoplay starts
-  const [isVideoMuted, setIsVideoMuted] = useState(true);
-
-  // Video error state - for fallback handling
+  // Video error state
   const [videoError, setVideoError] = useState<string | null>(null);
 
-  // Video playing state - for pause/play control
+  // Video playing state
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
   // Word info modal state
   const [wordModalOpen, setWordModalOpen] = useState(false);
   const [selectedLine, setSelectedLine] = useState<ModalLyricLine | null>(null);
 
-  // Mobile video collapsed state - starts collapsed for more lyrics space
-  const [isVideoCollapsed, setIsVideoCollapsed] = useState(true);
+  // Mobile video collapsed state
+  const [isVideoCollapsed, setIsVideoCollapsed] = useState(
+    userPreferences?.videoCollapsed ?? true
+  );
 
-  // Detect if mobile (viewport width < 768px)
+  // Track if preferences have been applied
+  const [preferencesApplied, setPreferencesApplied] = useState(false);
+
+  // Detect mobile
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -162,281 +279,395 @@ function SongPageContent({ songId }: SongPageContentProps) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Activity tracking for practice time
+  const lastActivityRef = useRef<number>(Date.now());
+  const IDLE_THRESHOLD_MS = 5000; // 5 seconds of no activity = idle
+
+  // Track user activity
+  useEffect(() => {
+    const updateActivity = () => {
+      lastActivityRef.current = Date.now();
+    };
+
+    // Track various activity types
+    window.addEventListener('mousemove', updateActivity);
+    window.addEventListener('mousedown', updateActivity);
+    window.addEventListener('keydown', updateActivity);
+    window.addEventListener('touchstart', updateActivity);
+    window.addEventListener('scroll', updateActivity, true);
+
+    return () => {
+      window.removeEventListener('mousemove', updateActivity);
+      window.removeEventListener('mousedown', updateActivity);
+      window.removeEventListener('keydown', updateActivity);
+      window.removeEventListener('touchstart', updateActivity);
+      window.removeEventListener('scroll', updateActivity, true);
+    };
+  }, []);
+
+  // Determine if we should count practice time
+  // Count when: video playing (not fluid+muted) OR modal open
+  const shouldCountTime = useMemo(() => {
+    const isFluidMuted = playbackMode === "fluid" && isVideoMuted;
+    const isActivelyPracticing = isVideoPlaying && !isFluidMuted;
+    const isInModal = wordModalOpen;
+    return isActivelyPracticing || isInModal;
+  }, [playbackMode, isVideoMuted, isVideoPlaying, wordModalOpen]);
+
+  // Practice time tracking - count and log every second, but only when active
+  useEffect(() => {
+    // Tick every second
+    const interval = setInterval(() => {
+      const timeSinceActivity = Date.now() - lastActivityRef.current;
+      const isActive = timeSinceActivity < IDLE_THRESHOLD_MS;
+
+      // Only count if shouldCountTime AND user is active
+      if (shouldCountTime && isActive) {
+        practiceSecondsRef.current += 1;
+
+        if (isAuthenticated) {
+          // Authenticated: Log every second to DB for real-time header updates
+          logPracticeMutation({
+            eventType: "audio_time",
+            value: 1,
+          });
+        } else {
+          // Anonymous: Log to localStorage via useProgress hook
+          logPracticeFn(1);
+        }
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+      practiceSecondsRef.current = 0;
+    };
+  }, [shouldCountTime, isAuthenticated, logPracticeMutation, logPracticeFn]);
+
+  // Sync state with loaded user preferences
+  useEffect(() => {
+    if (userPreferences) {
+      setPlaybackSpeed(userPreferences.playbackSpeed?.toString() || "1");
+      setLanguageFilter((userPreferences.languageFilter as LanguageFilter) || "all");
+      setIsVideoMuted(userPreferences.videoMuted ?? true);
+      setIsVideoCollapsed(userPreferences.videoCollapsed ?? true);
+      setPreferencesApplied(true);
+    }
+  }, [userPreferences]);
+
+  // For anonymous users, apply defaults and enable autoplay after brief delay
+  useEffect(() => {
+    if (!isAuthenticated && !preferencesApplied) {
+      // Small delay to allow component to mount
+      const timer = setTimeout(() => {
+        setPreferencesApplied(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated, preferencesApplied]);
+
+  // Preference persistence functions
+  const persistPlaybackSpeed = useCallback((speed: string) => {
+    if (!isAuthenticated) return;
+    updatePreferencesMutation({ playbackSpeed: parseFloat(speed) });
+  }, [updatePreferencesMutation, isAuthenticated]);
+
+  const persistLanguageFilter = useCallback((filter: LanguageFilter) => {
+    if (!isAuthenticated) return;
+    updatePreferencesMutation({ languageFilter: filter });
+  }, [updatePreferencesMutation, isAuthenticated]);
+
+  const persistPlaybackMode = useCallback((mode: PlaybackMode) => {
+    if (!isAuthenticated) return;
+    updatePreferencesMutation({ playbackMode: mode });
+  }, [updatePreferencesMutation, isAuthenticated]);
+
+  const persistVideoMuted = useCallback((muted: boolean) => {
+    if (!isAuthenticated) return;
+    updatePreferencesMutation({ videoMuted: muted });
+  }, [updatePreferencesMutation, isAuthenticated]);
+
+  const persistVideoCollapsed = useCallback((collapsed: boolean) => {
+    if (!isAuthenticated) return;
+    updatePreferencesMutation({ videoCollapsed: collapsed });
+  }, [updatePreferencesMutation, isAuthenticated]);
+
+  // Handle speed change - applies to video playback rate
   const handleSpeedChange = useCallback((speed: string) => {
     setPlaybackSpeed(speed);
-    // Update both video and audio playback rate
     playerRef.current?.setPlaybackRate(parseFloat(speed));
-    setAudioPlaybackRate(parseFloat(speed));
-  }, [setAudioPlaybackRate]);
+    persistPlaybackSpeed(speed);
+  }, [persistPlaybackSpeed]);
 
   // Handle playback mode change
   const handlePlaybackModeChange = useCallback((mode: PlaybackMode) => {
-    const previousMode = playbackMode;
     setPlaybackMode(mode);
 
-    // Sync video mute state with mode
     if (mode === "fluid") {
-      // Switching TO Fluid mode: unmute video, continue from current position
-      playerRef.current?.unmute();
+      // Fluid mode: unmute video, continue playing
       setIsVideoMuted(false);
-      // Continue playing from current position (don't restart)
+      persistVideoMuted(false);
       playerRef.current?.play();
-      // Auto-expand video on mobile when switching to Fluid mode
       if (isMobile) {
         setIsVideoCollapsed(false);
+        persistVideoCollapsed(false);
       }
     } else {
-      // Switching TO Single/Loop mode: mute video, audio from snippets
-      playerRef.current?.mute();
-      setIsVideoMuted(true);
-
-      // If coming FROM Fluid mode, stay at current line position
-      // The activeLineIndex already tracks where we are, so just trigger the snippet
-      if (previousMode === "fluid" && activeLineIndex !== undefined) {
-        const lineNumber = sortedLyrics[activeLineIndex]?.lineNumber;
-        if (lineNumber !== undefined && audioReady) {
-          setCurrentLineIndex(activeLineIndex);
-          // Set target line index to prevent wrong line detection during seek
-          targetLineIndexRef.current = activeLineIndex;
-          playAudioSnippet(lineNumber);
-          // Keep video in sync (muted)
-          playerRef.current?.seekTo(sortedLyrics[activeLineIndex].startTime);
-          playerRef.current?.play();
-        }
+      // Loop/Single mode: start from current line, active line, or first line
+      const lineIndexToPlay = currentLineIndex ?? activeLineIndex ?? 0;
+      if (sortedLyrics[lineIndexToPlay]) {
+        setCurrentLineIndex(lineIndexToPlay);
+        setActiveLineIndex(lineIndexToPlay);
+        isSeekingRef.current = true;
+        playerRef.current?.seekTo(sortedLyrics[lineIndexToPlay].startTime);
+        setTimeout(() => { isSeekingRef.current = false; }, 200);
+        playerRef.current?.play();
       }
     }
 
-    // Update audio loop based on mode
-    setAudioLoop(mode === "loop");
-  }, [playbackMode, setAudioLoop, activeLineIndex, sortedLyrics, audioReady, playAudioSnippet, isMobile]);
+    persistPlaybackMode(mode);
+  }, [activeLineIndex, currentLineIndex, sortedLyrics, isMobile, persistPlaybackMode, persistVideoMuted, persistVideoCollapsed]);
 
-  // REMOVED: playFullVideo function - Fluid mode now replaces "Play Full Video" functionality
-  // When user switches to Fluid mode, video continues from current position instead of restarting
+  // Handle language filter change
+  const handleLanguageFilterChange = useCallback((filter: LanguageFilter) => {
+    setLanguageFilter(filter);
+    persistLanguageFilter(filter);
+  }, [persistLanguageFilter]);
 
-  // Handle video error (for fallback)
+  // Handle video collapsed toggle
+  const handleVideoCollapsedToggle = useCallback(() => {
+    const newCollapsed = !isVideoCollapsed;
+    setIsVideoCollapsed(newCollapsed);
+    persistVideoCollapsed(newCollapsed);
+  }, [isVideoCollapsed, persistVideoCollapsed]);
+
+  // Handle video mute change
+  const handleVideoMuteChange = useCallback((muted: boolean) => {
+    setIsVideoMuted(muted);
+    persistVideoMuted(muted);
+  }, [persistVideoMuted]);
+
+  // Handle video error
   const handleVideoError = useCallback((error: string) => {
     setVideoError(error);
     console.warn('Local video error:', error);
   }, []);
 
-  // Handle video state change (playing/paused/ended)
+  // Handle video state change
   const handleVideoStateChange = useCallback((state: 'playing' | 'paused' | 'ended') => {
     setIsVideoPlaying(state === 'playing');
   }, []);
 
-  // Toggle pause/play across all modes
+  // Toggle pause/play
   const togglePlayPause = useCallback(() => {
-    if (playbackMode === "fluid") {
-      // Fluid mode: only video matters (video audio is playing)
-      if (isVideoPlaying) {
-        playerRef.current?.pause();
-      } else {
-        playerRef.current?.play();
-      }
+    if (isVideoPlaying) {
+      playerRef.current?.pause();
     } else {
-      // Single/Loop mode: pause/resume both video (muted) and audio snippet
-      if (isVideoPlaying || isAudioPlaying) {
-        // Pause both
-        playerRef.current?.pause();
-        pauseAudioSnippet();
-      } else {
-        // Resume both
-        playerRef.current?.play();
-        resumeAudioSnippet();
-      }
+      playerRef.current?.play();
     }
-  }, [playbackMode, isVideoPlaying, isAudioPlaying, pauseAudioSnippet, resumeAudioSnippet]);
+  }, [isVideoPlaying]);
 
-  // Clear click animation after 300ms
+  // Click animation
   const triggerClickAnimation = useCallback((lineIndex: number) => {
     setClickedLineIndex(lineIndex);
-    setTimeout(() => {
-      setClickedLineIndex(undefined);
-    }, 300);
+    setTimeout(() => setClickedLineIndex(undefined), 300);
   }, []);
 
+  // Handle line click - seek video to line
   const handleLineClick = useCallback(
     (startTime: number, lineIndex: number) => {
-      const lineNumber = sortedLyrics[lineIndex]?.lineNumber;
+      // Record completion of previous line in Loop mode
+      if (currentLineIndex !== undefined && currentLineIndex !== lineIndex && isAuthenticated && songId) {
+        const previousLineNumber = sortedLyrics[currentLineIndex]?.lineNumber;
+        if (previousLineNumber !== undefined && !sessionCompletedLines.has(previousLineNumber)) {
+          recordLineCompletionMutation({
+            songId: songId as Id<"songs">,
+            lineNumber: previousLineNumber
+          });
+          setSessionCompletedLines(prev => new Set(prev).add(previousLineNumber));
+        }
+      }
 
-      // Set seeking flag to prevent handleTimeUpdate from overwriting our line selection
-      // This is critical to avoid the "wrong line flash" bug
-      isLoopSeekingRef.current = true;
-
-      // Set the target line index - this tells handleTimeUpdate to use this line
-      // even if the video seeks to a time slightly before startTime (keyframe seeking)
-      targetLineIndexRef.current = lineIndex;
-
-      // Trigger visual feedback
       triggerClickAnimation(lineIndex);
-      // Set as active line
       setActiveLineIndex(lineIndex);
-      // Set as current line for looping/single mode
       setCurrentLineIndex(lineIndex);
 
-      // Seek video to match the line
+      // Reset loop guard when clicking a new line
+      isLoopingRef.current = false;
+
+      // Seek and play video with guard
+      isSeekingRef.current = true;
       playerRef.current?.seekTo(startTime);
+      setTimeout(() => { isSeekingRef.current = false; }, 200);
+      playerRef.current?.play();
 
-      // Clear seeking flag after seek completes (give browser time to process)
-      setTimeout(() => {
-        isLoopSeekingRef.current = false;
-      }, 100);
-
-      // Handle differently based on playback mode
-      if (playbackMode === "fluid") {
-        // Fluid mode: video plays with audio, continue playing after seek
-        playerRef.current?.play();
-      } else {
-        // Single/Loop mode: video muted, audio from snippet
-        // Play local audio snippet if available (instant playback)
-        if (lineNumber !== undefined && audioReady) {
-          playAudioSnippet(lineNumber);
-        }
-        // Also play video (muted) to keep visual in sync
-        playerRef.current?.play();
+      // If in Fluid mode and video was muted, unmute it
+      if (playbackMode === "fluid" && isVideoMuted) {
+        setIsVideoMuted(false);
+        persistVideoMuted(false);
       }
     },
-    [triggerClickAnimation, sortedLyrics, audioReady, playAudioSnippet, playbackMode]
+    [triggerClickAnimation, sortedLyrics, playbackMode, isVideoMuted, persistVideoMuted, currentLineIndex, isAuthenticated, songId, sessionCompletedLines, recordLineCompletionMutation]
   );
 
+  // Helper to seek with guard
+  const seekTo = useCallback((time: number) => {
+    isSeekingRef.current = true;
+    playerRef.current?.seekTo(time);
+    // Clear seeking flag after browser processes seek (200ms for safety)
+    setTimeout(() => {
+      isSeekingRef.current = false;
+    }, 200);
+  }, []);
+
+  // Handle time update - update active line based on video time
   const handleTimeUpdate = useCallback(
     (currentTime: number) => {
-      // Skip line updates during loop restart seek to prevent visual flash
-      if (isLoopSeekingRef.current) {
-        return;
-      }
+      // Ignore time updates while seeking
+      if (isSeekingRef.current) return;
 
-      // Find which line's time range contains currentTime
-      // Use startTime <= currentTime < endTime for consistent boundaries
-      const calculatedLineIndex = sortedLyrics.findIndex(
-        (line) => currentTime >= line.startTime && currentTime < line.endTime
-      );
+      // In Loop/Single mode, lock activeLineIndex to currentLineIndex
+      if (playbackMode !== "fluid" && currentLineIndex !== undefined) {
+        // Keep highlight locked to current line
+        if (activeLineIndex !== currentLineIndex) {
+          setActiveLineIndex(currentLineIndex);
+        }
 
-      // If we have a target line index (from clicking or loop restart),
-      // use it until we're safely within the target line's time range.
-      // This prevents the "wrong line flash" bug caused by:
-      // 1. Keyframe seeking landing slightly before the requested time
-      // 2. Time update events firing during the seek operation
-      // 3. Loop restart triggering at endTime before seek completes
-      if (targetLineIndexRef.current !== undefined) {
-        const targetLine = sortedLyrics[targetLineIndexRef.current];
-        if (targetLine) {
-          // Check if we're clearly within the target line's time range
-          // (past the start time AND before the end time)
-          const withinTargetLine = currentTime >= targetLine.startTime && currentTime < targetLine.endTime;
+        const currentLine = sortedLyrics[currentLineIndex];
+        if (currentLine) {
+          // Check if we've passed the end of the current line (with small buffer)
+          if (currentTime >= currentLine.endTime - 0.05 && !isLoopingRef.current) {
+            if (playbackMode === "loop") {
+              // Prevent multiple loop triggers
+              isLoopingRef.current = true;
 
-          if (withinTargetLine && calculatedLineIndex === targetLineIndexRef.current) {
-            // We're within the target line AND detection agrees - safe to clear
-            targetLineIndexRef.current = undefined;
-            // Update active line if needed and fall through
-            if (calculatedLineIndex !== activeLineIndex) {
-              setActiveLineIndex(calculatedLineIndex);
+              // Loop: seek back to start of line
+              seekTo(currentLine.startTime);
+
+              // Clear loop guard after seek is complete
+              setTimeout(() => {
+                isLoopingRef.current = false;
+              }, 300);
+
+              // Track loop completion
+              if (isAuthenticated) {
+                logPracticeMutation({ eventType: "line_loop", value: 1 });
+              }
+            } else {
+              // Single: move to next line and pause
+              const nextLineIndex = currentLineIndex + 1;
+              if (nextLineIndex < sortedLyrics.length) {
+                setCurrentLineIndex(nextLineIndex);
+                setActiveLineIndex(nextLineIndex);
+                seekTo(sortedLyrics[nextLineIndex].startTime);
+              }
+              playerRef.current?.pause();
+
+              // Record line completion
+              if (songId && !sessionCompletedLines.has(currentLine.lineNumber)) {
+                recordLineCompletionMutation({
+                  songId: songId as Id<"songs">,
+                  lineNumber: currentLine.lineNumber
+                });
+                setSessionCompletedLines(prev => new Set(prev).add(currentLine.lineNumber));
+              }
             }
-            return;
-          } else {
-            // Either:
-            // 1. We haven't reached the target line's start time yet (seeking)
-            // 2. We're at/past the end time (loop restart about to fire)
-            // 3. Detection disagrees with target (keyframe seek landed wrong)
-            // In all cases, keep using the target line to prevent flashing
-            if (targetLineIndexRef.current !== activeLineIndex) {
-              setActiveLineIndex(targetLineIndexRef.current);
-            }
-            return;
           }
         }
-      }
+      } else {
+        // Fluid mode: highlight follows video time
+        const lineIndex = sortedLyrics.findIndex(
+          (line) => currentTime >= line.startTime && currentTime < line.endTime
+        );
 
-      // Normal time-based detection (target is cleared or never set)
-      if (calculatedLineIndex !== -1 && calculatedLineIndex !== activeLineIndex) {
-        setActiveLineIndex(calculatedLineIndex);
+        if (lineIndex !== -1 && lineIndex !== activeLineIndex) {
+          setActiveLineIndex(lineIndex);
+        }
       }
     },
-    [sortedLyrics, activeLineIndex]
+    [sortedLyrics, activeLineIndex, playbackMode, currentLineIndex, isAuthenticated, songId, sessionCompletedLines, logPracticeMutation, recordLineCompletionMutation, seekTo]
   );
 
   // Handle opening word info modal
   const handleLineInfoClick = useCallback((line: LyricLine) => {
+    playerRef.current?.pause();
+
+    const fullLyricData = sortedLyrics.find(l => l.lineNumber === line.lineNumber);
+
     setSelectedLine({
       lineNumber: line.lineNumber,
       original: line.original,
       transliteration: line.transliteration,
       hebrew: line.hebrew,
       english: line.english,
+      audioSnippetUrl: fullLyricData?.audioSnippetUrl,
     });
     setWordModalOpen(true);
-  }, []);
+  }, [sortedLyrics]);
 
-  // Sync loop mode to audio preloader (for Single/Loop snippet modes)
-  useEffect(() => {
-    setAudioLoop(playbackMode === "loop");
-  }, [playbackMode, setAudioLoop]);
+  // Handle closing word info modal
+  const handleWordModalClose = useCallback(() => {
+    setWordModalOpen(false);
 
-  // Handle video segment looping/stopping in Single/Loop modes
-  // In these modes, video plays muted alongside audio snippets
-  useEffect(() => {
-    if (currentLineIndex === undefined || playbackMode === "fluid") {
-      return; // Only handle in Single/Loop modes
-    }
-
-    const currentLine = sortedLyrics[currentLineIndex];
-    if (!currentLine) return;
-
-    const checkTime = setInterval(() => {
-      const player = playerRef.current;
-      if (!player) return;
-
-      const currentTime = player.getCurrentTime();
-      // If we've reached the end of the current line
-      if (currentTime >= currentLine.endTime) {
-        if (playbackMode === "loop") {
-          // Loop mode: seek back to start of line
-          // Set flag to prevent line flashing during seek
-          isLoopSeekingRef.current = true;
-          // Set the target line index - this prevents handleTimeUpdate from
-          // showing the wrong line if video keyframe seeking lands before startTime
-          targetLineIndexRef.current = currentLineIndex;
-          player.seekTo(currentLine.startTime);
-          // Clear flag after seek completes (give browser time to process)
-          setTimeout(() => {
-            isLoopSeekingRef.current = false;
-          }, 100);
-        } else {
-          // Single mode: advance to next line and pause
-          const nextLineIndex = currentLineIndex + 1;
-          if (nextLineIndex < sortedLyrics.length) {
-            // Advance to next line
-            const nextLine = sortedLyrics[nextLineIndex];
-            setCurrentLineIndex(nextLineIndex);
-            setActiveLineIndex(nextLineIndex);
-            targetLineIndexRef.current = nextLineIndex;
-            player.seekTo(nextLine.startTime);
-          }
-          // Pause at the new position (or current if at last line)
-          player.pause();
-        }
+    // Resume playback
+    if (selectedLine) {
+      const lineIndex = sortedLyrics.findIndex(l => l.lineNumber === selectedLine.lineNumber);
+      if (lineIndex !== -1) {
+        setCurrentLineIndex(lineIndex);
+        setActiveLineIndex(lineIndex);
+        isSeekingRef.current = true;
+        playerRef.current?.seekTo(sortedLyrics[lineIndex].startTime);
+        setTimeout(() => { isSeekingRef.current = false; }, 200);
+        playerRef.current?.play();
       }
-    }, 100);
-
-    return () => clearInterval(checkTime);
-  }, [playbackMode, currentLineIndex, sortedLyrics]);
-
-  // Handle video segment looping in Fluid mode (when Loop mode was active before switching to Fluid)
-  useEffect(() => {
-    if (currentLineIndex === undefined || playbackMode !== "fluid") {
-      return; // Only handle in Fluid mode
     }
+  }, [selectedLine, sortedLyrics]);
 
-    // In Fluid mode, video just continues playing naturally
-    // No special handling needed - video plays through all segments
-  }, [playbackMode, currentLineIndex]);
+  // Handle checkbox toggle for line learned state
+  const handleLineCheckboxClick = useCallback((lineNumber: number) => {
+    if (isAuthenticated) {
+      // Optimistic update: determine current state and toggle it
+      const currentProgress = lineProgressFromConvex?.find(p => p.lineNumber === lineNumber);
+      const currentlyLearned = optimisticToggles.has(lineNumber)
+        ? optimisticToggles.get(lineNumber)
+        : currentProgress?.learned ?? false;
+      const newLearnedState = !currentlyLearned;
 
-  // Spacebar keyboard shortcut for pause/play
+      // Set optimistic state immediately for instant UI feedback
+      setOptimisticToggles(prev => {
+        const next = new Map(prev);
+        next.set(lineNumber, newLearnedState);
+        return next;
+      });
+
+      // Authenticated: use Convex mutation
+      toggleLineLearnedMutation({ songId, lineNumber });
+    } else {
+      // Anonymous: use localStorage via useProgress hook (already instant)
+      toggleLineLearnedFn(songId, lineNumber);
+    }
+  }, [isAuthenticated, toggleLineLearnedMutation, songId, toggleLineLearnedFn, lineProgressFromConvex, optimisticToggles]);
+
+  // Handle word learned toggle
+  const handleToggleWordLearned = useCallback((wordId: Id<"words">, persian: string) => {
+    if (isAuthenticated) {
+      // Authenticated: use Convex mutation
+      toggleWordLearnedMutation({ wordId, persian }).then((newLearnedState) => {
+        if (newLearnedState) {
+          logPracticeMutation({ eventType: "word_learned", value: 1 });
+        }
+      });
+    } else {
+      // Anonymous: use localStorage via useProgress hook
+      toggleWordLearnedFn(persian, wordId);
+    }
+  }, [isAuthenticated, toggleWordLearnedMutation, logPracticeMutation, toggleWordLearnedFn]);
+
+  // Spacebar for pause/play
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Only handle spacebar, and not when typing in an input
       if (event.code === 'Space' && event.target === document.body) {
-        event.preventDefault(); // Prevent page scroll
+        event.preventDefault();
         togglePlayPause();
       }
     };
@@ -445,25 +676,32 @@ function SongPageContent({ songId }: SongPageContentProps) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [togglePlayPause]);
 
-  // Note: Auto-play is now handled directly by LocalVideoPlayer component
-  // via the autoplay prop when playbackMode === "fluid"
+  // On desktop, prevent page scroll - only lyrics should scroll
+  useEffect(() => {
+    if (!isMobile) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = '';
+      };
+    }
+  }, [isMobile]);
 
   if (!song) {
     throw notFound();
   }
 
   return (
-    <div className="flex h-[calc(100vh-65px)] flex-col overflow-hidden bg-gray-900 text-white">
-      {/* Main content - side by side on desktop (lg+) */}
-      <div className="flex flex-1 flex-col lg:flex-row overflow-hidden">
-        {/* LEFT: Player section (50% on desktop, collapsible on mobile) */}
-        <div className={`flex-shrink-0 lg:w-1/2 lg:h-full lg:overflow-y-auto lg:border-r lg:border-gray-800 ${isMobile && isVideoCollapsed ? '' : ''}`}>
-          <div className="lg:sticky lg:top-0">
-            {/* Mobile: Collapsible Header Bar */}
+    <div className="bg-gray-900 text-white h-[calc(100vh-57px)] sm:h-[calc(100vh-69px)] flex flex-col lg:flex-row">
+      {/* LEFT: Video section */}
+      <div className="lg:w-1/2 lg:border-r lg:border-gray-800 flex-shrink-0">
+          {/* Mobile: Collapsible Header - use div instead of button to allow nested buttons */}
             {isMobile && (
-              <button
-                onClick={() => setIsVideoCollapsed(!isVideoCollapsed)}
-                className="w-full flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700 hover:bg-gray-700/50 transition-colors"
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={handleVideoCollapsedToggle}
+                onKeyDown={(e) => e.key === 'Enter' && handleVideoCollapsedToggle()}
+                className="w-full flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700 hover:bg-gray-700/50 transition-colors cursor-pointer"
               >
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                   <Video className="h-4 w-4 text-primary flex-shrink-0" />
@@ -471,13 +709,11 @@ function SongPageContent({ songId }: SongPageContentProps) {
                     <h1 className="text-sm font-bold truncate iran-gradient">{song.title}</h1>
                     <p className="text-xs text-gray-400 truncate">{song.artist}</p>
                   </div>
-                  {/* Wishlist button */}
                   <div onClick={(e) => e.stopPropagation()}>
                     <WishlistButton songId={songId} size="sm" />
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  {/* Compact mode toggle when collapsed */}
                   {isVideoCollapsed && (
                     <div className="flex items-center gap-1 mr-2" onClick={(e) => e.stopPropagation()}>
                       <ToggleGroup
@@ -486,40 +722,24 @@ function SongPageContent({ songId }: SongPageContentProps) {
                         onValueChange={(value) => value && handlePlaybackModeChange(value as PlaybackMode)}
                         className="bg-gray-900 rounded p-0.5"
                       >
-                        <ToggleGroupItem
-                          value="single"
-                          aria-label="Single"
-                          className="px-2 py-1 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-                        >
+                        <ToggleGroupItem value="single" aria-label="Single" className="px-2 py-1 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
                           <Square className="h-3 w-3" />
                         </ToggleGroupItem>
-                        <ToggleGroupItem
-                          value="loop"
-                          aria-label="Loop"
-                          className="px-2 py-1 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-                        >
+                        <ToggleGroupItem value="loop" aria-label="Loop" className="px-2 py-1 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
                           <Repeat className="h-3 w-3" />
                         </ToggleGroupItem>
-                        <ToggleGroupItem
-                          value="fluid"
-                          aria-label="Fluid"
-                          className="px-2 py-1 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-                        >
+                        <ToggleGroupItem value="fluid" aria-label="Fluid" className="px-2 py-1 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
                           <Waves className="h-3 w-3" />
                         </ToggleGroupItem>
                       </ToggleGroup>
                     </div>
                   )}
-                  {isVideoCollapsed ? (
-                    <ChevronDown className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <ChevronUp className="h-5 w-5 text-gray-400" />
-                  )}
+                  {isVideoCollapsed ? <ChevronDown className="h-5 w-5 text-gray-400" /> : <ChevronUp className="h-5 w-5 text-gray-400" />}
                 </div>
-              </button>
+              </div>
             )}
 
-            {/* Desktop: Song title (always visible) */}
+            {/* Desktop: Song title */}
             {!isMobile && (
               <div className="border-b border-gray-800 px-4 py-3 flex items-center justify-between">
                 <div>
@@ -530,7 +750,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
               </div>
             )}
 
-            {/* Player - hidden on mobile when collapsed */}
+            {/* Video player */}
             {(!isMobile || !isVideoCollapsed) && (
               <div className={`p-4 pb-2 ${isMobile ? 'pt-2' : ''}`}>
                 {song.videoUrl && !videoError ? (
@@ -540,17 +760,17 @@ function SongPageContent({ songId }: SongPageContentProps) {
                     onTimeUpdate={handleTimeUpdate}
                     onStateChange={handleVideoStateChange}
                     onError={handleVideoError}
+                    onMuteChange={handleVideoMuteChange}
                     muted={isVideoMuted}
-                    autoplay={playbackMode === "fluid"}
+                    autoplay={preferencesApplied && playbackMode === "fluid"}
+                    showMuteButton={true}
                   />
                 ) : (
                   <div className="flex aspect-video w-full items-center justify-center rounded-lg bg-gray-800 text-gray-400">
                     <div className="text-center p-4">
                       <Video className="h-12 w-12 mx-auto mb-2 opacity-50" />
                       <p className="font-semibold">Video not available</p>
-                      <p className="text-sm mt-1">
-                        {videoError || 'Local video file not found'}
-                      </p>
+                      <p className="text-sm mt-1">{videoError || 'Local video file not found'}</p>
                       {song.youtubeId && (
                         <a
                           href={`https://www.youtube.com/watch?v=${song.youtubeId}`}
@@ -567,10 +787,10 @@ function SongPageContent({ songId }: SongPageContentProps) {
               </div>
             )}
 
-            {/* Controls - shown on desktop always, on mobile only when expanded */}
+            {/* Controls */}
             {(!isMobile || !isVideoCollapsed) && (
               <div className="px-4 pb-4">
-                {/* Mobile: Current Line Indicator - always visible on its own row */}
+                {/* Mobile: Current Line Indicator */}
                 <div className="md:hidden mb-2">
                   <div className="flex items-center gap-2 rounded-lg bg-gray-800/50 px-3 py-2 border border-gray-700">
                     <span className="rounded bg-primary/20 px-2 py-1 text-xs font-medium text-primary whitespace-nowrap">
@@ -590,41 +810,26 @@ function SongPageContent({ songId }: SongPageContentProps) {
                 </div>
 
                 <div className="flex flex-col gap-3 rounded-lg bg-gray-800 p-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
-                  {/* Pause/Play Button - hidden in Fluid mode (video has native controls) */}
-                  {playbackMode !== "fluid" && (
-                    <button
-                      onClick={togglePlayPause}
-                      className="flex items-center gap-2 rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-600 transition-colors"
-                      title={isVideoPlaying || isAudioPlaying ? "Pause (Space)" : "Play (Space)"}
-                    >
-                      {isVideoPlaying || isAudioPlaying ? (
-                        <>
-                          <Pause className="h-4 w-4" />
-                          <span>Pause</span>
-                        </>
-                      ) : (
-                        <>
-                          <Play className="h-4 w-4" />
-                          <span>Play</span>
-                        </>
-                      )}
-                    </button>
-                  )}
+                  {/* Pause/Play Button */}
+                  <button
+                    onClick={togglePlayPause}
+                    className="flex items-center gap-2 rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-600 transition-colors"
+                    title={isVideoPlaying ? "Pause (Space)" : "Play (Space)"}
+                  >
+                    {isVideoPlaying ? (
+                      <>
+                        <Pause className="h-4 w-4" />
+                        <span>Pause</span>
+                      </>
+                    ) : (
+                      <>
+                        <Play className="h-4 w-4" />
+                        <span>Play</span>
+                      </>
+                    )}
+                  </button>
 
-                  {/* Watch on YouTube link - shown in Fluid mode as alternative to native controls */}
-                  {playbackMode === "fluid" && song.youtubeId && (
-                    <a
-                      href={`https://www.youtube.com/watch?v=${song.youtubeId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-600 transition-colors"
-                    >
-                      <Video className="h-4 w-4" />
-                      <span>Watch on YouTube</span>
-                    </a>
-                  )}
-
-                  {/* Desktop: Current Line Indicator - inline with other controls */}
+                  {/* Desktop: Current Line Indicator */}
                   {currentLineIndex !== undefined && (
                     <div className="hidden md:flex items-center gap-2">
                       <span className="rounded bg-primary/20 px-2 py-1 text-xs font-medium text-primary">
@@ -642,27 +847,15 @@ function SongPageContent({ songId }: SongPageContentProps) {
                       onValueChange={(value) => value && handlePlaybackModeChange(value as PlaybackMode)}
                       className="bg-gray-900 rounded-lg p-1"
                     >
-                      <ToggleGroupItem
-                        value="single"
-                        aria-label="Single play mode"
-                        className="px-3 py-1.5 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-                      >
+                      <ToggleGroupItem value="single" aria-label="Single play mode" className="px-3 py-1.5 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
                         <Square className="h-3 w-3 mr-1" />
                         Single
                       </ToggleGroupItem>
-                      <ToggleGroupItem
-                        value="loop"
-                        aria-label="Loop mode"
-                        className="px-3 py-1.5 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-                      >
+                      <ToggleGroupItem value="loop" aria-label="Loop mode" className="px-3 py-1.5 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
                         <Repeat className="h-3 w-3 mr-1" />
                         Loop
                       </ToggleGroupItem>
-                      <ToggleGroupItem
-                        value="fluid"
-                        aria-label="Fluid play mode"
-                        className="px-3 py-1.5 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-                      >
+                      <ToggleGroupItem value="fluid" aria-label="Fluid play mode" className="px-3 py-1.5 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
                         <Waves className="h-3 w-3 mr-1" />
                         Fluid
                       </ToggleGroupItem>
@@ -687,10 +880,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
                   {/* Language Filter */}
                   <div className="flex items-center gap-2">
                     <Languages className="h-4 w-4 text-gray-400" />
-                    <Select
-                      value={languageFilter}
-                      onValueChange={(value) => setLanguageFilter(value as LanguageFilter)}
-                    >
+                    <Select value={languageFilter} onValueChange={handleLanguageFilterChange}>
                       <SelectTrigger className="w-36 border-gray-700 bg-gray-900">
                         <SelectValue />
                       </SelectTrigger>
@@ -703,46 +893,36 @@ function SongPageContent({ songId }: SongPageContentProps) {
                       </SelectContent>
                     </Select>
                   </div>
-
-                  {/* Audio Loading Status - show only when not in Fluid mode (using snippets) */}
-                  {playbackMode !== "fluid" && (
-                    <div className="flex items-center gap-2">
-                      <Volume2 className={`h-4 w-4 ${audioReady ? "text-green-500" : "text-gray-400"}`} />
-                      {audioReady ? (
-                        <span className="text-xs text-green-500">Snippets ready</span>
-                      ) : (
-                        <span className="text-xs text-gray-400">
-                          Loading snippets... {audioLoaded}/{audioTotal}
-                        </span>
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
             )}
-          </div>
-        </div>
+      </div>
 
-        {/* RIGHT: Scrollable lyrics (50% on desktop) */}
-        <div className="flex-1 lg:w-1/2 overflow-y-auto px-4 py-4">
-          <LyricsDisplay
-            songId={songId}
-            onLineClick={handleLineClick}
-            onLineInfoClick={handleLineInfoClick}
-            activeLineIndex={activeLineIndex}
-            clickedLineIndex={clickedLineIndex}
-            languageFilter={languageFilter}
-          />
-        </div>
+      {/* RIGHT: Lyrics section - scrolls */}
+      <div className="flex-1 overflow-y-auto px-4 py-4">
+        {/* CTA banner for anonymous users with progress */}
+        <AnonymousProgressBanner />
+        <LyricsDisplay
+          songId={songId}
+          onLineClick={handleLineClick}
+          onLineInfoClick={handleLineInfoClick}
+          onLineCheckboxClick={handleLineCheckboxClick}
+          activeLineIndex={activeLineIndex}
+          clickedLineIndex={clickedLineIndex}
+          languageFilter={languageFilter}
+          lineProgress={lineProgress || []}
+        />
       </div>
 
       {/* Word Info Modal */}
       <WordInfoModal
         isOpen={wordModalOpen}
-        onClose={() => setWordModalOpen(false)}
+        onClose={handleWordModalClose}
         line={selectedLine}
         songId={songId}
         isMobile={isMobile}
+        lineAudioUrl={selectedLine?.audioSnippetUrl}
+        onToggleLearned={handleToggleWordLearned}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { authClient } from "../lib/auth-client";
 import { Button } from "../components/ui/button";
@@ -7,8 +7,7 @@ export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
 
-// Admin email - only this email can sign in
-const ADMIN_EMAIL = "etan@heyman.net";
+
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -52,13 +51,6 @@ function LoginPage() {
     setSuccess(null);
     setLoading(true);
 
-    // Check if email is admin email (client-side check)
-    if (email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
-      setError("Only admin email is allowed to sign in");
-      setLoading(false);
-      return;
-    }
-
     try {
       // Use absolute URL so redirect goes back to same origin (localhost or production)
       const callbackURL = `${window.location.origin}/dashboard`;
@@ -85,10 +77,10 @@ function LoginPage() {
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
       <div className="bg-slate-900 p-8 rounded-lg shadow-xl w-full max-w-md">
         <h1 className="text-2xl font-bold text-white mb-2 text-center">
-          SongScript Admin
+          Welcome Back
         </h1>
         <p className="text-gray-400 text-center mb-6 text-sm">
-          Admin access only (passwordless)
+          Sign in to your existing account
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -105,7 +97,7 @@ function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              placeholder="etan@heyman.net"
+              placeholder="your@email.com"
               required
             />
           </div>
@@ -131,7 +123,22 @@ function LoginPage() {
           </Button>
         </form>
 
-        <div className="mt-6 pt-6 border-t border-slate-700">
+        <div className="mt-6 pt-6 border-t border-slate-700 text-center">
+          <p className="text-gray-500 text-sm mb-4">OR</p>
+          <Link to="/signup">
+            <Button
+              variant="outline"
+              className="w-full border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white"
+            >
+              Create New Account →
+              <span className="block text-xs mt-1 opacity-80">
+                Keep your learning progress
+              </span>
+            </Button>
+          </Link>
+        </div>
+
+        <div className="mt-4">
           <p className="text-gray-500 text-xs text-center">
             A magic link will be sent to your email. Click it to sign in.
           </p>

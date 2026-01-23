@@ -1,0 +1,14 @@
+{
+  "id": "BUG-015",
+  "title": "Settings page shows visitorId instead of email",
+  "description": "The Settings page displays the visitorId (UUID) in the email field instead of the user's actual email. Fix by using session?.user?.email from auth instead of userInfo?.email from the query.",
+  "acceptanceCriteria": [
+    {"text": "Settings page shows actual user email, not UUID", "checked": true},
+    {"text": "Email field uses session?.user?.email from authClient.useSession()", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "Verify in browser - email shows correctly", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-21T15:20:36Z",
+  "blockedBy": null
+}

@@ -1,0 +1,16 @@
+{
+  "id": "BUG-001",
+  "title": "Fix user preferences not persisting on reload",
+  "description": "Video muted state, playback speed, and language filter are not persisting between page reloads even when signed in. The userPreferences mutations may not be called or queries not used to initialize state.",
+  "acceptanceCriteria": [
+    { "text": "Change video muted state, reload page - setting persists", "checked": true },
+    { "text": "Change playback speed, reload page - setting persists", "checked": true },
+    { "text": "Change language filter, reload page - setting persists", "checked": true },
+    { "text": "Verify mutations are being called (check Convex dashboard or logs)", "checked": true },
+    { "text": "Verify queries are used to initialize useState values", "checked": true },
+    { "text": "Typecheck passes", "checked": true }
+  ],
+  "passes": true,
+  "completedAt": "2026-01-20T09:09:55Z",
+  "blockedBy": null
+}

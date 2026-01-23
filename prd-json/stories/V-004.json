@@ -1,0 +1,18 @@
+{
+  "id": "V-004",
+  "title": "Verify: Language difficulty multipliers",
+  "description": "Write tests for the language difficulty utility to ensure multipliers are correct for all supported languages.",
+  "acceptanceCriteria": [
+    {"text": "Test file src/utils/languageDifficulty.test.ts exists", "checked": true},
+    {"text": "Tests verify Hebrew returns 1.5x", "checked": true},
+    {"text": "Tests verify Persian/fa returns 1.5x", "checked": true},
+    {"text": "Tests verify Arabic returns 2.0x", "checked": true},
+    {"text": "Tests verify Japanese returns 2.0x", "checked": true},
+    {"text": "Tests verify Spanish returns 1.0x", "checked": true},
+    {"text": "Tests verify unknown language returns 1.0x", "checked": true},
+    {"text": "All tests pass", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-21T13:38:57Z"
+}

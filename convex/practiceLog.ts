@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { getAuthUserId, requireAuth } from "./authHelpers";
 
 // Get today's date in YYYY-MM-DD format
 function getTodayDateString(): string {
@@ -14,20 +15,49 @@ function getDateDaysAgo(days: number): string {
   return date.toISOString().split("T")[0];
 }
 
-// Log a practice session - called when user practices
+// Log a practice session with weighted scoring
 export const logPractice = mutation({
   args: {
-    visitorId: v.string(),
-    durationSeconds: v.number(),
+    eventType: v.union(
+      v.literal("word_learned"),
+      v.literal("line_loop"),
+      v.literal("audio_time"),
+      v.literal("silent_time")
+    ),
+    value: v.number(), // seconds for time events, count for discrete events
   },
-  handler: async (ctx, { visitorId, durationSeconds }) => {
+  handler: async (ctx, { eventType, value }) => {
+    const userId = await requireAuth(ctx);
     const today = getTodayDateString();
+
+    // Calculate points based on event type and weighted formula
+    let points = 0;
+    let durationSeconds = 0;
+
+    switch (eventType) {
+      case "word_learned":
+        points = value * 10; // 10 points per word
+        break;
+      case "line_loop":
+        points = value * 3; // 3 points per loop completion
+        break;
+      case "audio_time":
+        points = Math.floor(value / 60) * 2; // 2 points per minute
+        durationSeconds = value;
+        break;
+      case "silent_time":
+        // Cap silent time at 15 minutes (900 seconds)
+        const cappedTime = Math.min(value, 900);
+        points = Math.floor(cappedTime / 60) * 1; // 1 point per minute, capped
+        durationSeconds = value;
+        break;
+    }
 
     // Check if there's already a log for today
     const existingLog = await ctx.db
       .query("userPracticeLog")
-      .withIndex("by_visitor_date", (q) =>
-        q.eq("visitorId", visitorId).eq("date", today)
+      .withIndex("by_user_date", (q) =>
+        q.eq("userId", userId).eq("date", today)
       )
       .first();
 
@@ -36,15 +66,18 @@ export const logPractice = mutation({
       await ctx.db.patch(existingLog._id, {
         practiceCount: existingLog.practiceCount + 1,
         totalSeconds: existingLog.totalSeconds + durationSeconds,
+        totalPoints: (existingLog.totalPoints || 0) + points,
       });
       return existingLog._id;
     } else {
       // Create new log for today
       return await ctx.db.insert("userPracticeLog", {
-        visitorId,
+        userId,
+        visitorId: "authenticated", // Legacy support
         date: today,
         practiceCount: 1,
         totalSeconds: durationSeconds,
+        totalPoints: points,
       });
     }
   },
@@ -53,21 +86,33 @@ export const logPractice = mutation({
 // Get practice history for last N days (default 90)
 export const getPracticeHistory = query({
   args: {
-    visitorId: v.string(),
     days: v.optional(v.number()),
   },
-  handler: async (ctx, { visitorId, days = 90 }) => {
-    // Get all practice logs for this visitor
+  handler: async (ctx, { days = 90 }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      return {
+        practiceData: [],
+        currentStreak: 0,
+        longestStreak: 0,
+        totalSessions: 0,
+        totalTimeSeconds: 0,
+        totalPoints: 0,
+        daysTracked: days,
+      };
+    }
+
+    // Get all practice logs for this user
     const logs = await ctx.db
       .query("userPracticeLog")
-      .withIndex("by_visitor", (q) => q.eq("visitorId", visitorId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
     // Filter to last N days and create a map
     const cutoffDate = getDateDaysAgo(days);
     const practiceMap = new Map<
       string,
-      { date: string; practiceCount: number; totalSeconds: number }
+      { date: string; practiceCount: number; totalSeconds: number; totalPoints: number }
     >();
 
     for (const log of logs) {
@@ -76,6 +121,7 @@ export const getPracticeHistory = query({
           date: log.date,
           practiceCount: log.practiceCount,
           totalSeconds: log.totalSeconds,
+          totalPoints: log.totalPoints || 0,
         });
       }
     }
@@ -136,12 +182,13 @@ export const getPracticeHistory = query({
     // Convert map to array for the response
     const practiceData = Array.from(practiceMap.values());
 
-    // Calculate total practice time and sessions
+    // Calculate total practice time, sessions, and points
     const totalSessions = practiceData.reduce(
       (sum, d) => sum + d.practiceCount,
       0
     );
     const totalTime = practiceData.reduce((sum, d) => sum + d.totalSeconds, 0);
+    const totalPoints = practiceData.reduce((sum, d) => sum + d.totalPoints, 0);
 
     return {
       practiceData,
@@ -149,6 +196,7 @@ export const getPracticeHistory = query({
       longestStreak,
       totalSessions,
       totalTimeSeconds: totalTime,
+      totalPoints,
       daysTracked: days,
     };
   },

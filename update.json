@@ -1,0 +1,48 @@
+{
+  "id": "songscript-dev-server-info",
+  "title": "SongScript Development Server Information",
+  "type": "info",
+  "status": "active",
+  "description": "SongScript development server is running in background for testing and development",
+  "serverDetails": {
+    "url": "http://localhost:3001",
+    "logFile": "/tmp/songscript-dev.log",
+    "startCommand": "cd /Users/etanheyman/Desktop/Gits/songscript && npm run dev",
+    "backgroundProcess": true
+  },
+  "debugCommands": {
+    "checkLogs": "cat /tmp/songscript-dev.log",
+    "checkProcess": "ps aux | grep node | grep songscript",
+    "tailLogs": "tail -f /tmp/songscript-dev.log",
+    "stopServer": "pkill -f 'songscript.*dev'"
+  },
+  "newBugs": [
+    {
+      "id": "bug-signup-checkbox-error",
+      "title": "Sign Up Checkbox Causes Error",
+      "type": "bug",
+      "priority": "medium",
+      "status": "todo",
+      "description": "Clicking the checkbox during sign up process causes an error. The 'bring it with you' checkbox functionality is broken.",
+      "acceptanceCriteria": [
+        "Sign up checkbox can be clicked without errors",
+        "Checkbox state changes properly when clicked",
+        "Sign up process completes successfully with checkbox checked/unchecked"
+      ],
+      "reproductionSteps": [
+        "Navigate to sign up page",
+        "Fill out sign up form",
+        "Click the 'bring it with you' checkbox",
+        "Observe error occurs"
+      ],
+      "impact": "Medium - Prevents users from completing sign up process",
+      "createdAt": "2026-01-22T14:18:56.552Z",
+      "tags": ["signup", "ui", "checkbox", "form-validation"]
+    }
+  ],
+  "relatedBugs": [
+    "bug-user-auth-id-mismatch"
+  ],
+  "notes": "Server running to test authentication ID mismatch bug fix. User etan@heyman.net should see progress data once bug is resolved.",
+  "createdAt": "2026-01-22T14:18:15.229Z"
+}

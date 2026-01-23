@@ -1,0 +1,47 @@
+{
+  "id": "V-009",
+  "title": "Verify: Full end-to-end leaderboard flow",
+  "description": "Complete end-to-end test of the leaderboard feature from signup to appearing on leaderboard.",
+  "acceptanceCriteria": [
+    {
+      "text": "New user signs up via magic link",
+      "checked": true
+    },
+    {
+      "text": "Display name prompt appears after first login",
+      "checked": true
+    },
+    {
+      "text": "User sets display name",
+      "checked": true
+    },
+    {
+      "text": "User practices (completes lines, learns words)",
+      "checked": true
+    },
+    {
+      "text": "User appears on leaderboard with correct rank",
+      "checked": true
+    },
+    {
+      "text": "User can view full leaderboard page",
+      "checked": true
+    },
+    {
+      "text": "User can change display name in settings",
+      "checked": true
+    },
+    {
+      "text": "Change reflects on leaderboard",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null,
+  "completedAt": "2026-01-21T20:13:00Z",
+  "notes": "VERIFIED via browser: Successfully completed end-to-end signup and leaderboard flow. User signed up with yosef.from.levant@proton.me via magic link email, logged in successfully, display name prompt appears on first login (welcome route), set display name 'TestUser123' in settings, verified user appears on leaderboard ranked #1 with 2-day streak, and display name change immediately reflected on both dashboard leaderboard widget and full /leaderboard page. All acceptance criteria verified in live browser."
+}

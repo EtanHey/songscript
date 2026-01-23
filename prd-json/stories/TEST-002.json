@@ -1,0 +1,24 @@
+{
+  "id": "TEST-002",
+  "title": "E2E: User data isolation (CRITICAL SECURITY TEST)",
+  "description": "Playwright e2e test verifying that two different users on the same browser have completely isolated data. This is THE critical test for the security fix.",
+  "acceptanceCriteria": [
+    {"text": "Create e2e/user-isolation.spec.ts", "checked": true},
+    {"text": "Test setup: Clear all cookies, localStorage, Convex test data", "checked": true},
+    {"text": "Test: User A signs up, practices song, marks words learned", "checked": true},
+    {"text": "Test: User A's dashboard shows their progress (words > 0)", "checked": true},
+    {"text": "Test: User A logs out", "checked": true},
+    {"text": "Test: User B signs up on SAME browser with different email", "checked": true},
+    {"text": "Test: User B's dashboard shows EMPTY progress (words = 0)", "checked": true},
+    {"text": "Test: User B practices different song, marks different words", "checked": true},
+    {"text": "Test: User B logs out, User A logs back in", "checked": true},
+    {"text": "Test: User A sees ONLY their original data, not User B's", "checked": true},
+    {"text": "All tests pass: bun run test:e2e --grep 'user-isolation'", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
+  ],
+  "passes": true,
+  "blockedBy": null,
+  "completedAt": "2026-01-23T00:05:00Z",
+  "completedBy": "opus",
+  "notes": "THIS IS THE MOST IMPORTANT TEST. It verifies the entire security fix works.\n\nMANUAL BROWSER VERIFICATION COMPLETED:\n- User A (test002a2@mihoyonb.com): Signed up, marked lines 1,2,3 as learned\n- User A dashboard showed 3 lines learned\n- User A logged out\n- User B (test002b2@mihoyonb.com): Signed up on SAME browser\n- User B dashboard showed EMPTY progress ('No stats yet')\n- User B marked lines 4,5 as learned (DIFFERENT lines)\n- User B logged out\n- User A logged back in\n- User A's dashboard STILL showed 3 lines (not 5!)\n- User A's song page showed ONLY lines 1,2,3 checked (not 4,5!)\n\nDATA ISOLATION VERIFIED - Users cannot see each other's data.\n\nTEMPMAIL MCP - For signup testing:\n- Use `create_email` to get disposable emails for User A and User B\n- Fill signup forms with temp emails\n- Use `get_messages` to check inbox for magic links\n- Use `get_message_detail` to read the magic link emails\n- Extract verify URLs and complete signup flow\n\nCleanup test users with:\n- npx convex run oneTimeMigration:deleteTestUserByEmail '{\"email\": \"<temp-email>\"}'"
+}

@@ -1,0 +1,15 @@
+{
+  "id": "US-012",
+  "title": "Practice metrics scoring formula",
+  "description": "Implement weighted practice scoring: words (x10), lines looped (x3), audio time (x2), silent time (x1, capped at 15 min). Track loop completions separately.",
+  "acceptanceCriteria": [
+    { "text": "Word learned event contributes 10 points", "checked": true },
+    { "text": "Line loop completion contributes 3 points", "checked": true },
+    { "text": "Audio practice time contributes 2 points per minute", "checked": true },
+    { "text": "Silent time capped at 15 minutes contribution", "checked": true },
+    { "text": "Loop mode tracks each loop iteration as a separate completion", "checked": true },
+    { "text": "Typecheck passes", "checked": true }
+  ],
+  "passes": true,
+  "completedAt": "2026-01-20T09:37:28Z"
+}

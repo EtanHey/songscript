@@ -1,0 +1,19 @@
+{
+  "id": "SEC-007",
+  "title": "Secure leaderboard.ts - fix userId lookups",
+  "description": "Fix leaderboard.ts to properly look up user data using userId, not email as visitorId. This is the main bug causing shared data between users.",
+  "acceptanceCriteria": [
+    {"text": "Import getAuthUserId from authHelpers", "checked": true},
+    {"text": "getUserInfo: Query users table by auth user ID, not visitorId", "checked": true},
+    {"text": "getStreakLeaderboard: Use userId to look up practice data, not email", "checked": true},
+    {"text": "getProgressLeaderboard: Use userId to look up word/line progress, not email", "checked": true},
+    {"text": "getUserRank: Use ctx.auth for current user, not visitorId argument", "checked": true},
+    {"text": "setDisplayName: Use requireAuth, not visitorId argument", "checked": true},
+    {"text": "Remove all visitorId arguments from exported functions", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-22T00:55:00Z",
+  "completedBy": "gemini-3-flash-preview",
+  "notes": "THE BUG (lines 101, 150 in leaderboard.ts):\n```typescript\n// WRONG - assumes email === visitorId\nconst streak = await calculateCurrentStreak(ctx, user.email);\nconst visitorId = user.email;  // This is the bug!\n```\n\nTHE FIX:\n```typescript\n// CORRECT - use authId to look up user's data\nconst authId = user.authId;  // User's Better Auth ID\nconst streak = await calculateCurrentStreak(ctx, authId);\n```\n\nThe users table has authId field linking to Better Auth. Use that to find user's data in other tables (which now have userId field)."
+}

@@ -1,0 +1,20 @@
+{
+  "id": "SEC-006",
+  "title": "Secure userPracticeLog.ts and userPreferences.ts",
+  "description": "Apply the same ctx.auth pattern to userPracticeLog.ts and userPreferences.ts. Remove all visitorId arguments.",
+  "acceptanceCriteria": [
+    {"text": "Import getAuthUserId, requireAuth from authHelpers in both files", "checked": true},
+    {"text": "userPracticeLog: Remove visitorId from all args", "checked": true},
+    {"text": "userPracticeLog: Use by_user index for all queries", "checked": true},
+    {"text": "userPracticeLog: Use requireAuth for mutations", "checked": true},
+    {"text": "userPreferences: Remove visitorId from all args", "checked": true},
+    {"text": "userPreferences: Use by_user index for all queries", "checked": true},
+    {"text": "userPreferences: Use requireAuth for mutations", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-22T01:30:00Z",
+  "completedBy": "gemini-3-flash-preview",
+  "blockedBy": "SEC-002",
+  "notes": "Follow the EXACT same pattern as SEC-003 (wordProgress.ts):\n\n1. Import helpers: `import { getAuthUserId, requireAuth } from './authHelpers'`\n2. Remove visitorId from args: `args: {}` or only non-user args\n3. Get userId inside handler: `const userId = await requireAuth(ctx)`\n4. Query by userId: `.withIndex('by_user', q => q.eq('userId', userId))`"
+}

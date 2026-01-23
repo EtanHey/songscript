@@ -1,0 +1,73 @@
+{
+  "id": "V-029",
+  "title": "Verify anonymous to authenticated migration flow",
+  "type": "verification",
+  "priority": "high",
+  "storyPoints": 2,
+  "description": "End-to-end verification that anonymous progress stored in localStorage correctly migrates to Convex when user signs up with 'Bring my progress' checked.",
+  "acceptanceCriteria": [
+    {
+      "text": "Anonymous user can practice song and mark words/lines learned",
+      "checked": true
+    },
+    {
+      "text": "Progress visible on song page as green checkmarks",
+      "checked": true
+    },
+    {
+      "text": "User signs up with 'Bring my progress' checkbox checked",
+      "checked": true
+    },
+    {
+      "text": "After magic link verification, user redirected to dashboard",
+      "checked": true
+    },
+    {
+      "text": "Dashboard shows migrated word count",
+      "checked": true
+    },
+    {
+      "text": "Song page shows same checkmarks as before signup",
+      "checked": true
+    },
+    {
+      "text": "localStorage is cleared after successful migration",
+      "checked": true
+    },
+    {
+      "text": "User can continue practicing and progress saves to Convex",
+      "checked": true
+    }
+  ],
+  "technicalNotes": [
+    "TEMPMAIL MCP FLOW (this WORKS - do NOT block on email infrastructure):",
+    "1. Call create_email → returns address like 'xyz123@tempmail.com'",
+    "2. Use THAT EXACT ADDRESS in the signup form (not any other email)",
+    "3. Submit signup form → magic link sent to temp address",
+    "4. Call get_messages → returns list of emails in that inbox",
+    "5. Call get_message_detail with message ID → get magic link URL",
+    "6. Navigate to the magic link URL to complete verification",
+    "IMPORTANT: Tempmail creates addresses it controls. You MUST use the address it gives you.",
+    "Use browser console to verify localStorage state before/after",
+    "Check Convex dashboard to verify records created"
+  ],
+  "testingNotes": [
+    "Start with cleared localStorage",
+    "Practice on at least 2 different songs",
+    "Mark at least 5 words and 3 lines as learned",
+    "Verify exact counts match before/after migration"
+  ],
+  "completionNotes": [
+    "PASSED on 2026-01-22",
+    "Fixed 2 bugs during verification:",
+    "1. convex/lib/validation.ts: Convex ID pattern was 26 chars, should be 32 chars",
+    "2. convex/migration.ts: Dynamic import not supported by Convex, changed to static import",
+    "Test user: v029done@chat-tempmail.com",
+    "Migrated 3 learned lines successfully from localStorage to Convex"
+  ],
+  "files": [
+    "convex/lib/validation.ts",
+    "convex/migration.ts"
+  ],
+  "passes": true
+}

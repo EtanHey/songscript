@@ -1,0 +1,20 @@
+{
+  "id": "TEST-007",
+  "title": "E2E: Signup checkbox toggle and localStorage persistence",
+  "description": "Playwright e2e test for the signup migration checkbox - verifies it toggles correctly and persists the preference to localStorage.",
+  "acceptanceCriteria": [
+    {"text": "Create or update e2e/auth-signup.spec.ts", "checked": true},
+    {"text": "Test: Checkbox is checked by default on page load", "checked": true},
+    {"text": "Test: Clicking checkbox toggles its visual state", "checked": true},
+    {"text": "Test: Submitting with checkbox checked sets localStorage to 'true'", "checked": true},
+    {"text": "Test: Submitting with checkbox unchecked sets localStorage to 'false'", "checked": true},
+    {"text": "Test: No console errors during checkbox interaction", "checked": true},
+    {"text": "All tests pass: bun run test:e2e --grep 'checkbox'", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-22T18:38:15Z",
+  "completedBy": "haiku",
+  "blockedBy": null,
+  "notes": "Test structure:\n```typescript\ntest.describe('Signup Checkbox', () => {\n  test('toggles visual state on click', async ({ page }) => {\n    await page.goto('/signup');\n    const checkbox = page.getByRole('checkbox');\n    await expect(checkbox).toBeChecked();\n    await checkbox.click();\n    await expect(checkbox).not.toBeChecked();\n    await checkbox.click();\n    await expect(checkbox).toBeChecked();\n  });\n\n  test('persists preference to localStorage', async ({ page }) => {\n    // ... test localStorage values\n  });\n});\n```"
+}

@@ -1,0 +1,15 @@
+{
+  "id": "US-038",
+  "title": "Leaderboard query: Streak leaderboard",
+  "description": "Create Convex query to fetch streak leaderboard. Returns users ranked by current streak (consecutive days practiced). Only includes users with displayName set. Supports period filter (weekly/monthly/all-time) and pagination.",
+  "acceptanceCriteria": [
+    {"text": "convex/leaderboard.ts file exists", "checked": true},
+    {"text": "getStreakLeaderboard query accepts period, limit, offset args", "checked": true},
+    {"text": "Query only returns users with displayName set", "checked": true},
+    {"text": "Users are sorted by currentStreak descending", "checked": true},
+    {"text": "Returns array with rank, displayName, streak, language fields", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-21T13:41:49Z"
+}

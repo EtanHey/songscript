@@ -29,3 +29,21 @@ export const create = mutation({
     });
   },
 });
+
+// Lock timestamps to prevent AI from modifying them without explicit unlock
+export const lockTimestamps = mutation({
+  args: { songId: v.id("songs") },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.songId, { timestampsLocked: true });
+    return { success: true, message: "🔒 Timestamps locked" };
+  },
+});
+
+// Unlock timestamps (requires user to explicitly request this)
+export const unlockTimestamps = mutation({
+  args: { songId: v.id("songs") },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.songId, { timestampsLocked: false });
+    return { success: true, message: "🔓 Timestamps unlocked" };
+  },
+});

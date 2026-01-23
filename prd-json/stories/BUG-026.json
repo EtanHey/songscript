@@ -1,0 +1,23 @@
+{
+  "id": "BUG-026",
+  "title": "Critical: User Auth ID Mismatch - Progress Data Not Displayed",
+  "description": "User etan@heyman.net has progress data (76 records) stored under userId k572fk152njnp9g621kc64bq4x7zgbyt, but getAuthUserId() returns jd7cr3fr0jv8637xeykwftw91h7zn9nv (app users table ID). Queries return empty because IDs don't match.",
+  "acceptanceCriteria": [
+    {"text": "Identify root cause: progress data uses Better Auth ID, but getAuthUserId returns app users ID", "checked": true},
+    {"text": "Fix: Update all progress data to use app users._id instead of Better Auth ID", "checked": true},
+    {"text": "Migrate wordProgress records from userId k572fk152njnp9g621kc64bq4x7zgbyt to jd7cr3fr0jv8637xeykwftw91h7zn9nv", "checked": true},
+    {"text": "Migrate userSongProgress records", "checked": true},
+    {"text": "Migrate lineProgress records", "checked": true},
+    {"text": "Migrate userWishlist records", "checked": true},
+    {"text": "Migrate userPracticeLog records", "checked": true},
+    {"text": "Migrate userGoals records", "checked": true},
+    {"text": "Migrate userPreferences records", "checked": true},
+    {"text": "Verify: Login as etan@heyman.net shows dashboard with progress data", "checked": true},
+    {"text": "Verify: 30/31 lines completed displays correctly", "checked": true}
+  ],
+  "passes": true,
+  "blockedBy": null,
+  "completedAt": "2026-01-22T15:58:00Z",
+  "completedBy": "opus",
+  "notes": "ROOT CAUSE ANALYSIS:\n\n1. Old system used Better Auth user._id directly as userId in progress tables\n2. Data was migrated with userId = k572fk152njnp9g621kc64bq4x7zgbyt (Better Auth ID)\n3. BUG-024 fix created separate app users table with _id = jd7cr3fr0jv8637xeykwftw91h7zn9nv\n4. getAuthUserId() now returns app users._id, not Better Auth ID\n5. Queries for userId = jd7cr3fr0jv8637xeykwftw91h7zn9nv find nothing!\n\nFIX APPROACH:\nMigrate all progress data from old userId to new userId:\n- FROM: k572fk152njnp9g621kc64bq4x7zgbyt (Better Auth ID)\n- TO: jd7cr3fr0jv8637xeykwftw91h7zn9nv (app users._id)\n\nAFFECTED TABLES:\n- wordProgress (65 records)\n- lineProgress (6 records)\n- userSongProgress (1 record)\n- userWishlist (1 record)\n- userPracticeLog (2 records)\n- userPreferences (1 record)\n\nTOTAL: 76 records to migrate\n\nMIGRATION COMPLETED:\nUsed oneTimeMigration:migrateVisitorIdToUserId to migrate 76 records from visitorId=k572fk152njnp9g621kc64bq4x7zgbyt to userId=jd7cr3fr0jv8637xeykwftw91h7zn9nv. Verified via checkUserData query that all data is now accessible under the correct userId."
+}

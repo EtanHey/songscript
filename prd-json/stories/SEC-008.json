@@ -1,0 +1,64 @@
+{
+  "id": "SEC-008",
+  "title": "Create /signup page with migration checkbox",
+  "description": "Create a dedicated signup page at /signup with: email input, display name input, prominent 'Bring my progress to this account' checkbox, and 'Send Magic Link' button.",
+  "acceptanceCriteria": [
+    {
+      "text": "Create src/routes/signup.tsx page",
+      "checked": true
+    },
+    {
+      "text": "Email input field with validation",
+      "checked": true
+    },
+    {
+      "text": "Display name input field (3-20 chars)",
+      "checked": true
+    },
+    {
+      "text": "Prominent checkbox: 'Bring my learning progress to this account'",
+      "checked": true
+    },
+    {
+      "text": "Checkbox is checked by default and visually prominent (large, colored border)",
+      "checked": true
+    },
+    {
+      "text": "Helper text under checkbox explaining what it does",
+      "checked": true
+    },
+    {
+      "text": "'Send Magic Link' button triggers magic link + stores migration preference",
+      "checked": true
+    },
+    {
+      "text": "Store migration preference in localStorage: songscript_migrate_on_signup",
+      "checked": true
+    },
+    {
+      "text": "Store display name in localStorage: songscript_signup_display_name",
+      "checked": true
+    },
+    {
+      "text": "After magic link sent, show 'Check your email' message",
+      "checked": true
+    },
+    {
+      "text": "Link to login page for existing users",
+      "checked": true
+    },
+    {
+      "text": "Typecheck passes",
+      "checked": true
+    },
+    {
+      "text": "Verify in browser: form renders correctly",
+      "checked": true
+    }
+  ],
+  "passes": true,
+  "blockedBy": null,
+  "notes": "UI Design:\n```\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502         Create Your Account         \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Email                               \u2502\n\u2502 \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510 \u2502\n\u2502 \u2502 your@email.com                  \u2502 \u2502\n\u2502 \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518 \u2502\n\u2502                                     \u2502\n\u2502 Display Name                        \u2502\n\u2502 \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510 \u2502\n\u2502 \u2502 Your Name                       \u2502 \u2502\n\u2502 \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518 \u2502\n\u2502                                     \u2502\n\u2502 \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510 \u2502\n\u2502 \u2502 \u2611\ufe0f Bring my learning progress   \u2502 \u2502\n\u2502 \u2502    to this account              \u2502 \u2502\n\u2502 \u2502    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500    \u2502 \u2502\n\u2502 \u2502    Your words learned and       \u2502 \u2502\n\u2502 \u2502    practice history will be     \u2502 \u2502\n\u2502 \u2502    saved to your new account    \u2502 \u2502\n\u2502 \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518 \u2502\n\u2502                                     \u2502\n\u2502 \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510 \u2502\n\u2502 \u2502      Send Magic Link            \u2502 \u2502\n\u2502 \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518 \u2502\n\u2502                                     \u2502\n\u2502 Already have an account? Log in     \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n```\n\nThe checkbox should be VERY prominent - large, with a colored border (green when checked), and helper text explaining what happens.",
+  "completedAt": "2026-01-21T22:32:12Z",
+  "completedBy": "gemini-3-flash-preview"
+}

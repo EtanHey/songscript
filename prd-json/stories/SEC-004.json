@@ -1,0 +1,20 @@
+{
+  "id": "SEC-004",
+  "title": "Secure userSongProgress.ts and lineProgress.ts",
+  "description": "Apply the same ctx.auth pattern to userSongProgress.ts and lineProgress.ts. Remove all visitorId arguments.",
+  "acceptanceCriteria": [
+    {"text": "Import getAuthUserId, requireAuth from authHelpers in both files", "checked": true},
+    {"text": "userSongProgress: Remove visitorId from all args", "checked": true},
+    {"text": "userSongProgress: Use by_user index for all queries", "checked": true},
+    {"text": "userSongProgress: Use requireAuth for mutations", "checked": true},
+    {"text": "lineProgress: Remove visitorId from all args", "checked": true},
+    {"text": "lineProgress: Use by_user index for all queries", "checked": true},
+    {"text": "lineProgress: Use requireAuth for mutations", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
+  ],
+  "passes": true,
+  "blockedBy": "",
+  "completedAt": "2026-01-22T10:00:00Z",
+  "completedBy": "gemini-3-flash-preview",
+  "notes": "Follow the EXACT same pattern as SEC-003 (wordProgress.ts):\n\n1. Import helpers: `import { getAuthUserId, requireAuth } from './authHelpers'`\n2. Remove visitorId from args: `args: {}` or only non-user args\n3. Get userId inside handler: `const userId = await requireAuth(ctx)`\n4. Query by userId: `.withIndex('by_user', q => q.eq('userId', userId))`\n\nCheck docs.local/convex-auth-patterns.md for reference if needed."
+}

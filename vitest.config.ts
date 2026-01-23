@@ -7,13 +7,14 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@convex': fileURLToPath(new URL('./convex', import.meta.url)),
     },
   },
   test: {
     environment: 'happy-dom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
-    include: ['src/**/*.{test,spec}.{js,ts,tsx}'],
+    include: ['src/**/*.{test,spec}.{js,ts,tsx}', 'convex/**/*.{test,spec}.{js,ts,tsx}'],
     exclude: ['node_modules', '.output', 'dist'],
     pool: 'forks',
     poolOptions: {

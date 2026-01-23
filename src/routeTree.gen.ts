@@ -9,14 +9,23 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SongSongIdRouteImport } from './routes/song.$songId'
 import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
+import { Route as AuthedWelcomeRouteImport } from './routes/_authed/welcome'
+import { Route as AuthedSettingsRouteImport } from './routes/_authed/settings'
+import { Route as AuthedLeaderboardRouteImport } from './routes/_authed/leaderboard'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -41,6 +50,21 @@ const AuthVerifyRoute = AuthVerifyRouteImport.update({
   path: '/auth/verify',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedWelcomeRoute = AuthedWelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedSettingsRoute = AuthedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedLeaderboardRoute = AuthedLeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -55,7 +79,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/leaderboard': typeof AuthedLeaderboardRoute
+  '/settings': typeof AuthedSettingsRoute
+  '/welcome': typeof AuthedWelcomeRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/song/$songId': typeof SongSongIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -63,7 +91,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/leaderboard': typeof AuthedLeaderboardRoute
+  '/settings': typeof AuthedSettingsRoute
+  '/welcome': typeof AuthedWelcomeRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/song/$songId': typeof SongSongIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -73,7 +105,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
   '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
+  '/_authed/leaderboard': typeof AuthedLeaderboardRoute
+  '/_authed/settings': typeof AuthedSettingsRoute
+  '/_authed/welcome': typeof AuthedWelcomeRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/song/$songId': typeof SongSongIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -83,7 +119,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/signup'
     | '/dashboard'
+    | '/leaderboard'
+    | '/settings'
+    | '/welcome'
     | '/auth/verify'
     | '/song/$songId'
     | '/api/auth/$'
@@ -91,7 +131,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/signup'
     | '/dashboard'
+    | '/leaderboard'
+    | '/settings'
+    | '/welcome'
     | '/auth/verify'
     | '/song/$songId'
     | '/api/auth/$'
@@ -100,7 +144,11 @@ export interface FileRouteTypes {
     | '/'
     | '/_authed'
     | '/login'
+    | '/signup'
     | '/_authed/dashboard'
+    | '/_authed/leaderboard'
+    | '/_authed/settings'
+    | '/_authed/welcome'
     | '/auth/verify'
     | '/song/$songId'
     | '/api/auth/$'
@@ -110,6 +158,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthedRoute: typeof AuthedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
   AuthVerifyRoute: typeof AuthVerifyRoute
   SongSongIdRoute: typeof SongSongIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -117,6 +166,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -152,6 +208,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthVerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed/welcome': {
+      id: '/_authed/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof AuthedWelcomeRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/settings': {
+      id: '/_authed/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthedSettingsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/leaderboard': {
+      id: '/_authed/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof AuthedLeaderboardRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/dashboard': {
       id: '/_authed/dashboard'
       path: '/dashboard'
@@ -171,10 +248,16 @@ declare module '@tanstack/react-router' {
 
 interface AuthedRouteChildren {
   AuthedDashboardRoute: typeof AuthedDashboardRoute
+  AuthedLeaderboardRoute: typeof AuthedLeaderboardRoute
+  AuthedSettingsRoute: typeof AuthedSettingsRoute
+  AuthedWelcomeRoute: typeof AuthedWelcomeRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedDashboardRoute: AuthedDashboardRoute,
+  AuthedLeaderboardRoute: AuthedLeaderboardRoute,
+  AuthedSettingsRoute: AuthedSettingsRoute,
+  AuthedWelcomeRoute: AuthedWelcomeRoute,
 }
 
 const AuthedRouteWithChildren =
@@ -184,6 +267,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
   LoginRoute: LoginRoute,
+  SignupRoute: SignupRoute,
   AuthVerifyRoute: AuthVerifyRoute,
   SongSongIdRoute: SongSongIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

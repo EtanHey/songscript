@@ -1,0 +1,23 @@
+{
+  "id": "SEC-011",
+  "title": "Update client pages - remove useVisitorId, require auth for data",
+  "description": "Update all client pages to remove useVisitorId usage. Data queries now use ctx.auth server-side, so client just needs to be authenticated.",
+  "acceptanceCriteria": [
+    {"text": "dashboard.tsx: Remove useVisitorId import and usage", "checked": true},
+    {"text": "dashboard.tsx: Remove visitorId from all query calls", "checked": true},
+    {"text": "settings.tsx: Remove useVisitorId import and usage", "checked": true},
+    {"text": "settings.tsx: Remove visitorId from all query calls", "checked": true},
+    {"text": "leaderboard.tsx: Remove useVisitorId import and usage", "checked": true},
+    {"text": "leaderboard.tsx: Remove visitorId from all query calls", "checked": true},
+    {"text": "song.$songId.tsx: Remove useVisitorId import and usage", "checked": true},
+    {"text": "song.$songId.tsx: Remove visitorId from all query calls", "checked": true},
+    {"text": "welcome.tsx: Remove useVisitorId import and usage", "checked": true},
+    {"text": "All components using useVisitorId updated", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "Verify in browser: dashboard loads for authenticated user", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-22T00:59:00Z",
+  "completedBy": "kiro",
+  "notes": "BEFORE:\n```typescript\nconst visitorId = useVisitorId();\nconst progress = useQuery(api.wordProgress.getByVisitor, { visitorId });\n```\n\nAFTER:\n```typescript\n// No visitorId needed - server uses ctx.auth\nconst progress = useQuery(api.wordProgress.getByUser);\n```\n\nThe queries now get the user from ctx.auth server-side, so the client doesn't need to pass any user identifier.\n\nSearch for all files using useVisitorId:\n```bash\ngrep -r 'useVisitorId' src/\n```\n\nUpdate each one to remove the hook and update query calls."
+}

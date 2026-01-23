@@ -1,0 +1,24 @@
+{
+  "id": "SEC-009",
+  "title": "Create migration mutation to copy anonymous data to user account",
+  "description": "Create convex/migration.ts with mutation to copy all data from visitorId to userId. Called after successful signup when user opted in.",
+  "acceptanceCriteria": [
+    {"text": "Create convex/migration.ts file", "checked": true},
+    {"text": "migrateAnonymousData mutation accepts visitorId string", "checked": true},
+    {"text": "Mutation requires auth (uses requireAuth)", "checked": true},
+    {"text": "Copies wordProgress records from visitorId to userId", "checked": true},
+    {"text": "Copies userSongProgress records from visitorId to userId", "checked": true},
+    {"text": "Copies lineProgress records from visitorId to userId", "checked": true},
+    {"text": "Copies userWishlist records from visitorId to userId", "checked": true},
+    {"text": "Copies userPracticeLog records from visitorId to userId", "checked": true},
+    {"text": "Copies userGoals records from visitorId to userId", "checked": true},
+    {"text": "Copies userPreferences records from visitorId to userId", "checked": true},
+    {"text": "Returns count of migrated records per table", "checked": true},
+    {"text": "Does NOT delete original visitorId records (keep as backup)", "checked": true},
+    {"text": "Typecheck passes", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-22T01:05:00Z",
+  "completedBy": "gemini-3-flash-preview",
+  "notes": "Migration mutation pattern implemented in convex/migration.ts. Uses basic deduplication to avoid overwriting existing authenticated user data if they already started practicing."
+}

@@ -1,0 +1,16 @@
+{
+  "id": "US-036",
+  "title": "Schema: Add displayName, createdAt to users, remove role",
+  "description": "Update users table schema for leaderboard identity. Add displayName (optional string for leaderboard), createdAt (timestamp). Remove unused role field since admin is checked by email.",
+  "acceptanceCriteria": [
+    {"text": "users table has displayName field (v.optional(v.string()))", "checked": true},
+    {"text": "users table has createdAt field (v.optional(v.number()))", "checked": true},
+    {"text": "role field is removed from users table", "checked": true},
+    {"text": "Any references to role field are removed from codebase", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "Convex dev server starts without errors", "checked": true}
+  ],
+  "passes": true,
+  "completedAt": "2026-01-21T13:35:17Z",
+  "blockedBy": null
+}

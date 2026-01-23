@@ -1,0 +1,14 @@
+{
+  "id": "US-003",
+  "title": "Add onEnded callback to useAudioPreloader",
+  "description": "Add an onEnded callback to the useAudioPreloader hook that fires when audio snippet finishes playing. This enables practice tracking when lines complete.",
+  "acceptanceCriteria": [
+    { "text": "onEnded callback parameter added to useAudioPreloader hook", "checked": true },
+    { "text": "Audio elements attach 'ended' event listener during preload", "checked": true },
+    { "text": "Callback fires when audio finishes (not when manually stopped)", "checked": true },
+    { "text": "Typecheck passes", "checked": true }
+  ],
+  "passes": true,
+  "completedAt": "2026-01-20T01:56:19Z",
+  "blockedBy": null
+}
