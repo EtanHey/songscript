@@ -2,6 +2,7 @@ import { mutation, internalMutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { requireAuth } from "./authHelpers";
 import type { Id } from "./_generated/dataModel";
+import { validateAnonymousProgress } from "./lib/validation";
 
 /**
  * BUG-026 Fix: Migrate progress data from old Better Auth ID to new app users ID
@@ -331,11 +332,6 @@ export const migrateAnonymousData = mutation({
   handler: async (ctx, { progressData }) => {
     const userId = await requireAuth(ctx);
 
-    // Import validation helpers
-    const {
-      validateAnonymousProgress,
-    } = await import("./lib/validation");
-
     // Validate all input data
     const validated = validateAnonymousProgress(progressData);
 
@@ -596,5 +592,54 @@ export const migrateAnonymousData = mutation({
     }
 
     return results;
+  },
+});
+
+/**
+ * Update lyrics timestamps for a song
+ * Used for applying WhisperX-generated timestamps
+ */
+export const updateLyricsTimestamps = mutation({
+  args: {
+    songTitle: v.string(),
+    timestamps: v.array(
+      v.object({
+        lineNumber: v.number(),
+        startTime: v.number(),
+        endTime: v.number(),
+      })
+    ),
+  },
+  handler: async (ctx, { songTitle, timestamps }) => {
+    // Find the song by title (case-insensitive partial match)
+    const allSongs = await ctx.db.query("songs").collect();
+    const song = allSongs.find((s) =>
+      s.title.toLowerCase().includes(songTitle.toLowerCase())
+    );
+
+    if (!song) {
+      throw new Error(`Song not found: ${songTitle}`);
+    }
+
+    // Get all lyrics for this song
+    const lyrics = await ctx.db
+      .query("lyrics")
+      .withIndex("by_song", (q) => q.eq("songId", song._id))
+      .collect();
+
+    let updated = 0;
+
+    for (const ts of timestamps) {
+      const lyric = lyrics.find((l) => l.lineNumber === ts.lineNumber);
+      if (lyric) {
+        await ctx.db.patch(lyric._id, {
+          startTime: ts.startTime,
+          endTime: ts.endTime,
+        });
+        updated++;
+      }
+    }
+
+    return { updated, total: timestamps.length };
   },
 });

@@ -6,8 +6,9 @@ import { authClient } from "../lib/auth-client";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Check } from "lucide-react";
+import { Info } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
+import { hasProgressToMigrate, readProgress } from "../hooks/useAnonymousProgress";
 
 export const Route = createFileRoute("/signup")({
   component: SignupPage,
@@ -20,12 +21,13 @@ function SignupPage() {
 
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [migrateProgress, setMigrateProgress] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [emailExists, setEmailExists] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [hasAnonymousProgress, setHasAnonymousProgress] = useState(false);
+  const [progressCount, setProgressCount] = useState({ words: 0, lines: 0 });
 
   // After a short timeout, show the form regardless of session state
   useEffect(() => {
@@ -33,6 +35,18 @@ function SignupPage() {
       setShowForm(true);
     }, 1500);
     return () => clearTimeout(timer);
+  }, []);
+
+  // Check for anonymous progress on mount
+  useEffect(() => {
+    if (hasProgressToMigrate()) {
+      setHasAnonymousProgress(true);
+      const progress = readProgress();
+      setProgressCount({
+        words: progress.wordProgress.filter(w => w.learned).length,
+        lines: progress.lineProgress.filter(l => l.learned).length,
+      });
+    }
   }, []);
 
   // If already logged in, redirect to dashboard
@@ -74,8 +88,7 @@ function SignupPage() {
         return;
       }
 
-      // Store preferences in localStorage for the migration flow
-      localStorage.setItem("songscript_migrate_on_signup", String(migrateProgress));
+      // Store display name in localStorage for the verify flow
       localStorage.setItem("songscript_signup_display_name", displayName);
 
       const callbackURL = `${window.location.origin}/dashboard`;
@@ -166,38 +179,26 @@ function SignupPage() {
               />
             </div>
 
-            <div
-              className={`p-4 rounded-lg border-2 transition-colors cursor-pointer ${
-                migrateProgress
-                  ? "border-emerald-500 bg-emerald-500/10"
-                  : "border-slate-700 bg-slate-800/50"
-              }`}
-              onClick={() => setMigrateProgress(!migrateProgress)}
-            >
-              <div className="flex items-start space-x-3">
-                <div
-                  className={`mt-1 size-4 shrink-0 rounded-[4px] border shadow-xs flex items-center justify-center transition-colors ${
-                    migrateProgress
-                      ? "bg-emerald-500 border-emerald-500"
-                      : "border-emerald-500 bg-transparent"
-                  }`}
-                  aria-hidden="true"
-                >
-                  {migrateProgress && <Check className="size-3.5 text-white" />}
-                </div>
-                <div className="space-y-1">
-                  <span
-                    className="text-sm font-bold text-white cursor-pointer"
-                  >
-                    Bring my learning progress to this account
-                  </span>
-                  <p className="text-xs text-gray-400 leading-relaxed">
-                    Your words learned and practice history will be
-                    saved to your new account.
+            {/* Reassuring note about anonymous progress */}
+            {hasAnonymousProgress && (
+              <div className="flex items-start gap-3 p-3 rounded-md bg-slate-800/50 border border-slate-700">
+                <Info className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
+                <div className="text-sm text-gray-300">
+                  <p>
+                    Your learning progress is saved on this device
+                    {(progressCount.words > 0 || progressCount.lines > 0) && (
+                      <span className="text-gray-400">
+                        {" "}({progressCount.words} {progressCount.words === 1 ? "word" : "words"}, {progressCount.lines} {progressCount.lines === 1 ? "line" : "lines"})
+                      </span>
+                    )}
+                    .
+                  </p>
+                  <p className="text-gray-400 mt-1">
+                    After signing up, you'll have the option to import it to your account.
                   </p>
                 </div>
               </div>
-            </div>
+            )}
 
             {error && (
               <div className="text-red-400 text-sm bg-red-900/20 p-3 rounded-md border border-red-900/50">

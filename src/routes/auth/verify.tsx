@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { authClient } from "../../lib/auth-client";
 import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { exportForMigration, clearProgress, hasProgressToMigrate } from "../../hooks/useAnonymousProgress";
 
 export const Route = createFileRoute("/auth/verify")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -17,9 +16,7 @@ function VerifyPage() {
   const navigate = useNavigate();
   const [status, setStatus] = useState<"verifying" | "success" | "error">("verifying");
   const [error, setError] = useState<string | null>(null);
-  const [migrationMessage, setMigrationMessage] = useState<string | null>(null);
 
-  const migrateData = useMutation(api.migration.migrateAnonymousData);
   const setDisplayName = useMutation(api.leaderboard.setDisplayName);
   const ensureAppUser = useMutation(api.users.ensureAppUser);
 
@@ -58,31 +55,8 @@ function VerifyPage() {
           }
         }
 
-        // Check localStorage for migration preferences
-        const shouldMigrate = localStorage.getItem('songscript_migrate_on_signup') === 'true';
+        // Get display name from signup form (if provided)
         const displayName = localStorage.getItem('songscript_signup_display_name');
-
-        // Handle migration if requested - read full progress from localStorage
-        if (shouldMigrate && hasProgressToMigrate()) {
-          try {
-            // Export the full anonymous progress data from localStorage
-            const progressData = exportForMigration();
-            const migrationResult = await migrateData({ progressData });
-            const totalMigrated = Object.values(migrationResult).reduce((sum: number, count: number) => {
-              // Skip the validationErrorCount field
-              if (typeof count === 'number') return sum + count;
-              return sum;
-            }, 0);
-            if (totalMigrated > 0) {
-              setMigrationMessage(`Successfully migrated ${totalMigrated} records from your anonymous session!`);
-            }
-            // Clear localStorage after successful migration
-            clearProgress();
-          } catch (migrationError) {
-            console.error('Migration failed:', migrationError);
-            // Continue with login even if migration fails
-          }
-        }
 
         // Set display name if provided
         if (displayName) {
@@ -94,11 +68,9 @@ function VerifyPage() {
           }
         }
 
-        // Clear migration-related localStorage keys
-        // Note: clearProgress() already clears songscript_visitor_id and songscript_anonymous_progress
-        localStorage.removeItem('songscript_migrate_on_signup');
+        // Clear signup-related localStorage keys
+        // Note: anonymous progress is preserved - migration happens via modal on dashboard
         localStorage.removeItem('songscript_signup_display_name');
-        // Keep songscript_welcome_shown as it's not user-specific
 
         setStatus("success");
         // Brief delay to show success state
@@ -110,7 +82,7 @@ function VerifyPage() {
           } else {
             navigate({ to: "/dashboard" });
           }
-        }, 1500); // Longer delay to show migration message if present
+        }, 1000);
       } catch (err) {
         setStatus("error");
         setError(err instanceof Error ? err.message : "Verification failed");
@@ -135,9 +107,6 @@ function VerifyPage() {
           <>
             <div className="text-emerald-500 text-5xl mb-4">✓</div>
             <h1 className="text-xl font-semibold text-white">Success!</h1>
-            {migrationMessage && (
-              <p className="text-emerald-400 mt-2 text-sm">{migrationMessage}</p>
-            )}
             <p className="text-gray-400 mt-2">Redirecting to dashboard...</p>
           </>
         )}

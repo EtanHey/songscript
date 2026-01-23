@@ -221,6 +221,7 @@ export const recordLinesCompletion = mutation({
 });
 
 // Toggle whether a line is marked as "learned" (mastery state)
+// Also updates userSongProgress so the song appears in "My Songs" dashboard
 export const toggleLineLearned = mutation({
   args: {
     songId: v.id("songs"),
@@ -234,21 +235,26 @@ export const toggleLineLearned = mutation({
       .withIndex("by_user", (q) =>
         q.eq("userId", userId)
       )
-      .filter((q) => 
-        q.eq(q.field("songId"), args.songId) && 
+      .filter((q) =>
+        q.eq(q.field("songId"), args.songId) &&
         q.eq(q.field("lineNumber"), args.lineNumber)
       )
       .first();
 
+    let lineProgressId;
+    let isNowLearned: boolean;
+
     if (existing) {
       // Toggle the learned state
+      isNowLearned = !existing.learned;
       await ctx.db.patch(existing._id, {
-        learned: !existing.learned,
+        learned: isNowLearned,
       });
-      return existing._id;
+      lineProgressId = existing._id;
     } else {
       // Create new line progress record as learned
-      return await ctx.db.insert("lineProgress", {
+      isNowLearned = true;
+      lineProgressId = await ctx.db.insert("lineProgress", {
         userId,
         visitorId: "authenticated",
         songId: args.songId,
@@ -256,6 +262,42 @@ export const toggleLineLearned = mutation({
         learned: true,
       });
     }
+
+    // Also update userSongProgress so song appears in "My Songs" dashboard
+    const songProgress = await ctx.db
+      .query("userSongProgress")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .filter((q) => q.eq(q.field("songId"), args.songId))
+      .first();
+
+    if (songProgress) {
+      // Update existing song progress
+      let linesCompleted = [...songProgress.linesCompleted];
+      if (isNowLearned && !linesCompleted.includes(args.lineNumber)) {
+        linesCompleted.push(args.lineNumber);
+        linesCompleted.sort((a, b) => a - b);
+      } else if (!isNowLearned) {
+        linesCompleted = linesCompleted.filter((n) => n !== args.lineNumber);
+      }
+
+      await ctx.db.patch(songProgress._id, {
+        linesCompleted,
+        lastPracticed: Date.now(),
+        lastLineIndex: args.lineNumber,
+      });
+    } else if (isNowLearned) {
+      // Create new song progress record
+      await ctx.db.insert("userSongProgress", {
+        userId,
+        visitorId: "authenticated",
+        songId: args.songId,
+        linesCompleted: [args.lineNumber],
+        lastPracticed: Date.now(),
+        lastLineIndex: args.lineNumber,
+      });
+    }
+
+    return lineProgressId;
   },
 });
 

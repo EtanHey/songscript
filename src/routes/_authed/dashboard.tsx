@@ -8,6 +8,7 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import type { Id } from "@convex/_generated/dataModel";
 import WordDetailsModal from "../../components/WordDetailsModal";
 import { getLanguageFlagString } from "../../components/LanguageFlag";
+import { MigrationConfirmModal, shouldShowMigrationModal } from "../../components/MigrationConfirmModal";
 
 // Import dashboard components
 import {
@@ -109,6 +110,10 @@ function DashboardPage() {
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [isWordModalOpen, setIsWordModalOpen] = useState(false);
 
+  // Migration modal state
+  const [isMigrationModalOpen, setIsMigrationModalOpen] = useState(false);
+  const [migrationChecked, setMigrationChecked] = useState(false);
+
   // Mobile detection (simple approach)
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
@@ -117,6 +122,19 @@ function DashboardPage() {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  // Check if migration modal should be shown (once per session)
+  useEffect(() => {
+    if (session?.user?.id && !migrationChecked) {
+      setMigrationChecked(true);
+      if (shouldShowMigrationModal(session.user.id)) {
+        // Small delay to let dashboard render first
+        setTimeout(() => {
+          setIsMigrationModalOpen(true);
+        }, 500);
+      }
+    }
+  }, [session?.user?.id, migrationChecked]);
 
   // Handle word click to open details modal
   const handleWordClick = useCallback((persian: string) => {
@@ -478,6 +496,15 @@ function DashboardPage() {
         persian={selectedWord}
         isMobile={isMobile}
       />
+
+      {/* Migration Confirm Modal */}
+      {session?.user?.id && (
+        <MigrationConfirmModal
+          isOpen={isMigrationModalOpen}
+          onClose={() => setIsMigrationModalOpen(false)}
+          userId={session.user.id}
+        />
+      )}
     </div>
   );
 }

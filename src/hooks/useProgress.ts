@@ -319,11 +319,17 @@ export function useProgress(): UseProgressReturn {
     anonClearProgress();
   }, [anonClearProgress]);
 
+  // Include anonymous progress data for reactivity - this changes when localStorage updates
+  const anonymousProgressData = anonProgress.progress;
+
   return useMemo(
     () => ({
       // Auth state
       isAuthenticated,
       isAuthLoading,
+
+      // Anonymous progress data (for reactivity in consuming components)
+      anonymousProgressData: isAuthenticated ? null : anonymousProgressData,
 
       // Word progress
       isWordLearned,
@@ -360,6 +366,7 @@ export function useProgress(): UseProgressReturn {
     [
       isAuthenticated,
       isAuthLoading,
+      anonymousProgressData,
       isWordLearned,
       setWordLearned,
       toggleWordLearned,

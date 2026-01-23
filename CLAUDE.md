@@ -173,6 +173,49 @@ bun run test:e2e    # Playwright E2E tests
 
 ---
 
+## 🎵 WHISPERX PIPELINE (Add New Songs in 30 min)
+
+**Full documentation:** `docs.local/learnings/whisperx-pipeline.md`
+
+### Quick Reference
+```bash
+# 1. Download audio
+cd scripts/whisperx
+yt-dlp -f "bestaudio[ext=m4a]" -o "downloads/SONGNAME.m4a" "YOUTUBE_URL"
+
+# 2. Activate venv & run WhisperX
+source venv/bin/activate
+whisperx downloads/SONGNAME.m4a \
+  --model large-v3 \
+  --language fa \
+  --align_model jonatasgrosman/wav2vec2-large-xlsr-53-persian \
+  --output_dir output/ \
+  --output_format json
+
+# 3. Match words to lines (custom script per song structure)
+python3 final_timestamps.py
+
+# 4. Apply to database
+npx convex run lyrics:updateTimestamps '{"songId": "ID", "unlockCode": "UNLOCK_TIMESTAMPS", "updates": [...]}'
+```
+
+### Language Models
+| Language | Code | Alignment Model |
+|----------|------|-----------------|
+| Persian | fa | `jonatasgrosman/wav2vec2-large-xlsr-53-persian` |
+| Korean | ko | `jonatasgrosman/wav2vec2-large-xlsr-53-korean` |
+| Arabic | ar | `jonatasgrosman/wav2vec2-large-xlsr-53-arabic` |
+| Hebrew | he | `imvladikon/wav2vec2-xls-r-300m-hebrew` |
+
+### Key Insight
+For songs with repeating patterns (e.g., "برای" in Baraye):
+1. Count pattern word occurrences in WhisperX output
+2. Map each occurrence to line numbers
+3. Handle lines with DOUBLE patterns specially
+4. Interpolate for WhisperX gaps
+
+---
+
 ## CLAUDE_COUNTER SYSTEM
 
 Every response MUST end with: `CLAUDE_COUNTER: N`

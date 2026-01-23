@@ -84,7 +84,6 @@ function SongPageContent({ songId }: SongPageContentProps) {
   const isAuthenticated = progress.isAuthenticated;
 
   // Extract stable function references from progress hook to avoid re-renders
-  const getLearnedLinesForSongFn = progress.getLearnedLinesForSong;
   const toggleLineLearnedFn = progress.toggleLineLearned;
   const toggleWordLearnedFn = progress.toggleWordLearned;
   const logPracticeFn = progress.logPractice;
@@ -95,14 +94,61 @@ function SongPageContent({ songId }: SongPageContentProps) {
     convexQuery(api.songProgress.getLineProgressByUserSong, { songId })
   );
 
+  // Optimistic toggle state for instant UI feedback
+  // Maps lineNumber -> optimistic learned state (true/false)
+  const [optimisticToggles, setOptimisticToggles] = useState<Map<number, boolean>>(new Map());
+
   // Build line progress array for LyricsDisplay - combine Convex data (authenticated) with local data (anonymous)
-  const lineProgress = useMemo(() => {
+  // Note: For anonymous users, we include `progress` in deps to trigger recompute when localStorage changes
+  // Type for the simplified line progress used by UI (subset of Convex data)
+  type LineProgressUI = {
+    _id: string;
+    visitorId: string;
+    songId: Id<"songs">;
+    lineNumber: number;
+    learned: boolean;
+  };
+
+  const lineProgress = useMemo((): LineProgressUI[] => {
     if (isAuthenticated) {
-      // Use Convex data for authenticated users
-      return lineProgressFromConvex || [];
+      // Use Convex data for authenticated users, with optimistic overrides
+      const convexProgress = lineProgressFromConvex || [];
+
+      // Transform Convex data to UI format and apply optimistic updates
+      const progressMap = new Map<number, LineProgressUI>();
+
+      // Add all Convex data
+      for (const p of convexProgress) {
+        progressMap.set(p.lineNumber, {
+          _id: p._id,
+          visitorId: p.visitorId,
+          songId: p.songId,
+          lineNumber: p.lineNumber,
+          learned: p.learned,
+        });
+      }
+
+      // Apply optimistic updates on top
+      for (const [lineNumber, learned] of optimisticToggles) {
+        const existing = progressMap.get(lineNumber);
+        if (existing) {
+          progressMap.set(lineNumber, { ...existing, learned });
+        } else if (learned) {
+          // Add new optimistic entry
+          progressMap.set(lineNumber, {
+            _id: `optimistic-${songId}-${lineNumber}`,
+            visitorId: 'authenticated',
+            songId: songId as Id<"songs">,
+            lineNumber,
+            learned: true,
+          });
+        }
+      }
+
+      return Array.from(progressMap.values());
     } else {
       // Build from anonymous localStorage data
-      const learnedLines = getLearnedLinesForSongFn(songId);
+      const learnedLines = progress.getLearnedLinesForSong(songId);
       return learnedLines.map(lineNumber => ({
         _id: `anon-${songId}-${lineNumber}`,
         visitorId: 'anonymous',
@@ -111,7 +157,41 @@ function SongPageContent({ songId }: SongPageContentProps) {
         learned: true,
       }));
     }
-  }, [isAuthenticated, lineProgressFromConvex, getLearnedLinesForSongFn, songId]);
+  }, [isAuthenticated, lineProgressFromConvex, progress, songId, optimisticToggles]);
+
+  // Clear optimistic state only when server confirms our expected state
+  // This prevents flicker when Convex pushes stale data before mutation completes
+  useEffect(() => {
+    if (!lineProgressFromConvex || optimisticToggles.size === 0) return;
+
+    // Only clear optimistic entries where server state matches what we expected
+    const serverStateMap = new Map(
+      lineProgressFromConvex.map(p => [p.lineNumber, p.learned])
+    );
+
+    let hasMatchingEntries = false;
+    for (const [lineNumber, optimisticLearned] of optimisticToggles) {
+      const serverLearned = serverStateMap.get(lineNumber) ?? false;
+      if (serverLearned === optimisticLearned) {
+        hasMatchingEntries = true;
+        break;
+      }
+    }
+
+    // Only clear if at least one optimistic entry matches server state
+    if (hasMatchingEntries) {
+      setOptimisticToggles(prev => {
+        const next = new Map(prev);
+        for (const [lineNumber, optimisticLearned] of prev) {
+          const serverLearned = serverStateMap.get(lineNumber) ?? false;
+          if (serverLearned === optimisticLearned) {
+            next.delete(lineNumber);
+          }
+        }
+        return next;
+      });
+    }
+  }, [lineProgressFromConvex, optimisticToggles]);
 
   // Load user preferences
   const { data: userPreferences } = useSuspenseQuery(
@@ -274,6 +354,17 @@ function SongPageContent({ songId }: SongPageContentProps) {
       setPreferencesApplied(true);
     }
   }, [userPreferences]);
+
+  // For anonymous users, apply defaults and enable autoplay after brief delay
+  useEffect(() => {
+    if (!isAuthenticated && !preferencesApplied) {
+      // Small delay to allow component to mount
+      const timer = setTimeout(() => {
+        setPreferencesApplied(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated, preferencesApplied]);
 
   // Preference persistence functions
   const persistPlaybackSpeed = useCallback((speed: string) => {
@@ -535,13 +626,27 @@ function SongPageContent({ songId }: SongPageContentProps) {
   // Handle checkbox toggle for line learned state
   const handleLineCheckboxClick = useCallback((lineNumber: number) => {
     if (isAuthenticated) {
+      // Optimistic update: determine current state and toggle it
+      const currentProgress = lineProgressFromConvex?.find(p => p.lineNumber === lineNumber);
+      const currentlyLearned = optimisticToggles.has(lineNumber)
+        ? optimisticToggles.get(lineNumber)
+        : currentProgress?.learned ?? false;
+      const newLearnedState = !currentlyLearned;
+
+      // Set optimistic state immediately for instant UI feedback
+      setOptimisticToggles(prev => {
+        const next = new Map(prev);
+        next.set(lineNumber, newLearnedState);
+        return next;
+      });
+
       // Authenticated: use Convex mutation
       toggleLineLearnedMutation({ songId, lineNumber });
     } else {
-      // Anonymous: use localStorage via useProgress hook
+      // Anonymous: use localStorage via useProgress hook (already instant)
       toggleLineLearnedFn(songId, lineNumber);
     }
-  }, [isAuthenticated, toggleLineLearnedMutation, songId, toggleLineLearnedFn]);
+  }, [isAuthenticated, toggleLineLearnedMutation, songId, toggleLineLearnedFn, lineProgressFromConvex, optimisticToggles]);
 
   // Handle word learned toggle
   const handleToggleWordLearned = useCallback((wordId: Id<"words">, persian: string) => {

@@ -7,6 +7,14 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { useState, useEffect } from "react";
+import {
+  hasProgressToMigrate,
+  readProgress,
+} from "../../hooks/useAnonymousProgress";
+import {
+  MigrationConfirmModal,
+  hasDeclinedMigration,
+} from "../../components/MigrationConfirmModal";
 
 export const Route = createFileRoute("/_authed/settings")({
   component: SettingsPage,
@@ -15,9 +23,49 @@ export const Route = createFileRoute("/_authed/settings")({
 function SettingsPage() {
   const navigate = useNavigate();
   const { data: session, isPending: sessionPending } = authClient.useSession();
-  
+
   const [displayName, setDisplayName] = useState("");
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  // Import device progress state
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importSectionVisible, setImportSectionVisible] = useState(false);
+  const [progressSummary, setProgressSummary] = useState({ words: 0, lines: 0, songs: 0 });
+
+  // Check if import section should be shown
+  useEffect(() => {
+    if (session?.user?.id) {
+      const userId = session.user.id;
+      const hasProgress = hasProgressToMigrate();
+      const hasDeclined = hasDeclinedMigration(userId);
+
+      if (hasProgress && hasDeclined) {
+        const progress = readProgress();
+        setProgressSummary({
+          words: progress.wordProgress.filter((w) => w.learned).length,
+          lines: progress.lineProgress.filter((l) => l.learned).length,
+          songs: progress.songProgress.length,
+        });
+        setImportSectionVisible(true);
+      } else {
+        setImportSectionVisible(false);
+      }
+    }
+  }, [session?.user?.id]);
+
+  // Handle successful migration from modal
+  const handleMigrationClose = () => {
+    setShowImportModal(false);
+    // After successful import, the localStorage is cleared and user is removed from declined list
+    // Check if we should still show the section
+    if (session?.user?.id) {
+      const hasProgress = hasProgressToMigrate();
+      const hasDeclined = hasDeclinedMigration(session.user.id);
+      if (!hasProgress || !hasDeclined) {
+        setImportSectionVisible(false);
+      }
+    }
+  };
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -151,7 +199,50 @@ function SettingsPage() {
             </Button>
           </div>
         </div>
+
+        {/* Import Device Progress Section */}
+        {importSectionVisible && session?.user?.id && (
+          <div className="bg-gray-900 rounded-lg p-6 mt-6 border border-amber-800/50">
+            <h2 className="text-lg font-semibold mb-3 text-amber-300">
+              Import Device Progress
+            </h2>
+            <p className="text-gray-400 text-sm mb-4">
+              You previously declined to import your learning progress. You can still import it now.
+            </p>
+            <div className="bg-gray-800/50 rounded-lg p-4 mb-4">
+              <p className="text-sm text-gray-300">
+                Device progress available:{" "}
+                <span className="text-emerald-400 font-medium">
+                  {progressSummary.words} {progressSummary.words === 1 ? "word" : "words"}
+                </span>
+                ,{" "}
+                <span className="text-emerald-400 font-medium">
+                  {progressSummary.lines} {progressSummary.lines === 1 ? "line" : "lines"}
+                </span>
+                ,{" "}
+                <span className="text-emerald-400 font-medium">
+                  {progressSummary.songs} {progressSummary.songs === 1 ? "song" : "songs"}
+                </span>
+              </p>
+            </div>
+            <Button
+              onClick={() => setShowImportModal(true)}
+              className="bg-amber-600 hover:bg-amber-700 text-white"
+            >
+              Import to my account
+            </Button>
+          </div>
+        )}
       </div>
+
+      {/* Migration Confirm Modal */}
+      {session?.user?.id && (
+        <MigrationConfirmModal
+          isOpen={showImportModal}
+          onClose={handleMigrationClose}
+          userId={session.user.id}
+        />
+      )}
     </div>
   );
 }
