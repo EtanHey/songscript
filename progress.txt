@@ -562,3 +562,51 @@ All 5 blocked stories are also due to same email infrastructure issue.
 - Learnings: Email infrastructure blocker affects 4 remaining stories (V-016, TEST-006, US-059, and their blockers)
 ---
 
+
+---
+
+## ITERATION COMPLETE - ALL REMAINING STORIES BLOCKED ON EMAIL INFRASTRUCTURE
+
+**Summary:**
+- Attempted V-016 (browser verification of signup + migration flow)
+- Successfully verified all steps up to magic link retrieval
+- Encountered infrastructure blocker: Email delivery not accessible
+
+**Work Completed:**
+✅ Partial V-016 completion:
+  - Cleared localStorage
+  - Created anonymous progress (4 lines learned)
+  - Verified localStorage has visitor ID and progress
+  - Filled signup form with test email
+  - Sent magic link successfully
+  - Committed progress with blockedBy: INFRASTRUCTURE_EMAIL_INACCESSIBLE
+
+**Remaining Pending Stories (2):**
+1. **TEST-006** - E2E migration flow test (blocked - requires magic link)
+2. **US-059** - Unknown (need to check)
+
+**Remaining Blocked Stories (4):**
+1. **V-016** - Just blocked this iteration (email infrastructure)
+2. **V-030** - (existing)
+3. **V-031** - (existing)
+4. **TEST-009** - (existing)
+
+**Root Cause - Infrastructure Not Available:**
+- Email delivery via Resend is configured
+- But no email capture tool available for browser automation:
+  - No MailHog/Mailpit local SMTP server
+  - No Better Auth development/test mode with bypass
+  - Tempmail service doesn't capture Resend-sent emails
+  - No MCP for email interception
+
+**What Needs to Be Done to Unblock ALL Stories:**
+1. Install and run MailHog or Mailpit locally
+2. Configure Better Auth or Resend to use local mail server
+3. Update tests to retrieve magic links from local email capture
+
+**Next Iteration Options:**
+1. Check US-059 - may not be email-dependent
+2. Set up MailHog/Mailpit infrastructure
+3. All other pending stories are email-dependent
+
+---
