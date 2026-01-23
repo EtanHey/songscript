@@ -6,10 +6,10 @@
   "stats": {
     "total": 71,
     "completed": 65,
-    "pending": 3,
-    "blocked": 3
+    "pending": 2,
+    "blocked": 4
   },
-  "nextStory": "V-016",
+  "nextStory": "TEST-006",
   "storyOrder": [
     "US-036",
     "V-003",
@@ -84,11 +84,11 @@
     "TEST-009"
   ],
   "pending": [
-    "V-016",
     "TEST-006",
     "US-059"
   ],
   "blocked": [
+    "V-016",
     "V-030",
     "V-031",
     "TEST-009"

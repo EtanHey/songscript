@@ -540,3 +540,25 @@ All 5 blocked stories are also due to same email infrastructure issue.
 - Note: UI changed since story was written - checkbox replaced with info card, migration now happens via modal on dashboard after magic link verification
 - Learnings: The migration flow has been redesigned - signup shows info card about progress, dashboard shows migration modal post-auth
 ---
+
+## Iteration - V-016: Signup flow with migration (BLOCKED)
+- Model: haiku
+- Successfully completed browser verification up to email step:
+  ✅ Cleared localStorage completely
+  ✅ Navigated to Baraye song page (Persian)
+  ✅ Marked 4 lines as learned - verified localStorage created songscript_visitor_id and songscript_anonymous_progress
+  ✅ Navigated to signup page
+  ✅ Verified migration info card displays "0 words, 4 lines" (correctly reading from localStorage)
+  ✅ Filled signup form with email (testcfb37241@tempmail.com) and display name (V-016 Test User)
+  ✅ Clicked "Send Magic Link" - received success message
+- ❌ INFRASTRUCTURE BLOCKER: Cannot access magic link email
+  - Resend API configured in .env.local with valid API key
+  - Magic link sent via Resend, but no way to retrieve it
+  - tempmail/browser cannot intercept Resend emails
+  - No MailHog/Mailpit local email capture configured
+  - No Better Auth test/bypass mode available
+- Marked V-016 as blocked with detailed blocker reason
+- Updated index.json: moved V-016 to blocked array, nextStory=TEST-006, stats updated (pending: 2, blocked: 4)
+- Learnings: Email infrastructure blocker affects 4 remaining stories (V-016, TEST-006, US-059, and their blockers)
+---
+
