@@ -35,8 +35,8 @@ const MAX_PLAYBACK_SPEED = 4.0;
 const MAX_LINE_NUMBER = 1_000_000;
 const MAX_TARGET_VALUE = 1_000_000;
 
-// Convex ID pattern (26 chars, alphanumeric)
-const CONVEX_ID_PATTERN = /^[a-z0-9]{26}$/i;
+// Convex ID pattern (32 chars, alphanumeric)
+const CONVEX_ID_PATTERN = /^[a-z0-9]{32}$/i;
 
 // ============================================
 // Type Definitions (matching useAnonymousProgress)

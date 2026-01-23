@@ -6,13 +6,13 @@
   "storyPoints": 1,
   "description": "Add a reassuring note on the signup page telling users their progress is safe and they can import it after signing up. This reduces anxiety about losing progress during signup.",
   "acceptanceCriteria": [
-    {"text": "Note appears on signup page when localStorage has anonymous progress", "checked": false},
-    {"text": "Note text: 'Your learning progress is saved on this device. After signing up, you'll have the option to import it to your account.'", "checked": false},
-    {"text": "Note styled subtly (not alarming) - info style, not warning", "checked": false},
-    {"text": "Note does NOT appear if no anonymous progress exists", "checked": false},
-    {"text": "Remove or update the 'Bring my progress' checkbox (no longer needed for auto-migration)", "checked": false},
-    {"text": "Typecheck passes", "checked": false},
-    {"text": "Verify in browser: note appears with progress, hidden without", "checked": false}
+    {"text": "Note appears on signup page when localStorage has anonymous progress", "checked": true},
+    {"text": "Note text: 'Your learning progress is saved on this device. After signing up, you'll have the option to import it to your account.'", "checked": true},
+    {"text": "Note styled subtly (not alarming) - info style, not warning", "checked": true},
+    {"text": "Note does NOT appear if no anonymous progress exists", "checked": true},
+    {"text": "Remove or update the 'Bring my progress' checkbox (no longer needed for auto-migration)", "checked": true},
+    {"text": "Typecheck passes", "checked": true},
+    {"text": "Verify in browser: note appears with progress, hidden without", "checked": true}
   ],
   "technicalNotes": [
     "Update src/routes/signup.tsx",
@@ -25,9 +25,19 @@
     "Test without localStorage progress - note should NOT appear",
     "Test note styling is reassuring, not alarming"
   ],
+  "completionNotes": [
+    "Added reassuring info note to signup.tsx",
+    "Note shows word and line counts from localStorage progress",
+    "Blue info icon with subtle gray/slate styling",
+    "Note only appears when hasProgressToMigrate() returns true",
+    "Checkbox already removed in US-057",
+    "Typecheck passes"
+  ],
   "files": [
     "src/routes/signup.tsx"
   ],
   "blockedBy": null,
-  "passes": false
+  "passes": true,
+  "completedAt": "2026-01-23T01:00:00Z",
+  "completedBy": "opus"
 }

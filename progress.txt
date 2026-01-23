@@ -610,3 +610,111 @@ All 5 blocked stories are also due to same email infrastructure issue.
 3. All other pending stories are email-dependent
 
 ---
+
+## Iteration - US-059: Add 'Import device progress' option in Settings
+- Model: opus
+- Successfully implemented US-059 feature (8/9 acceptance criteria met)
+- Created Import Device Progress section in src/routes/_authed/settings.tsx:
+  - Section checks both hasProgressToMigrate() AND hasDeclinedMigration(userId)
+  - Displays summary: "Device progress available: X words, Y lines, Z songs"
+  - "Import to my account" button opens MigrationConfirmModal
+  - Section disappears after successful import
+- Updated MigrationConfirmModal to export removeDeclinedUserId and call it on successful import
+- Typecheck passes
+- Browser verification started but blocked:
+  - Set up anonymous progress in localStorage (2 words, 3 lines)
+  - Filled login form with yosef.from.levant@proton.me
+  - Magic link sent, but user declined screenshot access to Proton Mail tab
+  - Cannot complete magic link flow to test Settings page
+- Marked US-059 as blocked on INFRASTRUCTURE_EMAIL_INACCESSIBLE
+- Also marked TEST-006 as blocked (same email infrastructure issue)
+- Learnings: US-059 implementation is complete, just needs manual browser verification with logged-in user
+---
+
+## ITERATION COMPLETE - ALL PENDING STORIES NOW BLOCKED
+
+**Summary:**
+- Implemented US-059 code changes (8/9 acceptance criteria met)
+- Both US-059 and TEST-006 are now blocked on email infrastructure
+
+**Statistics:**
+- Total: 71 stories
+- Completed: 65
+- Pending: 0
+- Blocked: 6
+
+**Blocked Stories (6):**
+1. **V-016** - Requires email-based signup + migration flow
+2. **V-030** - Requires email-based verification
+3. **V-031** - Requires email-based verification
+4. **TEST-009** - Requires email-based testing
+5. **US-059** - Code complete, browser verification needs login (email)
+6. **TEST-006** - E2E migration test needs magic link flow (email)
+
+**Root Cause - All Stories Blocked by Email Infrastructure:**
+- Resend is configured but sends to real email servers
+- Tempmail API cannot intercept Resend-sent emails
+- No MailHog/Mailpit local email capture
+- Browser automation cannot access user's personal email (Proton Mail)
+
+**To Unblock:**
+1. Set up MailHog/Mailpit with local SMTP on port 1025
+2. Configure Better Auth to use local mail server in dev mode
+3. Or implement a test bypass mode for magic link auth
+---
+
+## Iteration - V-030: Verify post-login migration confirmation flow
+- Model: opus
+- Successfully verified complete migration flow end-to-end with browser automation
+- **ACCEPT PATH** (User: aeriela8bebc4@nf.chessgameland.com):
+  ✅ Cleared localStorage completely
+  ✅ Navigated to Baraye song page, marked 4 lines as learned
+  ✅ Verified localStorage has songscript_visitor_id and songscript_anonymous_progress
+  ✅ Signed up with tempmail, filled form, submitted successfully
+  ✅ Retrieved magic link from tempmail inbox
+  ✅ Verified magic link → redirected to dashboard
+  ✅ Migration modal appeared showing "0 words, 4 lines, 0 songs"
+  ✅ Clicked "Import to my account"
+  ✅ Verified localStorage songscript_anonymous_progress was CLEARED
+  ✅ Verified song page shows green checkmarks for migrated lines
+- **DECLINE PATH** (User: whitford8bee07@mc.chessgameland.com):
+  ✅ Logged out, cleared localStorage
+  ✅ Marked 3 different lines as learned anonymously
+  ✅ Signed up with second tempmail account
+  ✅ Retrieved magic link, verified email
+  ✅ Migration modal appeared
+  ✅ Clicked "No thanks"
+  ✅ Verified userId added to songscript_migration_declined_by array
+  ✅ Anonymous progress preserved in localStorage
+- **DECLINED PERSISTENCE**:
+  ✅ Logged out declined user
+  ✅ Logged back in via magic link
+  ✅ Dashboard loaded WITHOUT migration modal appearing
+- All 10 acceptance criteria verified
+- Typecheck passes
+- Learnings: tempmail MCP via api.tempmail.lol with chessgameland.com domain works reliably for magic link testing
+---
+
+## Iteration - V-016: VERIFY Signup flow with migration end-to-end
+- Model: opus
+- UNBLOCKED AND COMPLETED - tempmail.lol API provides email interception capability
+- Test user: laurel8bf209@n9.awesomesaucemail.org (tempmail.lol)
+- Full E2E verification passed:
+  ✅ Cleared localStorage completely
+  ✅ Practiced Baraye song as anonymous user, marked 4 lines as learned
+  ✅ Verified localStorage: songscript_visitor_id (UUID) + songscript_anonymous_progress (4 lineProgress records)
+  ✅ Navigated to signup, filled tempmail email and display name "V016 Test User"
+  ✅ Verified info card shows "0 words, 4 lines" progress
+  ✅ Clicked "Send Magic Link" - received success message
+  ✅ Retrieved magic link from tempmail inbox (token: DTxVpsNQSXFOZFWjcBjaxvRVQGoGsHWv)
+  ✅ Verified magic link → redirected to /welcome, then /dashboard
+  ✅ Migration modal appeared showing "0 words, 4 lines, 0 songs"
+  ✅ Clicked "Import to my account" - modal closed
+  ✅ Dashboard showed "LINES: 4" in Your Stats section
+  ✅ Verified localStorage songscript_anonymous_progress = null (CLEARED)
+  ✅ Song page showed 4 green checkmarks on the first 4 lines
+  ✅ Data properly migrated to Convex (authenticated user queries return correct progress)
+- Typecheck passes
+- Also fixed Convex bundler error: removed stray .js files from convex/ and convex/lib/ directories
+- Learnings: tempmail.lol API (https://api.tempmail.lol/generate + /auth/{token}) works reliably for magic link E2E testing
+---
