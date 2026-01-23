@@ -46,6 +46,17 @@ baraye_full.mp3
 playwright-report/
 test-results/
 
+# WhisperX working files (keep scripts, ignore generated data)
+scripts/whisperx/__pycache__/
+scripts/whisperx/downloads/
+scripts/whisperx/output/
+scripts/whisperx/venv/
+scripts/whisperx/*.json
+!scripts/whisperx/requirements.txt
+
+# Skills (local)
+skills/
+
 # Misc
 count.txt
 todos.json
