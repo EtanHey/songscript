@@ -82,7 +82,7 @@ export function LeaderboardMiniSection() {
           </div>
         ) : (
           <div className="space-y-3">
-            {leaderboardData.map((user) => {
+            {leaderboardData.map((user: typeof leaderboardData[0]) => {
               const isCurrentUser = hasDisplayName && userRank && user.rank === userRank.rank;
               const medal = getMedalIcon(user.rank);
               

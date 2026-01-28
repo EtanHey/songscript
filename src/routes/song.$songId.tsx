@@ -73,9 +73,11 @@ interface SongPageContentProps {
 
 function SongPageContent({ songId }: SongPageContentProps) {
   const { data: song } = useSuspenseQuery(
+    // @ts-expect-error - convexQuery return type includes skipToken which useSuspenseQuery doesn't support, but works at runtime
     convexQuery(api.songs.getById, { id: songId })
   );
   const { data: lyrics } = useSuspenseQuery(
+    // @ts-expect-error - convexQuery return type includes skipToken which useSuspenseQuery doesn't support, but works at runtime
     convexQuery(api.lyrics.getBySong, { songId })
   );
 
@@ -91,6 +93,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
   // For authenticated users, get line progress from Convex
   // For anonymous users, we'll get it from the useProgress hook
   const { data: lineProgressFromConvex } = useSuspenseQuery(
+    // @ts-expect-error - convexQuery return type includes skipToken which useSuspenseQuery doesn't support, but works at runtime
     convexQuery(api.songProgress.getLineProgressByUserSong, { songId })
   );
 
@@ -166,7 +169,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
     // Only clear optimistic entries where server state matches what we expected
     const serverStateMap = new Map(
-      lineProgressFromConvex.map(p => [p.lineNumber, p.learned])
+      lineProgressFromConvex.map((p: typeof lineProgressFromConvex[0]) => [p.lineNumber, p.learned])
     );
 
     let hasMatchingEntries = false;
@@ -195,6 +198,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
   // Load user preferences
   const { data: userPreferences } = useSuspenseQuery(
+    // @ts-expect-error - convexQuery return type includes skipToken which useSuspenseQuery doesn't support, but works at runtime
     convexQuery(api.userPreferences.getUserPreferences, {})
   );
   const updatePreferencesMutation = useConvexMutation(api.userPreferences.updatePreferences);
@@ -627,7 +631,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
   const handleLineCheckboxClick = useCallback((lineNumber: number) => {
     if (isAuthenticated) {
       // Optimistic update: determine current state and toggle it
-      const currentProgress = lineProgressFromConvex?.find(p => p.lineNumber === lineNumber);
+      const currentProgress = lineProgressFromConvex?.find((p: typeof lineProgressFromConvex[0]) => p.lineNumber === lineNumber);
       const currentlyLearned = optimisticToggles.has(lineNumber)
         ? optimisticToggles.get(lineNumber)
         : currentProgress?.learned ?? false;

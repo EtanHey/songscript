@@ -86,9 +86,12 @@ function SettingsPage() {
     }
   }, [userInfo]);
 
+  // Convex mutation (extracted outside useMutation)
+  const setDisplayNameMutation = useConvexMutation(api.leaderboard.setDisplayName);
+
   // Set display name mutation
   const { mutate: setDisplayNameMutate, isPending: setDisplayNamePending } = useMutation({
-    mutationFn: useConvexMutation(api.leaderboard.setDisplayName),
+    mutationFn: (args: any) => setDisplayNameMutation(args),
   });
 
   const handleSave = async () => {

@@ -41,9 +41,12 @@ export function WishlistButton({
     }
   }, [isInWishlist]);
 
+  // Convex mutation (extracted outside useMutation)
+  const toggleWishlistMutation = useConvexMutation(api.wishlist.toggleWishlist);
+
   // Mutation with optimistic updates
   const { mutate: toggleWishlist, isPending } = useMutation({
-    mutationFn: useConvexMutation(api.wishlist.toggleWishlist),
+    mutationFn: (args: any) => toggleWishlistMutation(args),
     onMutate: () => {
       // Optimistically update UI immediately
       const currentState = optimisticState ?? isInWishlist ?? false;

@@ -54,7 +54,7 @@ function HomePage() {
           <div className="text-gray-400">Loading songs...</div>
         ) : songs && songs.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {songs.map((song) => (
+            {songs.map((song: typeof songs[0]) => (
               <Link
                 key={song._id}
                 to="/song/$songId"

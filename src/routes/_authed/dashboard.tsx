@@ -147,7 +147,7 @@ function DashboardPage() {
     if (!songProgress) return [];
     if (!selectedLanguage) return songProgress;
     return songProgress.filter(
-      (p) => p.song.sourceLanguage.toLowerCase() === selectedLanguage.toLowerCase()
+      (p: typeof songProgress[0]) => p.song.sourceLanguage.toLowerCase() === selectedLanguage.toLowerCase()
     );
   }, [songProgress, selectedLanguage]);
 
@@ -155,7 +155,7 @@ function DashboardPage() {
     if (!vocabulary) return [];
     if (!selectedLanguage) return vocabulary;
     return vocabulary.filter(
-      (v) => v.language.toLowerCase() === selectedLanguage.toLowerCase()
+      (v: typeof vocabulary[0]) => v.language.toLowerCase() === selectedLanguage.toLowerCase()
     );
   }, [vocabulary, selectedLanguage]);
 
@@ -163,7 +163,7 @@ function DashboardPage() {
     if (!wishlist) return [];
     if (!selectedLanguage) return wishlist;
     return wishlist.filter(
-      (w) => w.song?.sourceLanguage.toLowerCase() === selectedLanguage.toLowerCase()
+      (w: typeof wishlist[0]) => w.song?.sourceLanguage.toLowerCase() === selectedLanguage.toLowerCase()
     );
   }, [wishlist, selectedLanguage]);
 
@@ -171,13 +171,20 @@ function DashboardPage() {
     if (!recentSongs) return [];
     if (!selectedLanguage) return recentSongs;
     return recentSongs.filter(
-      (s) => s.song.sourceLanguage.toLowerCase() === selectedLanguage.toLowerCase()
+      (s: typeof recentSongs[0]) => s.song.sourceLanguage.toLowerCase() === selectedLanguage.toLowerCase()
     );
   }, [recentSongs, selectedLanguage]);
 
+  // Convex mutations (extracted outside useMutation)
+  const initializeDefaultGoalsMutation = useConvexMutation(api.goals.initializeDefaultGoals);
+  const setGoalMutation = useConvexMutation(api.goals.setGoal);
+  const updateGoalMutation = useConvexMutation(api.goals.updateGoal);
+  const reorderWishlistMutation = useConvexMutation(api.wishlist.reorderWishlist);
+  const removeFromWishlistMutation = useConvexMutation(api.wishlist.removeFromWishlist);
+
   // Initialize default goals mutation with error handling and retry
   const { mutate: initializeGoals } = useMutation({
-    mutationFn: useConvexMutation(api.goals.initializeDefaultGoals),
+    mutationFn: (args: any) => initializeDefaultGoalsMutation(args),
     onSuccess: () => {
       refetchGoals();
     },
@@ -194,7 +201,7 @@ function DashboardPage() {
 
   // Set goal mutation
   const { mutate: setGoal } = useMutation({
-    mutationFn: useConvexMutation(api.goals.setGoal),
+    mutationFn: (args: any) => setGoalMutation(args),
     onSuccess: () => {
       refetchGoals();
     },
@@ -202,7 +209,7 @@ function DashboardPage() {
 
   // Update goal mutation
   const { mutate: updateGoal } = useMutation({
-    mutationFn: useConvexMutation(api.goals.updateGoal),
+    mutationFn: (args: any) => updateGoalMutation(args),
     onSuccess: () => {
       refetchGoals();
     },
@@ -221,7 +228,7 @@ function DashboardPage() {
 
   // Reorder mutation
   const { mutate: reorderWishlist } = useMutation({
-    mutationFn: useConvexMutation(api.wishlist.reorderWishlist),
+    mutationFn: (args: any) => reorderWishlistMutation(args),
     onSuccess: () => {
       refetchWishlist();
     },
@@ -229,7 +236,7 @@ function DashboardPage() {
 
   // Remove from wishlist mutation
   const { mutate: removeFromWishlist } = useMutation({
-    mutationFn: useConvexMutation(api.wishlist.removeFromWishlist),
+    mutationFn: (args: any) => removeFromWishlistMutation(args),
     onSuccess: () => {
       refetchWishlist();
     },
@@ -397,7 +404,7 @@ function DashboardPage() {
                 <SkeletonCard height="h-48" />
               ) : filteredSongProgress && filteredSongProgress.length > 0 ? (
                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-                  {filteredSongProgress.map((progress) => (
+                  {filteredSongProgress.map((progress: typeof filteredSongProgress[0]) => (
                     <SongProgressCard
                       key={progress._id}
                       title={progress.song.title}
@@ -426,7 +433,7 @@ function DashboardPage() {
             {/* My Vocabulary Section - Collapsible on mobile */}
             <CollapsibleSection
               title="My Vocabulary"
-              badge={vocabulary?.reduce((sum, v) => sum + v.totalWords, 0) || 0}
+              badge={vocabulary?.reduce((sum: number, v: typeof vocabulary[0]) => sum + v.totalWords, 0) || 0}
               filterIndicator={selectedLanguage ? `(${getLanguageFlagString(selectedLanguage)} filtered)` : undefined}
               defaultExpanded={false}
             >
@@ -434,7 +441,7 @@ function DashboardPage() {
                 <SkeletonCard height="h-32" />
               ) : filteredVocabulary && filteredVocabulary.length > 0 ? (
                 <div className="space-y-4">
-                  {filteredVocabulary.map((langGroup) => (
+                  {filteredVocabulary.map((langGroup: typeof filteredVocabulary[0]) => (
                     <LanguageVocabularySection
                       key={langGroup.language}
                       language={langGroup.language}
