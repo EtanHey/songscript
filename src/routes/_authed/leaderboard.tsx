@@ -140,7 +140,7 @@ function LeaderboardPage() {
             </div>
           ) : (
             <div className="space-y-2">
-              {leaderboardData.map((user, index) => {
+              {leaderboardData.map((user: typeof leaderboardData[0], index: number) => {
                 const rank = offset + index + 1;
                 const medal = getMedalIcon(rank);
                 const isUser = isCurrentUser(rank);

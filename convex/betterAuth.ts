@@ -37,7 +37,7 @@ const resend = resendApiKey ? new Resend(resendApiKey) : null;
  * - Better Auth `displayUsername` ↔ App `displayName`
  * - Better Auth `_id` → App `authId` (link between tables)
  */
-export const authComponent = createClient<DataModel>(components.betterAuth, {
+export const authComponent = createClient<DataModel>(components.betterAuth as any, {
   authFunctions,
   triggers: {
     user: {

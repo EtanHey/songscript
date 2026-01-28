@@ -201,7 +201,7 @@ export default function WordDetailsModal({
             {wordDetails.songCount === 1 ? "song" : "songs"}
           </h3>
           <div className="space-y-2 max-h-[200px] overflow-y-auto">
-            {wordDetails.songs.map((song) => (
+            {wordDetails.songs.map((song: typeof wordDetails.songs[0]) => (
               <Link
                 key={`${song.songId}-${song.lineNumber}`}
                 to="/song/$songId"

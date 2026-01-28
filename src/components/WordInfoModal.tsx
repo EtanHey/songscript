@@ -314,7 +314,7 @@ export default function WordInfoModal({
 
   // Fetch word progress by persian text (syncs across repeated words)
   // Only fetch from Convex when authenticated
-  const persians = words?.map((w) => w.persian) ?? [];
+  const persians = words?.map((w: typeof words[0]) => w.persian) ?? [];
   const progressData = useQuery(
     api.wordProgress.getByUserPersians,
     isAuthenticated && persians.length > 0
@@ -363,12 +363,12 @@ export default function WordInfoModal({
 
     if (isAuthenticated && progressData) {
       // Authenticated: use Convex data
-      progressData.forEach(({ persian, progress: wordProg }) => {
+      progressData.forEach(({ persian, progress: wordProg }: { persian: string; progress: WordProgressData }) => {
         map.set(persian, wordProg);
       });
     } else if (!isAuthenticated && words) {
       // Anonymous: build from localStorage data
-      words.forEach((word) => {
+      words.forEach((word: typeof words[0]) => {
         const localProgress = getWordProgress(word.persian);
         if (localProgress) {
           map.set(word.persian, {
@@ -425,7 +425,7 @@ export default function WordInfoModal({
   useEffect(() => {
     if (isOpen && words) {
       // Increment view count for each word in the line
-      words.forEach((word) => {
+      words.forEach((word: typeof words[0]) => {
         if (isAuthenticated) {
           // Authenticated: use Convex mutation
           incrementViewCount({ wordId: word._id, persian: word.persian });
@@ -545,7 +545,7 @@ export default function WordInfoModal({
 
   // Calculate learned count for summary (lookup by persian text for sync)
   const learnedCount =
-    words?.filter((w) => wordProgressMap.get(w.persian)?.learned).length ?? 0;
+    words?.filter((w: typeof words[0]) => wordProgressMap.get(w.persian)?.learned).length ?? 0;
   const totalWords = words?.length ?? 0;
 
   // Show loading state while fetching words

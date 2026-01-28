@@ -216,6 +216,39 @@ For songs with repeating patterns (e.g., "برای" in Baraye):
 
 ---
 
+## 🛠️ SKILLS (from ralphtools)
+
+Skills are sourced globally from `~/.claude/commands/` (symlinked to ralphtools).
+
+### Convex Workflows
+
+Use `/convex` for Convex-specific tasks:
+
+| Workflow | Use Case |
+|----------|----------|
+| `/convex dev` | Start dev server |
+| `/convex deploy` | Deploy to production |
+| `/convex user-deletion` | Delete user and all related data |
+| `/convex run-function` | Run queries/mutations |
+| `/convex troubleshooting` | Debug common issues |
+
+### Other Available Skills
+
+| Skill | Description |
+|-------|-------------|
+| `/1password` | Secret management |
+| `/github` | Commits, PRs, issues |
+| `/worktrees` | Git worktree isolation |
+
+### Updating Skills
+
+Skills auto-update when ralphtools is pulled:
+```bash
+cd ~/.config/ralph && git pull
+```
+
+---
+
 ## CLAUDE_COUNTER SYSTEM
 
 Every response MUST end with: `CLAUDE_COUNTER: N`
