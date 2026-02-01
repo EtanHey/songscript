@@ -177,26 +177,7 @@ bun run test:e2e    # Playwright E2E tests
 
 **Full documentation:** `docs.local/learnings/whisperx-pipeline.md`
 
-### Quick Reference (Unified CLI)
-```bash
-# Install CLI (first time only)
-cd scripts/whisperx && ./install-cli.sh
-
-# Full pipeline: YouTube to database
-songscript-whisperx add "YOUTUBE_URL" fa --song-id ID --pattern "برای"
-
-# OR step-by-step:
-# 1. Extract timestamps
-songscript-whisperx extract downloads/SONGNAME.m4a fa
-
-# 2. Match to lyrics (if needed)
-songscript-whisperx match output/SONGNAME_whisperx_words.json --pattern "برای"
-
-# 3. Apply to database
-songscript-whisperx apply output/SONGNAME_final_timestamps.json ID
-```
-
-### Manual Method (Legacy)
+### Quick Reference
 ```bash
 # 1. Download audio
 cd scripts/whisperx
