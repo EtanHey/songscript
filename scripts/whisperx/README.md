@@ -38,7 +38,35 @@ MICROSOFT_TRANSLATOR_KEY=your_key  # Optional: for translations
 
 ## Usage
 
-### Quick Start (Local GPU)
+### Quick Start with CLI (Recommended)
+
+**Install the unified CLI tool:**
+```bash
+cd scripts/whisperx
+./install-cli.sh
+```
+
+**Add a new song from YouTube:**
+```bash
+songscript-whisperx add "https://www.youtube.com/watch?v=VIDEO_ID" fa --song-id j123456
+```
+
+**Extract timestamps from existing audio:**
+```bash
+songscript-whisperx extract downloads/song.m4a ko
+```
+
+**Match WhisperX output to lyrics (for songs with repeating patterns):**
+```bash
+songscript-whisperx match output/song_whisperx_words.json --pattern "برای"
+```
+
+**Apply timestamps to database:**
+```bash
+songscript-whisperx apply output/song_final_timestamps.json j123456
+```
+
+### Advanced Usage (Direct Python Scripts)
 
 ```bash
 # Transcribe a YouTube video
@@ -117,6 +145,8 @@ python3 pipeline.py "https://www.youtube.com/watch?v=VIDEO_ID" \
 
 ## Files
 
+- `songscript-whisperx` - **Unified CLI tool (recommended)**
+- `install-cli.sh` - CLI installation script
 - `requirements.txt` - Python dependencies
 - `download.py` - YouTube audio download
 - `separate.py` - Demucs vocal separation
