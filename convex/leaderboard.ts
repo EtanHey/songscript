@@ -51,7 +51,7 @@ async function calculateCurrentStreak(ctx: any, userId: string): Promise<number>
   const startDate = hasPracticedToday ? today : yesterday;
   let currentStreak = 0;
   let date = startDate;
-  
+
   while (practiceMap.has(date)) {
     currentStreak++;
     const dateObj = new Date(date);
@@ -60,6 +60,42 @@ async function calculateCurrentStreak(ctx: any, userId: string): Promise<number>
   }
 
   return currentStreak;
+}
+
+// Detect user's primary language from their practice data
+async function detectUserLanguage(ctx: any, userId: string): Promise<string> {
+  // Get user's song progress ordered by most recent practice
+  const songProgress = await ctx.db
+    .query("userSongProgress")
+    .withIndex("by_user", (q: any) => q.eq("userId", userId))
+    .collect();
+
+  if (songProgress.length === 0) {
+    return "mixed";
+  }
+
+  // Sort by lastPracticed to get most recent
+  songProgress.sort((a, b) => b.lastPracticed - a.lastPracticed);
+
+  // Count languages from recent practice (look at up to 5 most recent songs)
+  const languageCounts = new Map<string, number>();
+  const recentSongs = songProgress.slice(0, 5);
+
+  for (const progress of recentSongs) {
+    const song = await ctx.db.get(progress.songId);
+    if (song) {
+      const lang = song.sourceLanguage;
+      languageCounts.set(lang, (languageCounts.get(lang) || 0) + 1);
+    }
+  }
+
+  // If user practices multiple languages, return "mixed"
+  if (languageCounts.size > 1) {
+    return "mixed";
+  }
+
+  // Return the single language practiced, or "mixed" as fallback
+  return languageCounts.size === 1 ? Array.from(languageCounts.keys())[0] : "mixed";
 }
 
 // Get user information for the authenticated user
@@ -98,11 +134,10 @@ export const getStreakLeaderboard = query({
     for (const user of users) {
       // Use user's ID for practice data lookup
       const streak = await calculateCurrentStreak(ctx, user._id);
-      
+
       // Get user's primary language from their practice data
-      // For now, we'll use a placeholder language since we don't have language-specific practice tracking
-      const language = "mixed"; // TODO: Implement language detection from practice data
-      
+      const language = await detectUserLanguage(ctx, user._id);
+
       userStreaks.push({
         displayName: user.displayName!,
         streak,
