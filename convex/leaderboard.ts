@@ -18,6 +18,44 @@ function getDateDaysAgo(days: number): string {
   return date.toISOString().split("T")[0];
 }
 
+// Get user's primary language based on their practice data
+async function getUserPrimaryLanguage(ctx: any, userId: string): Promise<string> {
+  // Get user's line progress to determine which songs they've practiced
+  const lineProgress = await ctx.db
+    .query("lineProgress")
+    .withIndex("by_user", (q: any) => q.eq("userId", userId))
+    .filter((q: any) => q.eq(q.field("learned"), true))
+    .collect();
+
+  if (lineProgress.length === 0) {
+    return "mixed";
+  }
+
+  // Count lines by language
+  const languageCounts = new Map<string, number>();
+
+  for (const line of lineProgress) {
+    const song = await ctx.db.get(line.songId);
+    if (song) {
+      const language = song.sourceLanguage;
+      languageCounts.set(language, (languageCounts.get(language) || 0) + 1);
+    }
+  }
+
+  // Find the language with most lines practiced
+  let primaryLanguage = "mixed";
+  let maxCount = 0;
+
+  for (const [language, count] of languageCounts.entries()) {
+    if (count > maxCount) {
+      maxCount = count;
+      primaryLanguage = language;
+    }
+  }
+
+  return primaryLanguage;
+}
+
 // Calculate current streak for a user
 async function calculateCurrentStreak(ctx: any, userId: string): Promise<number> {
   const practiceLogs = await ctx.db
@@ -100,8 +138,7 @@ export const getStreakLeaderboard = query({
       const streak = await calculateCurrentStreak(ctx, user._id);
       
       // Get user's primary language from their practice data
-      // For now, we'll use a placeholder language since we don't have language-specific practice tracking
-      const language = "mixed"; // TODO: Implement language detection from practice data
+      const language = await getUserPrimaryLanguage(ctx, user._id);
       
       userStreaks.push({
         displayName: user.displayName!,
