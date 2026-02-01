@@ -98,11 +98,33 @@ export const getStreakLeaderboard = query({
     for (const user of users) {
       // Use user's ID for practice data lookup
       const streak = await calculateCurrentStreak(ctx, user._id);
-      
-      // Get user's primary language from their practice data
-      // For now, we'll use a placeholder language since we don't have language-specific practice tracking
-      const language = "mixed"; // TODO: Implement language detection from practice data
-      
+
+      // Detect user's primary language from their practice data
+      const lineProgress = await ctx.db
+        .query("lineProgress")
+        .withIndex("by_user", (q) => q.eq("userId", user._id))
+        .collect();
+
+      // Count lines per language
+      const languageCounts = new Map<string, number>();
+      for (const line of lineProgress) {
+        const song = await ctx.db.get(line.songId);
+        if (song) {
+          const lang = song.sourceLanguage;
+          languageCounts.set(lang, (languageCounts.get(lang) || 0) + 1);
+        }
+      }
+
+      // Find most practiced language
+      let language = "mixed";
+      let maxCount = 0;
+      for (const [lang, count] of languageCounts.entries()) {
+        if (count > maxCount) {
+          maxCount = count;
+          language = lang;
+        }
+      }
+
       userStreaks.push({
         displayName: user.displayName!,
         streak,
