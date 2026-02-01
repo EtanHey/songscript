@@ -51,7 +51,7 @@ async function calculateCurrentStreak(ctx: any, userId: string): Promise<number>
   const startDate = hasPracticedToday ? today : yesterday;
   let currentStreak = 0;
   let date = startDate;
-  
+
   while (practiceMap.has(date)) {
     currentStreak++;
     const dateObj = new Date(date);
@@ -60,6 +60,50 @@ async function calculateCurrentStreak(ctx: any, userId: string): Promise<number>
   }
 
   return currentStreak;
+}
+
+// Detect user's primary language from practice history
+async function detectPrimaryLanguage(ctx: any, userId: string): Promise<string> {
+  // Get all songs the user has practiced
+  const userSongProgress = await ctx.db
+    .query("userSongProgress")
+    .withIndex("by_user", (q: any) => q.eq("userId", userId))
+    .collect();
+
+  if (userSongProgress.length === 0) {
+    return "mixed";
+  }
+
+  // Count practice time by language
+  const languageCounts = new Map<string, number>();
+
+  for (const progress of userSongProgress) {
+    const song = await ctx.db.get(progress.songId);
+    if (song) {
+      const language = song.sourceLanguage;
+      const practiceWeight = progress.linesCompleted.length;
+      languageCounts.set(language, (languageCounts.get(language) || 0) + practiceWeight);
+    }
+  }
+
+  // Find the language with the most practice
+  let primaryLanguage = "mixed";
+  let maxCount = 0;
+
+  for (const [language, count] of languageCounts.entries()) {
+    if (count > maxCount) {
+      maxCount = count;
+      primaryLanguage = language;
+    }
+  }
+
+  // If user has practiced multiple languages with similar amounts, return "mixed"
+  const totalCount = Array.from(languageCounts.values()).reduce((a, b) => a + b, 0);
+  if (maxCount < totalCount * 0.6) {
+    return "mixed";
+  }
+
+  return primaryLanguage;
 }
 
 // Get user information for the authenticated user
@@ -98,11 +142,10 @@ export const getStreakLeaderboard = query({
     for (const user of users) {
       // Use user's ID for practice data lookup
       const streak = await calculateCurrentStreak(ctx, user._id);
-      
-      // Get user's primary language from their practice data
-      // For now, we'll use a placeholder language since we don't have language-specific practice tracking
-      const language = "mixed"; // TODO: Implement language detection from practice data
-      
+
+      // Detect user's primary language from their practice history
+      const language = await detectPrimaryLanguage(ctx, user._id);
+
       userStreaks.push({
         displayName: user.displayName!,
         streak,
