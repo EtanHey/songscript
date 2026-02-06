@@ -1,6 +1,7 @@
 {
   "permissions": {
-    "allow": [],
-    "deny": []
+    "allow": [
+      "Bash(git worktree:*)"
+    ]
   }
 }
