@@ -103,6 +103,7 @@ export const getStreakLeaderboard = query({
       const lineProgress = await ctx.db
         .query("lineProgress")
         .withIndex("by_user", (q) => q.eq("userId", user._id))
+        .filter((q) => q.eq(q.field("learned"), true))
         .collect();
 
       // Batch-fetch songs with deduplication
