@@ -47,7 +47,6 @@ export default function LyricsDisplay({
   lineProgress = [],
 }: LyricsDisplayProps) {
   const { data: lyrics } = useSuspenseQuery(
-    // @ts-expect-error - convexQuery return type includes skipToken which useSuspenseQuery doesn't support, but works at runtime
     convexQuery(api.lyrics.getBySong, { songId })
   );
 
