@@ -21,26 +21,20 @@
       "Bash(gh api:*)",
       "Bash(bun install:*)",
       "Bash(bun run:*)",
-      "Bash(bun run dev)",
-      "Bash(bun run test:*)",
-      "Bash(bun run build:*)",
-      "Bash(bun run typecheck)",
       "Bash(bun add:*)",
       "Bash(bun remove:*)",
       "Bash(bun x:*)",
       "Bash(bunx:*)",
       "Bash(npx convex:*)",
-      "Bash(npx convex dev)",
-      "Bash(npx convex run:*)",
       "Bash(npx playwright:*)",
       "Bash(rm -f convex/*.js)",
       "Bash(rm -f convex/*.js 2>/dev/null || true)",
-      "Bash(ls convex/*.js:*)",
       "Bash(python3:*)",
       "Bash(source:*)",
       "Bash(yt-dlp:*)",
       "Bash(whisperx:*)",
       "Bash(notify:*)",
+      "Bash(cursor:*)",
       "Bash(curl -X POST http://localhost:3847/*)",
       "Bash(ls:*)",
       "Bash(pwd)",
@@ -54,7 +48,9 @@
       "WebSearch"
     ],
     "deny": [
-      "Bash(rm -rf:*)"
+      "Bash(rm -rf:*)",
+      "Bash(curl:* | sh)",
+      "Bash(wget:* | sh)"
     ]
   },
   "enableAllProjectMcpServers": true
