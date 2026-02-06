@@ -105,13 +105,21 @@ export const getStreakLeaderboard = query({
         .withIndex("by_user", (q) => q.eq("userId", user._id))
         .collect();
 
+      // Batch-fetch songs with deduplication
+      const uniqueSongIds = [...new Set(lineProgress.map((l) => l.songId))];
+      const songResults = await Promise.all(
+        uniqueSongIds.map((id) => ctx.db.get(id))
+      );
+      const songMap = new Map(
+        uniqueSongIds.map((id, i) => [id, songResults[i]])
+      );
+
       // Count lines per language
       const languageCounts = new Map<string, number>();
       for (const line of lineProgress) {
-        const song = await ctx.db.get(line.songId);
-        if (song) {
-          const lang = song.sourceLanguage;
-          languageCounts.set(lang, (languageCounts.get(lang) || 0) + 1);
+        const song = songMap.get(line.songId);
+        if (song?.sourceLanguage) {
+          languageCounts.set(song.sourceLanguage, (languageCounts.get(song.sourceLanguage) || 0) + 1);
         }
       }
 
