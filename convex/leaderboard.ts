@@ -195,36 +195,31 @@ export const getProgressLeaderboard = query({
         .filter((q) => q.eq(q.field("learned"), true))
         .collect();
 
-      // Get songs to determine languages — use Promise.allSettled so
-      // individual lookup failures don't break the whole leaderboard
-      const songResults = await Promise.allSettled(
-        lineProgress.map(async (line) => {
-          return await ctx.db.get(line.songId);
-        })
+      // Batch-fetch songs with deduplication + error resilience
+      const uniqueSongIds = [...new Set(lineProgress.map((l) => l.songId))];
+      const songSettled = await Promise.allSettled(
+        uniqueSongIds.map((id) => ctx.db.get(id))
       );
-      const songs = songResults.map(result =>
-        result.status === 'fulfilled' ? result.value : null
+      const songMap = new Map(
+        uniqueSongIds.map((id, i) => [
+          id,
+          songSettled[i].status === 'fulfilled' ? songSettled[i].value : null,
+        ])
       );
 
       // Calculate weighted scores by language
       const languageScores = new Map<string, { wordsLearned: number, linesCompleted: number }>();
-      
-      // Count words learned (we'll use a default language since wordProgress doesn't track language directly)
-      const defaultLanguage = "mixed";
-      if (!languageScores.has(defaultLanguage)) {
-        languageScores.set(defaultLanguage, { wordsLearned: 0, linesCompleted: 0 });
-      }
-      languageScores.get(defaultLanguage)!.wordsLearned = wordProgress.length;
+      languageScores.set("mixed", { wordsLearned: wordProgress.length, linesCompleted: 0 });
 
       // Count lines completed by language
-      for (let i = 0; i < lineProgress.length; i++) {
-        const song = songs[i];
-        if (song) {
-          const language = song.sourceLanguage;
-          if (!languageScores.has(language)) {
-            languageScores.set(language, { wordsLearned: 0, linesCompleted: 0 });
+      for (const line of lineProgress) {
+        const song = songMap.get(line.songId);
+        if (song?.sourceLanguage) {
+          const lang = song.sourceLanguage;
+          if (!languageScores.has(lang)) {
+            languageScores.set(lang, { wordsLearned: 0, linesCompleted: 0 });
           }
-          languageScores.get(language)!.linesCompleted++;
+          languageScores.get(lang)!.linesCompleted++;
         }
       }
 
@@ -318,39 +313,33 @@ export const getUserRank = query({
         .filter((q) => q.eq(q.field("learned"), true))
         .collect();
 
-      // Get songs to determine languages — allSettled for resilience
+      // Batch-fetch songs with deduplication + error resilience
+      const uniqueSongIdsUser = [...new Set(lineProgress.map((l) => l.songId))];
       const songSettledUser = await Promise.allSettled(
-        lineProgress.map(async (line) => {
-          return await ctx.db.get(line.songId);
-        })
+        uniqueSongIdsUser.map((id) => ctx.db.get(id))
       );
-      const songs = songSettledUser.map(r =>
-        r.status === 'fulfilled' ? r.value : null
+      const songMapUser = new Map(
+        uniqueSongIdsUser.map((id, i) => [
+          id,
+          songSettledUser[i].status === 'fulfilled' ? songSettledUser[i].value : null,
+        ])
       );
 
       // Calculate weighted scores by language
       const languageScores = new Map<string, { wordsLearned: number, linesCompleted: number }>();
+      languageScores.set("mixed", { wordsLearned: wordProgress.length, linesCompleted: 0 });
 
-      // Count words learned
-      const defaultLanguage = "mixed";
-      if (!languageScores.has(defaultLanguage)) {
-        languageScores.set(defaultLanguage, { wordsLearned: 0, linesCompleted: 0 });
-      }
-      languageScores.get(defaultLanguage)!.wordsLearned = wordProgress.length;
-
-      // Count lines completed by language
-      for (let i = 0; i < lineProgress.length; i++) {
-        const song = songs[i];
-        if (song) {
-          const language = song.sourceLanguage;
-          if (!languageScores.has(language)) {
-            languageScores.set(language, { wordsLearned: 0, linesCompleted: 0 });
+      for (const line of lineProgress) {
+        const song = songMapUser.get(line.songId);
+        if (song?.sourceLanguage) {
+          const lang = song.sourceLanguage;
+          if (!languageScores.has(lang)) {
+            languageScores.set(lang, { wordsLearned: 0, linesCompleted: 0 });
           }
-          languageScores.get(language)!.linesCompleted++;
+          languageScores.get(lang)!.linesCompleted++;
         }
       }
 
-      // Calculate total weighted score
       let userScore = 0;
       for (const [language, scores] of languageScores.entries()) {
         const multiplier = getLanguageMultiplier(language);
@@ -380,30 +369,28 @@ export const getUserRank = query({
           .filter((q) => q.eq(q.field("learned"), true))
           .collect();
 
+        const otherUniqueSongIds = [...new Set(otherLineProgress.map((l) => l.songId))];
         const otherSongSettled = await Promise.allSettled(
-          otherLineProgress.map(async (line) => {
-            return await ctx.db.get(line.songId);
-          })
+          otherUniqueSongIds.map((id) => ctx.db.get(id))
         );
-        const otherSongs = otherSongSettled.map(r =>
-          r.status === 'fulfilled' ? r.value : null
+        const otherSongMap = new Map(
+          otherUniqueSongIds.map((id, i) => [
+            id,
+            otherSongSettled[i].status === 'fulfilled' ? otherSongSettled[i].value : null,
+          ])
         );
 
         const otherLanguageScores = new Map<string, { wordsLearned: number, linesCompleted: number }>();
-        
-        if (!otherLanguageScores.has(defaultLanguage)) {
-          otherLanguageScores.set(defaultLanguage, { wordsLearned: 0, linesCompleted: 0 });
-        }
-        otherLanguageScores.get(defaultLanguage)!.wordsLearned = otherWordProgress.length;
+        otherLanguageScores.set("mixed", { wordsLearned: otherWordProgress.length, linesCompleted: 0 });
 
-        for (let i = 0; i < otherLineProgress.length; i++) {
-          const song = otherSongs[i];
-          if (song) {
-            const language = song.sourceLanguage;
-            if (!otherLanguageScores.has(language)) {
-              otherLanguageScores.set(language, { wordsLearned: 0, linesCompleted: 0 });
+        for (const line of otherLineProgress) {
+          const song = otherSongMap.get(line.songId);
+          if (song?.sourceLanguage) {
+            const lang = song.sourceLanguage;
+            if (!otherLanguageScores.has(lang)) {
+              otherLanguageScores.set(lang, { wordsLearned: 0, linesCompleted: 0 });
             }
-            otherLanguageScores.get(language)!.linesCompleted++;
+            otherLanguageScores.get(lang)!.linesCompleted++;
           }
         }
 

@@ -54,8 +54,7 @@
       "WebSearch"
     ],
     "deny": [
-      "Bash(rm -rf:*)",
-      "Bash(git push:*)"
+      "Bash(rm -rf:*)"
     ]
   },
   "enableAllProjectMcpServers": true
