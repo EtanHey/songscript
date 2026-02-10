@@ -128,18 +128,21 @@ def check_existing_captions(url: str, language: str = "fa") -> Optional[str]:
         else:
             return None
 
-        # Try to get transcript
-        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        # Try to get transcript (v1.x API)
+        ytt_api = YouTubeTranscriptApi()
+        lang_codes = [language]
+        lang_map = {"fa": ["fa", "fa-IR"], "ko": ["ko", "ko-KR"], "ar": ["ar", "ar-SA"],
+                     "he": ["he", "iw"]}
+        if language in lang_map:
+            lang_codes = lang_map[language]
 
-        # Try target language first, then any available
-        for lang_code in [language, "en"]:
+        try:
+            return ytt_api.fetch(video_id, languages=lang_codes)
+        except Exception:
             try:
-                transcript = transcript_list.find_transcript([lang_code])
-                return transcript.fetch()
-            except:
-                continue
-
-        return None
+                return ytt_api.fetch(video_id, languages=["en"])
+            except Exception:
+                return None
     except ImportError:
         print("youtube-transcript-api not installed, skipping caption check")
         return None

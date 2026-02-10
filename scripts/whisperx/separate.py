@@ -5,6 +5,7 @@ Isolates vocals from music for better transcription accuracy.
 """
 
 import os
+import sys
 import subprocess
 from pathlib import Path
 from typing import Optional
@@ -33,6 +34,12 @@ def separate_vocals(
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
+    # Check if vocals already separated (cache)
+    final_path = output_path / f"{audio_path.stem}_vocals.wav"
+    if final_path.exists() and final_path.stat().st_size > 0:
+        print(f"Vocals already separated: {final_path}")
+        return str(final_path)
+
     # Determine device
     if device == "auto":
         try:
@@ -45,7 +52,7 @@ def separate_vocals(
 
     # Run Demucs
     cmd = [
-        "python3", "-m", "demucs",
+        sys.executable, "-m", "demucs",
         "--two-stems", "vocals",  # Only separate vocals vs other
         "-n", model,
         "-d", device,

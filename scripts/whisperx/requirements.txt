@@ -26,6 +26,13 @@ sentencepiece>=0.2.0
 # Language detection
 fast-langdetect>=1.0.0
 
+# LLM transliteration
+anthropic>=0.40.0
+
+# Reference lyrics fetching
+lyricsgenius>=3.0.0
+youtube-transcript-api>=1.0.0
+
 # Utilities
 python-dotenv>=1.0.0
 pydub>=0.25.0

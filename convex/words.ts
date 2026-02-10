@@ -16,6 +16,45 @@ export const getByLine = query({
   },
 });
 
+// Create a single word
+export const create = mutation({
+  args: {
+    songId: v.id("songs"),
+    lineNumber: v.number(),
+    wordIndex: v.number(),
+    persian: v.string(),
+    transliteration: v.string(),
+    hebrew: v.string(),
+    english: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("words", args);
+  },
+});
+
+// Batch create words for a song
+export const createMany = mutation({
+  args: {
+    songId: v.id("songs"),
+    words: v.array(
+      v.object({
+        lineNumber: v.number(),
+        wordIndex: v.number(),
+        persian: v.string(),
+        transliteration: v.string(),
+        hebrew: v.string(),
+        english: v.string(),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    for (const word of args.words) {
+      await ctx.db.insert("words", { songId: args.songId, ...word });
+    }
+    return { inserted: args.words.length };
+  },
+});
+
 // Get all words for a song
 export const getBySong = query({
   args: { songId: v.id("songs") },

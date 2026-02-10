@@ -30,6 +30,34 @@ export const create = mutation({
   },
 });
 
+// Delete a song and all its lyrics/words
+export const deleteSong = mutation({
+  args: { songId: v.id("songs") },
+  handler: async (ctx, args) => {
+    // Delete all lyrics for this song
+    const lyrics = await ctx.db
+      .query("lyrics")
+      .withIndex("by_song", (q) => q.eq("songId", args.songId))
+      .collect();
+    for (const lyric of lyrics) {
+      await ctx.db.delete(lyric._id);
+    }
+
+    // Delete all words for this song
+    const words = await ctx.db
+      .query("words")
+      .withIndex("by_song_line", (q) => q.eq("songId", args.songId))
+      .collect();
+    for (const word of words) {
+      await ctx.db.delete(word._id);
+    }
+
+    // Delete the song itself
+    await ctx.db.delete(args.songId);
+    return { deleted: true, lyrics: lyrics.length, words: words.length };
+  },
+});
+
 // Lock timestamps to prevent AI from modifying them without explicit unlock
 export const lockTimestamps = mutation({
   args: { songId: v.id("songs") },

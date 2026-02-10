@@ -5,10 +5,29 @@ Uses faster-whisper backend for speed and wav2vec2.0 for alignment.
 """
 
 import os
+import ssl
 import json
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 import argparse
+
+# Fix SSL certificates for macOS Python 3.13 (alignment model download)
+if not os.environ.get("SSL_CERT_FILE"):
+    try:
+        import certifi
+        os.environ["SSL_CERT_FILE"] = certifi.where()
+    except ImportError:
+        pass
+
+# Fix PyTorch 2.6+ compatibility with pyannote/omegaconf
+# pyannote checkpoints use omegaconf which isn't in torch's safe globals
+# Force weights_only=False because lightning_fabric explicitly passes True
+import torch
+_original_torch_load = torch.load
+def _patched_torch_load(*args, **kwargs):
+    kwargs['weights_only'] = False
+    return _original_torch_load(*args, **kwargs)
+torch.load = _patched_torch_load
 
 
 def transcribe_audio(
@@ -46,12 +65,21 @@ def transcribe_audio(
 
     print(f"Loading WhisperX model ({model_size}) on {device}...")
 
-    # Load model
+    # Load model with tuned options for songs
     model = whisperx.load_model(
         model_size,
         device,
         compute_type=compute_type,
-        language=language
+        language=language,
+        asr_options={
+            "beam_size": 8,
+            "suppress_numerals": True,
+            "condition_on_previous_text": False,
+        },
+        vad_options={
+            "vad_onset": 0.3,
+            "vad_offset": 0.3,
+        }
     )
 
     # Load audio
