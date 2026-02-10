@@ -6,7 +6,6 @@ import { ErrorBoundary } from "react-error-boundary";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import LocalVideoPlayer, { LocalVideoPlayerHandle } from "../components/LocalVideoPlayer";
-import YouTubePlayer, { YouTubePlayerHandle } from "../components/YouTubePlayer";
 import LyricsDisplay, { LanguageFilter, LyricLine } from "../components/LyricsDisplay";
 import WordInfoModal, { ModalLyricLine } from "../components/WordInfoModal";
 import { useConvexMutation } from "@convex-dev/react-query";
@@ -766,23 +765,22 @@ function SongPageContent({ songId }: SongPageContentProps) {
                     autoplay={preferencesApplied && playbackMode === "fluid"}
                     showMuteButton={true}
                   />
-                ) : song.youtubeId ? (
-                  <YouTubePlayer
-                    ref={playerRef as React.Ref<YouTubePlayerHandle>}
-                    videoId={song.youtubeId}
-                    onTimeUpdate={handleTimeUpdate}
-                    onStateChange={(state: number) => {
-                      // YouTube states: 1=playing, 2=paused, 0=ended
-                      const mapped = state === 1 ? 'playing' : state === 0 ? 'ended' : 'paused';
-                      handleVideoStateChange(mapped);
-                    }}
-                  />
                 ) : (
                   <div className="flex aspect-video w-full items-center justify-center rounded-lg bg-gray-800 text-gray-400">
                     <div className="text-center p-4">
                       <Video className="h-12 w-12 mx-auto mb-2 opacity-50" />
                       <p className="font-semibold">Video not available</p>
-                      <p className="text-sm mt-1">{videoError || 'No video source found'}</p>
+                      <p className="text-sm mt-1">{videoError || 'Local video file not found'}</p>
+                      {song.youtubeId && (
+                        <a
+                          href={`https://www.youtube.com/watch?v=${song.youtubeId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-primary hover:underline mt-2 inline-block"
+                        >
+                          Watch on YouTube →
+                        </a>
+                      )}
                     </div>
                   </div>
                 )}

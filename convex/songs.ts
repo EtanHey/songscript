@@ -58,6 +58,15 @@ export const deleteSong = mutation({
   },
 });
 
+// Set the video URL for a song
+export const setVideoUrl = mutation({
+  args: { songId: v.id("songs"), videoUrl: v.string() },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.songId, { videoUrl: args.videoUrl });
+    return { success: true };
+  },
+});
+
 // Lock timestamps to prevent AI from modifying them without explicit unlock
 export const lockTimestamps = mutation({
   args: { songId: v.id("songs") },
