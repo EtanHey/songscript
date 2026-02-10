@@ -4,6 +4,7 @@ import { useRef, useEffect } from "react";
 import { Info, Check } from "lucide-react";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
+import { isRTLLanguage } from "./LanguageFlag";
 
 export interface LyricLine {
   _id: Id<"lyrics">;
@@ -21,6 +22,7 @@ export type LanguageFilter = "all" | "persian" | "transliteration" | "hebrew" | 
 
 interface LyricsDisplayProps {
   songId: Id<"songs">;
+  sourceLanguage?: string;
   onLineClick?: (startTime: number, lineIndex: number) => void;
   onLineInfoClick?: (line: LyricLine, lineIndex: number) => void;
   onLineCheckboxClick?: (lineNumber: number) => void;
@@ -38,6 +40,7 @@ interface LyricsDisplayProps {
 
 export default function LyricsDisplay({
   songId,
+  sourceLanguage,
   onLineClick,
   onLineInfoClick,
   onLineCheckboxClick,
@@ -46,6 +49,7 @@ export default function LyricsDisplay({
   languageFilter = "all",
   lineProgress = [],
 }: LyricsDisplayProps) {
+  const isOriginalRTL = isRTLLanguage(sourceLanguage || "persian");
   const { data: lyrics } = useSuspenseQuery(
     convexQuery(api.lyrics.getBySong, { songId })
   );
@@ -135,11 +139,11 @@ export default function LyricsDisplay({
             onClick={() => onLineClick?.(line.startTime, index)}
             className="flex flex-1 flex-col gap-1 text-left hover:opacity-80 transition-opacity"
           >
-            {/* Persian text - RTL, larger font */}
+            {/* Original text - direction based on source language */}
             {(languageFilter === "all" || languageFilter === "persian") && (
               <p
-                dir="rtl"
-                className="text-right text-xl font-medium leading-relaxed"
+                dir={isOriginalRTL ? "rtl" : "ltr"}
+                className={`${isOriginalRTL ? "text-right" : "text-left"} text-xl font-medium leading-relaxed`}
               >
                 {line.original}
               </p>

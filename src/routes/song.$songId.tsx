@@ -21,6 +21,8 @@ import {
 import { Repeat, Languages, Video, Play, Square, Waves, Pause, ChevronDown, ChevronUp } from "lucide-react";
 import { WishlistButton } from "../components/WishlistButton";
 import { AnonymousProgressBanner } from "../components/AnonymousProgressBanner";
+import { getLanguageDisplayName } from "../components/dashboard/LanguageChip";
+import { isRTLLanguage } from "../components/LanguageFlag";
 
 // Playback modes - ALL modes use video as audio source
 type PlaybackMode = "single" | "loop" | "fluid";
@@ -797,7 +799,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
                       {currentLineIndex !== undefined ? `Line ${currentLineIndex + 1}` : 'Select a line'}
                     </span>
                     {currentLineIndex !== undefined && sortedLyrics[currentLineIndex] && (
-                      <span className="text-xs text-gray-400 truncate flex-1" dir="rtl">
+                      <span className="text-xs text-gray-400 truncate flex-1" dir={isRTLLanguage(song.sourceLanguage) ? "rtl" : "ltr"}>
                         {sortedLyrics[currentLineIndex].original}
                       </span>
                     )}
@@ -886,7 +888,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
                       </SelectTrigger>
                       <SelectContent className="border-gray-700 bg-gray-900">
                         <SelectItem value="all">All Languages</SelectItem>
-                        <SelectItem value="persian">Persian Only</SelectItem>
+                        <SelectItem value="persian">{getLanguageDisplayName(song.sourceLanguage)} Only</SelectItem>
                         <SelectItem value="transliteration">Transliteration</SelectItem>
                         <SelectItem value="hebrew">Hebrew Only</SelectItem>
                         <SelectItem value="english">English Only</SelectItem>
@@ -904,6 +906,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
         <AnonymousProgressBanner />
         <LyricsDisplay
           songId={songId}
+          sourceLanguage={song.sourceLanguage}
           onLineClick={handleLineClick}
           onLineInfoClick={handleLineInfoClick}
           onLineCheckboxClick={handleLineCheckboxClick}
@@ -920,6 +923,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
         onClose={handleWordModalClose}
         line={selectedLine}
         songId={songId}
+        sourceLanguage={song.sourceLanguage}
         isMobile={isMobile}
         lineAudioUrl={selectedLine?.audioSnippetUrl}
         onToggleLearned={handleToggleWordLearned}

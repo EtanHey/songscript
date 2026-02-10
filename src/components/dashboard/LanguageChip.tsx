@@ -23,6 +23,8 @@ export function getLanguageDisplayName(lang: string): string {
     korean: "Korean",
     ar: "Arabic",
     arabic: "Arabic",
+    es: "Spanish",
+    spanish: "Spanish",
     he: "Hebrew",
     hebrew: "Hebrew",
     ja: "Japanese",

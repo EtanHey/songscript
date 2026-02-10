@@ -6,6 +6,8 @@ import { Id, Doc } from "@convex/_generated/dataModel";
 import { playWordAudio, stopWordAudio } from "../utils/wordAudio";
 import { useAudioPreloader } from "../hooks/useAudioPreloader";
 import { useProgress } from "../hooks/useProgress";
+import { getLanguageDisplayName } from "./dashboard/LanguageChip";
+import { isRTLLanguage } from "./LanguageFlag";
 import {
   Dialog,
   DialogContent,
@@ -43,6 +45,7 @@ interface WordInfoModalProps {
   onClose: () => void;
   line: ModalLyricLine | null;
   songId: Id<"songs">;
+  sourceLanguage?: string;
   isMobile: boolean;
   lineAudioUrl?: string; // Audio URL for the specific line
   onToggleLearned?: (wordId: Id<"words">, persian: string) => void;
@@ -56,6 +59,8 @@ function WordTable({
   onToggleLearned,
   playingWord,
   loadingWord,
+  languageLabel,
+  isOriginalRTL,
 }: {
   words: WordData[];
   wordProgress: Map<string, WordProgressData>; // Keyed by persian text for sync
@@ -63,6 +68,8 @@ function WordTable({
   onToggleLearned: (wordId: Id<"words">, persian: string) => void;
   playingWord: string | null;
   loadingWord: string | null;
+  languageLabel: string;
+  isOriginalRTL: boolean;
 }) {
   return (
     <div className="overflow-x-auto">
@@ -70,7 +77,7 @@ function WordTable({
         <thead>
           <tr className="border-b border-gray-700 text-left text-sm text-gray-400">
             <th className="pb-2 pr-2 font-medium">✓</th>
-            <th className="pb-2 pr-4 font-medium">Persian</th>
+            <th className="pb-2 pr-4 font-medium">{languageLabel}</th>
             <th className="pb-2 pr-4 font-medium">Sound</th>
             <th className="pb-2 pr-4 font-medium">Hebrew</th>
             <th className="pb-2 pr-4 font-medium">English</th>
@@ -105,8 +112,8 @@ function WordTable({
                     }`}
                   />
                 </td>
-                {/* Persian - RTL */}
-                <td className="py-2 pr-4" dir="rtl">
+                {/* Original word */}
+                <td className="py-2 pr-4" dir={isOriginalRTL ? "rtl" : "ltr"}>
                   <span
                     className={`text-base font-medium ${
                       isLearned ? "text-green-400" : ""
@@ -184,6 +191,7 @@ function MobileWordCards({
   onToggleLearned,
   playingWord,
   loadingWord,
+  isOriginalRTL,
 }: {
   words: WordData[];
   wordProgress: Map<string, WordProgressData>; // Keyed by persian text for sync
@@ -191,6 +199,7 @@ function MobileWordCards({
   onToggleLearned: (wordId: Id<"words">, persian: string) => void;
   playingWord: string | null;
   loadingWord: string | null;
+  isOriginalRTL: boolean;
 }) {
   return (
     <div className="flex flex-col gap-3">
@@ -212,10 +221,10 @@ function MobileWordCards({
                   : "border-gray-700 bg-gray-800/50"
             }`}
           >
-            {/* Top row: Persian word + checkbox + audio */}
+            {/* Top row: Original word + checkbox + audio */}
             <div className="flex items-center justify-between gap-3">
-              {/* Persian word - prominent */}
-              <div className="flex-1" dir="rtl">
+              {/* Original word - prominent */}
+              <div className="flex-1" dir={isOriginalRTL ? "rtl" : "ltr"}>
                 <span
                   className={`text-2xl font-medium ${
                     isLearned
@@ -298,10 +307,13 @@ export default function WordInfoModal({
   onClose,
   line,
   songId,
+  sourceLanguage,
   isMobile,
   lineAudioUrl,
   onToggleLearned,
 }: WordInfoModalProps) {
+  const languageLabel = getLanguageDisplayName(sourceLanguage || "persian");
+  const isOriginalRTL = isRTLLanguage(sourceLanguage || "persian");
   // Get auth state and anonymous progress functions from unified hook
   const progress = useProgress();
   const isAuthenticated = progress.isAuthenticated;
@@ -483,6 +495,30 @@ export default function WordInfoModal({
       if (onToggleLearned) {
         // Use the provided callback from parent (for practice tracking)
         onToggleLearned(wordId, persian);
+        // Also do optimistic local state update so UI responds immediately
+        setWordProgressMap((prev) => {
+          const newMap = new Map(prev);
+          const existing = newMap.get(persian);
+          const currentLearned = existing?.learned ?? false;
+          const newLearned = !currentLearned;
+          if (existing) {
+            newMap.set(persian, { ...existing, learned: newLearned });
+          } else {
+            newMap.set(persian, {
+              _id: `optimistic-${persian}` as Id<"wordProgress">,
+              _creationTime: Date.now(),
+              visitorId: "optimistic",
+              userId: "optimistic",
+              wordId,
+              persian,
+              viewCount: 0,
+              playCount: 0,
+              learned: newLearned,
+              lastSeen: Date.now(),
+            });
+          }
+          return newMap;
+        });
       } else if (isAuthenticated) {
         // Fallback for authenticated users - use Convex directly
         const newLearned = await toggleLearned({ wordId, persian });
@@ -555,7 +591,7 @@ export default function WordInfoModal({
     <>
       {/* Full line display */}
       <div className="rounded-lg bg-gray-800 p-4">
-        <p dir="rtl" className="text-right text-xl font-medium leading-relaxed">
+        <p dir={isOriginalRTL ? "rtl" : "ltr"} className={`${isOriginalRTL ? "text-right" : "text-left"} text-xl font-medium leading-relaxed`}>
           {line.original}
         </p>
         <p className="mt-2 text-base italic text-emerald-500">
@@ -702,6 +738,8 @@ export default function WordInfoModal({
             onToggleLearned={handleToggleLearned}
             playingWord={playingWord}
             loadingWord={loadingWord}
+            languageLabel={languageLabel}
+            isOriginalRTL={isOriginalRTL}
           />
         ) : (
           <p className="py-8 text-center text-sm text-gray-500">
@@ -737,7 +775,7 @@ export default function WordInfoModal({
 
           {/* Compact line display for mobile */}
           <div className="flex-shrink-0 rounded-lg bg-gray-800 p-3">
-            <p dir="rtl" className="text-right text-lg font-medium leading-relaxed">
+            <p dir={isOriginalRTL ? "rtl" : "ltr"} className={`${isOriginalRTL ? "text-right" : "text-left"} text-lg font-medium leading-relaxed`}>
               {line.original}
             </p>
             <p className="mt-1 text-sm italic text-emerald-500">
@@ -879,6 +917,7 @@ export default function WordInfoModal({
                 onToggleLearned={handleToggleLearned}
                 playingWord={playingWord}
                 loadingWord={loadingWord}
+                isOriginalRTL={isOriginalRTL}
               />
             ) : (
               <p className="py-8 text-center text-sm text-gray-500">

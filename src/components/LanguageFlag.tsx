@@ -22,6 +22,9 @@ function getLanguageFlagEmoji(language: string): string {
     case "ar":
     case "arabic":
       return "🇸🇦";
+    case "es":
+    case "spanish":
+      return "🇪🇸";
     case "he":
     case "hebrew":
       return "🇮🇱";
@@ -74,6 +77,16 @@ export function getLanguageFlagString(language: string): string {
     return "🦁";
   }
   return getLanguageFlagEmoji(language);
+}
+
+/**
+ * Check if a language uses RTL text direction
+ */
+export function isRTLLanguage(language: string): boolean {
+  const l = language.toLowerCase();
+  return l === "fa" || l === "persian" || l === "farsi" ||
+    l === "ar" || l === "arabic" ||
+    l === "he" || l === "hebrew";
 }
 
 export default LanguageFlag;
