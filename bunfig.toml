@@ -1,0 +1,4 @@
+[test]
+# Prevent `bun test` from scanning e2e/ directory (Playwright spec files crash Bun's runner).
+# The project uses `bun run test` (vitest) for unit tests and `npx playwright test` for e2e.
+root = "src"
