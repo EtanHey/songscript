@@ -49,6 +49,8 @@ export function useAudioPreloader(
     setState({ loaded: 0, total, ready: false })
     audioMapRef.current.clear()
 
+    const endedHandlers = new Map<number, () => void>()
+
     snippets.forEach(({ lineNumber, audioUrl }) => {
       if (!audioUrl) return
 
@@ -92,17 +94,20 @@ export function useAudioPreloader(
       audio.addEventListener('canplay', handleCanPlay, { once: true }) // Fallback for cached audio
       audio.addEventListener('error', handleError, { once: true })
       audio.addEventListener('ended', handleEnded)
+      endedHandlers.set(lineNumber, handleEnded)
       audio.src = audioUrl
       audio.load() // Explicitly trigger loading
     })
 
     return () => {
       // Cleanup all audio elements on unmount
-      audioMapRef.current.forEach(audio => {
+      audioMapRef.current.forEach((audio, lineNumber) => {
         audio.pause()
-        audio.removeEventListener('ended', () => {})
+        const handler = endedHandlers.get(lineNumber)
+        if (handler) audio.removeEventListener('ended', handler)
         audio.src = ''
       })
+      endedHandlers.clear()
       audioMapRef.current.clear()
       currentlyPlayingRef.current = null
     }
