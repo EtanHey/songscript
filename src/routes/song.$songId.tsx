@@ -702,7 +702,12 @@ function SongPageContent({ songId }: SongPageContentProps) {
                 role="button"
                 tabIndex={0}
                 onClick={handleVideoCollapsedToggle}
-                onKeyDown={(e) => e.key === 'Enter' && handleVideoCollapsedToggle()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleVideoCollapsedToggle();
+                  }
+                }}
                 className="w-full flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700 hover:bg-gray-700/50 transition-colors cursor-pointer"
               >
                 <div className="flex items-center gap-3 min-w-0 flex-1">
