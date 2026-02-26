@@ -15,11 +15,13 @@ function WelcomePage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const setDisplayNameMutation = useConvexMutation(api.leaderboard.setDisplayName);
+  const setDisplayNameMutation = useConvexMutation(
+    api.leaderboard.setDisplayName,
+  );
 
   // Check if user already has a display name
   const { data: userInfo } = useQuery(
-    convexQuery(api.leaderboard.getUserInfo, {})
+    convexQuery(api.leaderboard.getUserInfo, {}),
   );
 
   // If user already has displayName, redirect to dashboard
@@ -95,7 +97,7 @@ function WelcomePage() {
               maxLength={20}
             />
             <p className="text-xs text-gray-500 mt-1">
-              3-20 characters, letters and spaces only
+              3-20 characters, letters, numbers, and spaces
             </p>
           </div>
 
