@@ -3,39 +3,86 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "../../../convex/_generated/api";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "../ui/card";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import { Button } from "../ui/button";
 
 type LeaderboardType = "streak" | "progress";
+
+type StreakEntry = {
+  rank: number;
+  displayName: string;
+  streak: number;
+  language: string;
+};
+
+type ProgressEntry = {
+  rank: number;
+  displayName: string;
+  score: number;
+  topLanguage: string;
+};
+
+function MiniRow({
+  rank,
+  displayName,
+  scoreText,
+  medal,
+  isCurrentUser,
+}: {
+  rank: number;
+  displayName: string;
+  scoreText: string;
+  medal: string | null;
+  isCurrentUser: boolean;
+}) {
+  return (
+    <div
+      className={`flex items-center justify-between p-2 rounded-lg ${
+        isCurrentUser ? "bg-primary/10 border border-primary/20" : "bg-muted/30"
+      }`}
+    >
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-medium w-6">{medal || `#${rank}`}</span>
+        <span className="text-sm font-medium">{displayName}</span>
+      </div>
+      <div className="text-sm text-muted-foreground">{scoreText}</div>
+    </div>
+  );
+}
 
 export function LeaderboardMiniSection() {
   const [selectedType, setSelectedType] = useState<LeaderboardType>("streak");
 
   // Get top 5 users for streak leaderboard
   const { data: streakData = [] } = useQuery(
-    convexQuery(api.leaderboard.getStreakLeaderboard, { limit: 5 })
+    convexQuery(api.leaderboard.getStreakLeaderboard, { limit: 5 }),
   );
 
   // Get top 5 users for progress leaderboard
   const { data: progressData = [] } = useQuery(
-    convexQuery(api.leaderboard.getProgressLeaderboard, { limit: 5 })
+    convexQuery(api.leaderboard.getProgressLeaderboard, { limit: 5 }),
   );
 
   // Get current user's rank
   const { data: userRank } = useQuery(
     convexQuery(api.leaderboard.getUserRank, {
       type: selectedType,
-    })
+    }),
   );
 
   // Get user info to check display name
   const { data: userInfo } = useQuery(
-    convexQuery(api.leaderboard.getUserInfo, {})
+    convexQuery(api.leaderboard.getUserInfo, {}),
   );
 
   const hasDisplayName = userInfo?.displayName !== null;
-  const leaderboardData = selectedType === "streak" ? streakData : progressData;
 
   // Medal icons for top 3
   const getMedalIcon = (rank: number) => {
@@ -58,7 +105,9 @@ export function LeaderboardMiniSection() {
         <ToggleGroup
           type="single"
           value={selectedType}
-          onValueChange={(value) => value && setSelectedType(value as LeaderboardType)}
+          onValueChange={(value) =>
+            value && setSelectedType(value as LeaderboardType)
+          }
           className="w-fit"
         >
           <ToggleGroupItem value="streak" variant="outline" size="sm">
@@ -82,53 +131,66 @@ export function LeaderboardMiniSection() {
           </div>
         ) : (
           <div className="space-y-3">
-            {leaderboardData.map((user: typeof leaderboardData[0]) => {
-              const isCurrentUser = hasDisplayName && userRank && user.rank === userRank.rank;
-              const medal = getMedalIcon(user.rank);
-              
-              return (
-                <div
-                  key={`${user.displayName}-${user.rank}`}
-                  className={`flex items-center justify-between p-2 rounded-lg ${
-                    isCurrentUser ? "bg-primary/10 border border-primary/20" : "bg-muted/30"
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium w-6">
-                      {medal || `#${user.rank}`}
-                    </span>
-                    <span className="text-sm font-medium">{user.displayName}</span>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {selectedType === "streak" 
-                      ? `${(user as any).streak || 0} days`
-                      : `${(user as any).score || 0} pts`
-                    }
-                  </div>
-                </div>
-              );
-            })}
+            {selectedType === "streak"
+              ? streakData.map((user: StreakEntry) => {
+                  const isCurrentUser =
+                    hasDisplayName && userRank && user.rank === userRank.rank;
+                  const medal = getMedalIcon(user.rank);
+                  return (
+                    <MiniRow
+                      key={`${user.displayName}-${user.rank}`}
+                      rank={user.rank}
+                      displayName={user.displayName}
+                      scoreText={`${user.streak || 0} days`}
+                      medal={medal}
+                      isCurrentUser={!!isCurrentUser}
+                    />
+                  );
+                })
+              : progressData.map((user: ProgressEntry) => {
+                  const isCurrentUser =
+                    hasDisplayName && userRank && user.rank === userRank.rank;
+                  const medal = getMedalIcon(user.rank);
+                  return (
+                    <MiniRow
+                      key={`${user.displayName}-${user.rank}`}
+                      rank={user.rank}
+                      displayName={user.displayName}
+                      scoreText={`${user.score || 0} pts`}
+                      medal={medal}
+                      isCurrentUser={!!isCurrentUser}
+                    />
+                  );
+                })}
 
             {/* Show current user's rank if not in top 5 but in top 50 */}
-            {hasDisplayName && userRank && userRank.rank > 5 && userRank.rank <= 50 && (
-              <>
-                <div className="border-t pt-2 mt-3">
-                  <div className="flex items-center justify-between p-2 rounded-lg bg-primary/10 border border-primary/20">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium w-6">#{userRank.rank}</span>
-                      <span className="text-sm font-medium">{userInfo?.displayName}</span>
-                      <span className="text-xs text-muted-foreground">(You)</span>
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {selectedType === "streak" 
-                        ? `${userRank.score} days`
-                        : `${userRank.score} pts`
-                      }
+            {hasDisplayName &&
+              userRank &&
+              userRank.rank > 5 &&
+              userRank.rank <= 50 && (
+                <>
+                  <div className="border-t pt-2 mt-3">
+                    <div className="flex items-center justify-between p-2 rounded-lg bg-primary/10 border border-primary/20">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium w-6">
+                          #{userRank.rank}
+                        </span>
+                        <span className="text-sm font-medium">
+                          {userInfo?.displayName}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          (You)
+                        </span>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {selectedType === "streak"
+                          ? `${userRank.score} days`
+                          : `${userRank.score} pts`}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </>
-            )}
+                </>
+              )}
           </div>
         )}
       </CardContent>

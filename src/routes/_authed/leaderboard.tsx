@@ -3,7 +3,12 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "../../../convex/_generated/api";
-import { Card, CardHeader, CardTitle, CardContent } from "../../components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "../../components/ui/card";
 import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
 import { Button } from "../../components/ui/button";
 import { getLanguageFlagString } from "../../components/LanguageFlag";
@@ -15,6 +20,20 @@ export const Route = createFileRoute("/_authed/leaderboard")({
 type LeaderboardType = "streak" | "progress";
 type TimePeriod = "weekly" | "monthly" | "all-time";
 
+type StreakEntry = {
+  rank: number;
+  displayName: string;
+  streak: number;
+  language: string;
+};
+
+type ProgressEntry = {
+  rank: number;
+  displayName: string;
+  score: number;
+  topLanguage: string;
+};
+
 function LeaderboardPage() {
   const [selectedType, setSelectedType] = useState<LeaderboardType>("streak");
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>("all-time");
@@ -25,19 +44,19 @@ function LeaderboardPage() {
 
   // Get leaderboard data
   const { data: streakData = [], isLoading: streakLoading } = useQuery(
-    convexQuery(api.leaderboard.getStreakLeaderboard, { 
-      limit, 
+    convexQuery(api.leaderboard.getStreakLeaderboard, {
+      limit,
       offset,
-      period: selectedPeriod 
-    })
+      period: selectedPeriod,
+    }),
   );
 
   const { data: progressData = [], isLoading: progressLoading } = useQuery(
-    convexQuery(api.leaderboard.getProgressLeaderboard, { 
-      limit, 
+    convexQuery(api.leaderboard.getProgressLeaderboard, {
+      limit,
       offset,
-      period: selectedPeriod 
-    })
+      period: selectedPeriod,
+    }),
   );
 
   // Get current user's rank
@@ -45,7 +64,7 @@ function LeaderboardPage() {
     convexQuery(api.leaderboard.getUserRank, {
       type: selectedType,
       period: selectedPeriod,
-    })
+    }),
   );
 
   const leaderboardData = selectedType === "streak" ? streakData : progressData;
@@ -54,10 +73,14 @@ function LeaderboardPage() {
   // Medal icons for top 3
   const getMedalIcon = (rank: number) => {
     switch (rank) {
-      case 1: return "🥇";
-      case 2: return "🥈";
-      case 3: return "🥉";
-      default: return null;
+      case 1:
+        return "🥇";
+      case 2:
+        return "🥈";
+      case 3:
+        return "🥉";
+      default:
+        return null;
     }
   };
 
@@ -65,6 +88,39 @@ function LeaderboardPage() {
   const isCurrentUser = (rank: number) => {
     return userRank?.rank === rank;
   };
+
+  const renderRow = (
+    rank: number,
+    displayName: string,
+    flag: string,
+    scoreText: string,
+    isUser: boolean,
+    medal: string | null,
+  ) => (
+    <div
+      key={`${displayName}-${rank}`}
+      className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
+        isUser ? "bg-primary/10 border border-primary/20" : "hover:bg-muted/50"
+      }`}
+    >
+      <div className="w-8 text-center font-mono text-sm text-muted-foreground">
+        {rank}
+      </div>
+      <div className="w-6 text-center">
+        {medal && <span className="text-lg">{medal}</span>}
+      </div>
+      <div className="flex items-center gap-3 flex-1">
+        <span className="text-lg">{flag}</span>
+        <span className="font-medium">
+          {displayName}
+          {isUser && <span className="ml-2 text-primary">⭐</span>}
+        </span>
+      </div>
+      <div className="text-right">
+        <div className="font-mono font-medium">{scoreText}</div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -80,7 +136,9 @@ function LeaderboardPage() {
         <ToggleGroup
           type="single"
           value={selectedType}
-          onValueChange={(value) => value && setSelectedType(value as LeaderboardType)}
+          onValueChange={(value) =>
+            value && setSelectedType(value as LeaderboardType)
+          }
           className="justify-start"
         >
           <ToggleGroupItem value="streak" className="px-6">
@@ -97,7 +155,9 @@ function LeaderboardPage() {
         <ToggleGroup
           type="single"
           value={selectedPeriod}
-          onValueChange={(value) => value && setSelectedPeriod(value as TimePeriod)}
+          onValueChange={(value) =>
+            value && setSelectedPeriod(value as TimePeriod)
+          }
           className="justify-start"
         >
           <ToggleGroupItem value="weekly" className="px-4">
@@ -115,17 +175,25 @@ function LeaderboardPage() {
       <Card>
         <CardHeader>
           <CardTitle>
-            {selectedType === "streak" ? "Practice Streak" : "Learning Progress"} - {
-              selectedPeriod === "all-time" ? "All Time" : 
-              selectedPeriod === "monthly" ? "This Month" : "This Week"
-            }
+            {selectedType === "streak"
+              ? "Practice Streak"
+              : "Learning Progress"}{" "}
+            -{" "}
+            {selectedPeriod === "all-time"
+              ? "All Time"
+              : selectedPeriod === "monthly"
+                ? "This Month"
+                : "This Week"}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="space-y-4">
               {Array.from({ length: 10 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-4 p-4 rounded-lg bg-muted/50 animate-pulse">
+                <div
+                  key={i}
+                  className="flex items-center gap-4 p-4 rounded-lg bg-muted/50 animate-pulse"
+                >
                   <div className="w-8 h-8 bg-muted rounded"></div>
                   <div className="w-6 h-6 bg-muted rounded"></div>
                   <div className="flex-1 h-4 bg-muted rounded"></div>
@@ -136,64 +204,35 @@ function LeaderboardPage() {
           ) : leaderboardData.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <p>No users found for this leaderboard yet.</p>
-              <p className="text-sm mt-2">Be the first to set a display name and start practicing!</p>
+              <p className="text-sm mt-2">
+                Be the first to set a display name and start practicing!
+              </p>
             </div>
           ) : (
             <div className="space-y-2">
-              {leaderboardData.map((user: typeof leaderboardData[0], index: number) => {
-                const rank = offset + index + 1;
-                const medal = getMedalIcon(rank);
-                const isUser = isCurrentUser(rank);
-                
-                return (
-                  <div
-                    key={`${user.displayName}-${rank}`}
-                    className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
-                      isUser 
-                        ? "bg-primary/10 border border-primary/20" 
-                        : "hover:bg-muted/50"
-                    }`}
-                  >
-                    {/* Rank */}
-                    <div className="w-8 text-center font-mono text-sm text-muted-foreground">
-                      {rank}
-                    </div>
-
-                    {/* Medal for top 3 */}
-                    <div className="w-6 text-center">
-                      {medal && <span className="text-lg">{medal}</span>}
-                    </div>
-
-                    {/* User info */}
-                    <div className="flex items-center gap-3 flex-1">
-                      {/* Language flag */}
-                      <span className="text-lg">
-                        {getLanguageFlagString(
-                          selectedType === "streak" 
-                            ? (user as any).language 
-                            : (user as any).topLanguage
-                        )}
-                      </span>
-                      
-                      {/* Display name with star for current user */}
-                      <span className="font-medium">
-                        {user.displayName}
-                        {isUser && <span className="ml-2 text-primary">⭐</span>}
-                      </span>
-                    </div>
-
-                    {/* Score */}
-                    <div className="text-right">
-                      <div className="font-mono font-medium">
-                        {selectedType === "streak" 
-                          ? `${(user as any).streak} days`
-                          : `${Math.round((user as any).score)} pts`
-                        }
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              {selectedType === "streak"
+                ? streakData.map((user: StreakEntry, index: number) => {
+                    const rank = offset + index + 1;
+                    return renderRow(
+                      rank,
+                      user.displayName,
+                      getLanguageFlagString(user.language),
+                      `${user.streak} days`,
+                      isCurrentUser(rank),
+                      getMedalIcon(rank),
+                    );
+                  })
+                : progressData.map((user: ProgressEntry, index: number) => {
+                    const rank = offset + index + 1;
+                    return renderRow(
+                      rank,
+                      user.displayName,
+                      getLanguageFlagString(user.topLanguage),
+                      `${Math.round(user.score)} pts`,
+                      isCurrentUser(rank),
+                      getMedalIcon(rank),
+                    );
+                  })}
             </div>
           )}
 
@@ -236,10 +275,9 @@ function LeaderboardPage() {
               </div>
               <div className="text-right">
                 <div className="font-mono font-medium">
-                  {selectedType === "streak" 
+                  {selectedType === "streak"
                     ? `${userRank.score} days`
-                    : `${Math.round(userRank.score)} pts`
-                  }
+                    : `${Math.round(userRank.score)} pts`}
                 </div>
               </div>
             </div>
