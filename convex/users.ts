@@ -3,17 +3,6 @@ import { v } from "convex/values";
 import { authComponent } from "./betterAuth";
 
 /**
- * Debug: Get raw Better Auth user info
- */
-export const debugAuthUser = query({
-  args: {},
-  handler: async (ctx) => {
-    const authUser = await authComponent.safeGetAuthUser(ctx);
-    return authUser;
-  },
-});
-
-/**
  * Check if an email is already registered in the app.
  * Used by signup page to prevent duplicate accounts.
  * Returns true if email exists, false otherwise.
@@ -46,8 +35,6 @@ export const ensureAppUser = mutation({
       throw new Error("Authentication required");
     }
 
-    console.log("ensureAppUser: authUser =", JSON.stringify(authUser));
-
     // 1. Check if app user record already exists by authId
     const existingByAuthId = await ctx.db
       .query("users")
@@ -55,7 +42,6 @@ export const ensureAppUser = mutation({
       .first();
 
     if (existingByAuthId) {
-      console.log("Found user by authId:", existingByAuthId._id);
       // Sync displayName from Better Auth if app user doesn't have one
       if (!existingByAuthId.displayName && authUser.displayUsername) {
         await ctx.db.patch(existingByAuthId._id, {
@@ -72,7 +58,6 @@ export const ensureAppUser = mutation({
       .first();
 
     if (existingByEmail) {
-      console.log("Found user by email, backfilling authId:", existingByEmail._id);
       // Backfill the authId and sync displayName if missing
       const patchData: { authId: string; displayName?: string } = {
         authId: authUser._id,
@@ -85,7 +70,6 @@ export const ensureAppUser = mutation({
     }
 
     // 3. Create new app user record with displayName from Better Auth
-    console.log("Creating new app user with email:", authUser.email, "authId:", authUser._id);
     const userId = await ctx.db.insert("users", {
       email: authUser.email,
       authId: authUser._id,
