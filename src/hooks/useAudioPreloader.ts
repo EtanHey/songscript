@@ -1,175 +1,195 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useRef, useCallback } from "react";
 
 interface AudioSnippet {
-  lineNumber: number
-  audioUrl: string
+  lineNumber: number;
+  audioUrl: string;
 }
 
 interface PreloadState {
-  loaded: number
-  total: number
-  ready: boolean
+  loaded: number;
+  total: number;
+  ready: boolean;
 }
 
 interface UseAudioPreloaderReturn extends PreloadState {
-  play: (lineNumber: number) => void
-  stop: () => void
-  pause: () => void
-  resume: () => void
-  isPlaying: boolean
-  setPlaybackRate: (rate: number) => void
-  setLoop: (loop: boolean) => void
+  play: (lineNumber: number) => void;
+  stop: () => void;
+  pause: () => void;
+  resume: () => void;
+  isPlaying: boolean;
+  setPlaybackRate: (rate: number) => void;
+  setLoop: (loop: boolean) => void;
 }
 
 export function useAudioPreloader(
   snippets: AudioSnippet[],
-  onEnded?: (lineNumber: number) => void
+  onEnded?: (lineNumber: number) => void,
 ): UseAudioPreloaderReturn {
   const [state, setState] = useState<PreloadState>({
     loaded: 0,
     total: snippets.length,
     ready: false,
-  })
-  const [isPlaying, setIsPlaying] = useState(false)
-  const audioMapRef = useRef<Map<number, HTMLAudioElement>>(new Map())
-  const currentlyPlayingRef = useRef<HTMLAudioElement | null>(null)
-  const playbackRateRef = useRef<number>(1)
-  const loopRef = useRef<boolean>(false)
+  });
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioMapRef = useRef<Map<number, HTMLAudioElement>>(new Map());
+  const currentlyPlayingRef = useRef<HTMLAudioElement | null>(null);
+  const playbackRateRef = useRef<number>(1);
+  const loopRef = useRef<boolean>(false);
+  const onEndedRef = useRef(onEnded);
+  const endedHandlersRef = useRef<Map<HTMLAudioElement, () => void>>(new Map());
+
+  // Keep onEnded ref fresh to avoid stale closures
+  onEndedRef.current = onEnded;
 
   useEffect(() => {
     if (snippets.length === 0) {
-      setState({ loaded: 0, total: 0, ready: true })
-      return
+      setState({ loaded: 0, total: 0, ready: true });
+      return;
     }
 
-    let loadedCount = 0
-    const total = snippets.length
+    let loadedCount = 0;
+    const total = snippets.length;
 
     // Reset state for new snippets
-    setState({ loaded: 0, total, ready: false })
-    audioMapRef.current.clear()
+    setState({ loaded: 0, total, ready: false });
+    audioMapRef.current.clear();
+    endedHandlersRef.current.clear();
 
     snippets.forEach(({ lineNumber, audioUrl }) => {
-      if (!audioUrl) return
+      if (!audioUrl) return;
 
-      const audio = new Audio()
-      audio.preload = 'auto'
-      let handled = false // Prevent double counting from canplay + canplaythrough
+      const audio = new Audio();
+      audio.preload = "auto";
+      let handled = false; // Prevent double counting from canplay + canplaythrough
 
       const handleCanPlay = () => {
-        if (handled) return
-        handled = true
-        loadedCount++
-        audioMapRef.current.set(lineNumber, audio)
+        if (handled) return;
+        handled = true;
+        loadedCount++;
+        audioMapRef.current.set(lineNumber, audio);
         setState({
           loaded: loadedCount,
           total,
           ready: loadedCount === total,
-        })
-      }
+        });
+      };
 
       const handleError = () => {
-        if (handled) return
-        handled = true
+        if (handled) return;
+        handled = true;
         // Still increment loaded count to not block ready state
-        loadedCount++
-        console.warn(`Failed to load audio for line ${lineNumber}: ${audioUrl}`)
+        loadedCount++;
+        console.warn(
+          `Failed to load audio for line ${lineNumber}: ${audioUrl}`,
+        );
         setState({
           loaded: loadedCount,
           total,
           ready: loadedCount === total,
-        })
-      }
+        });
+      };
 
       const handleEnded = () => {
-        setIsPlaying(false)
-        if (onEnded) {
-          onEnded(lineNumber)
-        }
-      }
+        setIsPlaying(false);
+        onEndedRef.current?.(lineNumber);
+      };
 
-      audio.addEventListener('canplaythrough', handleCanPlay, { once: true })
-      audio.addEventListener('canplay', handleCanPlay, { once: true }) // Fallback for cached audio
-      audio.addEventListener('error', handleError, { once: true })
-      audio.addEventListener('ended', handleEnded)
-      audio.src = audioUrl
-      audio.load() // Explicitly trigger loading
-    })
+      audio.addEventListener("canplaythrough", handleCanPlay, { once: true });
+      audio.addEventListener("canplay", handleCanPlay, { once: true }); // Fallback for cached audio
+      audio.addEventListener("error", handleError, { once: true });
+      audio.addEventListener("ended", handleEnded);
+      endedHandlersRef.current.set(audio, handleEnded);
+      audio.src = audioUrl;
+      audio.load(); // Explicitly trigger loading
+    });
 
     return () => {
       // Cleanup all audio elements on unmount
-      audioMapRef.current.forEach(audio => {
-        audio.pause()
-        audio.removeEventListener('ended', () => {})
-        audio.src = ''
-      })
-      audioMapRef.current.clear()
-      currentlyPlayingRef.current = null
-    }
-  }, [snippets])
+      audioMapRef.current.forEach((audio) => {
+        audio.pause();
+        const handler = endedHandlersRef.current.get(audio);
+        if (handler) {
+          audio.removeEventListener("ended", handler);
+        }
+        audio.src = "";
+      });
+      audioMapRef.current.clear();
+      endedHandlersRef.current.clear();
+      currentlyPlayingRef.current = null;
+    };
+  }, [snippets]);
 
   const play = useCallback((lineNumber: number) => {
     // Stop any currently playing audio
     if (currentlyPlayingRef.current) {
-      currentlyPlayingRef.current.pause()
-      currentlyPlayingRef.current.currentTime = 0
+      currentlyPlayingRef.current.pause();
+      currentlyPlayingRef.current.currentTime = 0;
     }
 
-    const audio = audioMapRef.current.get(lineNumber)
+    const audio = audioMapRef.current.get(lineNumber);
     if (audio) {
-      audio.currentTime = 0
-      audio.playbackRate = playbackRateRef.current
-      audio.loop = loopRef.current
+      audio.currentTime = 0;
+      audio.playbackRate = playbackRateRef.current;
+      audio.loop = loopRef.current;
       audio.play().catch((err) => {
-        console.warn(`Failed to play audio for line ${lineNumber}:`, err)
-        setIsPlaying(false)
-      })
-      currentlyPlayingRef.current = audio
-      setIsPlaying(true)
+        console.warn(`Failed to play audio for line ${lineNumber}:`, err);
+        setIsPlaying(false);
+      });
+      currentlyPlayingRef.current = audio;
+      setIsPlaying(true);
     }
-  }, [])
+  }, []);
 
   const stop = useCallback(() => {
-    audioMapRef.current.forEach(audio => {
-      audio.pause()
-      audio.currentTime = 0
-    })
-    currentlyPlayingRef.current = null
-    setIsPlaying(false)
-  }, [])
+    audioMapRef.current.forEach((audio) => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
+    currentlyPlayingRef.current = null;
+    setIsPlaying(false);
+  }, []);
 
   const pause = useCallback(() => {
     if (currentlyPlayingRef.current) {
-      currentlyPlayingRef.current.pause()
-      setIsPlaying(false)
+      currentlyPlayingRef.current.pause();
+      setIsPlaying(false);
     }
-  }, [])
+  }, []);
 
   const resume = useCallback(() => {
     if (currentlyPlayingRef.current) {
       currentlyPlayingRef.current.play().catch((err) => {
-        console.warn('Failed to resume audio:', err)
-        setIsPlaying(false)
-      })
-      setIsPlaying(true)
+        console.warn("Failed to resume audio:", err);
+        setIsPlaying(false);
+      });
+      setIsPlaying(true);
     }
-  }, [])
+  }, []);
 
   const setPlaybackRate = useCallback((rate: number) => {
-    playbackRateRef.current = rate
+    playbackRateRef.current = rate;
     // Update rate on currently playing audio immediately
     if (currentlyPlayingRef.current) {
-      currentlyPlayingRef.current.playbackRate = rate
+      currentlyPlayingRef.current.playbackRate = rate;
     }
-  }, [])
+  }, []);
 
   const setLoop = useCallback((loop: boolean) => {
-    loopRef.current = loop
+    loopRef.current = loop;
     // Update loop on currently playing audio immediately
     if (currentlyPlayingRef.current) {
-      currentlyPlayingRef.current.loop = loop
+      currentlyPlayingRef.current.loop = loop;
     }
-  }, [])
+  }, []);
 
-  return { ...state, play, stop, pause, resume, isPlaying, setPlaybackRate, setLoop }
+  return {
+    ...state,
+    play,
+    stop,
+    pause,
+    resume,
+    isPlaying,
+    setPlaybackRate,
+    setLoop,
+  };
 }
