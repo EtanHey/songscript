@@ -4,7 +4,7 @@ import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
 import { api } from "@convex/_generated/api";
 import { authClient } from "../../lib/auth-client";
 import { Button } from "../../components/ui/button";
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import type { Id } from "@convex/_generated/dataModel";
 import WordDetailsModal from "../../components/WordDetailsModal";
 import { getLanguageFlagString } from "../../components/LanguageFlag";
@@ -129,9 +129,10 @@ function DashboardPage() {
       setMigrationChecked(true);
       if (shouldShowMigrationModal(session.user.id)) {
         // Small delay to let dashboard render first
-        setTimeout(() => {
+        const timer = setTimeout(() => {
           setIsMigrationModalOpen(true);
         }, 500);
+        return () => clearTimeout(timer);
       }
     }
   }, [session?.user?.id, migrationChecked]);
@@ -182,19 +183,35 @@ function DashboardPage() {
   const reorderWishlistMutation = useConvexMutation(api.wishlist.reorderWishlist);
   const removeFromWishlistMutation = useConvexMutation(api.wishlist.removeFromWishlist);
 
-  // Initialize default goals mutation with error handling and retry
+  // Track retry state for goals initialization
+  const goalsRetryRef = useRef({ count: 0, timerId: null as ReturnType<typeof setTimeout> | null });
+
+  // Clean up any pending retry on unmount
+  useEffect(() => {
+    return () => {
+      if (goalsRetryRef.current.timerId) {
+        clearTimeout(goalsRetryRef.current.timerId);
+      }
+    };
+  }, []);
+
+  // Initialize default goals mutation with error handling and capped retry
   const { mutate: initializeGoals } = useMutation({
     mutationFn: (args: any) => initializeDefaultGoalsMutation(args),
     onSuccess: () => {
+      goalsRetryRef.current.count = 0;
       refetchGoals();
     },
     onError: (error) => {
       console.warn('Initialize goals failed:', error);
-      // Retry after a delay if authentication error
-      if (error.message?.includes('Authentication required')) {
-        setTimeout(() => {
+      // Retry up to 3 times with increasing delay if authentication error
+      if (error.message?.includes('Authentication required') && goalsRetryRef.current.count < 3) {
+        goalsRetryRef.current.count++;
+        const delay = 2000 * goalsRetryRef.current.count;
+        goalsRetryRef.current.timerId = setTimeout(() => {
+          goalsRetryRef.current.timerId = null;
           initializeGoals({});
-        }, 2000);
+        }, delay);
       }
     },
   });
