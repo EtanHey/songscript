@@ -3,7 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "../../../convex/_generated/api";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "../ui/card";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import { Button } from "../ui/button";
 
@@ -14,24 +20,24 @@ export function LeaderboardMiniSection() {
 
   // Get top 5 users for streak leaderboard
   const { data: streakData = [] } = useQuery(
-    convexQuery(api.leaderboard.getStreakLeaderboard, { limit: 5 })
+    convexQuery(api.leaderboard.getStreakLeaderboard, { limit: 5 }),
   );
 
   // Get top 5 users for progress leaderboard
   const { data: progressData = [] } = useQuery(
-    convexQuery(api.leaderboard.getProgressLeaderboard, { limit: 5 })
+    convexQuery(api.leaderboard.getProgressLeaderboard, { limit: 5 }),
   );
 
   // Get current user's rank
   const { data: userRank } = useQuery(
     convexQuery(api.leaderboard.getUserRank, {
       type: selectedType,
-    })
+    }),
   );
 
   // Get user info to check display name
   const { data: userInfo } = useQuery(
-    convexQuery(api.leaderboard.getUserInfo, {})
+    convexQuery(api.leaderboard.getUserInfo, {}),
   );
 
   const hasDisplayName = userInfo?.displayName !== null;
@@ -58,7 +64,9 @@ export function LeaderboardMiniSection() {
         <ToggleGroup
           type="single"
           value={selectedType}
-          onValueChange={(value) => value && setSelectedType(value as LeaderboardType)}
+          onValueChange={(value) =>
+            value && setSelectedType(value as LeaderboardType)
+          }
           className="w-fit"
         >
           <ToggleGroupItem value="streak" variant="outline" size="sm">
@@ -82,53 +90,65 @@ export function LeaderboardMiniSection() {
           </div>
         ) : (
           <div className="space-y-3">
-            {leaderboardData.map((user: typeof leaderboardData[0]) => {
-              const isCurrentUser = hasDisplayName && userRank && user.rank === userRank.rank;
+            {leaderboardData.map((user: (typeof leaderboardData)[0]) => {
+              const isCurrentUser =
+                hasDisplayName && userRank && user.rank === userRank.rank;
               const medal = getMedalIcon(user.rank);
-              
+
               return (
                 <div
                   key={`${user.displayName}-${user.rank}`}
                   className={`flex items-center justify-between p-2 rounded-lg ${
-                    isCurrentUser ? "bg-primary/10 border border-primary/20" : "bg-muted/30"
+                    isCurrentUser
+                      ? "bg-primary/10 border border-primary/20"
+                      : "bg-muted/30"
                   }`}
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium w-6">
                       {medal || `#${user.rank}`}
                     </span>
-                    <span className="text-sm font-medium">{user.displayName}</span>
+                    <span className="text-sm font-medium">
+                      {user.displayName}
+                    </span>
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {selectedType === "streak" 
-                      ? `${(user as any).streak || 0} days`
-                      : `${(user as any).score || 0} pts`
-                    }
+                    {"streak" in user
+                      ? `${user.streak || 0} days`
+                      : `${"score" in user ? user.score : 0} pts`}
                   </div>
                 </div>
               );
             })}
 
             {/* Show current user's rank if not in top 5 but in top 50 */}
-            {hasDisplayName && userRank && userRank.rank > 5 && userRank.rank <= 50 && (
-              <>
-                <div className="border-t pt-2 mt-3">
-                  <div className="flex items-center justify-between p-2 rounded-lg bg-primary/10 border border-primary/20">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium w-6">#{userRank.rank}</span>
-                      <span className="text-sm font-medium">{userInfo?.displayName}</span>
-                      <span className="text-xs text-muted-foreground">(You)</span>
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {selectedType === "streak" 
-                        ? `${userRank.score} days`
-                        : `${userRank.score} pts`
-                      }
+            {hasDisplayName &&
+              userRank &&
+              userRank.rank > 5 &&
+              userRank.rank <= 50 && (
+                <>
+                  <div className="border-t pt-2 mt-3">
+                    <div className="flex items-center justify-between p-2 rounded-lg bg-primary/10 border border-primary/20">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium w-6">
+                          #{userRank.rank}
+                        </span>
+                        <span className="text-sm font-medium">
+                          {userInfo?.displayName}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          (You)
+                        </span>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {selectedType === "streak"
+                          ? `${userRank.score} days`
+                          : `${userRank.score} pts`}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </>
-            )}
+                </>
+              )}
           </div>
         )}
       </CardContent>
