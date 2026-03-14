@@ -998,7 +998,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
         {/* Video player — stays mounted on mobile (animated accordion) to preserve playback position */}
         <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${isMobile && isVideoCollapsed ? "max-h-0 opacity-0" : "max-h-[500px] opacity-100"} ${!isMobile ? "max-h-none" : ""}`}
+          className={`overflow-hidden ${isMobile ? `transition-[max-height,opacity] duration-300 ease-in-out ${isVideoCollapsed ? "max-h-0 opacity-0" : "max-h-[1000px] opacity-100"}` : ""}`}
         >
           <div className={`p-4 pb-2 ${isMobile ? "pt-2" : ""}`}>
             {song.videoUrl && !videoError ? (
@@ -1038,36 +1038,40 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
         {/* Controls — stays mounted on mobile (animated accordion) */}
         <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${isMobile && isVideoCollapsed ? "max-h-0 opacity-0" : "max-h-[600px] opacity-100"} ${!isMobile ? "max-h-none" : ""}`}
+          className={`overflow-hidden ${isMobile ? `transition-[max-height,opacity] duration-300 ease-in-out ${isVideoCollapsed ? "max-h-0 opacity-0" : "max-h-[1000px] opacity-100"}` : ""}`}
         >
           <div className="px-4 pb-4">
             {/* Mobile: Current Line Indicator — uses activeLineIndex for live updates during playback */}
-            <div className="md:hidden mb-2">
-              <div className="flex items-center gap-2 rounded-lg bg-gray-800/50 px-3 py-2 border border-gray-700">
-                <span className="rounded bg-primary/20 px-2 py-1 text-xs font-medium text-primary whitespace-nowrap">
-                  {(activeLineIndex ?? currentLineIndex) !== undefined
-                    ? `Line ${(activeLineIndex ?? currentLineIndex)! + 1}`
-                    : "Select a line"}
-                </span>
-                {(activeLineIndex ?? currentLineIndex) !== undefined &&
-                  sortedLyrics[activeLineIndex ?? currentLineIndex!] && (
-                    <span
-                      className="text-xs text-gray-400 truncate flex-1"
-                      dir={isRTLLanguage(song.sourceLanguage) ? "rtl" : "ltr"}
-                    >
-                      {
-                        sortedLyrics[activeLineIndex ?? currentLineIndex!]
-                          .original
-                      }
+            {(() => {
+              const displayLineIndex = activeLineIndex ?? currentLineIndex;
+              return (
+                <div className="md:hidden mb-2">
+                  <div className="flex items-center gap-2 rounded-lg bg-gray-800/50 px-3 py-2 border border-gray-700">
+                    <span className="rounded bg-primary/20 px-2 py-1 text-xs font-medium text-primary whitespace-nowrap">
+                      {displayLineIndex !== undefined
+                        ? `Line ${displayLineIndex + 1}`
+                        : "Select a line"}
                     </span>
-                  )}
-                {(activeLineIndex ?? currentLineIndex) === undefined && (
-                  <span className="text-xs text-gray-500 italic">
-                    Tap a lyric line below to start
-                  </span>
-                )}
-              </div>
-            </div>
+                    {displayLineIndex !== undefined &&
+                      sortedLyrics[displayLineIndex] && (
+                        <span
+                          className="text-xs text-gray-400 truncate flex-1"
+                          dir={
+                            isRTLLanguage(song.sourceLanguage) ? "rtl" : "ltr"
+                          }
+                        >
+                          {sortedLyrics[displayLineIndex].original}
+                        </span>
+                      )}
+                    {displayLineIndex === undefined && (
+                      <span className="text-xs text-gray-500 italic">
+                        Tap a lyric line below to start
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
 
             <div className="flex flex-col gap-3 rounded-lg bg-gray-800 p-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
               {/* Pause/Play Button */}

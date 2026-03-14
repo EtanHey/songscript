@@ -92,7 +92,7 @@ function HomePage() {
                 key={song._id}
                 to="/song/$songId"
                 params={{ songId: song._id }}
-                className="block overflow-hidden bg-gray-900 rounded-lg border border-gray-800 hover:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:outline-none transition-all duration-200 hover:scale-[1.02] hover:shadow-lg"
+                className="block overflow-hidden bg-gray-900 rounded-lg border border-gray-800 hover:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:outline-none transition-all duration-200 hover:scale-[1.02] motion-reduce:hover:scale-100 hover:shadow-lg"
               >
                 <div className="aspect-video w-full bg-gray-800 relative">
                   <img
@@ -118,8 +118,14 @@ function HomePage() {
                   </div>
                 </div>
                 {/* Progress bar for authenticated users */}
-                {progressMap.has(song._id) && (
-                  <div className="h-1 bg-gray-800">
+                {(progressMap.get(song._id) ?? 0) > 0 && (
+                  <div
+                    className="h-1 bg-gray-800"
+                    role="progressbar"
+                    aria-valuenow={progressMap.get(song._id)}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                  >
                     <div
                       className="h-full bg-emerald-500 transition-all duration-300"
                       style={{ width: `${progressMap.get(song._id)}%` }}
