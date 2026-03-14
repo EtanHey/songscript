@@ -4,9 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "@convex/_generated/api";
+import { useMemo } from "react";
 import { WishlistButton } from "../components/WishlistButton";
 import { LanguageFlag } from "../components/LanguageFlag";
 import { getLanguageDisplayName } from "../components/dashboard/LanguageChip";
+import { authClient } from "../lib/auth-client";
 import type { Doc } from "../../convex/_generated/dataModel";
 
 // Type for song document from Convex
@@ -44,6 +46,26 @@ function HomePage() {
     initialData: loaderData.songs,
   });
 
+  // Check auth for progress bars
+  const { data: session } = authClient.useSession();
+
+  // Fetch song progress for authenticated users
+  const { data: songProgressData } = useQuery({
+    ...convexQuery(api.songProgress.getWithSongDetails, {}),
+    enabled: !!session?.user,
+  });
+
+  // Build progress map: songId -> progressPercent
+  const progressMap = useMemo(() => {
+    const map = new Map<string, number>();
+    if (songProgressData) {
+      for (const p of songProgressData) {
+        map.set(p.songId, p.progressPercent);
+      }
+    }
+    return map;
+  }, [songProgressData]);
+
   return (
     <main className="min-h-screen bg-gray-950 text-white">
       <div className="container mx-auto px-4 py-8">
@@ -70,7 +92,7 @@ function HomePage() {
                 key={song._id}
                 to="/song/$songId"
                 params={{ songId: song._id }}
-                className="block overflow-hidden bg-gray-900 rounded-lg border border-gray-800 hover:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:outline-none transition-colors"
+                className="block overflow-hidden bg-gray-900 rounded-lg border border-gray-800 hover:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:outline-none transition-all duration-200 hover:scale-[1.02] hover:shadow-lg"
               >
                 <div className="aspect-video w-full bg-gray-800 relative">
                   <img
@@ -95,6 +117,15 @@ function HomePage() {
                     <span>{getLanguageDisplayName(song.sourceLanguage)}</span>
                   </div>
                 </div>
+                {/* Progress bar for authenticated users */}
+                {progressMap.has(song._id) && (
+                  <div className="h-1 bg-gray-800">
+                    <div
+                      className="h-full bg-emerald-500 transition-all duration-300"
+                      style={{ width: `${progressMap.get(song._id)}%` }}
+                    />
+                  </div>
+                )}
               </Link>
             ))}
           </div>

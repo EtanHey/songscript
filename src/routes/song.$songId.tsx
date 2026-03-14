@@ -634,6 +634,12 @@ function SongPageContent({ songId }: SongPageContentProps) {
       // Reset loop guard when clicking a new line
       isLoopingRef.current = false;
 
+      // Mobile: expand video if collapsed so user can see playback
+      if (isMobile && isVideoCollapsed) {
+        setIsVideoCollapsed(false);
+        persistVideoCollapsed(false);
+      }
+
       // Seek and play video with guard
       isSeekingRef.current = true;
       playerRef.current?.seekTo(startTime);
@@ -654,6 +660,9 @@ function SongPageContent({ songId }: SongPageContentProps) {
       playbackMode,
       isVideoMuted,
       persistVideoMuted,
+      isMobile,
+      isVideoCollapsed,
+      persistVideoCollapsed,
       currentLineIndex,
       isAuthenticated,
       songId,
@@ -987,8 +996,10 @@ function SongPageContent({ songId }: SongPageContentProps) {
           </div>
         )}
 
-        {/* Video player */}
-        {(!isMobile || !isVideoCollapsed) && (
+        {/* Video player — stays mounted on mobile (animated accordion) to preserve playback position */}
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${isMobile && isVideoCollapsed ? "max-h-0 opacity-0" : "max-h-[500px] opacity-100"} ${!isMobile ? "max-h-none" : ""}`}
+        >
           <div className={`p-4 pb-2 ${isMobile ? "pt-2" : ""}`}>
             {song.videoUrl && !videoError ? (
               <LocalVideoPlayer
@@ -1023,29 +1034,34 @@ function SongPageContent({ songId }: SongPageContentProps) {
               </div>
             )}
           </div>
-        )}
+        </div>
 
-        {/* Controls */}
-        {(!isMobile || !isVideoCollapsed) && (
+        {/* Controls — stays mounted on mobile (animated accordion) */}
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${isMobile && isVideoCollapsed ? "max-h-0 opacity-0" : "max-h-[600px] opacity-100"} ${!isMobile ? "max-h-none" : ""}`}
+        >
           <div className="px-4 pb-4">
-            {/* Mobile: Current Line Indicator */}
+            {/* Mobile: Current Line Indicator — uses activeLineIndex for live updates during playback */}
             <div className="md:hidden mb-2">
               <div className="flex items-center gap-2 rounded-lg bg-gray-800/50 px-3 py-2 border border-gray-700">
                 <span className="rounded bg-primary/20 px-2 py-1 text-xs font-medium text-primary whitespace-nowrap">
-                  {currentLineIndex !== undefined
-                    ? `Line ${currentLineIndex + 1}`
+                  {(activeLineIndex ?? currentLineIndex) !== undefined
+                    ? `Line ${(activeLineIndex ?? currentLineIndex)! + 1}`
                     : "Select a line"}
                 </span>
-                {currentLineIndex !== undefined &&
-                  sortedLyrics[currentLineIndex] && (
+                {(activeLineIndex ?? currentLineIndex) !== undefined &&
+                  sortedLyrics[activeLineIndex ?? currentLineIndex!] && (
                     <span
                       className="text-xs text-gray-400 truncate flex-1"
                       dir={isRTLLanguage(song.sourceLanguage) ? "rtl" : "ltr"}
                     >
-                      {sortedLyrics[currentLineIndex].original}
+                      {
+                        sortedLyrics[activeLineIndex ?? currentLineIndex!]
+                          .original
+                      }
                     </span>
                   )}
-                {currentLineIndex === undefined && (
+                {(activeLineIndex ?? currentLineIndex) === undefined && (
                   <span className="text-xs text-gray-500 italic">
                     Tap a lyric line below to start
                   </span>
@@ -1172,7 +1188,7 @@ function SongPageContent({ songId }: SongPageContentProps) {
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* RIGHT: Lyrics section - scrolls */}
