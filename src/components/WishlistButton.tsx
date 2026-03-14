@@ -72,12 +72,14 @@ export function WishlistButton({
         songId,
       });
     },
-    [isAuthenticated, songId, isPending, toggleWishlist]
+    [isAuthenticated, songId, isPending, toggleWishlist],
   );
 
   // Determine display state (optimistic > real > loading)
   // For unauthenticated users, always false for now (until localStorage migration)
-  const displayState = isAuthenticated ? (optimisticState ?? isInWishlist ?? false) : false;
+  const displayState = isAuthenticated
+    ? (optimisticState ?? isInWishlist ?? false)
+    : false;
 
   // Size classes
   const sizeClasses = {
@@ -112,7 +114,13 @@ export function WishlistButton({
         ${!isAuthenticated || isPending ? "opacity-50" : ""}
         ${className}`}
       aria-label={displayState ? "Remove from wishlist" : "Add to wishlist"}
-      title={!isAuthenticated ? "Login to add to wishlist" : (displayState ? "Remove from wishlist" : "Add to wishlist")}
+      title={
+        !isAuthenticated
+          ? "Sign in to add to wishlist"
+          : displayState
+            ? "Remove from wishlist"
+            : "Add to wishlist"
+      }
     >
       {displayState ? (
         <HeartFilledIcon

@@ -7,8 +7,6 @@ export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
 
-
-
 function LoginPage() {
   const navigate = useNavigate();
   // Try to get session, but don't block the UI - auth endpoints may be unreliable
@@ -39,8 +37,8 @@ function LoginPage() {
   // Show loading only briefly - after timeout, show form anyway
   if (isPending && !showForm) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-500" />
       </div>
     );
   }
@@ -52,7 +50,7 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      // Use absolute URL so redirect goes back to same origin (localhost or production)
+      // Use absolute URL for redirect
       const callbackURL = `${window.location.origin}/dashboard`;
       const result = await authClient.signIn.magicLink({
         email,
@@ -62,9 +60,7 @@ function LoginPage() {
       if (result.error) {
         setError(result.error.message || "Failed to send magic link");
       } else {
-        setSuccess(
-          "Magic link sent! In dev mode, check the Convex dashboard logs at dashboard.convex.dev"
-        );
+        setSuccess("Magic link sent! Check your email for the login link.");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -74,8 +70,8 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      <div className="bg-slate-900 p-8 rounded-lg shadow-xl w-full max-w-md">
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
+      <div className="bg-gray-900 p-8 rounded-lg shadow-xl w-full max-w-md">
         <h1 className="text-2xl font-bold text-white mb-2 text-center">
           Welcome Back
         </h1>
@@ -96,7 +92,7 @@ function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               placeholder="your@email.com"
               required
             />
@@ -123,7 +119,7 @@ function LoginPage() {
           </Button>
         </form>
 
-        <div className="mt-6 pt-6 border-t border-slate-700 text-center">
+        <div className="mt-6 pt-6 border-t border-gray-700 text-center">
           <p className="text-gray-500 text-sm mb-4">OR</p>
           <Link to="/signup">
             <Button

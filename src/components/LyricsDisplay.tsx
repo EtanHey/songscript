@@ -18,7 +18,12 @@ export interface LyricLine {
   english: string;
 }
 
-export type LanguageFilter = "all" | "persian" | "transliteration" | "hebrew" | "english";
+export type LanguageFilter =
+  | "all"
+  | "source"
+  | "transliteration"
+  | "hebrew"
+  | "english";
 
 interface LyricsDisplayProps {
   songId: Id<"songs">;
@@ -51,27 +56,27 @@ export default function LyricsDisplay({
 }: LyricsDisplayProps) {
   const isOriginalRTL = isRTLLanguage(sourceLanguage || "persian");
   const { data: lyrics } = useSuspenseQuery(
-    convexQuery(api.lyrics.getBySong, { songId })
+    convexQuery(api.lyrics.getBySong, { songId }),
   );
 
   // Sort lyrics by lineNumber to ensure correct order
   const sortedLyrics = [...(lyrics || [])].sort(
-    (a, b) => a.lineNumber - b.lineNumber
+    (a, b) => a.lineNumber - b.lineNumber,
   ) as LyricLine[];
 
   // Create lookup maps for efficient state checking
   const lineLearnedMap = new Map(
-    lineProgress.map(lp => [lp.lineNumber, lp.learned])
+    lineProgress.map((lp) => [lp.lineNumber, lp.learned]),
   );
 
   // Determine visual state for each line
-  const getLineState = (line: LyricLine): 'default' | 'learned' => {
+  const getLineState = (line: LyricLine): "default" | "learned" => {
     // Check if line is explicitly marked as learned
     if (lineLearnedMap.get(line.lineNumber)) {
-      return 'learned';
+      return "learned";
     }
-    
-    return 'default';
+
+    return "default";
   };
 
   // Refs for each line to enable auto-scroll
@@ -91,98 +96,94 @@ export default function LyricsDisplay({
     <div className="flex flex-col gap-2">
       {sortedLyrics.map((line, index) => {
         const lineState = getLineState(line);
-        const isLearned = lineState === 'learned';
-        
+        const isLearned = lineState === "learned";
+
         return (
-        <div
-          key={line._id}
-          ref={(el) => {
-            lineRefs.current[index] = el as HTMLButtonElement | null;
-          }}
-          className={`flex min-h-11 items-start gap-2 rounded-lg p-3 transition-all duration-150 ${
-            activeLineIndex === index
-              ? "bg-primary/10 ring-1 ring-primary/20"
-              : ""
-          } ${
-            clickedLineIndex === index
-              ? "scale-[0.98] bg-primary/20"
-              : ""
-          } ${
-            // Visual state styling
-            lineState === 'learned'
-              ? "border-l-4 border-l-emerald-500"
-              : ""
-          }`}
-        >
-          {/* Checkbox - left side, sticky position */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onLineCheckboxClick?.(line.lineNumber);
+          <div
+            key={line._id}
+            ref={(el) => {
+              lineRefs.current[index] = el as HTMLButtonElement | null;
             }}
-            className={`flex-shrink-0 w-11 h-11 rounded-lg border-2 transition-all duration-200 flex items-center justify-center ${
-              isLearned
-                ? "bg-emerald-500 border-emerald-500 text-white"
-                : "border-gray-300 hover:border-emerald-400 hover:bg-emerald-50"
+            className={`flex min-h-11 items-start gap-2 rounded-lg p-3 transition-all duration-150 ${
+              activeLineIndex === index
+                ? "bg-primary/10 ring-1 ring-primary/20"
+                : ""
+            } ${
+              clickedLineIndex === index ? "scale-[0.98] bg-primary/20" : ""
+            } ${
+              // Visual state styling
+              lineState === "learned" ? "border-l-4 border-l-emerald-500" : ""
             }`}
-            title={isLearned ? "Mark as not learned" : "Mark as learned"}
           >
-            {isLearned && (
-              <Check className="h-5 w-5" />
-            )}
-          </button>
+            {/* Checkbox - left side, sticky position */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onLineCheckboxClick?.(line.lineNumber);
+              }}
+              className={`flex-shrink-0 w-11 h-11 rounded-lg border-2 transition-all duration-200 flex items-center justify-center ${
+                isLearned
+                  ? "bg-emerald-500 border-emerald-500 text-white"
+                  : "border-gray-300 hover:border-emerald-400 hover:bg-emerald-50"
+              }`}
+              title={isLearned ? "Mark as not learned" : "Mark as learned"}
+            >
+              {isLearned && <Check className="h-5 w-5" />}
+            </button>
 
-          {/* Main content - clickable to play audio */}
-          <button
-            type="button"
-            onClick={() => onLineClick?.(line.startTime, index)}
-            className="flex flex-1 flex-col gap-1 text-left hover:opacity-80 transition-opacity"
-          >
-            {/* Original text - direction based on source language */}
-            {(languageFilter === "all" || languageFilter === "persian") && (
-              <p
-                dir={isOriginalRTL ? "rtl" : "ltr"}
-                className={`${isOriginalRTL ? "text-right" : "text-left"} text-xl font-medium leading-relaxed`}
-              >
-                {line.original}
-              </p>
-            )}
+            {/* Main content - clickable to play audio */}
+            <button
+              type="button"
+              onClick={() => onLineClick?.(line.startTime, index)}
+              className="flex flex-1 flex-col gap-1 text-left hover:opacity-80 transition-opacity"
+            >
+              {/* Original text - direction based on source language */}
+              {(languageFilter === "all" || languageFilter === "source") && (
+                <p
+                  dir={isOriginalRTL ? "rtl" : "ltr"}
+                  className={`${isOriginalRTL ? "text-right" : "text-left"} text-xl font-medium leading-relaxed`}
+                >
+                  {line.original}
+                </p>
+              )}
 
-            {/* Transliteration - italic, green */}
-            {(languageFilter === "all" || languageFilter === "transliteration") && (
-              <p className="text-base italic text-emerald-500">
-                {line.transliteration}
-              </p>
-            )}
+              {/* Transliteration - italic, green */}
+              {(languageFilter === "all" ||
+                languageFilter === "transliteration") && (
+                <p className="text-base italic text-emerald-500">
+                  {line.transliteration}
+                </p>
+              )}
 
-            {/* Hebrew text - RTL, blue */}
-            {(languageFilter === "all" || languageFilter === "hebrew") && line.hebrew && (
-              <p dir="rtl" className="text-right text-base text-blue-500">
-                {line.hebrew}
-              </p>
-            )}
+              {/* Hebrew text - RTL, blue */}
+              {(languageFilter === "all" || languageFilter === "hebrew") &&
+                line.hebrew && (
+                  <p dir="rtl" className="text-right text-base text-blue-500">
+                    {line.hebrew}
+                  </p>
+                )}
 
-            {/* English translation - smaller, gray */}
-            {(languageFilter === "all" || languageFilter === "english") && (
-              <p className="text-sm text-gray-400">{line.english}</p>
-            )}
-          </button>
+              {/* English translation - smaller, gray */}
+              {(languageFilter === "all" || languageFilter === "english") && (
+                <p className="text-sm text-gray-400">{line.english}</p>
+              )}
+            </button>
 
-          {/* Info button - opens word breakdown modal */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onLineInfoClick?.(line, index);
-            }}
-            className="flex-shrink-0 rounded p-1.5 text-gray-500 hover:bg-gray-700 hover:text-white transition-colors"
-            title="View word breakdown"
-          >
-            <Info className="h-4 w-4" />
-          </button>
-        </div>
-        )
+            {/* Info button - opens word breakdown modal */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onLineInfoClick?.(line, index);
+              }}
+              className="flex-shrink-0 rounded p-1.5 text-gray-500 hover:bg-gray-700 hover:text-white transition-colors"
+              title="View word breakdown"
+            >
+              <Info className="h-4 w-4" />
+            </button>
+          </div>
+        );
       })}
     </div>
   );

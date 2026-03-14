@@ -1,9 +1,9 @@
-import { Link, useNavigate } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import { convexQuery } from '@convex-dev/react-query'
-import { api } from '@convex/_generated/api'
-import { authClient } from '../lib/auth-client'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { convexQuery } from "@convex-dev/react-query";
+import { api } from "@convex/_generated/api";
+import { authClient } from "../lib/auth-client";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,67 +11,67 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from './ui/dropdown-menu'
-import { Clock, LayoutDashboard, LogOut, Settings } from 'lucide-react'
+} from "./ui/dropdown-menu";
+import { Clock, LayoutDashboard, LogOut, Settings } from "lucide-react";
 
 // Format seconds into human-readable time (always show seconds)
 function formatTime(totalSeconds: number): string {
-  const hours = Math.floor(totalSeconds / 3600)
-  const mins = Math.floor((totalSeconds % 3600) / 60)
-  const secs = totalSeconds % 60
+  const hours = Math.floor(totalSeconds / 3600);
+  const mins = Math.floor((totalSeconds % 3600) / 60);
+  const secs = totalSeconds % 60;
 
   if (hours > 0) {
-    return `${hours}h ${mins}m ${secs}s`
+    return `${hours}h ${mins}m ${secs}s`;
   }
   if (mins > 0) {
-    return `${mins}m ${secs}s`
+    return `${mins}m ${secs}s`;
   }
-  return `${secs}s`
+  return `${secs}s`;
 }
 
 // Get initials from name or email
 function getInitials(name?: string | null, email?: string | null): string {
   if (name) {
-    const parts = name.split(' ')
+    const parts = name.split(" ");
     if (parts.length >= 2) {
-      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
-    return name.slice(0, 2).toUpperCase()
+    return name.slice(0, 2).toUpperCase();
   }
   if (email) {
-    return email.slice(0, 2).toUpperCase()
+    return email.slice(0, 2).toUpperCase();
   }
-  return 'U'
+  return "U";
 }
 
 export default function Header() {
-  const { data: session, isPending } = authClient.useSession()
-  const navigate = useNavigate()
-  const isLoggedIn = !!session?.user
+  const { data: session, isPending } = authClient.useSession();
+  const navigate = useNavigate();
+  const isLoggedIn = !!session?.user;
 
   // Get user stats for practice time
   const { data: userStats } = useQuery({
     ...convexQuery(api.userStats.getAggregatedStats, {}),
     enabled: isLoggedIn,
-  })
+  });
 
   // Get user info for display name
   const { data: userInfo } = useQuery({
     ...convexQuery(api.leaderboard.getUserInfo, {}),
     enabled: isLoggedIn,
-  })
+  });
 
   const handleSignOut = async () => {
-    await authClient.signOut()
-    navigate({ to: '/' })
-  }
+    await authClient.signOut();
+    navigate({ to: "/" });
+  };
 
-  const user = session?.user
+  const user = session?.user;
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-800 bg-gray-900">
       <nav className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
-        <Link to="/" className="text-xl font-bold iran-gradient sm:text-2xl">
+        <Link to="/" className="text-xl font-bold brand-gradient sm:text-2xl">
           SongScript
         </Link>
 
@@ -101,28 +101,38 @@ export default function Header() {
                 <DropdownMenuTrigger asChild>
                   <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-gray-600">
                     <Avatar className="h-8 w-8 sm:h-9 sm:w-9">
-                      <AvatarImage src={user?.image || undefined} alt={user?.name || 'User'} />
+                      <AvatarImage
+                        src={user?.image || undefined}
+                        alt={user?.name || "User"}
+                      />
                       <AvatarFallback className="bg-gray-700 text-gray-200 text-sm">
                         {getInitials(user?.name, user?.email)}
                       </AvatarFallback>
                     </Avatar>
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-gray-900 border-gray-700">
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 bg-gray-900 border-gray-700"
+                >
                   <DropdownMenuLabel className="text-gray-200">
                     <div className="flex flex-col space-y-1">
                       {userInfo?.displayName ? (
-                        <p className="text-sm font-medium">{userInfo.displayName}</p>
+                        <p className="text-sm font-medium">
+                          {userInfo.displayName}
+                        </p>
                       ) : (
-                        <button 
-                          onClick={() => navigate({ to: '/settings' })}
+                        <button
+                          onClick={() => navigate({ to: "/settings" })}
                           className="text-sm font-medium text-gray-400 hover:text-gray-200 text-left"
                         >
                           Set display name
                         </button>
                       )}
                       {user?.email && (
-                        <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                        <p className="text-xs text-gray-400 truncate">
+                          {user.email}
+                        </p>
                       )}
                     </div>
                   </DropdownMenuLabel>
@@ -131,23 +141,29 @@ export default function Header() {
                   {/* Practice time in dropdown for mobile */}
                   {userStats && userStats.totalPracticeTimeSeconds > 0 && (
                     <>
-                      <DropdownMenuItem disabled className="text-gray-400 sm:hidden">
+                      <DropdownMenuItem
+                        disabled
+                        className="text-gray-400 sm:hidden"
+                      >
                         <Clock className="mr-2 h-4 w-4" />
-                        <span>Total: {formatTime(userStats.totalPracticeTimeSeconds)}</span>
+                        <span>
+                          Total:{" "}
+                          {formatTime(userStats.totalPracticeTimeSeconds)}
+                        </span>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator className="bg-gray-700 sm:hidden" />
                     </>
                   )}
 
                   <DropdownMenuItem
-                    onClick={() => navigate({ to: '/dashboard' })}
+                    onClick={() => navigate({ to: "/dashboard" })}
                     className="text-gray-200 cursor-pointer hover:bg-gray-800 focus:bg-gray-800"
                   >
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     <span>Dashboard</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => navigate({ to: '/settings' })}
+                    onClick={() => navigate({ to: "/settings" })}
                     className="text-gray-200 cursor-pointer hover:bg-gray-800 focus:bg-gray-800"
                   >
                     <Settings className="mr-2 h-4 w-4" />
@@ -175,5 +191,5 @@ export default function Header() {
         </div>
       </nav>
     </header>
-  )
+  );
 }

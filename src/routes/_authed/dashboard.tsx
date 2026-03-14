@@ -8,7 +8,10 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import type { Id } from "@convex/_generated/dataModel";
 import WordDetailsModal from "../../components/WordDetailsModal";
 import { getLanguageFlagString } from "../../components/LanguageFlag";
-import { MigrationConfirmModal, shouldShowMigrationModal } from "../../components/MigrationConfirmModal";
+import {
+  MigrationConfirmModal,
+  shouldShowMigrationModal,
+} from "../../components/MigrationConfirmModal";
 
 // Import dashboard components
 import {
@@ -49,13 +52,14 @@ function DashboardPage() {
 
   // Ensure app user exists (fallback for race condition)
   const ensureAppUser = useConvexMutation(api.users.ensureAppUser);
-  
+
   // Check if session exists but app user is missing, trigger ensureAppUser
   useEffect(() => {
     if (session?.user && !sessionPending) {
       // Try to ensure app user exists as a fallback
       ensureAppUser({}).catch((error) => {
-        console.warn('Dashboard ensureAppUser fallback failed:', error);
+        if (import.meta.env.DEV)
+          console.warn("Dashboard ensureAppUser fallback failed:", error);
         // Don't throw - this is a fallback mechanism
       });
     }
@@ -63,44 +67,48 @@ function DashboardPage() {
 
   // Get song progress with details
   const { data: songProgress, isLoading: progressLoading } = useQuery(
-    convexQuery(api.songProgress.getWithSongDetails, {})
+    convexQuery(api.songProgress.getWithSongDetails, {}),
   );
 
   // Get vocabulary grouped by language
   const { data: vocabulary, isLoading: vocabLoading } = useQuery(
-    convexQuery(api.wordProgress.getVocabularyByLanguage, {})
+    convexQuery(api.wordProgress.getVocabularyByLanguage, {}),
   );
 
   // Get wishlist / learning queue
-  const { data: wishlist, isLoading: wishlistLoading, refetch: refetchWishlist } = useQuery(
-    convexQuery(api.wishlist.getWishlist, {})
-  );
+  const {
+    data: wishlist,
+    isLoading: wishlistLoading,
+    refetch: refetchWishlist,
+  } = useQuery(convexQuery(api.wishlist.getWishlist, {}));
 
   // Get practice history for streaks
   const { data: practiceHistory, isLoading: practiceLoading } = useQuery(
     convexQuery(api.practiceLog.getPracticeHistory, {
       days: 90,
-    })
+    }),
   );
 
   // Get recent songs for "Continue Learning" section
   const { data: recentSongs, isLoading: recentLoading } = useQuery(
-    convexQuery(api.songProgress.getRecentForContinue, {})
+    convexQuery(api.songProgress.getRecentForContinue, {}),
   );
 
   // Get aggregated stats
   const { data: userStats, isLoading: statsLoading } = useQuery(
-    convexQuery(api.userStats.getAggregatedStats, {})
+    convexQuery(api.userStats.getAggregatedStats, {}),
   );
 
   // Get goals with progress
-  const { data: goalsWithProgress, isLoading: goalsLoading, refetch: refetchGoals } = useQuery(
-    convexQuery(api.goals.getGoalsWithProgress, {})
-  );
+  const {
+    data: goalsWithProgress,
+    isLoading: goalsLoading,
+    refetch: refetchGoals,
+  } = useQuery(convexQuery(api.goals.getGoalsWithProgress, {}));
 
   // Get language progress
   const { data: languageProgress, isLoading: languageLoading } = useQuery(
-    convexQuery(api.userStats.getLanguageProgress, {})
+    convexQuery(api.userStats.getLanguageProgress, {}),
   );
 
   // Language filter state
@@ -147,7 +155,8 @@ function DashboardPage() {
     if (!songProgress) return [];
     if (!selectedLanguage) return songProgress;
     return songProgress.filter(
-      (p: typeof songProgress[0]) => p.song.sourceLanguage.toLowerCase() === selectedLanguage.toLowerCase()
+      (p: (typeof songProgress)[0]) =>
+        p.song.sourceLanguage.toLowerCase() === selectedLanguage.toLowerCase(),
     );
   }, [songProgress, selectedLanguage]);
 
@@ -155,7 +164,8 @@ function DashboardPage() {
     if (!vocabulary) return [];
     if (!selectedLanguage) return vocabulary;
     return vocabulary.filter(
-      (v: typeof vocabulary[0]) => v.language.toLowerCase() === selectedLanguage.toLowerCase()
+      (v: (typeof vocabulary)[0]) =>
+        v.language.toLowerCase() === selectedLanguage.toLowerCase(),
     );
   }, [vocabulary, selectedLanguage]);
 
@@ -163,7 +173,8 @@ function DashboardPage() {
     if (!wishlist) return [];
     if (!selectedLanguage) return wishlist;
     return wishlist.filter(
-      (w: typeof wishlist[0]) => w.song?.sourceLanguage.toLowerCase() === selectedLanguage.toLowerCase()
+      (w: (typeof wishlist)[0]) =>
+        w.song?.sourceLanguage.toLowerCase() === selectedLanguage.toLowerCase(),
     );
   }, [wishlist, selectedLanguage]);
 
@@ -171,16 +182,23 @@ function DashboardPage() {
     if (!recentSongs) return [];
     if (!selectedLanguage) return recentSongs;
     return recentSongs.filter(
-      (s: typeof recentSongs[0]) => s.song.sourceLanguage.toLowerCase() === selectedLanguage.toLowerCase()
+      (s: (typeof recentSongs)[0]) =>
+        s.song.sourceLanguage.toLowerCase() === selectedLanguage.toLowerCase(),
     );
   }, [recentSongs, selectedLanguage]);
 
   // Convex mutations (extracted outside useMutation)
-  const initializeDefaultGoalsMutation = useConvexMutation(api.goals.initializeDefaultGoals);
+  const initializeDefaultGoalsMutation = useConvexMutation(
+    api.goals.initializeDefaultGoals,
+  );
   const setGoalMutation = useConvexMutation(api.goals.setGoal);
   const updateGoalMutation = useConvexMutation(api.goals.updateGoal);
-  const reorderWishlistMutation = useConvexMutation(api.wishlist.reorderWishlist);
-  const removeFromWishlistMutation = useConvexMutation(api.wishlist.removeFromWishlist);
+  const reorderWishlistMutation = useConvexMutation(
+    api.wishlist.reorderWishlist,
+  );
+  const removeFromWishlistMutation = useConvexMutation(
+    api.wishlist.removeFromWishlist,
+  );
 
   // Initialize default goals mutation with error handling and retry
   const { mutate: initializeGoals } = useMutation({
@@ -189,9 +207,9 @@ function DashboardPage() {
       refetchGoals();
     },
     onError: (error) => {
-      console.warn('Initialize goals failed:', error);
+      if (import.meta.env.DEV) console.warn("Initialize goals failed:", error);
       // Retry after a delay if authentication error
-      if (error.message?.includes('Authentication required')) {
+      if (error.message?.includes("Authentication required")) {
         setTimeout(() => {
           initializeGoals({});
         }, 2000);
@@ -217,7 +235,11 @@ function DashboardPage() {
 
   // Initialize goals on first visit (if no goals exist) with retry logic
   useEffect(() => {
-    if (goalsWithProgress !== undefined && goalsWithProgress.length === 0 && session?.user) {
+    if (
+      goalsWithProgress !== undefined &&
+      goalsWithProgress.length === 0 &&
+      session?.user
+    ) {
       // Add a longer delay to ensure session is stable, with retry mechanism
       const timer = setTimeout(() => {
         initializeGoals({});
@@ -247,7 +269,7 @@ function DashboardPage() {
     (songIds: Id<"songs">[]) => {
       reorderWishlist({ songIds });
     },
-    [reorderWishlist]
+    [reorderWishlist],
   );
 
   // Handle remove from wishlist
@@ -255,7 +277,7 @@ function DashboardPage() {
     (songId: Id<"songs">) => {
       removeFromWishlist({ songId });
     },
-    [removeFromWishlist]
+    [removeFromWishlist],
   );
 
   // Show loading state briefly
@@ -291,24 +313,26 @@ function DashboardPage() {
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold mb-1">Dashboard</h1>
           <p className="text-gray-400 text-sm sm:text-base">
-            Welcome back, {session.user.email}
+            Welcome back, {session.user.name || session.user.email}
           </p>
         </div>
 
         {/* === TOP SECTION: Continue Learning (Most Important) === */}
-        {!recentLoading && filteredRecentSongs && filteredRecentSongs.length > 0 && (
-          <section className="mb-6 sm:mb-8">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">
-              Continue Learning
-              {selectedLanguage && (
-                <span className="ml-2 text-sm font-normal text-gray-400">
-                  ({getLanguageFlagString(selectedLanguage)} filtered)
-                </span>
-              )}
-            </h2>
-            <ContinueLearningCarousel items={filteredRecentSongs} />
-          </section>
-        )}
+        {!recentLoading &&
+          filteredRecentSongs &&
+          filteredRecentSongs.length > 0 && (
+            <section className="mb-6 sm:mb-8">
+              <h2 className="text-lg sm:text-xl font-semibold mb-4">
+                Continue Learning
+                {selectedLanguage && (
+                  <span className="ml-2 text-sm font-normal text-gray-400">
+                    ({getLanguageFlagString(selectedLanguage)} filtered)
+                  </span>
+                )}
+              </h2>
+              <ContinueLearningCarousel items={filteredRecentSongs} />
+            </section>
+          )}
 
         {/* === GOALS + STREAK: Side by Side on md+ === */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 sm:mb-8">
@@ -320,21 +344,23 @@ function DashboardPage() {
             ) : goalsWithProgress && goalsWithProgress.length > 0 ? (
               <MyGoalsSection
                 goals={goalsWithProgress}
-                onUpdateGoal={(goalId, targetValue) => updateGoal({ goalId, targetValue })}
+                onUpdateGoal={(goalId, targetValue) =>
+                  updateGoal({ goalId, targetValue })
+                }
                 onSetGoal={(goalType, period, targetValue) => {
                   setGoal({ goalType, period, targetValue });
                 }}
               />
             ) : (
-              <GoalsEmptyState
-                onInitialize={() => initializeGoals({})}
-              />
+              <GoalsEmptyState onInitialize={() => initializeGoals({})} />
             )}
           </section>
 
           {/* Practice Streak Section */}
           <section>
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">Practice Streak</h2>
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">
+              Practice Streak
+            </h2>
             {practiceLoading ? (
               <SkeletonCard height="h-48" />
             ) : practiceHistory ? (
@@ -373,7 +399,9 @@ function DashboardPage() {
 
         {/* === LANGUAGES: Full Width === */}
         <section className="mb-6 sm:mb-8">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4">My Languages</h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-4">
+            My Languages
+          </h2>
           {languageLoading ? (
             <SkeletonCard height="h-24" />
           ) : languageProgress && languageProgress.length > 0 ? (
@@ -397,32 +425,46 @@ function DashboardPage() {
             <CollapsibleSection
               title="My Songs"
               badge={filteredSongProgress?.length || 0}
-              filterIndicator={selectedLanguage ? `(${getLanguageFlagString(selectedLanguage)} filtered)` : undefined}
+              filterIndicator={
+                selectedLanguage
+                  ? `(${getLanguageFlagString(selectedLanguage)} filtered)`
+                  : undefined
+              }
               defaultExpanded={true}
             >
               {progressLoading ? (
                 <SkeletonCard height="h-48" />
               ) : filteredSongProgress && filteredSongProgress.length > 0 ? (
                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-                  {filteredSongProgress.map((progress: typeof filteredSongProgress[0]) => (
-                    <SongProgressCard
-                      key={progress._id}
-                      title={progress.song.title}
-                      artist={progress.song.artist}
-                      sourceLanguage={progress.song.sourceLanguage}
-                      youtubeId={progress.song.youtubeId}
-                      progressPercent={progress.progressPercent}
-                      linesCompleted={progress.linesCompleted.length}
-                      totalLines={progress.totalLines}
-                      lastPracticed={progress.lastPracticed}
-                      songId={progress.songId}
-                    />
-                  ))}
+                  {filteredSongProgress.map(
+                    (progress: (typeof filteredSongProgress)[0]) => (
+                      <SongProgressCard
+                        key={progress._id}
+                        title={progress.song.title}
+                        artist={progress.song.artist}
+                        sourceLanguage={progress.song.sourceLanguage}
+                        youtubeId={progress.song.youtubeId}
+                        progressPercent={progress.progressPercent}
+                        linesCompleted={progress.linesCompleted.length}
+                        totalLines={progress.totalLines}
+                        lastPracticed={progress.lastPracticed}
+                        songId={progress.songId}
+                      />
+                    ),
+                  )}
                 </div>
-              ) : selectedLanguage && songProgress && songProgress.length > 0 ? (
+              ) : selectedLanguage &&
+                songProgress &&
+                songProgress.length > 0 ? (
                 <div className="bg-gray-900 rounded-lg border border-gray-800 p-6 text-center">
                   <p className="text-gray-400">
-                    No songs in {selectedLanguage}. <button onClick={() => setSelectedLanguage(null)} className="text-emerald-400 hover:text-emerald-300 underline">Show all songs</button>
+                    No songs in {selectedLanguage}.{" "}
+                    <button
+                      onClick={() => setSelectedLanguage(null)}
+                      className="text-emerald-400 hover:text-emerald-300 underline"
+                    >
+                      Show all songs
+                    </button>
                   </p>
                 </div>
               ) : (
@@ -433,31 +475,49 @@ function DashboardPage() {
             {/* My Vocabulary Section - Collapsible on mobile */}
             <CollapsibleSection
               title="My Vocabulary"
-              badge={vocabulary?.reduce((sum: number, v: typeof vocabulary[0]) => sum + v.totalWords, 0) || 0}
-              filterIndicator={selectedLanguage ? `(${getLanguageFlagString(selectedLanguage)} filtered)` : undefined}
+              badge={
+                vocabulary?.reduce(
+                  (sum: number, v: (typeof vocabulary)[0]) =>
+                    sum + v.totalWords,
+                  0,
+                ) || 0
+              }
+              filterIndicator={
+                selectedLanguage
+                  ? `(${getLanguageFlagString(selectedLanguage)} filtered)`
+                  : undefined
+              }
               defaultExpanded={false}
             >
               {vocabLoading ? (
                 <SkeletonCard height="h-32" />
               ) : filteredVocabulary && filteredVocabulary.length > 0 ? (
                 <div className="space-y-4">
-                  {filteredVocabulary.map((langGroup: typeof filteredVocabulary[0]) => (
-                    <LanguageVocabularySection
-                      key={langGroup.language}
-                      language={langGroup.language}
-                      totalWords={langGroup.totalWords}
-                      newCount={langGroup.newCount}
-                      learningCount={langGroup.learningCount}
-                      masteredCount={langGroup.masteredCount}
-                      words={langGroup.words}
-                      onWordClick={handleWordClick}
-                    />
-                  ))}
+                  {filteredVocabulary.map(
+                    (langGroup: (typeof filteredVocabulary)[0]) => (
+                      <LanguageVocabularySection
+                        key={langGroup.language}
+                        language={langGroup.language}
+                        totalWords={langGroup.totalWords}
+                        newCount={langGroup.newCount}
+                        learningCount={langGroup.learningCount}
+                        masteredCount={langGroup.masteredCount}
+                        words={langGroup.words}
+                        onWordClick={handleWordClick}
+                      />
+                    ),
+                  )}
                 </div>
               ) : selectedLanguage && vocabulary && vocabulary.length > 0 ? (
                 <div className="bg-gray-900 rounded-lg border border-gray-800 p-6 text-center">
                   <p className="text-gray-400">
-                    No vocabulary in {selectedLanguage}. <button onClick={() => setSelectedLanguage(null)} className="text-emerald-400 hover:text-emerald-300 underline">Show all</button>
+                    No vocabulary in {selectedLanguage}.{" "}
+                    <button
+                      onClick={() => setSelectedLanguage(null)}
+                      className="text-emerald-400 hover:text-emerald-300 underline"
+                    >
+                      Show all
+                    </button>
                   </p>
                 </div>
               ) : (
@@ -471,7 +531,11 @@ function DashboardPage() {
             <CollapsibleSection
               title="Learning Queue"
               badge={filteredWishlist?.length || 0}
-              filterIndicator={selectedLanguage ? `(${getLanguageFlagString(selectedLanguage)} filtered)` : undefined}
+              filterIndicator={
+                selectedLanguage
+                  ? `(${getLanguageFlagString(selectedLanguage)} filtered)`
+                  : undefined
+              }
               defaultExpanded={true}
             >
               {wishlistLoading ? (
@@ -485,7 +549,13 @@ function DashboardPage() {
               ) : selectedLanguage && wishlist && wishlist.length > 0 ? (
                 <div className="bg-gray-900 rounded-lg border border-gray-800 p-6 text-center">
                   <p className="text-gray-400">
-                    No songs in your queue for {selectedLanguage}. <button onClick={() => setSelectedLanguage(null)} className="text-emerald-400 hover:text-emerald-300 underline">Show all</button>
+                    No songs in your queue for {selectedLanguage}.{" "}
+                    <button
+                      onClick={() => setSelectedLanguage(null)}
+                      className="text-emerald-400 hover:text-emerald-300 underline"
+                    >
+                      Show all
+                    </button>
                   </p>
                 </div>
               ) : (
