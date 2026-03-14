@@ -253,9 +253,10 @@ export function readProgress(): AnonymousProgress {
     return validateProgress(parsed, visitorId);
   } catch {
     // JSON parse error or localStorage error - reset to empty state
-    console.warn(
-      "[useAnonymousProgress] Corrupted localStorage data, resetting to empty state"
-    );
+    if (import.meta.env.DEV)
+      console.warn(
+        "[useAnonymousProgress] Corrupted localStorage data, resetting to empty state",
+      );
     const empty = createEmptyProgress(visitorId);
     try {
       localStorage.setItem(PROGRESS_KEY, JSON.stringify(empty));
@@ -277,7 +278,11 @@ export function writeProgress(progress: AnonymousProgress): void {
   try {
     localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
   } catch (e) {
-    console.warn("[useAnonymousProgress] Failed to write to localStorage:", e);
+    if (import.meta.env.DEV)
+      console.warn(
+        "[useAnonymousProgress] Failed to write to localStorage:",
+        e,
+      );
   }
 }
 
@@ -323,7 +328,7 @@ export function isWordLearned(persian: string): boolean {
 export function setWordLearned(
   persian: string,
   learned: boolean,
-  wordId?: string
+  wordId?: string,
 ): void {
   const progress = readProgress();
   const existing = progress.wordProgress.find((w) => w.persian === persian);
@@ -419,11 +424,11 @@ export function getLearnedWordsCount(): number {
  */
 export function getLineProgress(
   songId: string,
-  lineNumber: number
+  lineNumber: number,
 ): LineProgressItem | undefined {
   const progress = readProgress();
   return progress.lineProgress.find(
-    (l) => l.songId === songId && l.lineNumber === lineNumber
+    (l) => l.songId === songId && l.lineNumber === lineNumber,
   );
 }
 
@@ -441,11 +446,11 @@ export function isLineLearned(songId: string, lineNumber: number): boolean {
 export function setLineLearned(
   songId: string,
   lineNumber: number,
-  learned: boolean
+  learned: boolean,
 ): void {
   const progress = readProgress();
   const existing = progress.lineProgress.find(
-    (l) => l.songId === songId && l.lineNumber === lineNumber
+    (l) => l.songId === songId && l.lineNumber === lineNumber,
   );
 
   if (existing) {
@@ -486,9 +491,7 @@ export function getLearnedLinesCount(): number {
 /**
  * Get song progress for a specific song
  */
-export function getSongProgress(
-  songId: string
-): SongProgressItem | undefined {
+export function getSongProgress(songId: string): SongProgressItem | undefined {
   const progress = readProgress();
   return progress.songProgress.find((s) => s.songId === songId);
 }
@@ -498,7 +501,7 @@ export function getSongProgress(
  */
 export function updateSongProgress(
   songId: string,
-  listenTimeSeconds: number
+  listenTimeSeconds: number,
 ): void {
   const progress = readProgress();
   const existing = progress.songProgress.find((s) => s.songId === songId);
@@ -534,7 +537,7 @@ function getTodayDate(): string {
 export function logPractice(
   practiceSeconds: number,
   wordsLearned: number = 0,
-  linesCompleted: number = 0
+  linesCompleted: number = 0,
 ): void {
   const progress = readProgress();
   const today = getTodayDate();
@@ -627,7 +630,7 @@ export function getPreferences(): UserPreferences {
  * Update user preferences
  */
 export function updatePreferences(
-  updates: Partial<UserPreferences>
+  updates: Partial<UserPreferences>,
 ): UserPreferences {
   const progress = readProgress();
   progress.preferences = { ...progress.preferences, ...updates };
@@ -709,7 +712,7 @@ export function useAnonymousProgress() {
       setWordLearned(persian, learned, wordId);
       triggerUpdate();
     },
-    [triggerUpdate]
+    [triggerUpdate],
   );
 
   const setLineLearnedLocal = useCallback(
@@ -717,7 +720,7 @@ export function useAnonymousProgress() {
       setLineLearned(songId, lineNumber, learned);
       triggerUpdate();
     },
-    [triggerUpdate]
+    [triggerUpdate],
   );
 
   const updatePreferencesLocal = useCallback(
@@ -726,7 +729,7 @@ export function useAnonymousProgress() {
       triggerUpdate();
       return result;
     },
-    [triggerUpdate]
+    [triggerUpdate],
   );
 
   return {

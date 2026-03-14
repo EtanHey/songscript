@@ -1,8 +1,15 @@
 import { convexBetterAuthReactStart } from "@convex-dev/better-auth/react-start";
 
 // Use process.env for server-side code (import.meta.env is client-side only)
-const convexUrl = process.env.VITE_CONVEX_URL!;
-const convexSiteUrl = process.env.VITE_CONVEX_SITE_URL || "http://localhost:3001";
+const convexUrl = process.env.VITE_CONVEX_URL;
+if (!convexUrl) {
+  throw new Error("VITE_CONVEX_URL environment variable is required");
+}
+
+const convexSiteUrl = process.env.VITE_CONVEX_SITE_URL;
+if (!convexSiteUrl) {
+  throw new Error("VITE_CONVEX_SITE_URL environment variable is required");
+}
 
 // Initialize with all server utilities
 export const {

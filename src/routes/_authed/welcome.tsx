@@ -15,11 +15,13 @@ function WelcomePage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const setDisplayNameMutation = useConvexMutation(api.leaderboard.setDisplayName);
+  const setDisplayNameMutation = useConvexMutation(
+    api.leaderboard.setDisplayName,
+  );
 
   // Check if user already has a display name
   const { data: userInfo } = useQuery(
-    convexQuery(api.leaderboard.getUserInfo, {})
+    convexQuery(api.leaderboard.getUserInfo, {}),
   );
 
   // If user already has displayName, redirect to dashboard
@@ -66,8 +68,8 @@ function WelcomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      <div className="bg-slate-900 p-8 rounded-lg shadow-xl w-full max-w-md">
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
+      <div className="bg-gray-900 p-8 rounded-lg shadow-xl w-full max-w-md">
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-white mb-2">
             Welcome to SongScript! 🎵
@@ -90,7 +92,7 @@ function WelcomePage() {
               type="text"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               placeholder="Your name"
               maxLength={20}
             />
@@ -124,7 +126,7 @@ function WelcomePage() {
           </div>
         </div>
 
-        <div className="mt-6 pt-6 border-t border-slate-700">
+        <div className="mt-6 pt-6 border-t border-gray-700">
           <p className="text-gray-500 text-xs text-center">
             You can always set your display name later in Settings
           </p>
