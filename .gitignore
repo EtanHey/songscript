@@ -61,3 +61,6 @@ skills/
 count.txt
 todos.json
 .claude.json
+
+# MCP config (contains secrets)
+.mcp.json
