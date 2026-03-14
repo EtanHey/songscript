@@ -5,7 +5,7 @@ import {
   createRootRoute,
   Link,
 } from "@tanstack/react-router";
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
 
 import Header from "../components/Header";
 
@@ -117,17 +117,19 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           <Header />
           {children}
         </ConvexClientProvider>
-        <TanStackDevtools
-          config={{
-            position: "bottom-right",
-          }}
-          plugins={[
-            {
-              name: "Tanstack Router",
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
+        <Suspense fallback={null}>
+          <TanStackDevtools
+            config={{
+              position: "bottom-right",
+            }}
+            plugins={[
+              {
+                name: "Tanstack Router",
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+            ]}
+          />
+        </Suspense>
         <Scripts />
       </body>
     </html>

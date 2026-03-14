@@ -334,6 +334,32 @@ function SongPageContent({ songId }: SongPageContentProps) {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // Keyboard shortcut hint (desktop only, dismisses after first interaction)
+  const [showSpaceHint, setShowSpaceHint] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return !localStorage.getItem("songscript-space-hint-dismissed");
+  });
+
+  // Auto-dismiss after 8 seconds or on first spacebar press
+  useEffect(() => {
+    if (!showSpaceHint || isMobile) return;
+    const timer = setTimeout(() => {
+      setShowSpaceHint(false);
+      localStorage.setItem("songscript-space-hint-dismissed", "1");
+    }, 8000);
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.code === "Space") {
+        setShowSpaceHint(false);
+        localStorage.setItem("songscript-space-hint-dismissed", "1");
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("keydown", handleKey);
+    };
+  }, [showSpaceHint, isMobile]);
+
   // Activity tracking for practice time
   const lastActivityRef = useRef<number>(Date.now());
   const IDLE_THRESHOLD_MS = 5000; // 5 seconds of no activity = idle
@@ -362,12 +388,17 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
   // Determine if we should count practice time
   // Count when: video playing (not fluid+muted) OR modal open
+  // For YouTube player, mute state isn't controllable via our UI yet,
+  // so treat it as unmuted for practice tracking purposes
+  const isUsingYouTube = !song?.videoUrl && !!song?.youtubeId;
+  const effectiveIsMuted = isUsingYouTube ? false : isVideoMuted;
+
   const shouldCountTime = useMemo(() => {
-    const isFluidMuted = playbackMode === "fluid" && isVideoMuted;
+    const isFluidMuted = playbackMode === "fluid" && effectiveIsMuted;
     const isActivelyPracticing = isVideoPlaying && !isFluidMuted;
     const isInModal = wordModalOpen;
     return isActivelyPracticing || isInModal;
-  }, [playbackMode, isVideoMuted, isVideoPlaying, wordModalOpen]);
+  }, [playbackMode, effectiveIsMuted, isVideoPlaying, wordModalOpen]);
 
   // Practice time tracking - count and log every second, but only when active
   useEffect(() => {
@@ -893,6 +924,17 @@ function SongPageContent({ songId }: SongPageContentProps) {
                   className="flex items-center gap-1 mr-2"
                   onClick={(e) => e.stopPropagation()}
                 >
+                  <button
+                    onClick={togglePlayPause}
+                    className="p-1.5 rounded bg-gray-900 text-white hover:bg-gray-700 transition-colors"
+                    aria-label={isVideoPlaying ? "Pause" : "Play"}
+                  >
+                    {isVideoPlaying ? (
+                      <Pause className="h-3.5 w-3.5" />
+                    ) : (
+                      <Play className="h-3.5 w-3.5" />
+                    )}
+                  </button>
                   <ToggleGroup
                     type="single"
                     value={playbackMode}
@@ -1013,23 +1055,35 @@ function SongPageContent({ songId }: SongPageContentProps) {
 
             <div className="flex flex-col gap-3 rounded-lg bg-gray-800 p-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
               {/* Pause/Play Button */}
-              <button
-                onClick={togglePlayPause}
-                className="flex items-center gap-2 rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-600 transition-colors"
-                title={isVideoPlaying ? "Pause (Space)" : "Play (Space)"}
-              >
-                {isVideoPlaying ? (
-                  <>
-                    <Pause className="h-4 w-4" />
-                    <span>Pause</span>
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-4 w-4" />
-                    <span>Play</span>
-                  </>
+              <div className="relative">
+                <button
+                  onClick={togglePlayPause}
+                  className="flex items-center gap-2 rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-600 transition-colors"
+                  title={isVideoPlaying ? "Pause (Space)" : "Play (Space)"}
+                >
+                  {isVideoPlaying ? (
+                    <>
+                      <Pause className="h-4 w-4" />
+                      <span>Pause</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4" />
+                      <span>Play</span>
+                    </>
+                  )}
+                </button>
+                {/* Keyboard shortcut hint - desktop only, dismisses after first use */}
+                {showSpaceHint && !isMobile && (
+                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 shadow-lg animate-pulse">
+                    Press{" "}
+                    <kbd className="rounded bg-gray-600 px-1 font-mono">
+                      Space
+                    </kbd>{" "}
+                    to play/pause
+                  </div>
                 )}
-              </button>
+              </div>
 
               {/* Desktop: Current Line Indicator */}
               {currentLineIndex !== undefined && (
