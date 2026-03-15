@@ -63,9 +63,12 @@ export default function Header() {
   });
 
   const handleSignOut = async () => {
-    await authClient.signOut();
-    queryClient.clear();
-    navigate({ to: "/" });
+    try {
+      await authClient.signOut();
+    } finally {
+      queryClient.clear();
+      navigate({ to: "/" });
+    }
   };
 
   const user = session?.user;
