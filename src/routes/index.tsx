@@ -117,8 +117,8 @@ function HomePage() {
                     <span>{getLanguageDisplayName(song.sourceLanguage)}</span>
                   </div>
                 </div>
-                {/* Progress bar for authenticated users */}
-                {(progressMap.get(song._id) ?? 0) > 0 && (
+                {/* Progress bar for authenticated users — gate on session to prevent stale cache after logout */}
+                {session?.user && (progressMap.get(song._id) ?? 0) > 0 && (
                   <div
                     className="h-1 bg-gray-800"
                     role="progressbar"
