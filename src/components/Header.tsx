@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@convex/_generated/api";
 import { authClient } from "../lib/auth-client";
@@ -47,6 +47,7 @@ function getInitials(name?: string | null, email?: string | null): string {
 export default function Header() {
   const { data: session, isPending } = authClient.useSession();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const isLoggedIn = !!session?.user;
 
   // Get user stats for practice time
@@ -62,8 +63,12 @@ export default function Header() {
   });
 
   const handleSignOut = async () => {
-    await authClient.signOut();
-    navigate({ to: "/" });
+    try {
+      await authClient.signOut();
+    } finally {
+      queryClient.clear();
+      navigate({ to: "/" });
+    }
   };
 
   const user = session?.user;
