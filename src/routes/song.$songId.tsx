@@ -521,8 +521,8 @@ function SongPageContent({ songId }: SongPageContentProps) {
           persistVideoCollapsed(false);
         }
       } else {
-        // Loop/Single mode: start from current line, active line, or first line
-        const lineIndexToPlay = currentLineIndex ?? activeLineIndex ?? 0;
+        // Loop/Single mode: prefer live position (activeLineIndex) over last-clicked line
+        const lineIndexToPlay = activeLineIndex ?? currentLineIndex ?? 0;
         if (sortedLyrics[lineIndexToPlay]) {
           setCurrentLineIndex(lineIndexToPlay);
           setActiveLineIndex(lineIndexToPlay);
@@ -1105,11 +1105,11 @@ function SongPageContent({ songId }: SongPageContentProps) {
                 )}
               </div>
 
-              {/* Desktop: Current Line Indicator */}
-              {currentLineIndex !== undefined && (
+              {/* Desktop: Current Line Indicator — uses activeLineIndex for live fluid updates */}
+              {(activeLineIndex ?? currentLineIndex) !== undefined && (
                 <div className="hidden md:flex items-center gap-2">
                   <span className="rounded bg-primary/20 px-2 py-1 text-xs font-medium text-primary">
-                    Line {currentLineIndex + 1}
+                    Line {(activeLineIndex ?? currentLineIndex)! + 1}
                   </span>
                 </div>
               )}

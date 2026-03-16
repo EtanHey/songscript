@@ -104,14 +104,15 @@ export default function LyricsDisplay({
             ref={(el) => {
               lineRefs.current[index] = el as HTMLButtonElement | null;
             }}
-            className={`flex min-h-11 items-start gap-2 rounded-lg p-3 transition-all duration-150 ${
+            className={`flex min-h-11 items-start gap-2 rounded-lg p-3 transition-all duration-200 ${
               activeLineIndex === index
-                ? "bg-primary/10 ring-1 ring-primary/20"
-                : ""
+                ? "bg-primary/15 ring-2 ring-primary/40 shadow-md shadow-primary/20 scale-[1.01]"
+                : activeLineIndex !== undefined
+                  ? "opacity-60"
+                  : ""
             } ${
               clickedLineIndex === index ? "scale-[0.98] bg-primary/20" : ""
             } ${
-              // Visual state styling
               lineState === "learned" ? "border-l-4 border-l-emerald-500" : ""
             }`}
           >
@@ -136,7 +137,7 @@ export default function LyricsDisplay({
             <button
               type="button"
               onClick={() => onLineClick?.(line.startTime, index)}
-              className="flex flex-1 flex-col gap-1 text-left hover:opacity-80 transition-opacity"
+              className="flex flex-1 flex-col gap-1 text-left hover:brightness-125 transition-[filter]"
             >
               {/* Original text - direction based on source language */}
               {(languageFilter === "all" || languageFilter === "source") && (

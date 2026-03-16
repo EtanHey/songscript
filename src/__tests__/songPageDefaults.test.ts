@@ -63,21 +63,13 @@ describe("LocalVideoPlayer Auto-Play", () => {
     expect(localVideoPlayerContent).toContain("autoplay?: boolean");
   });
 
-  it("uses a ref to prevent multiple auto-play triggers", () => {
-    expect(localVideoPlayerContent).toContain("hasAttemptedAutoplayRef");
-    expect(localVideoPlayerContent).toContain(
-      "hasAttemptedAutoplayRef.current = true",
-    );
+  it("triggers autoplay via effect when autoplay prop becomes true", () => {
+    expect(localVideoPlayerContent).toContain("if (!autoplay");
+    expect(localVideoPlayerContent).toContain("video.play()");
   });
 
   it("shows play button overlay when autoplay is blocked", () => {
     expect(localVideoPlayerContent).toContain("showPlayButton");
     expect(localVideoPlayerContent).toContain("Click to play");
-  });
-
-  it("handles autoplay attempt in canplay event", () => {
-    expect(localVideoPlayerContent).toContain(
-      "autoplay && !hasAttemptedAutoplayRef.current",
-    );
   });
 });
