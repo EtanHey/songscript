@@ -162,7 +162,14 @@ export function useLineProgress({
           return next;
         });
 
-        toggleLineLearnedMutation({ songId, lineNumber });
+        toggleLineLearnedMutation({ songId, lineNumber }).catch(() => {
+          // Revert optimistic state on mutation failure
+          setOptimisticToggles((prev) => {
+            const next = new Map(prev);
+            next.delete(lineNumber);
+            return next;
+          });
+        });
       } else {
         progress.toggleLineLearned(songId, lineNumber);
       }
@@ -181,13 +188,15 @@ export function useLineProgress({
   const handleToggleWordLearned = useCallback(
     (wordId: Id<"words">, persian: string) => {
       if (isAuthenticated) {
-        toggleWordLearnedMutation({ wordId, persian }).then(
-          (newLearnedState) => {
+        toggleWordLearnedMutation({ wordId, persian })
+          .then((newLearnedState) => {
             if (newLearnedState) {
               logPracticeMutation({ eventType: "word_learned", value: 1 });
             }
-          },
-        );
+          })
+          .catch(() => {
+            // Silently handle — word toggle is idempotent, no optimistic state to revert
+          });
       } else {
         progress.toggleWordLearned(persian, wordId);
       }
