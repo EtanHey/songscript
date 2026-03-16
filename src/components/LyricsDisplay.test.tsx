@@ -146,9 +146,9 @@ describe("LyricsDisplay", () => {
       .getByText("For being afraid at the moment of kissing")
       .closest("button");
     const lineContainer = button?.parentElement;
-    expect(lineContainer).toHaveClass("bg-primary/10");
-    expect(lineContainer).toHaveClass("ring-1");
-    expect(lineContainer).toHaveClass("ring-primary/20");
+    expect(lineContainer).toHaveClass("bg-primary/15");
+    expect(lineContainer).toHaveClass("ring-2");
+    expect(lineContainer).toHaveClass("ring-primary/40");
   });
 
   it("applies click animation class to clicked line", () => {
