@@ -279,11 +279,10 @@ bun run test:e2e
 
 Tests are automatically run on commit via Husky pre-commit hooks.
 
-### TypeScript & Linting
+### TypeScript
 
 ```bash
 bun run typecheck      # Type checking
-bun run lint           # ESLint
 ```
 
 ### Building for Production
@@ -369,7 +368,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-[MIT](LICENSE)
+[Apache 2.0](LICENSE)
 
 ---
 

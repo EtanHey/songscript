@@ -1,257 +1,81 @@
 # SongScript
 
-Song transliteration learning app - follow each line of a song and learn to read/pronounce it.
+Song transliteration learning app — follow each line of a song and learn to read/pronounce it.
 
-## Project Status: 🚧 In Development
+## Purpose (WHY)
+- Display song lyrics line by line with transliteration
+- Help users learn pronunciation by following along
+- Supported languages: Persian, Korean, Arabic, Hebrew, English
 
-Tech stack decided. Ralph will execute PRD.md stories.
+## Tech Stack (WHAT)
+- Framework: TanStack Start (Bun runtime)
+- Database: Convex (real-time sync)
+- Auth: Convex + Better Auth
+- Styling: Tailwind CSS + shadcn/ui
+- State: @convex-dev/react-query + TanStack Query
+- Testing: Vitest (199 tests) + Playwright (E2E)
 
----
+## Workflow (HOW)
 
-## 🤖 RALPH WORKFLOW
-
-This project uses Ralph for autonomous task execution.
-
-### Commands
-```bash
-ralph [N]           # Run N iterations on PRD.md
-ralph-init          # Create PRD template
-ralph-archive       # Archive completed stories
-ralph-status        # Show PRD status
-```
-
-### After Creating a PRD
-**🛑 STOP. Do NOT implement. Do NOT spawn subagents.**
-
-The `/prd` command creates `PRD.md` and `progress.txt`, then YOU (Claude) must STOP and tell the user: "PRD ready. Run Ralph to execute."
-
----
-
-## 🚨 GIT SAFETY
-
-**NEVER commit or push unless explicitly told.**
-**ALWAYS ask which branch before committing.**
+### Git safety
+Never commit or push unless explicitly told.
+Always ask which branch before committing.
 
 ```bash
 git status  # Check current branch FIRST
-# Then ASK: "Should I commit to <branch-name>?"
+# Then ask: "Should I commit to <branch-name>?"
 ```
 
----
+### Convex .js file error (critical)
+If Convex sees both `.ts` and `.js` in `convex/`, it will fail with:
+`Two output files share the same path but have different contents`.
+Fix by removing stray JS files before starting dev:
 
-## 🔥 CONVEX .JS FILE ERROR (CRITICAL - MEMORIZE THIS)
-
-**Error message:**
-```
-✘ [ERROR] Two output files share the same path but have different contents: out/filename.js
-```
-
-### What Causes It
-Convex bundler finds BOTH `.ts` and `.js` files with the same name in `convex/` folder.
-This happens when:
-1. Git worktrees are created (copies compiled .js files)
-2. Convex crashes mid-compilation
-3. Manual file operations gone wrong
-
-### BEFORE Starting Convex Dev Server - ALWAYS RUN:
 ```bash
 rm -f convex/*.js
 npx convex dev
 ```
 
-### Fix When Error Occurs:
-```bash
-# Stop convex dev (Ctrl+C)
-rm -f convex/*.js
-npx convex dev
-```
+If it happens mid-run, stop dev, delete `convex/*.js`, restart.
+Never create `.js` files in `convex/` (only `.ts`).
 
-### Prevention Rules:
-1. **NEVER create .js files in convex/** - Only .ts files belong there
-2. **After creating git worktree** - Run `rm -f convex/*.js` before `npx convex dev`
-3. **Add to .gitignore** - Ensure `convex/*.js` is ignored (it should be)
-4. **Check before starting** - Quick `ls convex/*.js 2>/dev/null` to verify clean state
+Prevention rules:
+- After creating a git worktree, run `rm -f convex/*.js` before `npx convex dev`
+- Ensure `convex/*.js` is ignored in `.gitignore`
+- Check before starting: `ls convex/*.js 2>/dev/null`
 
-### For Ralph/Automated Workflows:
-Add this to the START of any iteration that uses Convex:
-```bash
-# Clean Convex before starting
-rm -f convex/*.js 2>/dev/null || true
-```
+### Testing requirements
+All new helpers/utilities must have tests.
 
----
-
-## Project Structure
-
-```
-songscript/
-├── CLAUDE.md          ← This file
-├── README.md          ← Project description
-├── PRD.md             ← Ralph task list
-├── progress.txt       ← Ralph progress
-├── app/
-│   ├── components/    ← React components
-│   │   ├── YouTubePlayer.tsx
-│   │   └── LyricsDisplay.tsx
-│   ├── routes/        ← TanStack file-based routes
-│   │   ├── index.tsx
-│   │   ├── login.tsx
-│   │   └── song.$songId.tsx
-│   └── styles/
-│       └── globals.css
-├── convex/
-│   ├── schema.ts      ← Database schema
-│   ├── songs.ts       ← Queries/mutations
-│   ├── seed.ts        ← Seed data
-│   └── auth.ts        ← Auth config
-├── package.json
-├── vite.config.ts
-└── tailwind.config.ts
-```
-
----
-
-## Core Concept
-
-**Song transliteration learning:**
-- Display song lyrics line by line
-- Show transliteration (phonetic spelling in user's alphabet)
-- User follows along, learns pronunciation
-- Possibly: audio sync, progress tracking, spaced repetition
-
-**Target languages:** TBD (Hebrew songs? K-pop? Arabic? All?)
-
----
-
-## Tech Stack (DECIDED)
-
-- **Framework:** TanStack Start (with Bun runtime)
-- **Database:** Convex (real-time sync)
-- **Auth:** Convex + Better Auth (admin-only for v1)
-- **Styling:** Tailwind CSS + ShadCN UI
-- **State:** @convex-dev/react-query + TanStack Query
-- **Testing:** Vitest + Playwright
-
-**References:**
-- [TanStack Start + Bun](https://bun.com/docs/guides/ecosystem/tanstack-start)
-- [Convex + TanStack Start](https://docs.convex.dev/quickstart/tanstack-start)
-- [Convex + Better Auth](https://labs.convex.dev/better-auth/framework-guides/tanstack-start)
-
----
-
-## 🧪 TESTING REQUIREMENTS
-
-**All new helpers/utilities MUST have tests.**
-
-### Test Location Convention
+Test locations:
 - Component tests: `src/components/ComponentName.test.tsx`
 - Hook tests: `src/hooks/hookName.test.ts`
 - Utility tests: `src/lib/utilName.test.ts` or `src/utils/utilName.test.ts`
 - Integration tests: `src/__tests__/featureName.test.ts`
+- Convex function tests: `convex/functionName.test.ts`
 
-### Pre-commit Hooks
-Tests run automatically on every commit via Husky:
+Pre-commit hooks run:
 ```bash
-bun run test        # Unit tests (Vitest)
-bun run typecheck   # TypeScript check
+bun run test      # Unit tests (Vitest)
+bun run typecheck # TypeScript check
 ```
 
 If tests fail, the commit is blocked. Fix tests before committing.
 
-### Running Tests Manually
+Manual test commands:
 ```bash
-bun run test        # Run all tests once
+bun run test        # Run all tests once (199 tests)
 bun run test:watch  # Watch mode for development
 bun run test:e2e    # Playwright E2E tests
 ```
 
-### When Creating New Code
-1. **New helper/utility** → Create `*.test.ts` file with unit tests
-2. **New component with logic** → Create `*.test.tsx` file
-3. **Bug fix** → Add regression test if possible
-4. **Refactoring** → Ensure existing tests still pass
+When creating new code:
+1. New helper/utility -> add `*.test.ts`
+2. New component with logic -> add `*.test.tsx`
+3. Bug fix -> add regression test if possible
+4. Refactor -> ensure existing tests still pass
 
----
-
-## 🎵 WHISPERX PIPELINE (Add New Songs in 30 min)
-
-**Full documentation:** `docs.local/learnings/whisperx-pipeline.md`
-
-### Quick Reference
-```bash
-# 1. Download audio
-cd scripts/whisperx
-yt-dlp -f "bestaudio[ext=m4a]" -o "downloads/SONGNAME.m4a" "YOUTUBE_URL"
-
-# 2. Activate venv & run WhisperX
-source venv/bin/activate
-whisperx downloads/SONGNAME.m4a \
-  --model large-v3 \
-  --language fa \
-  --align_model jonatasgrosman/wav2vec2-large-xlsr-53-persian \
-  --output_dir output/ \
-  --output_format json
-
-# 3. Match words to lines (custom script per song structure)
-python3 final_timestamps.py
-
-# 4. Apply to database
-npx convex run lyrics:updateTimestamps '{"songId": "ID", "unlockCode": "UNLOCK_TIMESTAMPS", "updates": [...]}'
-```
-
-### Language Models
-| Language | Code | Alignment Model |
-|----------|------|-----------------|
-| Persian | fa | `jonatasgrosman/wav2vec2-large-xlsr-53-persian` |
-| Korean | ko | `jonatasgrosman/wav2vec2-large-xlsr-53-korean` |
-| Arabic | ar | `jonatasgrosman/wav2vec2-large-xlsr-53-arabic` |
-| Hebrew | he | `imvladikon/wav2vec2-xls-r-300m-hebrew` |
-
-### Key Insight
-For songs with repeating patterns (e.g., "برای" in Baraye):
-1. Count pattern word occurrences in WhisperX output
-2. Map each occurrence to line numbers
-3. Handle lines with DOUBLE patterns specially
-4. Interpolate for WhisperX gaps
-
----
-
-## 🛠️ SKILLS (from ralphtools)
-
-Skills are sourced globally from `~/.claude/commands/` (symlinked to ralphtools).
-
-### Convex Workflows
-
-Use `/convex` for Convex-specific tasks:
-
-| Workflow | Use Case |
-|----------|----------|
-| `/convex dev` | Start dev server |
-| `/convex deploy` | Deploy to production |
-| `/convex user-deletion` | Delete user and all related data |
-| `/convex run-function` | Run queries/mutations |
-| `/convex troubleshooting` | Debug common issues |
-
-### Other Available Skills
-
-| Skill | Description |
-|-------|-------------|
-| `/1password` | Secret management |
-| `/github` | Commits, PRs, issues |
-| `/worktrees` | Git worktree isolation |
-
-### Updating Skills
-
-Skills auto-update when ralphtools is pulled:
-```bash
-cd ~/.config/ralph && git pull
-```
-
----
-
-## CLAUDE_COUNTER SYSTEM
-
-Every response MUST end with: `CLAUDE_COUNTER: N`
-
-- Start at 10, decrement by 1 each response
-- When 0: re-read CLAUDE.md, reset to 10
+### WhisperX pipeline
+Full documentation: `docs.local/learnings/whisperx-pipeline.md`
+Use it when adding songs or updating timestamps.
+Pipeline scripts live in `scripts/whisperx/`.
