@@ -64,3 +64,6 @@ todos.json
 
 # MCP config (contains secrets)
 .mcp.json
+.worktrees/
+.claude/worktrees/
+.cmux/worktrees/
