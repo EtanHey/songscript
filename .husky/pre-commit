@@ -19,5 +19,7 @@ echo "All checks passed"
 
 # Guard — no tracked docs.local/ (personal data; see scripts/guard-no-docslocal.sh)
 if [ -f scripts/guard-no-docslocal.sh ]; then
-  sh scripts/guard-no-docslocal.sh || exit 1
+  # Must be `bash`: the guard uses `set -o pipefail`, which POSIX shells
+  # (dash on Ubuntu/Debian, where /bin/sh is dash) reject outright.
+  bash scripts/guard-no-docslocal.sh || exit 1
 fi
