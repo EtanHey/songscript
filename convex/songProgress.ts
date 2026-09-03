@@ -236,8 +236,10 @@ export const toggleLineLearned = mutation({
         q.eq("userId", userId)
       )
       .filter((q) =>
-        q.eq(q.field("songId"), args.songId) &&
-        q.eq(q.field("lineNumber"), args.lineNumber)
+        q.and(
+          q.eq(q.field("songId"), args.songId),
+          q.eq(q.field("lineNumber"), args.lineNumber)
+        )
       )
       .first();
 
