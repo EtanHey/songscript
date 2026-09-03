@@ -172,4 +172,65 @@ describe('YouTubePlayer', () => {
     // Check destroy was called
     expect(mockPlayerInstance.destroy).toHaveBeenCalled()
   })
+
+  it('shows error when YouTube API script fails to load', async () => {
+    // Remove YT so the component tries to load the script
+    ;(window as unknown as { YT: unknown }).YT = undefined
+
+    render(<YouTubePlayer videoId="test123" />)
+
+    // The component should have created a script tag - fire error on it
+    await waitFor(() => {
+      const script = document.getElementById('youtube-iframe-api')
+      expect(script).not.toBeNull()
+    })
+
+    const script = document.getElementById('youtube-iframe-api')!
+    act(() => {
+      script.dispatchEvent(new Event('error'))
+    })
+
+    await waitFor(() => {
+      expect(screen.getByText('Failed to load YouTube player')).toBeInTheDocument()
+    })
+
+    // Clean up the script tag for other tests
+    script.remove()
+  })
+
+  it('allows retry after script load failure', async () => {
+    // First: fail the load
+    ;(window as unknown as { YT: unknown }).YT = undefined
+
+    const { unmount } = render(<YouTubePlayer videoId="test123" />)
+
+    await waitFor(() => {
+      const script = document.getElementById('youtube-iframe-api')
+      expect(script).not.toBeNull()
+    })
+
+    const script = document.getElementById('youtube-iframe-api')!
+    act(() => {
+      script.dispatchEvent(new Event('error'))
+    })
+
+    await waitFor(() => {
+      expect(screen.getByText('Failed to load YouTube player')).toBeInTheDocument()
+    })
+
+    unmount()
+    script.remove()
+
+    // Second: retry with YT available should succeed
+    ;(window as unknown as { YT: unknown }).YT = {
+      Player: MockYTPlayer,
+      PlayerState: { UNSTARTED: -1, ENDED: 0, PLAYING: 1, PAUSED: 2, BUFFERING: 3, CUED: 5 },
+    }
+
+    render(<YouTubePlayer videoId="retry123" />)
+
+    await waitFor(() => {
+      expect(MockYTPlayer).toHaveBeenCalled()
+    })
+  })
 })

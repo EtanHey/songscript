@@ -83,6 +83,8 @@ interface YouTubePlayerProps {
 
 let apiLoadPromise: Promise<void> | null = null
 
+const API_LOAD_TIMEOUT_MS = 10000
+
 function loadYouTubeAPI(): Promise<void> {
   if (apiLoadPromise) return apiLoadPromise
 
@@ -90,34 +92,53 @@ function loadYouTubeAPI(): Promise<void> {
     return Promise.resolve()
   }
 
-  apiLoadPromise = new Promise((resolve) => {
+  apiLoadPromise = new Promise((resolve, reject) => {
     if (typeof window === 'undefined') {
       resolve()
       return
     }
 
+    const timeout = setTimeout(() => {
+      apiLoadPromise = null
+      reject(new Error('YouTube API load timed out'))
+    }, API_LOAD_TIMEOUT_MS)
+
+    const onLoad = () => {
+      clearTimeout(timeout)
+      resolve()
+    }
+
+    const onError = () => {
+      clearTimeout(timeout)
+      apiLoadPromise = null
+      reject(new Error('Failed to load YouTube API script'))
+    }
+
     const existingScript = document.getElementById('youtube-iframe-api')
     if (existingScript) {
       if (window.YT && window.YT.Player) {
+        clearTimeout(timeout)
         resolve()
       } else {
         const originalCallback = window.onYouTubeIframeAPIReady
         window.onYouTubeIframeAPIReady = () => {
           originalCallback?.()
-          resolve()
+          onLoad()
         }
+        existingScript.addEventListener('error', onError)
       }
       return
     }
 
     window.onYouTubeIframeAPIReady = () => {
-      resolve()
+      onLoad()
     }
 
     const script = document.createElement('script')
     script.id = 'youtube-iframe-api'
     script.src = 'https://www.youtube.com/iframe_api'
     script.async = true
+    script.addEventListener('error', onError)
     document.body.appendChild(script)
   })
 
