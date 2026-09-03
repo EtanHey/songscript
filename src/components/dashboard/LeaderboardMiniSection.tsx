@@ -8,6 +8,32 @@ import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import { Button } from "../ui/button";
 
 type LeaderboardType = "streak" | "progress";
+type StreakEntry = { rank: number; displayName: string; streak: number; language: string };
+type ProgressEntry = { rank: number; displayName: string; score: number; topLanguage: string };
+
+function MiniLeaderboardRow({ rank, displayName, medal, isCurrentUser, value }: {
+  rank: number;
+  displayName: string;
+  medal: string | null;
+  isCurrentUser: boolean;
+  value: string;
+}) {
+  return (
+    <div
+      className={`flex items-center justify-between p-2 rounded-lg ${
+        isCurrentUser ? "bg-primary/10 border border-primary/20" : "bg-muted/30"
+      }`}
+    >
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-medium w-6">
+          {medal || `#${rank}`}
+        </span>
+        <span className="text-sm font-medium">{displayName}</span>
+      </div>
+      <div className="text-sm text-muted-foreground">{value}</div>
+    </div>
+  );
+}
 
 export function LeaderboardMiniSection() {
   const [selectedType, setSelectedType] = useState<LeaderboardType>("streak");
@@ -35,7 +61,7 @@ export function LeaderboardMiniSection() {
   );
 
   const hasDisplayName = userInfo?.displayName !== null;
-  const leaderboardData = selectedType === "streak" ? streakData : progressData;
+  const isStreak = selectedType === "streak";
 
   // Medal icons for top 3
   const getMedalIcon = (rank: number) => {
@@ -82,32 +108,28 @@ export function LeaderboardMiniSection() {
           </div>
         ) : (
           <div className="space-y-3">
-            {leaderboardData.map((user: typeof leaderboardData[0]) => {
-              const isCurrentUser = hasDisplayName && userRank && user.rank === userRank.rank;
-              const medal = getMedalIcon(user.rank);
-              
-              return (
-                <div
-                  key={`${user.displayName}-${user.rank}`}
-                  className={`flex items-center justify-between p-2 rounded-lg ${
-                    isCurrentUser ? "bg-primary/10 border border-primary/20" : "bg-muted/30"
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium w-6">
-                      {medal || `#${user.rank}`}
-                    </span>
-                    <span className="text-sm font-medium">{user.displayName}</span>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {selectedType === "streak" 
-                      ? `${(user as any).streak || 0} days`
-                      : `${(user as any).score || 0} pts`
-                    }
-                  </div>
-                </div>
-              );
-            })}
+            {isStreak
+              ? streakData.map((user: StreakEntry) => (
+                  <MiniLeaderboardRow
+                    key={`${user.displayName}-${user.rank}`}
+                    rank={user.rank}
+                    displayName={user.displayName}
+                    medal={getMedalIcon(user.rank)}
+                    isCurrentUser={!!(hasDisplayName && userRank && user.rank === userRank.rank)}
+                    value={`${user.streak || 0} days`}
+                  />
+                ))
+              : progressData.map((user: ProgressEntry) => (
+                  <MiniLeaderboardRow
+                    key={`${user.displayName}-${user.rank}`}
+                    rank={user.rank}
+                    displayName={user.displayName}
+                    medal={getMedalIcon(user.rank)}
+                    isCurrentUser={!!(hasDisplayName && userRank && user.rank === userRank.rank)}
+                    value={`${user.score || 0} pts`}
+                  />
+                ))
+            }
 
             {/* Show current user's rank if not in top 5 but in top 50 */}
             {hasDisplayName && userRank && userRank.rank > 5 && userRank.rank <= 50 && (

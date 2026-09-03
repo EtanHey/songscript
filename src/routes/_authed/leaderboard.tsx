@@ -15,6 +15,45 @@ export const Route = createFileRoute("/_authed/leaderboard")({
 type LeaderboardType = "streak" | "progress";
 type TimePeriod = "weekly" | "monthly" | "all-time";
 
+type StreakEntry = { rank: number; displayName: string; streak: number; language: string };
+type ProgressEntry = { rank: number; displayName: string; score: number; topLanguage: string };
+
+function LeaderboardRow({ rank, displayName, medal, isUser, language, value }: {
+  rank: number;
+  displayName: string;
+  medal: string | null;
+  isUser: boolean;
+  language: string;
+  value: string;
+}) {
+  return (
+    <div
+      className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
+        isUser
+          ? "bg-primary/10 border border-primary/20"
+          : "hover:bg-muted/50"
+      }`}
+    >
+      <div className="w-8 text-center font-mono text-sm text-muted-foreground">
+        {rank}
+      </div>
+      <div className="w-6 text-center">
+        {medal && <span className="text-lg">{medal}</span>}
+      </div>
+      <div className="flex items-center gap-3 flex-1">
+        <span className="text-lg">{language}</span>
+        <span className="font-medium">
+          {displayName}
+          {isUser && <span className="ml-2 text-primary">⭐</span>}
+        </span>
+      </div>
+      <div className="text-right">
+        <div className="font-mono font-medium">{value}</div>
+      </div>
+    </div>
+  );
+}
+
 function LeaderboardPage() {
   const [selectedType, setSelectedType] = useState<LeaderboardType>("streak");
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>("all-time");
@@ -48,8 +87,9 @@ function LeaderboardPage() {
     })
   );
 
-  const leaderboardData = selectedType === "streak" ? streakData : progressData;
-  const isLoading = selectedType === "streak" ? streakLoading : progressLoading;
+  const isStreak = selectedType === "streak";
+  const leaderboardData = isStreak ? streakData : progressData;
+  const isLoading = isStreak ? streakLoading : progressLoading;
 
   // Medal icons for top 3
   const getMedalIcon = (rank: number) => {
@@ -140,60 +180,36 @@ function LeaderboardPage() {
             </div>
           ) : (
             <div className="space-y-2">
-              {leaderboardData.map((user: typeof leaderboardData[0], index: number) => {
-                const rank = offset + index + 1;
-                const medal = getMedalIcon(rank);
-                const isUser = isCurrentUser(rank);
-                
-                return (
-                  <div
-                    key={`${user.displayName}-${rank}`}
-                    className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
-                      isUser 
-                        ? "bg-primary/10 border border-primary/20" 
-                        : "hover:bg-muted/50"
-                    }`}
-                  >
-                    {/* Rank */}
-                    <div className="w-8 text-center font-mono text-sm text-muted-foreground">
-                      {rank}
-                    </div>
-
-                    {/* Medal for top 3 */}
-                    <div className="w-6 text-center">
-                      {medal && <span className="text-lg">{medal}</span>}
-                    </div>
-
-                    {/* User info */}
-                    <div className="flex items-center gap-3 flex-1">
-                      {/* Language flag */}
-                      <span className="text-lg">
-                        {getLanguageFlagString(
-                          selectedType === "streak" 
-                            ? (user as any).language 
-                            : (user as any).topLanguage
-                        )}
-                      </span>
-                      
-                      {/* Display name with star for current user */}
-                      <span className="font-medium">
-                        {user.displayName}
-                        {isUser && <span className="ml-2 text-primary">⭐</span>}
-                      </span>
-                    </div>
-
-                    {/* Score */}
-                    <div className="text-right">
-                      <div className="font-mono font-medium">
-                        {selectedType === "streak" 
-                          ? `${(user as any).streak} days`
-                          : `${Math.round((user as any).score)} pts`
-                        }
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              {isStreak
+                ? streakData.map((user: StreakEntry, index: number) => {
+                    const rank = offset + index + 1;
+                    return (
+                      <LeaderboardRow
+                        key={`${user.displayName}-${rank}`}
+                        rank={rank}
+                        displayName={user.displayName}
+                        medal={getMedalIcon(rank)}
+                        isUser={isCurrentUser(rank)}
+                        language={getLanguageFlagString(user.language)}
+                        value={`${user.streak} days`}
+                      />
+                    );
+                  })
+                : progressData.map((user: ProgressEntry, index: number) => {
+                    const rank = offset + index + 1;
+                    return (
+                      <LeaderboardRow
+                        key={`${user.displayName}-${rank}`}
+                        rank={rank}
+                        displayName={user.displayName}
+                        medal={getMedalIcon(rank)}
+                        isUser={isCurrentUser(rank)}
+                        language={getLanguageFlagString(user.topLanguage)}
+                        value={`${Math.round(user.score)} pts`}
+                      />
+                    );
+                  })
+              }
             </div>
           )}
 
