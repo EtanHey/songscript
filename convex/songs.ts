@@ -1,4 +1,4 @@
-import { query, mutation } from "./_generated/server";
+import { query, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 
 export const list = query({
@@ -15,7 +15,7 @@ export const getById = query({
   },
 });
 
-export const create = mutation({
+export const create = internalMutation({
   args: {
     title: v.string(),
     artist: v.string(),
@@ -31,7 +31,7 @@ export const create = mutation({
 });
 
 // Delete a song and all its lyrics/words
-export const deleteSong = mutation({
+export const deleteSong = internalMutation({
   args: { songId: v.id("songs") },
   handler: async (ctx, args) => {
     // Delete all lyrics for this song
@@ -59,7 +59,7 @@ export const deleteSong = mutation({
 });
 
 // Set the video URL for a song
-export const setVideoUrl = mutation({
+export const setVideoUrl = internalMutation({
   args: { songId: v.id("songs"), videoUrl: v.string() },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.songId, { videoUrl: args.videoUrl });
@@ -68,7 +68,7 @@ export const setVideoUrl = mutation({
 });
 
 // Lock timestamps to prevent AI from modifying them without explicit unlock
-export const lockTimestamps = mutation({
+export const lockTimestamps = internalMutation({
   args: { songId: v.id("songs") },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.songId, { timestampsLocked: true });
@@ -77,7 +77,7 @@ export const lockTimestamps = mutation({
 });
 
 // Unlock timestamps (requires user to explicitly request this)
-export const unlockTimestamps = mutation({
+export const unlockTimestamps = internalMutation({
   args: { songId: v.id("songs") },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.songId, { timestampsLocked: false });
