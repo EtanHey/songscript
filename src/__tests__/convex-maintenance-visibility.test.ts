@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
-import * as oneTimeMigration from "./oneTimeMigration";
-import * as seed from "./seed";
-import * as testData from "./testData";
-import * as migration from "./migration";
-import * as wordProgress from "./wordProgress";
-import * as users from "./users";
-import * as words from "./words";
-import * as transcription from "./transcription";
-import * as songs from "./songs";
-import * as lyrics from "./lyrics";
+import * as oneTimeMigration from "../../convex/oneTimeMigration";
+import * as seed from "../../convex/seed";
+import * as testData from "../../convex/testData";
+import * as migration from "../../convex/migration";
+import * as wordProgress from "../../convex/wordProgress";
+import * as users from "../../convex/users";
+import * as words from "../../convex/words";
+import * as transcription from "../../convex/transcription";
+import * as songs from "../../convex/songs";
+import * as lyrics from "../../convex/lyrics";
 
 // Inspect real registrations without executing any maintenance or PII handler.
 const modules: Array<{
@@ -65,7 +65,7 @@ describe("maintenance API boundary", () => {
   );
 
   it("has no frontend references to internal functions", () => {
-    const sources = import.meta.glob<string>("../src/**/*.{ts,tsx}", {
+    const sources = import.meta.glob<string>("../**/*.{ts,tsx}", {
       eager: true,
       query: "?raw",
       import: "default",
