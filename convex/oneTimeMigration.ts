@@ -1,9 +1,9 @@
-import { mutation, query } from "./_generated/server";
+import { internalMutation, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 import { components } from "./_generated/api";
 
 // One-time migration: Migrate visitorId data to a userId (Better Auth user ID)
-export const migrateVisitorToUser = mutation({
+export const migrateVisitorToUser = internalMutation({
   args: {
     visitorId: v.string(),
     userId: v.string(), // Better Auth user ID directly
@@ -101,7 +101,7 @@ export const migrateVisitorToUser = mutation({
 });
 
 // Query to check what data exists for a visitorId
-export const checkVisitorData = query({
+export const checkVisitorData = internalQuery({
   args: { visitorId: v.string() },
   handler: async (ctx, { visitorId }) => {
     const wordProgress = await ctx.db
@@ -157,7 +157,7 @@ export const checkVisitorData = query({
 });
 
 // Delete a user record by ID
-export const deleteUserRecord = mutation({
+export const deleteUserRecord = internalMutation({
   args: { userId: v.id("users") },
   handler: async (ctx, { userId }) => {
     await ctx.db.delete(userId);
@@ -166,7 +166,7 @@ export const deleteUserRecord = mutation({
 });
 
 // Delete test user by email from BOTH Better Auth 'user' table AND app 'users' table
-export const deleteTestUserByEmail = mutation({
+export const deleteTestUserByEmail = internalMutation({
   args: { email: v.string() },
   handler: async (ctx, { email }) => {
     const results = {
@@ -219,7 +219,7 @@ export const deleteTestUserByEmail = mutation({
 });
 
 // List all app users in the database
-export const listAllAppUsers = query({
+export const listAllAppUsers = internalQuery({
   args: {},
   handler: async (ctx) => {
     const users = await ctx.db.query("users").collect();
@@ -228,7 +228,7 @@ export const listAllAppUsers = query({
 });
 
 // Fix app user record - backfill authId and correct email
-export const fixAppUserRecord = mutation({
+export const fixAppUserRecord = internalMutation({
   args: {
     appUserId: v.id("users"),
     correctEmail: v.string(),
@@ -244,7 +244,7 @@ export const fixAppUserRecord = mutation({
 });
 
 // Check what data exists for a userId (in the userId field)
-export const checkUserData = query({
+export const checkUserData = internalQuery({
   args: { userId: v.string() },
   handler: async (ctx, { userId }) => {
     const wordProgress = await ctx.db
@@ -302,7 +302,7 @@ export const checkUserData = query({
 // BUG-026 FIX: Migrate from visitorId=BetterAuthID to userId=AppUsersID
 // The old system stored Better Auth ID in the visitorId field
 // The new system uses app users ID in the userId field
-export const migrateVisitorIdToUserId = mutation({
+export const migrateVisitorIdToUserId = internalMutation({
   args: {
     oldVisitorId: v.string(), // Better Auth ID that was stored in visitorId
     newUserId: v.string(), // App users ID to store in userId
@@ -420,7 +420,7 @@ export const migrateVisitorIdToUserId = mutation({
 });
 
 // Migrate userId field from old Better Auth ID to new app users ID
-export const migrateUserId = mutation({
+export const migrateUserId = internalMutation({
   args: {
     oldUserId: v.string(),
     newUserId: v.string(),
@@ -517,7 +517,7 @@ export const migrateUserId = mutation({
 });
 
 // List all unique visitorIds in the database
-export const listAllVisitorIds = query({
+export const listAllVisitorIds = internalQuery({
   args: {},
   handler: async (ctx) => {
     const visitorIds = new Set<string>();

@@ -1,11 +1,11 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 import { authComponent } from "./betterAuth";
 
 /**
  * Debug: Get raw Better Auth user info
  */
-export const debugAuthUser = query({
+export const debugAuthUser = internalQuery({
   args: {},
   handler: async (ctx) => {
     const authUser = await authComponent.safeGetAuthUser(ctx);

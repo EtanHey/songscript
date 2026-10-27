@@ -1,4 +1,4 @@
-import { mutation, internalMutation, query } from "./_generated/server";
+import { mutation, internalMutation, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 import { requireAuth } from "./authHelpers";
 import type { Id } from "./_generated/dataModel";
@@ -110,10 +110,10 @@ export const migrateUserIdFromBetterAuthToAppUsers = internalMutation({
 });
 
 /**
- * Public wrapper to run the migration (for CLI execution)
+ * Internal maintenance migration (for authenticated CLI execution)
  * Usage: npx convex run migration:runUserIdMigration '{"oldUserId": "...", "newUserId": "..."}'
  */
-export const runUserIdMigration = mutation({
+export const runUserIdMigration = internalMutation({
   args: {
     oldUserId: v.string(),
     newUserId: v.string(),
@@ -213,7 +213,7 @@ export const runUserIdMigration = mutation({
 /**
  * Query to verify progress data counts for a user
  */
-export const verifyUserProgressData = query({
+export const verifyUserProgressData = internalQuery({
   args: { userId: v.string() },
   handler: async (ctx, { userId }) => {
     const wordProgress = await ctx.db
@@ -599,7 +599,7 @@ export const migrateAnonymousData = mutation({
  * Update lyrics timestamps for a song
  * Used for applying WhisperX-generated timestamps
  */
-export const updateLyricsTimestamps = mutation({
+export const updateLyricsTimestamps = internalMutation({
   args: {
     songTitle: v.string(),
     timestamps: v.array(
