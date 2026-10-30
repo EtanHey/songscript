@@ -1,5 +1,13 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { Volume2, Check, Loader2, Play, Pause, RotateCcw, Repeat } from "lucide-react";
+import {
+  Volume2,
+  Check,
+  Loader2,
+  Play,
+  Pause,
+  RotateCcw,
+  Repeat,
+} from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Id, Doc } from "@convex/_generated/dataModel";
@@ -104,7 +112,9 @@ function WordTable({
                 <td className="py-2 pr-2">
                   <Checkbox
                     checked={isLearned}
-                    onCheckedChange={() => onToggleLearned(word._id, word.persian)}
+                    onCheckedChange={() =>
+                      onToggleLearned(word._id, word.persian)
+                    }
                     className={`${
                       isLearned
                         ? "border-green-500 bg-green-500 text-white"
@@ -269,7 +279,9 @@ function MobileWordCards({
                       : "border-2 border-gray-600 bg-transparent text-gray-400"
                   }`}
                 >
-                  <Check className={`h-5 w-5 ${isLearned ? "" : "opacity-40"}`} />
+                  <Check
+                    className={`h-5 w-5 ${isLearned ? "" : "opacity-40"}`}
+                  />
                 </button>
               </div>
             </div>
@@ -321,17 +333,15 @@ export default function WordInfoModal({
   // Fetch words for this line from Convex
   const words = useQuery(
     api.words.getByLine,
-    line ? { songId, lineNumber: line.lineNumber } : "skip"
+    line ? { songId, lineNumber: line.lineNumber } : "skip",
   );
 
   // Fetch word progress by persian text (syncs across repeated words)
   // Only fetch from Convex when authenticated
-  const persians = words?.map((w: typeof words[0]) => w.persian) ?? [];
+  const persians = words?.map((w: (typeof words)[0]) => w.persian) ?? [];
   const progressData = useQuery(
     api.wordProgress.getByUserPersians,
-    isAuthenticated && persians.length > 0
-      ? { persians }
-      : "skip"
+    isAuthenticated && persians.length > 0 ? { persians } : "skip",
   );
 
   // Build a map of persian -> progress for easy lookup (synced across all instances)
@@ -349,10 +359,14 @@ export default function WordInfoModal({
 
   // Prepare audio snippet for line playback (memoized to prevent infinite re-renders)
   const lineAudioSnippets = useMemo(() => {
-    return lineAudioUrl && line ? [{
-      lineNumber: line.lineNumber,
-      audioUrl: lineAudioUrl
-    }] : [];
+    return lineAudioUrl && line
+      ? [
+          {
+            lineNumber: line.lineNumber,
+            audioUrl: lineAudioUrl,
+          },
+        ]
+      : [];
   }, [lineAudioUrl, line]);
 
   // Audio preloader for line playback
@@ -375,19 +389,27 @@ export default function WordInfoModal({
 
     if (isAuthenticated && progressData) {
       // Authenticated: use Convex data
-      progressData.forEach(({ persian, progress: wordProg }: { persian: string; progress: WordProgressData }) => {
-        map.set(persian, wordProg);
-      });
+      progressData.forEach(
+        ({
+          persian,
+          progress: wordProg,
+        }: {
+          persian: string;
+          progress: WordProgressData;
+        }) => {
+          map.set(persian, wordProg);
+        },
+      );
     } else if (!isAuthenticated && words) {
       // Anonymous: build from localStorage data
-      words.forEach((word: typeof words[0]) => {
+      words.forEach((word: (typeof words)[0]) => {
         const localProgress = getWordProgress(word.persian);
         if (localProgress) {
           map.set(word.persian, {
             _id: `anon-${word.persian}` as Id<"wordProgress">,
             _creationTime: Date.now(),
-            visitorId: 'anonymous',
-            userId: 'anonymous',
+            visitorId: "anonymous",
+            userId: "anonymous",
             wordId: word._id,
             persian: word.persian,
             viewCount: localProgress.viewCount,
@@ -437,7 +459,7 @@ export default function WordInfoModal({
   useEffect(() => {
     if (isOpen && words) {
       // Increment view count for each word in the line
-      words.forEach((word: typeof words[0]) => {
+      words.forEach((word: (typeof words)[0]) => {
         if (isAuthenticated) {
           // Authenticated: use Convex mutation
           incrementViewCount({ wordId: word._id, persian: word.persian });
@@ -473,12 +495,9 @@ export default function WordInfoModal({
           // Clear playing state after a short delay (audio is typically short)
           setTimeout(() => {
             setPlayingWord((current) =>
-              current === word.persian ? null : current
+              current === word.persian ? null : current,
             );
           }, 2000);
-        } else {
-          // Audio not available - clear states
-          console.log(`Audio not available for "${word.persian}": ${result.error}`);
         }
       } catch (error) {
         console.error("Error playing word audio:", error);
@@ -486,7 +505,7 @@ export default function WordInfoModal({
         setLoadingWord(null);
       }
     },
-    [isAuthenticated, incrementPlayCount, incrementWordPlay]
+    [isAuthenticated, incrementPlayCount, incrementWordPlay],
   );
 
   // Toggle learned status - syncs across all instances of the same word
@@ -574,14 +593,16 @@ export default function WordInfoModal({
         });
       }
     },
-    [onToggleLearned, isAuthenticated, toggleLearned, toggleWordLearned]
+    [onToggleLearned, isAuthenticated, toggleLearned, toggleWordLearned],
   );
 
   if (!line) return null;
 
   // Calculate learned count for summary (lookup by persian text for sync)
   const learnedCount =
-    words?.filter((w: typeof words[0]) => wordProgressMap.get(w.persian)?.learned).length ?? 0;
+    words?.filter(
+      (w: (typeof words)[0]) => wordProgressMap.get(w.persian)?.learned,
+    ).length ?? 0;
   const totalWords = words?.length ?? 0;
 
   // Show loading state while fetching words
@@ -591,7 +612,10 @@ export default function WordInfoModal({
     <>
       {/* Full line display */}
       <div className="rounded-lg bg-gray-800 p-4">
-        <p dir={isOriginalRTL ? "rtl" : "ltr"} className={`${isOriginalRTL ? "text-right" : "text-left"} text-xl font-medium leading-relaxed`}>
+        <p
+          dir={isOriginalRTL ? "rtl" : "ltr"}
+          className={`${isOriginalRTL ? "text-right" : "text-left"} text-xl font-medium leading-relaxed`}
+        >
           {line.original}
         </p>
         <p className="mt-2 text-base italic text-emerald-500">
@@ -609,7 +633,9 @@ export default function WordInfoModal({
       {lineAudioUrl && (
         <div className="mt-3 rounded-lg bg-gray-800/50 p-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-300">Line Audio</span>
+            <span className="text-sm font-medium text-gray-300">
+              Line Audio
+            </span>
             <div className="flex items-center gap-2">
               {/* Speed control */}
               <select
@@ -675,7 +701,13 @@ export default function WordInfoModal({
                       ? "bg-gray-700 text-white hover:bg-gray-600"
                       : "bg-gray-700 text-gray-500 cursor-not-allowed"
                 }`}
-                title={!lineAudioReady ? "Loading audio..." : isLineAudioPlaying ? "Pause" : "Play line"}
+                title={
+                  !lineAudioReady
+                    ? "Loading audio..."
+                    : isLineAudioPlaying
+                      ? "Pause"
+                      : "Play line"
+                }
               >
                 {isLineAudioPlaying ? (
                   <Pause className="h-4 w-4" />
@@ -690,9 +722,7 @@ export default function WordInfoModal({
           {isLineAudioPlaying && (
             <div className="mt-2 flex items-center gap-2 text-xs text-primary">
               <div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
-              <span>
-                {lineLoopEnabled ? "Playing (looping)" : "Playing"}
-              </span>
+              <span>{lineLoopEnabled ? "Playing (looping)" : "Playing"}</span>
             </div>
           )}
 
@@ -767,7 +797,9 @@ export default function WordInfoModal({
           <div className="mx-auto mt-2 h-1 w-12 rounded-full bg-gray-600" />
 
           <SheetHeader className="flex-shrink-0 pb-2 pt-3">
-            <SheetTitle className="text-white">Line {line.lineNumber}</SheetTitle>
+            <SheetTitle className="text-white">
+              Line {line.lineNumber}
+            </SheetTitle>
             <SheetDescription className="text-gray-400">
               Tap a word to mark as learned
             </SheetDescription>
@@ -775,7 +807,10 @@ export default function WordInfoModal({
 
           {/* Compact line display for mobile */}
           <div className="flex-shrink-0 rounded-lg bg-gray-800 p-3">
-            <p dir={isOriginalRTL ? "rtl" : "ltr"} className={`${isOriginalRTL ? "text-right" : "text-left"} text-lg font-medium leading-relaxed`}>
+            <p
+              dir={isOriginalRTL ? "rtl" : "ltr"}
+              className={`${isOriginalRTL ? "text-right" : "text-left"} text-lg font-medium leading-relaxed`}
+            >
               {line.original}
             </p>
             <p className="mt-1 text-sm italic text-emerald-500">
@@ -788,12 +823,16 @@ export default function WordInfoModal({
           {lineAudioUrl && (
             <div className="flex-shrink-0 rounded-lg bg-gray-800/50 p-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-300">Line Audio</span>
+                <span className="text-sm font-medium text-gray-300">
+                  Line Audio
+                </span>
                 <div className="flex items-center gap-3">
                   {/* Speed control */}
                   <select
                     value={linePlaybackSpeed}
-                    onChange={(e) => setLinePlaybackSpeed(Number(e.target.value))}
+                    onChange={(e) =>
+                      setLinePlaybackSpeed(Number(e.target.value))
+                    }
                     className="rounded bg-gray-700 px-2 py-1 text-xs text-white"
                     disabled={!lineAudioReady}
                   >
@@ -854,7 +893,13 @@ export default function WordInfoModal({
                           ? "bg-gray-700 text-white active:bg-gray-600"
                           : "bg-gray-700 text-gray-500"
                     }`}
-                    title={!lineAudioReady ? "Loading audio..." : isLineAudioPlaying ? "Pause" : "Play line"}
+                    title={
+                      !lineAudioReady
+                        ? "Loading audio..."
+                        : isLineAudioPlaying
+                          ? "Pause"
+                          : "Play line"
+                    }
                   >
                     {isLineAudioPlaying ? (
                       <Pause className="h-5 w-5" />
@@ -891,7 +936,9 @@ export default function WordInfoModal({
               <span className="text-gray-400">Progress:</span>
               <span
                 className={`font-medium ${
-                  learnedCount === totalWords ? "text-green-500" : "text-gray-300"
+                  learnedCount === totalWords
+                    ? "text-green-500"
+                    : "text-gray-300"
                 }`}
               >
                 {learnedCount}/{totalWords} words
@@ -907,7 +954,9 @@ export default function WordInfoModal({
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
                 <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                <span className="ml-2 text-sm text-gray-400">Loading words...</span>
+                <span className="ml-2 text-sm text-gray-400">
+                  Loading words...
+                </span>
               </div>
             ) : words && words.length > 0 ? (
               <MobileWordCards
@@ -935,7 +984,9 @@ export default function WordInfoModal({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-2xl border-gray-700 bg-gray-900 text-white">
         <DialogHeader>
-          <DialogTitle className="text-white">Line {line.lineNumber}</DialogTitle>
+          <DialogTitle className="text-white">
+            Line {line.lineNumber}
+          </DialogTitle>
           <DialogDescription className="text-gray-400">
             Word-by-word breakdown
           </DialogDescription>

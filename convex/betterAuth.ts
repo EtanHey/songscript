@@ -148,11 +148,6 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
           // Build frontend verify URL - user goes directly to our app, no redirect through Convex
           const frontendVerifyUrl = `${frontendOrigin}/auth/verify?token=${token}`;
 
-          console.log("=".repeat(60));
-          console.log("MAGIC LINK FOR:", email);
-          console.log("FRONTEND URL:", frontendVerifyUrl);
-          console.log("=".repeat(60));
-
           // Send email via Resend if configured
           if (resend) {
             try {

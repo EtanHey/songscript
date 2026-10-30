@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { internalMutation } from "./_generated/server";
 
 // Word-by-word breakdown for all Baraye lyrics
 const barayeWords = [
@@ -328,7 +328,7 @@ const barayeLyrics = [
   { lineNumber: 31, startTime: 145.0, endTime: 151.46, original: "بـــرای آزادی", transliteration: "Barāye āzādi", hebrew: "בָּרָאיֶה אָזָאדִי", english: "For freedom", audioSnippetUrl: "/audio/baraye/baraye_031.mp3" },
 ];
 
-export const seedBaraye = mutation({
+export const seedBaraye = internalMutation({
   args: {},
   handler: async (ctx) => {
     // Check if Baraye already exists (try new youtubeId first, then old)
@@ -402,7 +402,7 @@ export const seedBaraye = mutation({
 });
 
 // Seed word data for Baraye song
-export const seedBarayeWords = mutation({
+export const seedBarayeWords = internalMutation({
   args: {},
   handler: async (ctx) => {
     // Find Baraye song

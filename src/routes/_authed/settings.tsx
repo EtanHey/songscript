@@ -25,12 +25,19 @@ function SettingsPage() {
   const { data: session, isPending: sessionPending } = authClient.useSession();
 
   const [displayName, setDisplayName] = useState("");
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [feedback, setFeedback] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   // Import device progress state
   const [showImportModal, setShowImportModal] = useState(false);
   const [importSectionVisible, setImportSectionVisible] = useState(false);
-  const [progressSummary, setProgressSummary] = useState({ words: 0, lines: 0, songs: 0 });
+  const [progressSummary, setProgressSummary] = useState({
+    words: 0,
+    lines: 0,
+    songs: 0,
+  });
 
   // Check if import section should be shown
   useEffect(() => {
@@ -76,7 +83,7 @@ function SettingsPage() {
 
   // Get user info
   const { data: userInfo, isPending: userInfoPending } = useQuery(
-    convexQuery(api.leaderboard.getUserInfo, {})
+    convexQuery(api.leaderboard.getUserInfo, {}),
   );
 
   // Update display name when user info loads
@@ -87,12 +94,15 @@ function SettingsPage() {
   }, [userInfo]);
 
   // Convex mutation (extracted outside useMutation)
-  const setDisplayNameMutation = useConvexMutation(api.leaderboard.setDisplayName);
+  const setDisplayNameMutation = useConvexMutation(
+    api.leaderboard.setDisplayName,
+  );
 
   // Set display name mutation
-  const { mutate: setDisplayNameMutate, isPending: setDisplayNamePending } = useMutation({
-    mutationFn: (args: any) => setDisplayNameMutation(args),
-  });
+  const { mutate: setDisplayNameMutate, isPending: setDisplayNamePending } =
+    useMutation({
+      mutationFn: (args: any) => setDisplayNameMutation(args),
+    });
 
   const handleSave = async () => {
     try {
@@ -104,15 +114,24 @@ function SettingsPage() {
         {
           onSuccess: (result) => {
             if (result.success) {
-              setFeedback({ type: "success", message: "Display name updated successfully!" });
+              setFeedback({
+                type: "success",
+                message: "Display name updated successfully!",
+              });
             } else {
-              setFeedback({ type: "error", message: result.error || "Failed to update display name" });
+              setFeedback({
+                type: "error",
+                message: result.error || "Failed to update display name",
+              });
             }
           },
           onError: () => {
-            setFeedback({ type: "error", message: "An error occurred while saving" });
+            setFeedback({
+              type: "error",
+              message: "An error occurred while saving",
+            });
           },
-        }
+        },
       );
     } catch (error) {
       setFeedback({ type: "error", message: "An error occurred while saving" });
@@ -121,7 +140,7 @@ function SettingsPage() {
 
   if (sessionPending || userInfoPending) {
     return (
-      <div className="min-h-screen bg-black text-white p-6">
+      <div className="min-h-screen bg-gray-950 text-white p-6">
         <div className="max-w-2xl mx-auto">
           <div className="bg-gray-900 rounded-lg p-6">
             <div className="animate-pulse">
@@ -140,15 +159,18 @@ function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
+    <div className="min-h-screen bg-gray-950 text-white p-6">
       <div className="max-w-2xl mx-auto">
         <div className="bg-gray-900 rounded-lg p-6">
           <h1 className="text-2xl font-bold mb-6">Settings</h1>
-          
+
           <div className="space-y-6">
             {/* Email (read-only) */}
             <div>
-              <Label htmlFor="email" className="text-sm font-medium text-gray-300">
+              <Label
+                htmlFor="email"
+                className="text-sm font-medium text-gray-300"
+              >
                 Email
               </Label>
               <Input
@@ -162,7 +184,10 @@ function SettingsPage() {
 
             {/* Display Name (editable) */}
             <div>
-              <Label htmlFor="displayName" className="text-sm font-medium text-gray-300">
+              <Label
+                htmlFor="displayName"
+                className="text-sm font-medium text-gray-300"
+              >
                 Display Name
               </Label>
               <Input
@@ -210,21 +235,25 @@ function SettingsPage() {
               Import Device Progress
             </h2>
             <p className="text-gray-400 text-sm mb-4">
-              You previously declined to import your learning progress. You can still import it now.
+              You previously declined to import your learning progress. You can
+              still import it now.
             </p>
             <div className="bg-gray-800/50 rounded-lg p-4 mb-4">
               <p className="text-sm text-gray-300">
                 Device progress available:{" "}
                 <span className="text-emerald-400 font-medium">
-                  {progressSummary.words} {progressSummary.words === 1 ? "word" : "words"}
+                  {progressSummary.words}{" "}
+                  {progressSummary.words === 1 ? "word" : "words"}
                 </span>
                 ,{" "}
                 <span className="text-emerald-400 font-medium">
-                  {progressSummary.lines} {progressSummary.lines === 1 ? "line" : "lines"}
+                  {progressSummary.lines}{" "}
+                  {progressSummary.lines === 1 ? "line" : "lines"}
                 </span>
                 ,{" "}
                 <span className="text-emerald-400 font-medium">
-                  {progressSummary.songs} {progressSummary.songs === 1 ? "song" : "songs"}
+                  {progressSummary.songs}{" "}
+                  {progressSummary.songs === 1 ? "song" : "songs"}
                 </span>
               </p>
             </div>
