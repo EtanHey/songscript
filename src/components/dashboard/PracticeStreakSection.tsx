@@ -20,7 +20,7 @@ export type PracticeStreakSectionProps = {
 
 /**
  * Practice Streak Section Component with heatmap.
- * Displays current and longest streak stats, along with a 90-day heatmap of practice activity.
+ * Displays current and longest streak stats, along with an 18-week heatmap of practice activity.
  */
 export function PracticeStreakSection({
   currentStreak,
