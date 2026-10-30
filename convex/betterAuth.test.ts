@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { inspect } from "node:util";
 import { memoryAdapter } from "better-auth/adapters/memory";
 import type { GenericCtx } from "@convex-dev/better-auth";
 import type { DataModel } from "./_generated/dataModel";
@@ -22,19 +23,29 @@ beforeEach(() => {
   vi.stubEnv("RESEND_API_KEY", "re_unit_test_only");
   send.mockReset().mockResolvedValue({ data: { id: "test-message" }, error: null });
   registerRoutes.mockClear();
-  vi.spyOn(console, "error").mockImplementation(() => {});
-  vi.spyOn(console, "warn").mockImplementation(() => {});
+  for (const method of ["log", "info", "warn", "error", "debug"] as const) {
+    vi.spyOn(console, method).mockImplementation(() => {});
+  }
 });
-afterEach(() => { vi.unstubAllEnvs(); vi.restoreAllMocks(); });
+afterEach(() => {
+  try {
+    for (const method of ["log", "info", "warn", "error", "debug"] as const) {
+      const logged = inspect(vi.mocked(console[method]).mock.calls, { depth: null, customInspect: false });
+      for (const privateValue of ["test@example.com", "private.example", "?token="]) {
+        expect(logged, `console.${method} leaked private data`).not.toContain(privateValue);
+      }
+    }
+  } finally { vi.unstubAllEnvs(); vi.restoreAllMocks(); }
+});
 
-async function testAuth() {
+async function testAuth(ctx: GenericCtx<DataModel> = {} as GenericCtx<DataModel>) {
   const { createAuth } = await import("./betterAuth");
   // Only the Convex adapter is replaced; Better Auth runs its real HTTP middleware.
-  return createAuth({} as GenericCtx<DataModel>);
+  return createAuth(ctx);
 }
 
-async function request(origin = "https://songscript-eight.vercel.app") {
-  const auth = await testAuth();
+async function request(origin = "https://songscript-eight.vercel.app", ctx?: GenericCtx<DataModel>) {
+  const auth = await testAuth(ctx);
   return auth.handler(new Request("https://songscript-ten.vercel.app/api/auth/sign-in/magic-link", {
     method: "POST",
     headers: { Origin: origin, "Content-Type": "application/json" },
@@ -52,6 +63,17 @@ describe("magic-link delivery HTTP contract", () => {
   it("keeps unknown callback origins blocked before sending", async () => {
     expect((await request("https://untrusted.example")).status).toBe(403);
     expect(send).not.toHaveBeenCalled();
+  });
+  it("rejects an outside Vercel subdomain before sending", async () => {
+    expect((await request("https://evil-songscript.vercel.app")).status).toBe(403);
+    expect(send).not.toHaveBeenCalled();
+  });
+  it.each([false, true])("sends the same response with a db context, registered=%s", async (registered) => {
+    const ctx = { db: { query: () => ({ withIndex: () => ({ first: async () => registered ? { email: "test@example.com" } : null }) }) } };
+    const response = await request(undefined, ctx as unknown as GenericCtx<DataModel>);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ status: true });
+    expect(send).toHaveBeenCalledTimes(1);
   });
   it("allows the production alias through Convex CORS", async () => {
     await import("./http");
@@ -73,7 +95,7 @@ describe("magic-link delivery HTTP contract", () => {
     expect(response.status).toBe(502);
     expect(await response.json()).toEqual({ code: "MAGIC_LINK_DELIVERY_FAILED", message: "Unable to send sign-in email. Please try again later." });
     expect(console.error).toHaveBeenCalledWith("Magic link delivery failed", { code: kind === "returned" ? "validation_error" : "provider_exception" });
-    expect(JSON.stringify(vi.mocked(console.error).mock.calls)).not.toContain(privateMessage);
+    expect(console.error).toHaveBeenCalledTimes(1);
   });
   it("exposes the sanitized failure as the client result.error used by the login form", async () => {
     send.mockResolvedValue({ data: null, error: { name: "validation_error", message: "private" } });
