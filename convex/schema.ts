@@ -48,7 +48,9 @@ export default defineSchema({
     english: v.string(),
     grammarType: v.optional(v.string()), // noun, verb, preposition, adjective, etc.
     forvoAudioUrl: v.optional(v.string()), // Future: audio from Forvo or ElevenLabs
-  }).index("by_song_line", ["songId", "lineNumber"]),
+  })
+    .index("by_song_line", ["songId", "lineNumber"])
+    .index("by_persian", ["persian"]),
 
   // Track user's learning progress for individual words
   // Learning state is keyed by persian text so repeated words (e.g., "برای") sync across all instances
@@ -79,7 +81,8 @@ export default defineSchema({
   })
     .index("by_visitor", ["visitorId"])
     .index("by_user", ["userId"])
-    .index("by_visitor_song", ["visitorId", "songId"]),
+    .index("by_visitor_song", ["visitorId", "songId"])
+    .index("by_user_song", ["userId", "songId"]),
 
   // Track which lines users have explicitly marked as "learned"
   // Separate from linesCompleted which tracks practice - this is for mastery
@@ -93,7 +96,9 @@ export default defineSchema({
     .index("by_visitor", ["visitorId"])
     .index("by_user", ["userId"])
     .index("by_visitor_song", ["visitorId", "songId"])
-    .index("by_visitor_song_line", ["visitorId", "songId", "lineNumber"]),
+    .index("by_visitor_song_line", ["visitorId", "songId", "lineNumber"])
+    .index("by_user_song", ["userId", "songId"])
+    .index("by_user_song_line", ["userId", "songId", "lineNumber"]),
 
   // User's learning queue / wishlist of songs to learn later
   userWishlist: defineTable({

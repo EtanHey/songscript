@@ -1,11 +1,11 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 import { authComponent } from "./betterAuth";
 
 /**
  * Debug: Get raw Better Auth user info
  */
-export const debugAuthUser = query({
+export const debugAuthUser = internalQuery({
   args: {},
   handler: async (ctx) => {
     const authUser = await authComponent.safeGetAuthUser(ctx);
@@ -46,8 +46,6 @@ export const ensureAppUser = mutation({
       throw new Error("Authentication required");
     }
 
-    console.log("ensureAppUser: authUser =", JSON.stringify(authUser));
-
     // 1. Check if app user record already exists by authId
     const existingByAuthId = await ctx.db
       .query("users")
@@ -85,7 +83,7 @@ export const ensureAppUser = mutation({
     }
 
     // 3. Create new app user record with displayName from Better Auth
-    console.log("Creating new app user with email:", authUser.email, "authId:", authUser._id);
+    console.log("Creating new app user");
     const userId = await ctx.db.insert("users", {
       email: authUser.email,
       authId: authUser._id,

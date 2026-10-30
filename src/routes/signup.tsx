@@ -7,8 +7,18 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Info } from "lucide-react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
-import { hasProgressToMigrate, readProgress } from "../hooks/useAnonymousProgress";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import {
+  hasProgressToMigrate,
+  readProgress,
+} from "../hooks/useAnonymousProgress";
 
 export const Route = createFileRoute("/signup")({
   component: SignupPage,
@@ -43,8 +53,8 @@ function SignupPage() {
       setHasAnonymousProgress(true);
       const progress = readProgress();
       setProgressCount({
-        words: progress.wordProgress.filter(w => w.learned).length,
-        lines: progress.lineProgress.filter(l => l.learned).length,
+        words: progress.wordProgress.filter((w) => w.learned).length,
+        lines: progress.lineProgress.filter((l) => l.learned).length,
       });
     }
   }, []);
@@ -59,8 +69,8 @@ function SignupPage() {
   // Show loading only briefly
   if (isPending && !showForm) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-500" />
       </div>
     );
   }
@@ -100,15 +110,14 @@ function SignupPage() {
       });
 
       if (result.error) {
-         // If user already exists, better-auth might return an error here
-         // But for magic link flow, we can also just try signIn.magicLink
-         // However, story says "Send Magic Link button triggers magic link"
-         // Let's use magicLink directly as it handles both signup and signin if configured,
-         // or just follow the login pattern but with extra metadata.
-
-         // Re-reading PRD: "Send Magic Link button triggers magic link + stores migration preference"
-         // The migration actually happens in verify.tsx (next stories).
-         // So here we just need to send the magic link and store the metadata.
+        // If user already exists, better-auth might return an error here
+        // But for magic link flow, we can also just try signIn.magicLink
+        // However, story says "Send Magic Link button triggers magic link"
+        // Let's use magicLink directly as it handles both signup and signin if configured,
+        // or just follow the login pattern but with extra metadata.
+        // Re-reading PRD: "Send Magic Link button triggers magic link + stores migration preference"
+        // The migration actually happens in verify.tsx (next stories).
+        // So here we just need to send the magic link and store the metadata.
       }
 
       // Actually, signIn.magicLink is what we want because it sends the email.
@@ -124,7 +133,7 @@ function SignupPage() {
         setError(magicResult.error.message || "Failed to send magic link");
       } else {
         setSuccess(
-          "Magic link sent! Check your email to complete your account creation."
+          "Magic link sent! Check your email to complete your account creation.",
         );
       }
     } catch (err) {
@@ -135,8 +144,8 @@ function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-slate-900 border-slate-800">
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-gray-900 border-gray-800">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-white text-center">
             Create Your Account
@@ -158,7 +167,7 @@ function SignupPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
                 required
-                className="bg-slate-800 border-slate-700 text-white placeholder-gray-500"
+                className="bg-gray-800 border-gray-700 text-white placeholder-gray-500"
               />
             </div>
 
@@ -175,26 +184,31 @@ function SignupPage() {
                 required
                 minLength={3}
                 maxLength={20}
-                className="bg-slate-800 border-slate-700 text-white placeholder-gray-500"
+                className="bg-gray-800 border-gray-700 text-white placeholder-gray-500"
               />
             </div>
 
             {/* Reassuring note about anonymous progress */}
             {hasAnonymousProgress && (
-              <div className="flex items-start gap-3 p-3 rounded-md bg-slate-800/50 border border-slate-700">
+              <div className="flex items-start gap-3 p-3 rounded-md bg-gray-800/50 border border-gray-700">
                 <Info className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
                 <div className="text-sm text-gray-300">
                   <p>
                     Your learning progress is saved on this device
                     {(progressCount.words > 0 || progressCount.lines > 0) && (
                       <span className="text-gray-400">
-                        {" "}({progressCount.words} {progressCount.words === 1 ? "word" : "words"}, {progressCount.lines} {progressCount.lines === 1 ? "line" : "lines"})
+                        {" "}
+                        ({progressCount.words}{" "}
+                        {progressCount.words === 1 ? "word" : "words"},{" "}
+                        {progressCount.lines}{" "}
+                        {progressCount.lines === 1 ? "line" : "lines"})
                       </span>
                     )}
                     .
                   </p>
                   <p className="text-gray-400 mt-1">
-                    After signing up, you'll have the option to import it to your account.
+                    After signing up, you'll have the option to import it to
+                    your account.
                   </p>
                 </div>
               </div>
@@ -237,10 +251,13 @@ function SignupPage() {
             )}
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-4 border-t border-slate-800 pt-6">
+        <CardFooter className="flex flex-col space-y-4 border-t border-gray-800 pt-6">
           <p className="text-gray-400 text-sm text-center">
             Already have an account?{" "}
-            <Link to="/login" className="text-emerald-500 hover:text-emerald-400 font-medium">
+            <Link
+              to="/login"
+              className="text-emerald-500 hover:text-emerald-400 font-medium"
+            >
               Log in
             </Link>
           </p>

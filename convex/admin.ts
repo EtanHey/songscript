@@ -15,7 +15,7 @@ import { v } from "convex/values";
 export const deleteUserAndAllData = internalMutation({
   args: { email: v.string() },
   handler: async (ctx, args) => {
-    console.log(`[admin:deleteUserAndAllData] Starting deletion for user: ${args.email}`);
+    console.log("[admin:deleteUserAndAllData] Starting user deletion");
 
     const deletionReport: Record<string, number> = {
       wordProgress: 0,
@@ -35,7 +35,7 @@ export const deleteUserAndAllData = internalMutation({
       .first();
 
     if (!appUser) {
-      console.log(`[admin:deleteUserAndAllData] User not found: ${args.email}`);
+      console.log("[admin:deleteUserAndAllData] User not found");
       return {
         success: false,
         message: `User not found: ${args.email}`,
@@ -44,10 +44,8 @@ export const deleteUserAndAllData = internalMutation({
     }
 
     const userId = appUser._id;
-    const authId = appUser.authId;
-
     console.log(
-      `[admin:deleteUserAndAllData] Found user - app userId: ${userId}, authId: ${authId}`
+      `[admin:deleteUserAndAllData] Found user - app userId: ${userId}`
     );
 
     // Step 2: Delete all user-specific data in order
