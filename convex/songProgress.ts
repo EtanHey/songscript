@@ -8,7 +8,7 @@ export const getByUser = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return [];
-    
+
     return await ctx.db
       .query("userSongProgress")
       .withIndex("by_user", (q) => q.eq("userId", userId))
@@ -44,16 +44,20 @@ export const getWithSongDetails = query({
           ...p,
           song,
           totalLines: lyrics.length,
-          progressPercent: lyrics.length > 0
-            ? Math.round((p.linesCompleted.length / lyrics.length) * 100)
-            : 0,
+          progressPercent:
+            lyrics.length > 0
+              ? Math.round((p.linesCompleted.length / lyrics.length) * 100)
+              : 0,
         };
-      })
+      }),
     );
 
     // Filter out nulls (deleted songs), songs with no progress, and sort by lastPracticed descending
     return withDetails
-      .filter((p): p is NonNullable<typeof p> => p !== null && p.linesCompleted.length > 0)
+      .filter(
+        (p): p is NonNullable<typeof p> =>
+          p !== null && p.linesCompleted.length > 0,
+      )
       .sort((a, b) => b.lastPracticed - a.lastPracticed);
   },
 });
@@ -89,9 +93,11 @@ export const getRecentForContinue = query({
 
         // Find the last practiced line (or first line if none recorded)
         const lastLineIndex = p.lastLineIndex ?? 0;
-        const lastLine = lyrics.find((l) => l.lineNumber === lastLineIndex) ?? lyrics[0];
+        const lastLine =
+          lyrics.find((l) => l.lineNumber === lastLineIndex) ?? lyrics[0];
         const lastLinePreview = lastLine
-          ? lastLine.original.substring(0, 50) + (lastLine.original.length > 50 ? "..." : "")
+          ? lastLine.original.substring(0, 50) +
+            (lastLine.original.length > 50 ? "..." : "")
           : "";
 
         return {
@@ -102,11 +108,12 @@ export const getRecentForContinue = query({
           lastLinePreview,
           song,
           totalLines: lyrics.length,
-          progressPercent: lyrics.length > 0
-            ? Math.round((p.linesCompleted.length / lyrics.length) * 100)
-            : 0,
+          progressPercent:
+            lyrics.length > 0
+              ? Math.round((p.linesCompleted.length / lyrics.length) * 100)
+              : 0,
         };
-      })
+      }),
     );
 
     return withDetails.filter((p): p is NonNullable<typeof p> => p !== null);
@@ -122,10 +129,9 @@ export const getByUserSong = query({
 
     return await ctx.db
       .query("userSongProgress")
-      .withIndex("by_user", (q) =>
-        q.eq("userId", userId)
+      .withIndex("by_user_song", (q) =>
+        q.eq("userId", userId).eq("songId", args.songId),
       )
-      .filter((q) => q.eq(q.field("songId"), args.songId))
       .first();
   },
 });
@@ -134,17 +140,16 @@ export const getByUserSong = query({
 export const recordLineCompletion = mutation({
   args: {
     songId: v.id("songs"),
-    lineNumber: v.number()
+    lineNumber: v.number(),
   },
   handler: async (ctx, args) => {
     const userId = await requireAuth(ctx);
 
     const existing = await ctx.db
       .query("userSongProgress")
-      .withIndex("by_user", (q) =>
-        q.eq("userId", userId)
+      .withIndex("by_user_song", (q) =>
+        q.eq("userId", userId).eq("songId", args.songId),
       )
-      .filter((q) => q.eq(q.field("songId"), args.songId))
       .first();
 
     if (existing) {
@@ -177,7 +182,7 @@ export const recordLineCompletion = mutation({
 export const recordLinesCompletion = mutation({
   args: {
     songId: v.id("songs"),
-    lineNumbers: v.array(v.number())
+    lineNumbers: v.array(v.number()),
   },
   handler: async (ctx, args) => {
     const userId = await requireAuth(ctx);
@@ -185,10 +190,9 @@ export const recordLinesCompletion = mutation({
 
     const existing = await ctx.db
       .query("userSongProgress")
-      .withIndex("by_user", (q) =>
-        q.eq("userId", userId)
+      .withIndex("by_user_song", (q) =>
+        q.eq("userId", userId).eq("songId", args.songId),
       )
-      .filter((q) => q.eq(q.field("songId"), args.songId))
       .first();
 
     // Track the highest line number as the "last" position
@@ -196,7 +200,10 @@ export const recordLinesCompletion = mutation({
 
     if (existing) {
       // Merge new lines with existing, avoiding duplicates
-      const lineSet = new Set([...existing.linesCompleted, ...args.lineNumbers]);
+      const lineSet = new Set([
+        ...existing.linesCompleted,
+        ...args.lineNumbers,
+      ]);
       const linesCompleted = [...lineSet].sort((a, b) => a - b);
 
       await ctx.db.patch(existing._id, {
@@ -207,7 +214,9 @@ export const recordLinesCompletion = mutation({
       return existing._id;
     } else {
       // Create new progress record
-      const linesCompleted = [...new Set(args.lineNumbers)].sort((a, b) => a - b);
+      const linesCompleted = [...new Set(args.lineNumbers)].sort(
+        (a, b) => a - b,
+      );
       return await ctx.db.insert("userSongProgress", {
         userId,
         visitorId: "authenticated",
@@ -225,19 +234,18 @@ export const recordLinesCompletion = mutation({
 export const toggleLineLearned = mutation({
   args: {
     songId: v.id("songs"),
-    lineNumber: v.number()
+    lineNumber: v.number(),
   },
   handler: async (ctx, args) => {
     const userId = await requireAuth(ctx);
 
     const existing = await ctx.db
       .query("lineProgress")
-      .withIndex("by_user", (q) =>
-        q.eq("userId", userId)
-      )
-      .filter((q) =>
-        q.eq(q.field("songId"), args.songId) &&
-        q.eq(q.field("lineNumber"), args.lineNumber)
+      .withIndex("by_user_song_line", (q) =>
+        q
+          .eq("userId", userId)
+          .eq("songId", args.songId)
+          .eq("lineNumber", args.lineNumber),
       )
       .first();
 
@@ -266,8 +274,9 @@ export const toggleLineLearned = mutation({
     // Also update userSongProgress so song appears in "My Songs" dashboard
     const songProgress = await ctx.db
       .query("userSongProgress")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
-      .filter((q) => q.eq(q.field("songId"), args.songId))
+      .withIndex("by_user_song", (q) =>
+        q.eq("userId", userId).eq("songId", args.songId),
+      )
       .first();
 
     if (songProgress) {
@@ -310,10 +319,9 @@ export const getLineProgressByUserSong = query({
 
     return await ctx.db
       .query("lineProgress")
-      .withIndex("by_user", (q) =>
-        q.eq("userId", userId)
+      .withIndex("by_user_song", (q) =>
+        q.eq("userId", userId).eq("songId", args.songId),
       )
-      .filter((q) => q.eq(q.field("songId"), args.songId))
       .collect();
   },
 });

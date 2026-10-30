@@ -79,7 +79,8 @@ export default defineSchema({
   })
     .index("by_visitor", ["visitorId"])
     .index("by_user", ["userId"])
-    .index("by_visitor_song", ["visitorId", "songId"]),
+    .index("by_visitor_song", ["visitorId", "songId"])
+    .index("by_user_song", ["userId", "songId"]),
 
   // Track which lines users have explicitly marked as "learned"
   // Separate from linesCompleted which tracks practice - this is for mastery
@@ -93,7 +94,9 @@ export default defineSchema({
     .index("by_visitor", ["visitorId"])
     .index("by_user", ["userId"])
     .index("by_visitor_song", ["visitorId", "songId"])
-    .index("by_visitor_song_line", ["visitorId", "songId", "lineNumber"]),
+    .index("by_visitor_song_line", ["visitorId", "songId", "lineNumber"])
+    .index("by_user_song", ["userId", "songId"])
+    .index("by_user_song_line", ["userId", "songId", "lineNumber"]),
 
   // User's learning queue / wishlist of songs to learn later
   userWishlist: defineTable({
