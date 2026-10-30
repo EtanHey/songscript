@@ -85,7 +85,7 @@ function DashboardPage() {
   // Get practice history for streaks
   const { data: practiceHistory, isLoading: practiceLoading } = useQuery(
     convexQuery(api.practiceLog.getPracticeHistory, {
-      days: 90,
+      days: 18 * 7,
     }),
   );
 

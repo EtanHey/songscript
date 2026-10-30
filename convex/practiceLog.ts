@@ -11,7 +11,7 @@ function getTodayDateString(): string {
 // Get date N days ago in YYYY-MM-DD format
 function getDateDaysAgo(days: number): string {
   const date = new Date();
-  date.setDate(date.getDate() - days);
+  date.setUTCDate(date.getUTCDate() - days);
   return date.toISOString().split("T")[0];
 }
 
@@ -83,7 +83,7 @@ export const logPractice = mutation({
   },
 });
 
-// Get practice history for last N days (default 90)
+// Get windowed practice history with lifetime streaks (default window: 90 days)
 export const getPracticeHistory = query({
   args: {
     days: v.optional(v.number()),
@@ -108,7 +108,7 @@ export const getPracticeHistory = query({
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
-    // Filter to last N days and create a map
+    // Streaks use every practice day; only the heatmap and totals are windowed.
     const cutoffDate = getDateDaysAgo(days);
     const practiceMap = new Map<
       string,
@@ -116,14 +116,12 @@ export const getPracticeHistory = query({
     >();
 
     for (const log of logs) {
-      if (log.date >= cutoffDate) {
-        practiceMap.set(log.date, {
-          date: log.date,
-          practiceCount: log.practiceCount,
-          totalSeconds: log.totalSeconds,
-          totalPoints: log.totalPoints || 0,
-        });
-      }
+      practiceMap.set(log.date, {
+        date: log.date,
+        practiceCount: log.practiceCount,
+        totalSeconds: log.totalSeconds,
+        totalPoints: log.totalPoints || 0,
+      });
     }
 
     // Calculate streaks
@@ -174,13 +172,15 @@ export const getPracticeHistory = query({
       while (practiceMap.has(date)) {
         currentStreak++;
         const dateObj = new Date(date);
-        dateObj.setDate(dateObj.getDate() - 1);
+        dateObj.setUTCDate(dateObj.getUTCDate() - 1);
         date = dateObj.toISOString().split("T")[0];
       }
     }
 
     // Convert map to array for the response
-    const practiceData = Array.from(practiceMap.values());
+    const practiceData = Array.from(practiceMap.values()).filter(
+      (day) => day.date >= cutoffDate
+    );
 
     // Calculate total practice time, sessions, and points
     const totalSessions = practiceData.reduce(
