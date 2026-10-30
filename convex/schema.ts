@@ -48,7 +48,9 @@ export default defineSchema({
     english: v.string(),
     grammarType: v.optional(v.string()), // noun, verb, preposition, adjective, etc.
     forvoAudioUrl: v.optional(v.string()), // Future: audio from Forvo or ElevenLabs
-  }).index("by_song_line", ["songId", "lineNumber"]),
+  })
+    .index("by_song_line", ["songId", "lineNumber"])
+    .index("by_persian", ["persian"]),
 
   // Track user's learning progress for individual words
   // Learning state is keyed by persian text so repeated words (e.g., "برای") sync across all instances

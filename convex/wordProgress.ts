@@ -8,7 +8,7 @@ export const getByUser = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return [];
-    
+
     return await ctx.db
       .query("wordProgress")
       .withIndex("by_user", (q) => q.eq("userId", userId))
@@ -25,9 +25,7 @@ export const getByUserWord = query({
 
     return await ctx.db
       .query("wordProgress")
-      .withIndex("by_user", (q) =>
-        q.eq("userId", userId)
-      )
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .filter((q) => q.eq(q.field("wordId"), args.wordId))
       .first();
   },
@@ -42,9 +40,7 @@ export const getByUserPersian = query({
 
     return await ctx.db
       .query("wordProgress")
-      .withIndex("by_user", (q) =>
-        q.eq("userId", userId)
-      )
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .filter((q) => q.eq(q.field("persian"), args.persian))
       .first();
   },
@@ -64,13 +60,11 @@ export const getByUserPersians = query({
       uniquePersians.map(async (persian) => {
         const progress = await ctx.db
           .query("wordProgress")
-          .withIndex("by_user", (q) =>
-            q.eq("userId", userId)
-          )
+          .withIndex("by_user", (q) => q.eq("userId", userId))
           .filter((q) => q.eq(q.field("persian"), persian))
           .first();
         return { persian, progress };
-      })
+      }),
     );
     return results;
   },
@@ -87,13 +81,11 @@ export const getByUserWords = query({
       args.wordIds.map(async (wordId) => {
         const progress = await ctx.db
           .query("wordProgress")
-          .withIndex("by_user", (q) =>
-            q.eq("userId", userId)
-          )
+          .withIndex("by_user", (q) => q.eq("userId", userId))
           .filter((q) => q.eq(q.field("wordId"), wordId))
           .first();
         return { wordId, progress };
-      })
+      }),
     );
     return results;
   },
@@ -109,9 +101,7 @@ export const incrementViewCount = mutation({
     // Look up by persian text first - this is the canonical key
     const existingPersian = await ctx.db
       .query("wordProgress")
-      .withIndex("by_user", (q) =>
-        q.eq("userId", userId)
-      )
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .filter((q) => q.eq(q.field("persian"), args.persian))
       .first();
 
@@ -148,9 +138,7 @@ export const incrementPlayCount = mutation({
     // Look up by persian text first - this is the canonical key
     const existingPersian = await ctx.db
       .query("wordProgress")
-      .withIndex("by_user", (q) =>
-        q.eq("userId", userId)
-      )
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .filter((q) => q.eq(q.field("persian"), args.persian))
       .first();
 
@@ -186,27 +174,26 @@ export const toggleLearned = mutation({
     // Find all progress records for this persian word
     const allMatching = await ctx.db
       .query("wordProgress")
-      .withIndex("by_user", (q) =>
-        q.eq("userId", userId)
-      )
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .filter((q) => q.eq(q.field("persian"), args.persian))
       .collect();
 
     // Determine the new learned state (toggle from current)
-    const currentLearned = allMatching.length > 0 ? allMatching[0].learned : false;
+    const currentLearned =
+      allMatching.length > 0 ? allMatching[0].learned : false;
     const newLearned = !currentLearned;
 
     // Update ALL matching records
     // Only update lastSeen when marking as learned, not when unmarking
-    const updateData: { learned: boolean; lastSeen?: number } = { learned: newLearned };
+    const updateData: { learned: boolean; lastSeen?: number } = {
+      learned: newLearned,
+    };
     if (newLearned) {
       updateData.lastSeen = Date.now();
     }
 
     await Promise.all(
-      allMatching.map((record) =>
-        ctx.db.patch(record._id, updateData)
-      )
+      allMatching.map((record) => ctx.db.patch(record._id, updateData)),
     );
 
     // If no records exist yet, create one for this specific word instance
@@ -237,23 +224,21 @@ export const setLearned = mutation({
     // Find all progress records for this persian word
     const allMatching = await ctx.db
       .query("wordProgress")
-      .withIndex("by_user", (q) =>
-        q.eq("userId", userId)
-      )
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .filter((q) => q.eq(q.field("persian"), args.persian))
       .collect();
 
     // Update ALL matching records
     // Only update lastSeen when marking as learned, not when unmarking
-    const updateData: { learned: boolean; lastSeen?: number } = { learned: args.learned };
+    const updateData: { learned: boolean; lastSeen?: number } = {
+      learned: args.learned,
+    };
     if (args.learned) {
       updateData.lastSeen = Date.now();
     }
 
     await Promise.all(
-      allMatching.map((record) =>
-        ctx.db.patch(record._id, updateData)
-      )
+      allMatching.map((record) => ctx.db.patch(record._id, updateData)),
     );
 
     // If no records exist yet, create one for this specific word instance
@@ -428,7 +413,7 @@ export const getVocabularyByLanguage = query({
           masteryLevel,
           sourceLanguage: song.sourceLanguage,
         };
-      })
+      }),
     );
 
     // Filter out nulls and dedupe by persian text (keep highest practice count)
@@ -485,8 +470,10 @@ export const getWordDetailsWithSongs = query({
   args: { persian: v.string() },
   handler: async (ctx, args) => {
     // Find all word instances with this persian text across all songs
-    const allWords = await ctx.db.query("words").collect();
-    const matchingWords = allWords.filter((w) => w.persian === args.persian);
+    const matchingWords = await ctx.db
+      .query("words")
+      .withIndex("by_persian", (q) => q.eq("persian", args.persian))
+      .collect();
 
     if (matchingWords.length === 0) {
       return null;
@@ -512,7 +499,7 @@ export const getWordDetailsWithSongs = query({
         const line = await ctx.db
           .query("lyrics")
           .withIndex("by_song", (q) =>
-            q.eq("songId", songId).eq("lineNumber", lineNumber)
+            q.eq("songId", songId).eq("lineNumber", lineNumber),
           )
           .first();
 
@@ -524,7 +511,7 @@ export const getWordDetailsWithSongs = query({
           lineNumber,
           linePreview: line?.original?.slice(0, 50) || "",
         };
-      })
+      }),
     );
 
     const validSongs = songsWithContext.filter(Boolean) as NonNullable<
@@ -562,9 +549,7 @@ export const getWordPracticeHistory = query({
     // Get the progress record for this word
     const progress = await ctx.db
       .query("wordProgress")
-      .withIndex("by_user", (q) =>
-        q.eq("userId", userId)
-      )
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .filter((q) => q.eq(q.field("persian"), args.persian))
       .first();
 
