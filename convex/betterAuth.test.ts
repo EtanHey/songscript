@@ -60,6 +60,15 @@ describe("magic-link delivery HTTP contract", () => {
     expect(await response.json()).toEqual({ status: true });
     expect(send).toHaveBeenCalledTimes(1);
   });
+  it("sends the branded template with the frontend verify URL in both parts", async () => {
+    await request();
+    const message = send.mock.calls[0][0];
+    expect(message).toMatchObject({ from: "SongScript <songscript@contact.heymans.dev>", to: "test@example.com", subject: "Sign in to SongScript" });
+    const verifyUrl = message.html.match(/<a href="([^"]+)" class="ss-button"/)?.[1];
+    expect(verifyUrl).toMatch(/^https:\/\/songscript-eight\.vercel\.app\/auth\/verify\?token=[A-Za-z0-9]+$/);
+    expect(message.text.split("\n")).toContain(verifyUrl);
+    expect(message.text).toContain("expires in 5 minutes");
+  });
   it("keeps unknown callback origins blocked before sending", async () => {
     expect((await request("https://untrusted.example")).status).toBe(403);
     expect(send).not.toHaveBeenCalled();
