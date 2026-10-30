@@ -1,5 +1,6 @@
 import { httpRouter } from "convex/server";
 import { authComponent, createAuth } from "./betterAuth";
+import { trustedOrigins } from "./authOrigins";
 
 const http = httpRouter();
 
@@ -7,10 +8,7 @@ const http = httpRouter();
 // Note: allowCredentials: true is set internally by @convex-dev/better-auth
 authComponent.registerRoutes(http, createAuth, {
   cors: {
-    allowedOrigins: [
-      "http://localhost:3001",
-      "https://songscript-ten.vercel.app",
-    ],
+    allowedOrigins: trustedOrigins,
     allowedHeaders: ["Content-Type", "Authorization", "Better-Auth-Cookie"],
   },
 });
