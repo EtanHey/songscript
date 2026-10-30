@@ -135,15 +135,6 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
       // Magic link passwordless authentication
       magicLink({
         sendMagicLink: async ({ email, url, token }) => {
-          // Check if user already exists (only if db is available in this context)
-          if ("db" in ctx) {
-            const dbCtx = ctx as unknown as { db: { query: (table: string) => { withIndex: (name: string, fn: (q: any) => any) => { first: () => Promise<any> } } } };
-            const existingUser = await dbCtx.db.query("users").withIndex("email", (q) => q.eq("email", email)).first();
-            if (existingUser) {
-              throw new Error("This email is already registered. Please sign in instead.");
-            }
-          }
-
           // Extract frontend origin from the callbackURL in the original URL
           // The URL looks like: .../verify?token=xxx&callbackURL=http://localhost:3001/dashboard
           const urlObj = new URL(url);
