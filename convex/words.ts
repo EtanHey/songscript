@@ -1,4 +1,4 @@
-import { query, mutation } from "./_generated/server";
+import { query, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 
 // Get all words for a specific line
@@ -17,7 +17,7 @@ export const getByLine = query({
 });
 
 // Create a single word
-export const create = mutation({
+export const create = internalMutation({
   args: {
     songId: v.id("songs"),
     lineNumber: v.number(),
@@ -33,7 +33,7 @@ export const create = mutation({
 });
 
 // Batch create words for a song
-export const createMany = mutation({
+export const createMany = internalMutation({
   args: {
     songId: v.id("songs"),
     words: v.array(
@@ -74,7 +74,7 @@ export const getBySong = query({
 });
 
 // Clear all Forvo audio URLs (they don't work due to CORS/expiration)
-export const clearForvoAudioUrls = mutation({
+export const clearForvoAudioUrls = internalMutation({
   args: { songId: v.id("songs") },
   handler: async (ctx, args) => {
     const words = await ctx.db

@@ -1,4 +1,4 @@
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalMutation, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 import { getAuthUserId, requireAuth } from "./authHelpers";
 
@@ -275,7 +275,7 @@ export const setLearned = mutation({
 });
 
 // Migration: Backfill persian field for existing wordProgress records
-export const migrateAddPersian = mutation({
+export const migrateAddPersian = internalMutation({
   args: {},
   handler: async (ctx) => {
     // Get all wordProgress records without persian field
@@ -300,7 +300,7 @@ export const migrateAddPersian = mutation({
 // Migration: Deduplicate wordProgress entries by (visitorId, persian)
 // Keeps the entry with highest viewCount+playCount, or most recent lastSeen if counts are equal
 // Merges counts from duplicates into the kept entry
-export const deduplicateWordProgress = mutation({
+export const deduplicateWordProgress = internalMutation({
   args: {},
   handler: async (ctx) => {
     // Get all wordProgress records
@@ -589,7 +589,7 @@ export const getWordPracticeHistory = query({
 });
 
 // Query: Check for duplicate wordProgress entries (for auditing)
-export const checkDuplicates = query({
+export const checkDuplicates = internalQuery({
   args: {},
   handler: async (ctx) => {
     const allProgress = await ctx.db.query("wordProgress").collect();

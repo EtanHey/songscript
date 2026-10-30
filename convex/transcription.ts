@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, internalQuery } from "./_generated/server";
 
 /**
  * Transcription job status tracking.
@@ -20,7 +20,7 @@ export const JOB_STATUS = {
 /**
  * Create a new transcription job.
  */
-export const createJob = mutation({
+export const createJob = internalMutation({
   args: {
     youtubeUrl: v.string(),
     language: v.string(),
@@ -62,9 +62,9 @@ export const createJob = mutation({
 });
 
 /**
- * Update job status (called by Python pipeline via HTTP action).
+ * Internal pipeline maintenance; no public HTTP update route is registered.
  */
-export const updateJobStatus = mutation({
+export const updateJobStatus = internalMutation({
   args: {
     jobId: v.id("transcriptionJobs"),
     status: v.string(),
@@ -97,7 +97,7 @@ export const updateJobStatus = mutation({
 /**
  * Get job status for real-time updates.
  */
-export const getJobStatus = query({
+export const getJobStatus = internalQuery({
   args: {
     jobId: v.id("transcriptionJobs"),
   },
@@ -109,7 +109,7 @@ export const getJobStatus = query({
 /**
  * Get all jobs for a visitor.
  */
-export const getJobsByVisitor = query({
+export const getJobsByVisitor = internalQuery({
   args: {
     visitorId: v.string(),
   },
@@ -126,7 +126,7 @@ export const getJobsByVisitor = query({
  * Import transcription result as a new song.
  * Called after pipeline completes successfully.
  */
-export const importTranscription = mutation({
+export const importTranscription = internalMutation({
   args: {
     jobId: v.id("transcriptionJobs"),
   },
@@ -205,10 +205,3 @@ export const importTranscription = mutation({
     return songId;
   },
 });
-
-/**
- * HTTP endpoint for Python pipeline to update job status.
- * Used when running pipeline externally (RunPod, local, etc.)
- */
-// Note: HTTP endpoints are defined in http.ts
-// This would be called via: POST /api/transcription/update

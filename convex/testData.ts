@@ -1,7 +1,7 @@
-import { mutation } from "./_generated/server";
+import { internalMutation } from "./_generated/server";
 
 // Create test practice data for dashboard testing
-export const createTestPracticeData = mutation({
+export const createTestPracticeData = internalMutation({
   args: {},
   handler: async (ctx) => {
     const visitorId = "test-visitor-123";

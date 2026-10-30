@@ -1,4 +1,4 @@
-import { query, mutation } from "./_generated/server";
+import { query, internalMutation } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 
 export const getBySong = query({
@@ -11,7 +11,7 @@ export const getBySong = query({
   },
 });
 
-export const create = mutation({
+export const create = internalMutation({
   args: {
     songId: v.id("songs"),
     lineNumber: v.number(),
@@ -27,7 +27,7 @@ export const create = mutation({
   },
 });
 
-export const createMany = mutation({
+export const createMany = internalMutation({
   args: {
     songId: v.id("songs"),
     lyrics: v.array(
@@ -57,7 +57,7 @@ export const createMany = mutation({
 
 // Update timestamps for specific lines (used for fixing timestamp issues)
 // LOCKED: Requires explicit unlock if song.timestampsLocked is true
-export const updateTimestamps = mutation({
+export const updateTimestamps = internalMutation({
   args: {
     songId: v.id("songs"),
     updates: v.array(

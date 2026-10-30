@@ -10,9 +10,19 @@ git reset HEAD -- convex/*.js 2>/dev/null
 
 # Run unit tests and typecheck
 echo "Running tests..."
-bun run test || { echo "Unit tests failed"; exit 1; }
+(
+  unset $(git rev-parse --local-env-vars)
+  bun run test
+) || { echo "Unit tests failed"; exit 1; }
 
 echo "Running typecheck..."
 bun run typecheck || { echo "Typecheck failed"; exit 1; }
 
 echo "All checks passed"
+
+# Guard — no tracked docs.local/ (personal data; see scripts/guard-no-docslocal.sh)
+if [ -f scripts/guard-no-docslocal.sh ]; then
+  # Must be `bash`: the guard uses `set -o pipefail`, which POSIX shells
+  # (dash on Ubuntu/Debian, where /bin/sh is dash) reject outright.
+  bash scripts/guard-no-docslocal.sh || exit 1
+fi
