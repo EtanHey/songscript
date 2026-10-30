@@ -1,4 +1,6 @@
 import { betterAuth } from "better-auth/minimal";
+import { APIError } from "better-auth/api";
+import { trustedOrigins } from "./authOrigins";
 import { createClient, type AuthFunctions } from "@convex-dev/better-auth";
 import { convex, crossDomain } from "@convex-dev/better-auth/plugins";
 import { magicLink } from "better-auth/plugins";
@@ -18,6 +20,21 @@ const resendApiKey = process.env.RESEND_API_KEY;
 
 // Initialize Resend client (only if API key is present)
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
+
+// Provider messages may contain recipients or links. Only these fixed codes may be logged.
+const safeProviderCodes = new Set([
+  "validation_error", "missing_api_key", "restricted_api_key", "invalid_api_key",
+  "rate_limit_exceeded", "application_error", "internal_server_error",
+  "invalid_from_address", "not_found", "daily_quota_exceeded", "monthly_quota_exceeded",
+]);
+
+function deliveryFailure(code: string): never {
+  console.error("Magic link delivery failed", { code });
+  throw new APIError("BAD_GATEWAY", {
+    code: "MAGIC_LINK_DELIVERY_FAILED",
+    message: "Unable to send sign-in email. Please try again later.",
+  });
+}
 
 /**
  * Better Auth Component Client
@@ -108,10 +125,7 @@ export const { onCreate, onUpdate, onDelete } = authComponent.triggersApi();
 export const createAuth = (ctx: GenericCtx<DataModel>) => {
   return betterAuth({
     baseURL: siteUrl,
-    trustedOrigins: [
-      "http://localhost:3001",
-      "https://songscript-ten.vercel.app",
-    ],
+    trustedOrigins,
     database: authComponent.adapter(ctx),
     plugins: [
       // The Convex plugin is required for Convex compatibility
@@ -136,7 +150,7 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
           const callbackURL = urlObj.searchParams.get("callbackURL") || "";
 
           // Get frontend origin from callbackURL, fallback to trusted origins
-          let frontendOrigin = "https://songscript-ten.vercel.app";
+          let frontendOrigin = new URL(siteUrl).origin;
           if (callbackURL) {
             try {
               frontendOrigin = new URL(callbackURL).origin;
@@ -148,14 +162,14 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
           // Build frontend verify URL - user goes directly to our app, no redirect through Convex
           const frontendVerifyUrl = `${frontendOrigin}/auth/verify?token=${token}`;
 
-          // Send email via Resend if configured
-          if (resend) {
-            try {
-              const { error } = await resend.emails.send({
-                from: "SongScript <songscript@contact.heymans.dev>",
-                to: email,
-                subject: "Your SongScript Login Link",
-                html: `
+          if (!resend) deliveryFailure("not_configured");
+          let failureCode: string | undefined;
+          try {
+            const { error } = await resend.emails.send({
+              from: "SongScript <songscript@contact.heymans.dev>",
+              to: email,
+              subject: "Your SongScript Login Link",
+              html: `
                   <!DOCTYPE html>
                   <html lang="en">
                   <head>
@@ -288,20 +302,16 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
                     </div>
                   </body>
                   </html>
-                `,
-              });
+              `,
+            });
 
-              if (error) {
-                console.error("Resend email error:", error);
-              } else {
-                console.log("Magic link email sent successfully via Resend");
-              }
-            } catch (err) {
-              console.error("Failed to send email via Resend:", err);
+            if (error) {
+              failureCode = safeProviderCodes.has(error.name) ? error.name : "provider_error";
             }
-          } else {
-            console.log("Resend not configured - check RESEND_API_KEY in .env.local");
+          } catch {
+            failureCode = "provider_exception";
           }
+          if (failureCode) deliveryFailure(failureCode);
         },
       }),
     ],

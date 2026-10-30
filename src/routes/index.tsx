@@ -1,3 +1,4 @@
+import { convexDeployment } from "../lib/convex-deployment";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -16,7 +17,7 @@ type Song = Doc<"songs">;
 
 // Server function to fetch songs at request time (SSR)
 const getSongs = createServerFn({ method: "GET" }).handler(async () => {
-  const convexUrl = process.env.VITE_CONVEX_URL || process.env.CONVEX_URL;
+  const convexUrl = convexDeployment.cloudUrl;
   if (!convexUrl) {
     console.error("CONVEX_URL not configured for SSR");
     return [] as Song[];

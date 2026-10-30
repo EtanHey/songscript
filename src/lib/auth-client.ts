@@ -1,3 +1,4 @@
+import { convexDeployment } from "./convex-deployment";
 import { createAuthClient } from "better-auth/react";
 import {
   convexClient,
@@ -6,7 +7,7 @@ import {
 import { magicLinkClient } from "better-auth/client/plugins";
 
 export const authClient = createAuthClient({
-  baseURL: import.meta.env.VITE_CONVEX_SITE_URL,
+  baseURL: convexDeployment.siteUrl,
   plugins: [
     convexClient(),
     magicLinkClient(),
