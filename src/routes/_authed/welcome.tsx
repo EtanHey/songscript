@@ -97,7 +97,7 @@ function WelcomePage() {
               maxLength={20}
             />
             <p className="text-xs text-gray-500 mt-1">
-              3-20 characters, letters and spaces only
+              3-20 characters, letters, numbers, and spaces
             </p>
           </div>
 

@@ -19,7 +19,10 @@ function getDateDaysAgo(days: number): string {
 }
 
 // Calculate current streak for a user
-async function calculateCurrentStreak(ctx: any, userId: string): Promise<number> {
+async function calculateCurrentStreak(
+  ctx: any,
+  userId: string,
+): Promise<number> {
   const practiceLogs = await ctx.db
     .query("userPracticeLog")
     .withIndex("by_user", (q: any) => q.eq("userId", userId))
@@ -51,7 +54,7 @@ async function calculateCurrentStreak(ctx: any, userId: string): Promise<number>
   const startDate = hasPracticedToday ? today : yesterday;
   let currentStreak = 0;
   let date = startDate;
-  
+
   while (practiceMap.has(date)) {
     currentStreak++;
     const dateObj = new Date(date);
@@ -66,7 +69,7 @@ async function calculateCurrentStreak(ctx: any, userId: string): Promise<number>
 // resolves songs with error resilience, computes weighted score.
 async function calculateProgressScore(
   ctx: any,
-  userId: string
+  userId: string,
 ): Promise<{ score: number; topLanguage: string }> {
   const wordProgress = await ctx.db
     .query("wordProgress")
@@ -82,17 +85,25 @@ async function calculateProgressScore(
 
   const uniqueSongIds = [...new Set(lineProgress.map((l: any) => l.songId))];
   const songSettled = await Promise.allSettled(
-    uniqueSongIds.map((id: any) => ctx.db.get(id))
+    uniqueSongIds.map((id: any) => ctx.db.get(id)),
   );
   const songMap = new Map(
     uniqueSongIds.map((id: any, i: number) => [
       id,
-      songSettled[i].status === 'fulfilled' ? (songSettled[i] as PromiseFulfilledResult<any>).value : null,
-    ])
+      songSettled[i].status === "fulfilled"
+        ? (songSettled[i] as PromiseFulfilledResult<any>).value
+        : null,
+    ]),
   );
 
-  const languageScores = new Map<string, { wordsLearned: number; linesCompleted: number }>();
-  languageScores.set("mixed", { wordsLearned: wordProgress.length, linesCompleted: 0 });
+  const languageScores = new Map<
+    string,
+    { wordsLearned: number; linesCompleted: number }
+  >();
+  languageScores.set("mixed", {
+    wordsLearned: wordProgress.length,
+    linesCompleted: 0,
+  });
 
   for (const line of lineProgress) {
     const song = songMap.get(line.songId);
@@ -111,7 +122,9 @@ async function calculateProgressScore(
 
   for (const [language, scores] of languageScores.entries()) {
     const multiplier = getLanguageMultiplier(language);
-    const languageScore = (scores.wordsLearned * multiplier) + (scores.linesCompleted * multiplier * 0.5);
+    const languageScore =
+      scores.wordsLearned * multiplier +
+      scores.linesCompleted * multiplier * 0.5;
     totalScore += languageScore;
     if (languageScore > maxLanguageScore) {
       maxLanguageScore = languageScore;
@@ -144,7 +157,9 @@ export const getUserInfo = query({
 // Get streak leaderboard
 export const getStreakLeaderboard = query({
   args: {
-    period: v.optional(v.union(v.literal("weekly"), v.literal("monthly"), v.literal("all-time"))),
+    period: v.optional(
+      v.union(v.literal("weekly"), v.literal("monthly"), v.literal("all-time")),
+    ),
     limit: v.optional(v.number()),
     offset: v.optional(v.number()),
   },
@@ -157,7 +172,7 @@ export const getStreakLeaderboard = query({
 
     // Calculate streak for each user and collect results
     const userStreaks = [];
-    
+
     for (const user of users) {
       // Use user's ID for practice data lookup
       const streak = await calculateCurrentStreak(ctx, user._id);
@@ -172,13 +187,13 @@ export const getStreakLeaderboard = query({
       // Batch-fetch songs with deduplication + error resilience
       const uniqueSongIds = [...new Set(lineProgress.map((l) => l.songId))];
       const songSettled = await Promise.allSettled(
-        uniqueSongIds.map((id) => ctx.db.get(id))
+        uniqueSongIds.map((id) => ctx.db.get(id)),
       );
       const songMap = new Map(
         uniqueSongIds.map((id, i) => [
           id,
-          songSettled[i].status === 'fulfilled' ? songSettled[i].value : null,
-        ])
+          songSettled[i].status === "fulfilled" ? songSettled[i].value : null,
+        ]),
       );
 
       // Count lines per language
@@ -186,7 +201,10 @@ export const getStreakLeaderboard = query({
       for (const line of lineProgress) {
         const song = songMap.get(line.songId);
         if (song?.sourceLanguage) {
-          languageCounts.set(song.sourceLanguage, (languageCounts.get(song.sourceLanguage) || 0) + 1);
+          languageCounts.set(
+            song.sourceLanguage,
+            (languageCounts.get(song.sourceLanguage) || 0) + 1,
+          );
         }
       }
 
@@ -227,7 +245,9 @@ export const getStreakLeaderboard = query({
 // Get progress leaderboard with difficulty multipliers
 export const getProgressLeaderboard = query({
   args: {
-    period: v.optional(v.union(v.literal("weekly"), v.literal("monthly"), v.literal("all-time"))),
+    period: v.optional(
+      v.union(v.literal("weekly"), v.literal("monthly"), v.literal("all-time")),
+    ),
     limit: v.optional(v.number()),
     offset: v.optional(v.number()),
   },
@@ -240,9 +260,12 @@ export const getProgressLeaderboard = query({
 
     // Calculate progress score for each user
     const userScores = [];
-    
+
     for (const user of users) {
-      const { score, topLanguage } = await calculateProgressScore(ctx, user._id);
+      const { score, topLanguage } = await calculateProgressScore(
+        ctx,
+        user._id,
+      );
 
       userScores.push({
         displayName: user.displayName!,
@@ -272,7 +295,9 @@ export const getProgressLeaderboard = query({
 export const getUserRank = query({
   args: {
     type: v.union(v.literal("streak"), v.literal("progress")),
-    period: v.optional(v.union(v.literal("weekly"), v.literal("monthly"), v.literal("all-time"))),
+    period: v.optional(
+      v.union(v.literal("weekly"), v.literal("monthly"), v.literal("all-time")),
+    ),
   },
   handler: async (ctx, { type, period: _period = "all-time" }) => {
     const userId = await getAuthUserId(ctx);
@@ -314,7 +339,10 @@ export const getUserRank = query({
 
       let betterCount = 0;
       for (const otherUser of allUsers) {
-        const { score: otherScore } = await calculateProgressScore(ctx, otherUser._id);
+        const { score: otherScore } = await calculateProgressScore(
+          ctx,
+          otherUser._id,
+        );
         if (otherScore > userScore) {
           betterCount++;
         }
@@ -342,10 +370,13 @@ export const setDisplayName = mutation({
       return { success: false, error: "Display name must be 3-20 characters" };
     }
 
-    // Validate display name contains valid characters (alphanumeric + spaces)
-    const validPattern = /^[a-zA-Z0-9\s]+$/;
+    // Validate display name contains valid characters (Unicode letters, numbers + spaces)
+    const validPattern = /^[\p{L}\p{N}\s]+$/u;
     if (!validPattern.test(displayName)) {
-      return { success: false, error: "Display name can only contain letters, numbers, and spaces" };
+      return {
+        success: false,
+        error: "Display name can only contain letters, numbers, and spaces",
+      };
     }
 
     // Reject names with only spaces
@@ -358,7 +389,10 @@ export const setDisplayName = mutation({
     const lowerDisplayName = displayName.toLowerCase();
     for (const word of offensiveWords) {
       if (lowerDisplayName.includes(word)) {
-        return { success: false, error: "Display name contains inappropriate content" };
+        return {
+          success: false,
+          error: "Display name contains inappropriate content",
+        };
       }
     }
 
